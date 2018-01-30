@@ -1,21 +1,28 @@
 from decimal import *
-from math import sqrt, sin, cos, radians, atan, atan2
+from math import sqrt, sin, cos, degrees, atan, atan2
+
+
+# Universal Transverse Mercator Projection Parameters
+Proj = [6378137, Decimal('298.25722210088'), 500000,
+        10000000, Decimal('0.9996'), 6, -177]
+# Calculate Projection Constants
+f = float(1 / Proj[1])
+a = Proj[0]
+b = a * (1 - f)
+e2 = f * (2 - f)
+
+
 def xyz2llh(x, y, z):
     """
-    Write Desc"""
-    # Universal Transverse Mercator Projection Parameters
-    Proj = [6378137,Decimal('298.25722210088'),500000,10000000,Decimal('0.9996'),6,-177]
-    # Calculate Projection Constants
-    f = float(1/Proj[1])
-    a = Proj[0]
-    b = a * (1 - f)
-    e2 = f * (2 - f)
+    Input: Cartesian XYZ coordinate in metres
+    Output: Latitude and Longitude in Decimal
+    Degrees and Ellipsoidal Height in Metres
+    """
     # Calculate Longitude
-    long = degrees(atan2(y,x))
+    long = degrees(atan2(y, x))
     # Calculate Latitude
-    r = sqrt(x**2 + y**2 + z**2)
     p = sqrt(x**2 + y**2)
-    latcentric = atan2(p,z)
+    latcentric = atan2(p, z)
     lat = latcentric
     itercheck = 1
     while abs(itercheck) > 0.001:

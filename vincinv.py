@@ -99,7 +99,7 @@ def vincinv(lat1, long1, lat2, long2):
                      * f * sin_alpha
                      * (sigma + C * sin_sigma
                         * (cos_2sigm + C * sigma
-                           * (-1 + 2 * (cos_2sigm) ** 2))))
+                           * (-1 + 2 * cos_2sigm ** 2))))
 
     # Eq. 81
     u_sq = (cos(alpha) ** 2 * (a ** 2 - b ** 2)) / b ** 2
@@ -134,8 +134,7 @@ def vincinv(lat1, long1, lat2, long2):
         return dist, 180, 0
     if long1 == long2 and lat1 < lat2:
         return dist, 0, 180
-    return dist, Azimuth1to2, Azimuth2to1, locals()
-
+    return dist, Azimuth1to2, Azimuth2to1
 
 
 def vincinvio():
@@ -143,16 +142,16 @@ def vincinvio():
     print('Enter co-ordinate file:')
     fn = input()
     # Open Filename
-    csvFile = open(fn)
-    csvReader = csv.reader(csvFile)
+    csvfile = open(fn)
+    csvreader = csv.reader(csvfile)
     # Create Output File
     fn_part = (os.path.splitext(fn))
     fn_out = fn_part[0] + '_out' + fn_part[1]
-    outFile = open(fn_out, 'w')
+    outfile = open(fn_out, 'w')
     # Write Output
-    outFilewriter = csv.writer(outFile)
-    outFilewriter.writerow(['Ell_Dist', 'Azimuth1to2', 'Azimuth2to1'])
-    for row in csvReader:
+    outfilewriter = csv.writer(outfile)
+    outfilewriter.writerow(['Ell_Dist', 'Azimuth1to2', 'Azimuth2to1'])
+    for row in csvreader:
         lat1 = dms2dd(float(row[0]))
         long1 = dms2dd(float(row[1]))
         lat2 = dms2dd(float(row[2]))
@@ -161,7 +160,7 @@ def vincinvio():
         azimuth1to2 = dd2dms(azimuth1to2)
         azimuth2to1 = dd2dms(azimuth2to1)
         output = (dist, azimuth1to2, azimuth2to1)
-        outFilewriter.writerow(output)
+        outfilewriter.writerow(output)
     # Close Files
-    outFile.close()
-    csvFile.close()
+    outfile.close()
+    csvfile.close()
