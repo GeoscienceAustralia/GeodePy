@@ -181,7 +181,7 @@ def hp2sex(lon, lat):
         return hp_coord
 
 # Convert the coordinates
-    hp_lon = fmt_hp(lon)
-    hp_lat = fmt_hp(lat)
+    hp_lon = fmt_sex(lon)
+    hp_lat = fmt_sex(lat)
 
     return hp_lon, hp_lat
