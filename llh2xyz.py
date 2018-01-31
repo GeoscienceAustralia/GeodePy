@@ -18,13 +18,14 @@ def llh2xyz(lat, long, ellht):
     a = Proj[0]
     b = a*(1-f)
     e2 = f*(2 - f)
-    # Calculate Rn
+    # Calculate Ellipsoid Radius of Curvature in the Prime Vertical - nu
     if lat == 0:
-        Rn = Proj[0]
+        nu = Proj[0]
     else:
-        Rn = a/(sqrt(1 - e2 * (sin(lat)**2)))
+        nu = a/(sqrt(1 - e2 * (sin(lat)**2)))
     # Calculate x, y, z
-    x = Decimal(str((Rn + ellht) * cos(lat) * cos(long)))
-    y = Decimal(str((Rn + ellht) * cos(lat) * sin(long)))
-    z = Decimal(str(((b**2 / a**2) * Rn + ellht) * sin(lat)))
+    x = Decimal(str((nu + ellht) * cos(lat) * cos(long)))
+    y = Decimal(str((nu + ellht) * cos(lat) * sin(long)))
+    z = Decimal(str(((b**2 / a**2) * nu + ellht) * sin(lat)))
     return x, y, z
+

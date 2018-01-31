@@ -19,25 +19,25 @@ def xyz2llh(x, y, z):
     Degrees and Ellipsoidal Height in Metres
     """
     # Calculate Longitude
-    long = degrees(atan2(y, x))
+    long = atan2(y, x)
     # Calculate Latitude
     p = sqrt(x**2 + y**2)
     latcentric = atan2(p, z)
     lat = latcentric
     itercheck = 1
-    while abs(itercheck) > 0.001:
-        rn = a/(sqrt(1 - e2 * (sin(lat))**2))
-        h = p/cos(lat) - rn
+    while abs(itercheck) > 0.0000001:
+        nu = a/(sqrt(1 - e2 * (sin(lat))**2))
+        ellht = p/cos(lat) - nu
         latcheck = lat
-        lat = atan(z/p*sqrt(1-e2*(rn/(rn+h))))
+        lat = atan(z / p * sqrt(1 - e2 * (nu / (nu + ellht))))
         itercheck = latcheck - lat
-    rn = a/(sqrt(1 - e2 * (sin(lat))**2))
+    nu = a/(sqrt(1 - e2 * (sin(lat))**2))
     if abs(degrees(lat)) >= 90:
-        l = z + e2 * rn * sin(lat)
-        h = l/sin(lat) - rn
+        l = z + e2 * nu * sin(lat)
+        ellht = l/sin(lat) - nu
     else:
-        h = p/cos(lat) - rn
+        ellht = p/cos(lat) - nu
     # Convert Latitude and Longitude to Degrees
     lat = degrees(lat)
     long = degrees(long)
-    return lat, long, h
+    return lat, long, ellht, locals()
