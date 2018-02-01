@@ -9,7 +9,15 @@ Proj = [6378137, Decimal('298.25722210088'), 500000,
 f = float(1 / Proj[1])
 a = Proj[0]
 b = a * (1 - f)
-e2 = f * (2 - f)
+ecc1sq = f * (2 - f)
+ecc2sq = ecc1sq/(1-ecc1sq)
+
+"""
+# Test Data
+x = -3753473.196
+y = 3912741.0310
+z = -3347959.6998
+"""
 
 
 def xyz2llh(x, y, z):
@@ -22,22 +30,16 @@ def xyz2llh(x, y, z):
     long = atan2(y, x)
     # Calculate Latitude
     p = sqrt(x**2 + y**2)
-    latcentric = atan2(p, z)
-    lat = latcentric
+    latinit = atan((z*(1+ecc2sq))/p)
+    lat = latinit
     itercheck = 1
-    while abs(itercheck) > 0.0000001:
-        nu = a/(sqrt(1 - e2 * (sin(lat))**2))
-        ellht = p/cos(lat) - nu
-        latcheck = lat
-        lat = atan(z / p * sqrt(1 - e2 * (nu / (nu + ellht))))
-        itercheck = latcheck - lat
-    nu = a/(sqrt(1 - e2 * (sin(lat))**2))
-    if abs(degrees(lat)) >= 90:
-        l = z + e2 * nu * sin(lat)
-        ellht = l/sin(lat) - nu
-    else:
-        ellht = p/cos(lat) - nu
+    while abs(itercheck) > 1e-10:
+        nu = a/(sqrt(1 - ecc1sq * (sin(lat))**2))
+        itercheck = lat - atan((z + nu * ecc1sq * sin(lat))/p)
+        lat = atan((z + nu * ecc1sq * sin(lat))/p)
+    nu = a/(sqrt(1 - ecc1sq * (sin(lat))**2))
+    ellht = p/(cos(lat)) - nu
     # Convert Latitude and Longitude to Degrees
     lat = degrees(lat)
     long = degrees(long)
-    return lat, long, ellht, locals()
+    return lat, long, ellht
