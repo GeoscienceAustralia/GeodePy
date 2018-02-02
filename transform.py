@@ -1,5 +1,5 @@
 """
-Functions: geo2grid, grid2geo, geo2gridio, grid2geoio
+Functions: geo2grid, grid2geo, xyz2llh, llh2xyz, geo2gridio, grid2geoio
 
 geo2grid:
     input: Latitude and Longitude in Decimal Degrees.
