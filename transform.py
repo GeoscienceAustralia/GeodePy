@@ -19,6 +19,13 @@ xyz2llh:
     Output: Latitude and Longitude in Decimal.
     Degrees and Ellipsoidal Height in Metres.
 
+
+def llh2xyz:
+    Input: Latitude and Longitude in Decimal Degrees, Ellipsoidal Height in metres.
+
+    Output: Cartesian X, Y, Z Coordinates in metres.
+
+
 geo2gridio:
     No Input:
     Prompts the user for the name of a file in csv format. Data in the file
