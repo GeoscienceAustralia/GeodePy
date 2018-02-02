@@ -15,5 +15,5 @@ This package requires the following non-standard Python modules installed:
 * **Craig Harrison** - *Project Management* - [harry093](https://github.com/harry093)
 * **Josh Batchelor** - *Initial Work, Geodesy and Surveying* - [BatchelorJ](https://github.com/BatchelorJ)
 
-See also the list of [contributors](https://github.com/harry093/geodesy-package/graphs/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/GeoscienceAustralia/geodesy-package/graphs/contributors) who participated in this project.
 
