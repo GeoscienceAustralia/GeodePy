@@ -17,25 +17,24 @@ Ref: https://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf
 from decimal import *
 from math import (pi, degrees, radians, sqrt, sin,
                   cos, tan, asin, atan, atan2)
-from dd2dms import dd2dms
-from dms2dd import dms2dd
 import os
 import csv
+from conversions import dd2dms, dms2dd
+from constants import grs80
 
 getcontext().prec = 28
 
-"""Test Data
+# Test Data
 lat1 = -37.57037203
 long1 = 144.25295244
 azimuth1to2 = 306.5205373
-dist = 54.972271
-"""
+dist = 54972.271
+
 
 # Universal Transverse Mercator Projection Parameters
-Proj = [6378137, Decimal('298.25722210088'), 500000,
-        10000000, Decimal('0.9996'), 6, -177]
-f = float(1 / Proj[1])
-a = Proj[0]
+proj = grs80
+f = float(1 / proj[1])
+a = proj[0]
 b = a * (1 - f)
 
 
@@ -138,16 +137,16 @@ def vincdirio():
     # Enter Filename
     fn = input('Enter co-ordinate file:\n')
     # Open Filename
-    csvFile = open(fn)
-    csvReader = csv.reader(csvFile)
+    csvfile = open(fn)
+    csvreader = csv.reader(csvfile)
     # Create Output File
     fn_part = (os.path.splitext(fn))
     fn_out = fn_part[0] + '_out' + fn_part[1]
-    outFile = open(fn_out, 'w')
+    outfile = open(fn_out, 'w')
     # Write Output
-    outFilewriter = csv.writer(outFile)
-    # outFilewriter.writerow(['Latitude2', 'Longitude2', 'azimuth2to1'])
-    for row in csvReader:
+    outfilewriter = csv.writer(outfile)
+    # outfilewriter.writerow(['Latitude2', 'Longitude2', 'azimuth2to1'])
+    for row in csvreader:
         lat1 = dms2dd(float(row[0]))
         long1 = dms2dd(float(row[1]))
         azimuth1to2 = dms2dd(float(row[2]))
@@ -157,7 +156,7 @@ def vincdirio():
         long2 = dd2dms(long2)
         azimuth2to1 = dd2dms(azimuth2to1)
         output = [lat2, long2, azimuth2to1]
-        outFilewriter.writerow(output)
+        outfilewriter.writerow(output)
     # Close Files
-    outFile.close()
-    csvFile.close()
+    outfile.close()
+    csvfile.close()

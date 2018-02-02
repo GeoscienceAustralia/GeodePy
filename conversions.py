@@ -181,7 +181,21 @@ def hp2sex(lon, lat):
         return hp_coord
 
 # Convert the coordinates
-    hp_lon = fmt_hp(lon)
-    hp_lat = fmt_hp(lat)
+    hp_lon = fmt_sex(lon)
+    hp_lat = fmt_sex(lat)
 
     return hp_lon, hp_lat
+
+
+def dd2dms(dd):
+    minutes, seconds = divmod(abs(dd) * 3600, 60)
+    degrees, minutes = divmod(minutes, 60)
+    dms = degrees + (minutes / 100) + (seconds / 10000)
+    return dms if dd >= 0 else -dms
+
+
+def dms2dd(dms):
+    minsec, degrees = math.modf(abs(dms))
+    seconds, minutes = math.modf(minsec * 100)
+    dd = degrees + minutes / 60 + seconds / 36
+    return dd if dms >= 0 else -dd

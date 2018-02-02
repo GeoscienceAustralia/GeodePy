@@ -1,13 +1,14 @@
 from decimal import *
 from math import sqrt, sin, cos, degrees, atan, atan2
+from constants import grs80
+from conversions import dd2dms
 
 
 # Universal Transverse Mercator Projection Parameters
-Proj = [6378137, Decimal('298.25722210088'), 500000,
-        10000000, Decimal('0.9996'), 6, -177]
+proj = grs80
 # Calculate Projection Constants
-f = float(1 / Proj[1])
-a = Proj[0]
+f = float(1 / proj[1])
+a = proj[0]
 b = a * (1 - f)
 ecc1sq = f * (2 - f)
 ecc2sq = ecc1sq/(1-ecc1sq)

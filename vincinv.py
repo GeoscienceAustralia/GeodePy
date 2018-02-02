@@ -15,13 +15,13 @@ Ref: https://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf
 
 # Author: Josh Batchelor <josh.batchelor@ga.gov.au>
 
-import os
-import csv
-from dd2dms import dd2dms
-from dms2dd import dms2dd
 from decimal import *
 from math import (pi, degrees, radians, sqrt, sin,
                   cos, tan, asin, atan, atan2)
+import os
+import csv
+from conversions import dd2dms, dms2dd
+from constants import grs80
 
 getcontext().prec = 28
 
@@ -40,10 +40,9 @@ long2 = dms2dd(long2)
 """
 
 # Universal Transverse Mercator Projection Parameters
-Proj = [6378137, Decimal('298.25722210088'), 500000,
-        10000000, Decimal('0.9996'), 6, -177]
-f = float(1 / Proj[1])
-a = Proj[0]
+proj = grs80
+f = float(1 / proj[1])
+a = proj[0]
 b = a * (1 - f)
 
 
@@ -119,22 +118,22 @@ def vincinv(lat1, long1, lat2, long2):
     # Eq. 85
     dist = b * A * (sigma - delta_sigma)
     # Calculate Alpha1
-    Azimuth1to2 = degrees(atan2((cos_u2 * sin(long_diff)),
+    azimuth1to2 = degrees(atan2((cos_u2 * sin(long_diff)),
                                 (cos_u1 * sin_u2 - sin_u1
                                  * cos_u2 * cos(long_diff))))
-    if Azimuth1to2 < 0:
-        Azimuth1to2 = Azimuth1to2 + 360
+    if azimuth1to2 < 0:
+        azimuth1to2 = azimuth1to2 + 360
     # Calculate Alpha2
-    Azimuth2to1 = degrees(atan2((cos_u1 * sin(long_diff)),
+    azimuth2to1 = degrees(atan2((cos_u1 * sin(long_diff)),
                                 (-sin_u1 * cos_u2 + cos_u1
                                  * sin_u2 * cos(long_diff))))
-    Azimuth2to1 = Azimuth2to1 + 180
+    azimuth2to1 = azimuth2to1 + 180
     # Meridian Critical Case Tests
     if long1 == long2 and lat1 > lat2:
         return dist, 180, 0
     if long1 == long2 and lat1 < lat2:
         return dist, 0, 180
-    return dist, Azimuth1to2, Azimuth2to1
+    return dist, azimuth1to2, azimuth2to1
 
 
 def vincinvio():
