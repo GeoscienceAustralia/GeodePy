@@ -13,6 +13,12 @@ grid2geo:
 
     output: Latitude and Longitude in Decimal Degrees.
 
+xyz2llh:
+    Input: Cartesian XYZ coordinate in metres.
+
+    Output: Latitude and Longitude in Decimal.
+    Degrees and Ellipsoidal Height in Metres.
+
 geo2gridio:
     No Input:
     Prompts the user for the name of a file in csv format. Data in the file
@@ -42,7 +48,7 @@ Ref: http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 # Author: Josh Batchelor <josh.batchelor@ga.gov.au>
 
 from decimal import *
-from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan
+from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2
 import os
 import csv
 from constants import grs80
@@ -54,11 +60,16 @@ getcontext().prec = 28
 proj = grs80
 # Ellipsoidal Constants
 f = 1 / proj[1]
-e2 = f * (2 - f)
-ecc1 = sqrt(e2)
+semi_maj = proj[0]
+semi_min = float(semi_maj * (1 - f))
+ecc1sq = float(f * (2 - f))
+ecc2sq = float(ecc1sq/(1 - ecc1sq))
+ecc1 = sqrt(ecc1sq)
 n = f / (2 - f)
 n = float(n)
 n2 = n ** 2
+
+
 # Rectifying Radius (Horner Form)
 A = proj[0] / (1 + n) * ((n2 *
                           (n2 *
@@ -305,7 +316,7 @@ def grid2geo(zone, easting, northing):
 
     def f1tn(t):
         f1tn = (sqrt(1 + (sigma(t)) ** 2) * sqrt(1 + t ** 2) - sigma(t) * t) * (
-                ((1 - float(e2)) * sqrt(1 + t ** 2)) / (1 + (1 - float(e2)) * t ** 2))
+                ((1 - float(ecc1sq)) * sqrt(1 + t ** 2)) / (1 + (1 - float(ecc1sq)) * t ** 2))
         return f1tn
 
     t2 = t1 - (ftn(t1)) / (f1tn(t1))
@@ -320,6 +331,52 @@ def grid2geo(zone, easting, northing):
     long_diff = degrees(atan(sinh(eta1) / cos(xi1)))
     long = cm + long_diff
     return round(lat, 11), round(long, 11)
+
+
+def xyz2llh(x, y, z):
+    """
+    Input: Cartesian XYZ coordinate in metres
+
+    Output: Latitude and Longitude in Decimal
+    Degrees and Ellipsoidal Height in Metres
+    """
+    # Calculate Longitude
+    long = atan2(y, x)
+    # Calculate Latitude
+    p = sqrt(x**2 + y**2)
+    latinit = atan((z*(1+ecc2sq))/p)
+    lat = latinit
+    itercheck = 1
+    while abs(itercheck) > 1e-10:
+        nu = semi_maj/(sqrt(1 - ecc1sq * (sin(lat))**2))
+        itercheck = lat - atan((z + nu * ecc1sq * sin(lat))/p)
+        lat = atan((z + nu * ecc1sq * sin(lat))/p)
+    nu = semi_maj/(sqrt(1 - ecc1sq * (sin(lat))**2))
+    ellht = p/(cos(lat)) - nu
+    # Convert Latitude and Longitude to Degrees
+    lat = degrees(lat)
+    long = degrees(long)
+    return lat, long, ellht
+
+
+def llh2xyz(lat, long, ellht):
+    """
+    Input: Latitude and Longitude in Decimal Degrees, Ellipsoidal Height in metres
+    Output: Cartesian X, Y, Z Coordinates in metres
+    """
+    # Convert lat & long to radians
+    lat = radians(lat)
+    long = radians(long)
+    # Calculate Ellipsoid Radius of Curvature in the Prime Vertical - nu
+    if lat == 0:
+        nu = proj[0]
+    else:
+        nu = semi_maj/(sqrt(1 - ecc1sq * (sin(lat)**2)))
+    # Calculate x, y, z
+    x = Decimal(str((nu + ellht) * cos(lat) * cos(long)))
+    y = Decimal(str((nu + ellht) * cos(lat) * sin(long)))
+    z = Decimal(str(((semi_min**2 / semi_maj**2) * nu + ellht) * sin(lat)))
+    return x, y, z
 
 
 def grid2geoio():
