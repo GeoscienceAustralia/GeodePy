@@ -56,6 +56,7 @@ Ref: http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 
 from decimal import *
 from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2
+import numpy as np
 import os
 import csv
 from constants import grs80
@@ -384,6 +385,51 @@ def llh2xyz(lat, long, ellht):
     y = Decimal(str((nu + ellht) * cos(lat) * sin(long)))
     z = Decimal(str(((semi_min**2 / semi_maj**2) * nu + ellht) * sin(lat)))
     return x, y, z
+
+
+"""
+# conform7 Debug - Test Values ALIC
+x = -4052051.7643
+y = 4212836.2017
+z = -2545106.0245
+# Debug - Test Helmert Params (GDA94 to GDA2020, scale in ppm and rotations in seconds)
+conform_gda94to20 = [0.06155, -0.01087, -0.04019, -0.009994, -0.0394924, -0.0327221, -0.0328979]
+"""
+
+
+def conform7(x, y, z, conform7_param):
+    """
+    input: x, y, z: 3D Cartesian Coordinate X, Y, Z in metres
+           conform7_param: list of 7 Helmert Parameters [tx, ty, tz, sc, rx, ry, rz]
+            tx, ty, tz: 3 Translations in metres
+            sc: Scale factor in parts per million
+            rx, ry, rz: 3 Rotations in decimal seconds
+    return: xnew, ynew, znew: Transformed 3D Cartesian Coordinate X, Y, Z in metres
+    """
+    # Create XYZ Vector
+    xyz_before = np.array([[x],
+                           [y],
+                           [z]])
+    # Convert Units for Transformation Parameters
+    scale = conform7_param[3] / 1000000
+    rx = radians(dms2dd(conform7_param[4] / 10000))
+    ry = radians(dms2dd(conform7_param[5] / 10000))
+    rz = radians(dms2dd(conform7_param[6] / 10000))
+    # Create Translation Vector
+    translation = np.array([[conform7_param[0]],
+                            [conform7_param[1]],
+                            [conform7_param[2]]])
+    # Create Rotation Matrix
+    rotation = np.array([[1., rz, -ry],
+                         [-rz, 1., rx],
+                         [ry, -rx, 1.]])
+    # Conformal Transform Eq
+    xyz_after = translation + (1 + scale) * np.dot(rotation, xyz_before)
+    # Convert Vector to Separate Variables
+    xtrans = float(xyz_after[0])
+    ytrans = float(xyz_after[1])
+    ztrans = float(xyz_after[2])
+    return xtrans, ytrans, ztrans
 
 
 def grid2geoio():
