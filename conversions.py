@@ -195,7 +195,7 @@ def dd2dms(dd):
 
 
 def dms2dd(dms):
-    minsec, degrees = math.modf(abs(dms))
-    seconds, minutes = math.modf(minsec * 100)
-    dd = degrees + minutes / 60 + seconds / 36
+    degmin, seconds = divmod(abs(dms) * 1000, 10)
+    degrees, minutes = divmod(degmin, 100)
+    dd = degrees + (minutes / 60) + (seconds / 360)
     return dd if dms >= 0 else -dd
