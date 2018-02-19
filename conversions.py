@@ -185,3 +185,17 @@ def hp2sex(lon, lat):
     hp_lat = fmt_sex(lat)
 
     return hp_lon, hp_lat
+
+
+def dd2dms(dd):
+    minutes, seconds = divmod(abs(dd) * 3600, 60)
+    degrees, minutes = divmod(minutes, 60)
+    dms = degrees + (minutes / 100) + (seconds / 10000)
+    return dms if dd >= 0 else -dms
+
+
+def dms2dd(dms):
+    degmin, seconds = divmod(abs(dms) * 1000, 10)
+    degrees, minutes = divmod(degmin, 100)
+    dd = degrees + (minutes / 60) + (seconds / 360)
+    return dd if dms >= 0 else -dd
