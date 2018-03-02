@@ -8,7 +8,7 @@ def va_conv(verta_hp, slope_dist, height_inst=0, height_tgt=0):
     computation of zenith and slope distances between ground points.
 
     :param verta_hp:        Vertical Angle from Instrument to Target, expressed in HP Format (DDD.MMSSSSSS)
-    :param slope_dist:      Slope Distance in metres
+    :param slope_dist:      Slope Distance from Instrument to Target in metres
     :param height_inst:     Height of Instrument. Optional - Default Value of 0m
     :param height_tgt:      Height of Target. Optional - Default Value of 0m
 
