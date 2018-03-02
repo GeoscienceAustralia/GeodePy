@@ -7,15 +7,15 @@ def va_conv(verta_hp, slope_dist, height_inst=0, height_tgt=0):
     distances and changes in height. Instrument and Target heights can be entered to allow
     computation of zenith and slope distances between ground points.
 
-    :param verta_hp: Vertical Angle from Instrument to Target, expressed in HP Format (DDD.MMSSSSSS)
-    :param slope_dist: Slope Distance in metres
-    :param height_inst: Height of Instrument. Optional - Default Value of 0m
-    :param height_tgt: Height of Target. Optional - Default Value of 0m
+    :param verta_hp:        Vertical Angle from Instrument to Target, expressed in HP Format (DDD.MMSSSSSS)
+    :param slope_dist:      Slope Distance in metres
+    :param height_inst:     Height of Instrument. Optional - Default Value of 0m
+    :param height_tgt:      Height of Target. Optional - Default Value of 0m
 
-    :return: verta_pt_hp: Vertical Angle between Ground Points, expressed in HP Format (DDD.MMSSSSSS)
+    :return: verta_pt_hp:   Vertical Angle between Ground Points, expressed in HP Format (DDD.MMSSSSSS)
     :return: slope_dist_pt: Slope Distance between Ground Points in metres
-    :return: hz_dist: Horizontal Distance
-    :return: delta_ht: Change in height between Ground Points in metres
+    :return: hz_dist:       Horizontal Distance
+    :return: delta_ht:      Change in height between Ground Points in metres
     """
     # Convert Zenith Angle to Vertical Angle
     try:
