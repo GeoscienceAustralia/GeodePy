@@ -66,6 +66,16 @@ class AngleObs(object):
     def __repr__(self):
         return repr(self.degrees) + 'd ' + repr(self.minutes) + '\' ' + repr(self.seconds) + '\"'
 
+    def decimal(self):
+        dd = abs(self.degrees + self.minutes / 60 + self.seconds / 3600)
+        return
+
+# Functions to write out station and obs data to DNA format
+
+
+
+
+
 
 def va_conv(verta_hp, slope_dist, height_inst=0, height_tgt=0):
     """
