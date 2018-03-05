@@ -1,5 +1,77 @@
+#!/usr/bin/env python3
+
 from math import sqrt, degrees, radians, sin, cos, asin
 from conversions import dd2dms, dms2dd
+
+
+# Defines a bunch of classes required to convert GSI (or any other format) to DynaNet v3 Format
+
+
+class Coordinate(object):
+    def __init__(self, name, system, hz_datum, vert_datum, epoch, x=0, y=0, z=0):
+        self.name = name
+        self.system = system
+        self.hz_datum = hz_datum
+        self.vert_datum = vert_datum
+        self.epoch = epoch
+        self.x = x
+        self.y = y
+        self.z = z
+
+
+class InstSetup(object):
+    def __init__(self, name, coordinate, inst_height, observation=None):
+        self.name = name
+        self.coordinate = coordinate
+        self.inst_height = inst_height
+        if observation is None:
+            self.observation = []
+        else:
+            self.observation.append(observation)
+
+    def __repr__(self):
+        return ('{InstSetup: ' + repr(self.name)
+                + ' ' + repr(self.coordinate)
+                + '; inst_height ' + repr(self.inst_height)
+                + '}\n Observations:\n'
+                + repr(self.observation))
+
+
+class Observation(object):
+    def __init__(self, to_name, coordinate, target_height=0, hz_obs=0, va_obs=0, sd_obs=0, hz_dist=0, vert_dist=0):
+        self.to_name = to_name
+        self.coordinate = coordinate
+        self.target_height = target_height
+        self.hz_obs = hz_obs
+        self.va_obs = va_obs
+        self.sd_obs = sd_obs
+        self.hz_dist = hz_dist
+        self.vert_dist = vert_dist
+
+    def __repr__(self):
+        return ('{to: ' + repr(self.to_name)
+                + '; target_height ' + repr(self.target_height)
+                + '; hz_obs ' + repr(self.hz_obs)
+                + '; va_obs ' + repr(self.va_obs)
+                + '; sd_obs ' + repr(self.sd_obs)
+                + '; target_height ' + repr(self.target_height)
+                + '}')
+
+
+class AngleObs(object):
+    def __init__(self, degrees=0, minutes=0, seconds=0):
+        self.degrees = int(degrees)
+        self.minutes = int(minutes)
+        self.seconds = float(seconds)
+
+    def __repr__(self):
+        return repr(self.degrees) + 'd ' + repr(self.minutes) + '\' ' + repr(self.seconds) + '\"'
+
+    def decimal(self):
+        dd = abs(self.degrees + self.minutes / 60 + self.seconds / 3600)
+        return dd
+
+# Functions to write out station and obs data to DNA format
 
 
 def va_conv(verta_hp, slope_dist, height_inst=0, height_tgt=0):
