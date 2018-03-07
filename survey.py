@@ -27,6 +27,7 @@ class InstSetup(object):
         if observation is None:
             self.observation = []
         else:
+            self.observation = []
             self.observation.append(observation)
 
     def __repr__(self):
@@ -36,9 +37,13 @@ class InstSetup(object):
                 + '}\n Observations:\n'
                 + repr(self.observation))
 
+    def addobs(self, observation):
+        return self.observation.append(observation)
+
 
 class Observation(object):
-    def __init__(self, to_name, coordinate, target_height=0, hz_obs=0, va_obs=0, sd_obs=0, hz_dist=0, vert_dist=0):
+    def __init__(self, from_name, to_name, coordinate, target_height=0, hz_obs=0, va_obs=0, sd_obs=0, hz_dist=0, vert_dist=0):
+        self.from_name = from_name
         self.to_name = to_name
         self.coordinate = coordinate
         self.target_height = target_height
@@ -72,6 +77,33 @@ class AngleObs(object):
         return dd
 
 # Functions to write out station and obs data to DNA format
+
+
+def dnaout_sd(observation):
+    return ('S '
+            + observation.from_name.ljust(20)
+            + observation.to_name.ljust(20)
+            + ''.ljust(20)
+            + str(observation.sd_obs).ljust(14) #76
+            + ''.ljust(14)
+            + '0.0010'.ljust(9)         #add standard deviation
+            + str(1.7960).ljust(7)      #add intrument height
+            + str(observation.target_height).ljust(7))
+
+
+def dnaout_va(observation):
+    return ('V '
+            + observation.from_name.ljust(20)
+            + observation.to_name.ljust(20)
+            + ''.ljust(34)
+            + str(observation.va_obs.degrees).rjust(3)
+            + ' '
+            + str('%02d' % observation.va_obs.minutes)
+            + ' '
+            + str(observation.va_obs.seconds).ljust(8)
+            + '1.0000'.ljust(9)         #add standard deviation
+            + str(1.7960).ljust(7)      #add intrument height
+            + str(observation.target_height).ljust(7))
 
 
 def va_conv(verta_hp, slope_dist, height_inst=0, height_tgt=0):
