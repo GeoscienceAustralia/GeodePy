@@ -9,8 +9,8 @@ from conversions import dd2dms, dms2dd
 
 
 class Coordinate(object):
-    def __init__(self, name, system, hz_datum, vert_datum, epoch, x=0, y=0, z=0):
-        self.name = name
+    def __init__(self, pt_id, system, hz_datum, vert_datum, epoch, x=0, y=0, z=0):
+        self.pt_id = pt_id
         self.system = system
         self.hz_datum = hz_datum
         self.vert_datum = vert_datum
@@ -21,8 +21,8 @@ class Coordinate(object):
 
 
 class InstSetup(object):
-    def __init__(self, name, coordinate, observation=None):
-        self.name = name
+    def __init__(self, pt_id, coordinate, observation=None):
+        self.pt_id = pt_id
         self.coordinate = coordinate
         if observation is None:
             self.observation = []
@@ -31,7 +31,7 @@ class InstSetup(object):
             self.observation.append(observation)
 
     def __repr__(self):
-        return ('{InstSetup: ' + repr(self.name)
+        return ('{InstSetup: ' + repr(self.pt_id)
                 + ' ' + repr(self.coordinate)
                 + '}\n Observations:\n'
                 + repr(self.observation))
@@ -41,10 +41,9 @@ class InstSetup(object):
 
 
 class Observation(object):
-    def __init__(self, from_name, to_name, coordinate, inst_height=0, target_height=0, hz_obs=0, va_obs=0, sd_obs=0, hz_dist=0, vert_dist=0):
-        self.from_name = from_name
-        self.to_name = to_name
-        self.coordinate = coordinate
+    def __init__(self, from_id, to_id, inst_height=0, target_height=0, hz_obs=0, va_obs=0, sd_obs=0, hz_dist=0, vert_dist=0):
+        self.from_id = from_id
+        self.to_id = to_id
         self.inst_height = inst_height
         self.target_height = target_height
         self.hz_obs = hz_obs
@@ -79,6 +78,12 @@ class AngleObs(object):
 
 # Functions to read in data to classes from Leica GSI format file (GA_Survey2.frt)
 
+def readgsiword16(linestring, word_id):
+    wordstart = str.find(linestring, word_id)
+    word_val = linestring[(wordstart + 7):(wordstart + 23)]
+    word_val = int(word_val.lstrip('0'))
+    return word_val
+
 
 def readgsi(filepath):
     # check file extension, throw except if not .gsi
@@ -89,20 +94,37 @@ def readgsi(filepath):
     except ValueError:
         print('ValueError: file must have .gsi extension')
         return
-    # open up the file listed
+    # Open file and read data line-by-line
     with open(filepath, 'r') as file:
+        project = dict()
+        stncount = 0
         gsilines = file.readlines()
-        for i in gsilines:
-            ln_id = int(i[3:7])
-            if '84..' in i:
-                print(str(ln_id) + ': station')
-            else:
-                print(str(ln_id) + ': obs')
+        for line in gsilines:
+            ln_id = int(line[3:7])
+            # Create Station Record
+            if '84..' in line:
+                stncount += 1
+                # Parse Pt ID
+                pt_id = line[8:24]
+                pt_id = pt_id.lstrip('0')
+                # Parse Easting
+                easting = readgsiword16(line, '84..')
+                easting = easting / 10000
+                # Parse Northing
+                northing = readgsiword16(line, '85..')
+                northing = northing / 10000
+                # Parse Elev
+                elev = readgsiword16(line, '86..')
+                elev = elev / 10000
+                # Create Coordinate Object
+                coord = Coordinate(pt_id, 'utm', 'gda', 'gda', '2018', easting, northing, elev)
+                # Create and Add Instrument Setup to Project
+                project.update({'InstSetup_' + str(stncount): InstSetup(pt_id, coord)})
     # Wrap this in a while loop for all InstSetups
         # Create InstSetup Object
         # Read all obs into Observation Object until next InstSetup
 
-    return gsilines
+    return project
 
 # Functions to write out station and obs data to DNA format
 
