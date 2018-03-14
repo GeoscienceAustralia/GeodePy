@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 from math import sqrt, degrees, radians, sin, cos, asin
 from conversions import dd2dms, dms2dd
 
@@ -20,10 +21,9 @@ class Coordinate(object):
 
 
 class InstSetup(object):
-    def __init__(self, name, coordinate, inst_height, observation=None):
+    def __init__(self, name, coordinate, observation=None):
         self.name = name
         self.coordinate = coordinate
-        self.inst_height = inst_height
         if observation is None:
             self.observation = []
         else:
@@ -33,7 +33,6 @@ class InstSetup(object):
     def __repr__(self):
         return ('{InstSetup: ' + repr(self.name)
                 + ' ' + repr(self.coordinate)
-                + '; inst_height ' + repr(self.inst_height)
                 + '}\n Observations:\n'
                 + repr(self.observation))
 
@@ -42,10 +41,11 @@ class InstSetup(object):
 
 
 class Observation(object):
-    def __init__(self, from_name, to_name, coordinate, target_height=0, hz_obs=0, va_obs=0, sd_obs=0, hz_dist=0, vert_dist=0):
+    def __init__(self, from_name, to_name, coordinate, inst_height=0, target_height=0, hz_obs=0, va_obs=0, sd_obs=0, hz_dist=0, vert_dist=0):
         self.from_name = from_name
         self.to_name = to_name
         self.coordinate = coordinate
+        self.inst_height = inst_height
         self.target_height = target_height
         self.hz_obs = hz_obs
         self.va_obs = va_obs
@@ -75,6 +75,34 @@ class AngleObs(object):
     def decimal(self):
         dd = abs(self.degrees + self.minutes / 60 + self.seconds / 3600)
         return dd
+
+
+# Functions to read in data to classes from Leica GSI format file (GA_Survey2.frt)
+
+
+def readgsi(filepath):
+    # check file extension, throw except if not .gsi
+    ext = os.path.splitext(filepath)[-1].lower()
+    try:
+        if ext != '.gsi':
+            raise ValueError
+    except ValueError:
+        print('ValueError: file must have .gsi extension')
+        return
+    # open up the file listed
+    with open(filepath, 'r') as file:
+        gsilines = file.readlines()
+        for i in gsilines:
+            ln_id = int(i[3:7])
+            if '84..' in i:
+                print(str(ln_id) + ': station')
+            else:
+                print(str(ln_id) + ': obs')
+    # Wrap this in a while loop for all InstSetups
+        # Create InstSetup Object
+        # Read all obs into Observation Object until next InstSetup
+
+    return gsilines
 
 # Functions to write out station and obs data to DNA format
 
