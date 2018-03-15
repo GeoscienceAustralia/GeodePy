@@ -9,7 +9,7 @@ from conversions import dd2dms, dms2dd
 
 
 class Coordinate(object):
-    def __init__(self, pt_id, system, hz_datum, vert_datum, epoch, x=0, y=0, z=0):
+    def __init__(self, pt_id, system, hz_datum, vert_datum, epoch, x=0.0, y=0.0, z=0.0):
         self.pt_id = pt_id
         self.system = system
         self.hz_datum = hz_datum
@@ -41,7 +41,8 @@ class InstSetup(object):
 
 
 class Observation(object):
-    def __init__(self, from_id, to_id, inst_height=0, target_height=0, hz_obs=0, va_obs=0, sd_obs=0, hz_dist=0, vert_dist=0):
+    def __init__(self, from_id, to_id, inst_height=0, target_height=0,
+                 hz_obs=0, va_obs=0, sd_obs=0, hz_dist=0, vert_dist=0):
         self.from_id = from_id
         self.to_id = to_id
         self.inst_height = inst_height
@@ -53,7 +54,7 @@ class Observation(object):
         self.vert_dist = vert_dist
 
     def __repr__(self):
-        return ('{to: ' + repr(self.to_name)
+        return ('{to: ' + repr(self.to_id)
                 + '; target_height ' + repr(self.target_height)
                 + '; hz_obs ' + repr(self.hz_obs)
                 + '; va_obs ' + repr(self.va_obs)
@@ -98,8 +99,10 @@ def readgsi(filepath):
     with open(filepath, 'r') as file:
         project = dict()
         stncount = 0
+        linecount = 0
         gsilines = file.readlines()
         for line in gsilines:
+            linecount += 1
             ln_id = int(line[3:7])
             # Create Station Record
             if '84..' in line:
@@ -116,15 +119,17 @@ def readgsi(filepath):
                 # Parse Elev
                 elev = readgsiword16(line, '86..')
                 elev = elev / 10000
-                # Create Coordinate Object
+                # Create Coordinate and Instrument Setup Objects
                 coord = Coordinate(pt_id, 'utm', 'gda', 'gda', '2018', easting, northing, elev)
-                # Create and Add Instrument Setup to Project
-                project.update({'InstSetup_' + str(stncount): InstSetup(pt_id, coord)})
+                setup = InstSetup(pt_id, coord)
+                # Add Instrument Setup to Project
+                project.update({'InstSetup_' + str(stncount): setup})
     # Wrap this in a while loop for all InstSetups
         # Create InstSetup Object
         # Read all obs into Observation Object until next InstSetup
 
     return project
+
 
 # Functions to write out station and obs data to DNA format
 
@@ -134,10 +139,10 @@ def dnaout_sd(observation):
             + observation.from_name.ljust(20)
             + observation.to_name.ljust(20)
             + ''.ljust(20)
-            + str(observation.sd_obs).ljust(14) #76
+            + str(observation.sd_obs).ljust(14)  # 76
             + ''.ljust(14)
-            + '0.0010'.ljust(9)         #add standard deviation
-            + str(1.7960).ljust(7)      #add intrument height
+            + '0.0010'.ljust(9)         # add standard deviation
+            + str(1.7960).ljust(7)      # add intrument height
             + str(observation.target_height).ljust(7))
 
 
@@ -151,8 +156,8 @@ def dnaout_va(observation):
             + str('%02d' % observation.va_obs.minutes)
             + ' '
             + str(observation.va_obs.seconds).ljust(8)
-            + '1.0000'.ljust(9)         #add standard deviation
-            + str(1.7960).ljust(7)      #add intrument height
+            + '1.0000'.ljust(9)         # add standard deviation
+            + str(1.7960).ljust(7)      # add intrument height
             + str(observation.target_height).ljust(7))
 
 
