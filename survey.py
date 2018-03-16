@@ -79,15 +79,15 @@ class AngleObs(object):
 
 # Functions to read in data to classes from Leica GSI format file (GA_Survey2.frt)
 
-def readgsiword16(linestring, word_id):
-    wordstart = str.find(linestring, word_id)
-    word_val = linestring[(wordstart + 7):(wordstart + 23)]
-    word_val = int(word_val.lstrip('0'))
-    return word_val
-
 
 def readgsi(filepath):
-    # check file extension, throw except if not .gsi
+    """
+    Takes in a gsi file (GA_Survey2.frt) and returns a list
+    of stations with their associated observations.
+    :param filepath:
+    :return:
+    """
+    # Check file extension, throw except if not .gsi
     ext = os.path.splitext(filepath)[-1].lower()
     try:
         if ext != '.gsi':
@@ -95,40 +95,62 @@ def readgsi(filepath):
     except ValueError:
         print('ValueError: file must have .gsi extension')
         return
-    # Open file and read data line-by-line
+    # Read data from gsi file
     with open(filepath, 'r') as file:
-        project = dict()
-        stncount = 0
-        linecount = 0
-        gsilines = file.readlines()
-        for line in gsilines:
-            linecount += 1
-            ln_id = int(line[3:7])
-            # Create Station Record
-            if '84..' in line:
-                stncount += 1
-                # Parse Pt ID
-                pt_id = line[8:24]
-                pt_id = pt_id.lstrip('0')
-                # Parse Easting
-                easting = readgsiword16(line, '84..')
-                easting = easting / 10000
-                # Parse Northing
-                northing = readgsiword16(line, '85..')
-                northing = northing / 10000
-                # Parse Elev
-                elev = readgsiword16(line, '86..')
-                elev = elev / 10000
-                # Create Coordinate and Instrument Setup Objects
-                coord = Coordinate(pt_id, 'utm', 'gda', 'gda', '2018', easting, northing, elev)
-                setup = InstSetup(pt_id, coord)
-                # Add Instrument Setup to Project
-                project.update({'InstSetup_' + str(stncount): setup})
-    # Wrap this in a while loop for all InstSetups
-        # Create InstSetup Object
-        # Read all obs into Observation Object until next InstSetup
+        gsidata = file.readlines()
+        stn_index = [0]
+        for i in gsidata:
+            # Create list of line numbers of station records
+            if '84..' in i:
+                lnid = i[3:7]
+                lnid = int(lnid.lstrip('0'))
+                stn_index.append(lnid)
+        gsi_listbystation = []
+        # Create lists of gsi data with station records as first element
+        for i in range(0, (len(stn_index) - 1)):
+            gsi_listbystation.append(gsidata[(stn_index[i]) - 1:(stn_index[i + 1])])
+        del gsi_listbystation[0]
+    return gsi_listbystation
+
+
+def gsi2class(gsi_stnplusobs):
+    """
+    Takes a list where first entry is station record and
+    all remaining records are observations and creates
+    a InstSetup Object with Observation Objects included.
+    :param gsi_stnplusobs:
+    :return:
+    """
+    def parse_ptid(gsi_line):
+        ptid = gsi_line[8:24]
+        ptid = ptid.lstrip('0')
+        return ptid
+    """
+    # Parse Easting
+    easting = readgsiword16(line, '84..')
+    easting = easting / 10000
+    # Parse Northing
+    northing = readgsiword16(line, '85..')
+    northing = northing / 10000
+    # Parse Elev
+    elev = readgsiword16(line, '86..')
+    elev = elev / 10000
+    # Create Coordinate and Instrument Setup Objects
+    coord = Coordinate(pt_id, 'utm', 'gda', 'gda', '2018', easting, northing, elev)
+    setup = InstSetup(pt_id, coord)
+    # Add Instrument Setup to Project
+    project.update({'InstSetup_' + str(stncount): setup})
+        # Add Observation Records to InstSetup Objects
 
     return project
+    """
+
+
+def readgsiword16(linestring, word_id):
+    wordstart = str.find(linestring, word_id)
+    word_val = linestring[(wordstart + 7):(wordstart + 23)]
+    word_val = int(word_val.lstrip('0'))
+    return word_val
 
 
 # Functions to write out station and obs data to DNA format
