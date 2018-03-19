@@ -8,6 +8,20 @@ from conversions import dd2dms, dms2dd
 # Defines a bunch of classes required to convert GSI (or any other format) to DynaNet v3 Format
 
 
+class AngleObs(object):
+    def __init__(self, degrees=0, minutes=0, seconds=0):
+        self.degrees = int(degrees)
+        self.minutes = int(minutes)
+        self.seconds = float(seconds)
+
+    def __repr__(self):
+        return repr(self.degrees) + 'd ' + repr(self.minutes) + '\' ' + repr(self.seconds) + '\"'
+
+    def decimal(self):
+        dd = abs(self.degrees + self.minutes / 60 + self.seconds / 3600)
+        return dd
+
+
 class Coordinate(object):
     def __init__(self, pt_id, system, hz_datum, vert_datum, epoch, x=0.0, y=0.0, z=0.0):
         self.pt_id = pt_id
@@ -41,8 +55,8 @@ class InstSetup(object):
 
 
 class Observation(object):
-    def __init__(self, from_id, to_id, inst_height=0, target_height=0,
-                 hz_obs=0, va_obs=0, sd_obs=0, hz_dist=0, vert_dist=0):
+    def __init__(self, from_id, to_id, inst_height=0.0, target_height=0.0,
+                 hz_obs=AngleObs(0, 0, 0), va_obs=AngleObs(0, 0, 0), sd_obs=0.0, hz_dist=0.0, vert_dist=0.0):
         self.from_id = from_id
         self.to_id = to_id
         self.inst_height = inst_height
@@ -61,20 +75,6 @@ class Observation(object):
                 + '; sd_obs ' + repr(self.sd_obs)
                 + '; target_height ' + repr(self.target_height)
                 + '}')
-
-
-class AngleObs(object):
-    def __init__(self, degrees=0, minutes=0, seconds=0):
-        self.degrees = int(degrees)
-        self.minutes = int(minutes)
-        self.seconds = float(seconds)
-
-    def __repr__(self):
-        return repr(self.degrees) + 'd ' + repr(self.minutes) + '\' ' + repr(self.seconds) + '\"'
-
-    def decimal(self):
-        dd = abs(self.degrees + self.minutes / 60 + self.seconds / 3600)
-        return dd
 
 
 # Functions to read in data to classes from Leica GSI format file (GA_Survey2.frt)
@@ -100,7 +100,7 @@ def readgsi(filepath):
         gsidata = file.readlines()
         stn_index = [0]
         for i in gsidata:
-            # Create list of line numbers of station records
+            # Create list of line numbers of station records (Only stations have '84..' string)
             if '84..' in i:
                 lnid = i[3:7]
                 lnid = int(lnid.lstrip('0'))
@@ -113,7 +113,7 @@ def readgsi(filepath):
     return gsi_listbystation
 
 
-def gsi2class(gsi_stnplusobs):
+def gsi2class(gsi_list):
     """
     Takes a list where first entry is station record and
     all remaining records are observations and creates
@@ -121,20 +121,73 @@ def gsi2class(gsi_stnplusobs):
     :param gsi_stnplusobs:
     :return:
     """
+    def readgsiword16(linestring, word_id):
+        wordstart = str.find(linestring, word_id)
+        word_val = linestring[(wordstart + 7):(wordstart + 23)]
+        word_val = int(word_val.lstrip('0'))
+        return word_val
+
     def parse_ptid(gsi_line):
         ptid = gsi_line[8:24]
         ptid = ptid.lstrip('0')
         return ptid
+
+    def parse_easting(gsi_line):
+        return (readgsiword16(gsi_line, '84..')) / 10000
+
+    def parse_northing(gsi_line):
+        return (readgsiword16(gsi_line, '85..')) / 10000
+
+    def parse_elev(gsi_line):
+        return (readgsiword16(gsi_line, '86..')) / 10000
+
+    def parse_hz(gsi_line):
+        dms = readgsiword16(gsi_line, '21.324') / 100000
+        degmin, seconds = divmod(abs(dms) * 1000, 10)
+        degrees, minutes = divmod(degmin, 100)
+        return AngleObs(degrees, minutes, seconds * 10)
+
+    def parse_slope(gsi_line):
+        return (readgsiword16(gsi_line, '31..')) / 10000
+
+    def parse_dist(gsi_line):
+        return (readgsiword16(gsi_line, '32..')) / 10000
+
+    def parse_tgtht(gsi_line):
+        return (readgsiword16(gsi_line, '87..')) / 10000
+
+    def parse_instht(gsi_line):
+        return (readgsiword16(gsi_line, '88..')) / 10000
+
+    def parse_vert(gsi_line):
+        dms = readgsiword16(gsi_line, '22.324') / 100000
+        degmin, seconds = divmod(abs(dms) * 1000, 10)
+        degrees, minutes = divmod(degmin, 100)
+        return AngleObs(degrees, minutes, seconds * 10)
+
+    for record in gsi_list:
+        from_stn = parse_ptid(record[0])
+        obs_list = []
+        for line in record:
+            if '31..' in line:
+                to_stn = parse_ptid(line)
+                hz = parse_hz(line)
+                vert = parse_vert(line)
+                slope = parse_slope(line)
+                tgtht = parse_tgtht(line)
+                instht = parse_instht(line)
+                obs = Observation(from_stn, to_stn, instht, tgtht, hz, vert, slope)
+                obs_list.append(obs)
+        if '84..' in record[0]:
+            pt_id = parse_ptid(record[0])
+            easting = parse_easting(record[0])
+            northing = parse_northing(record[0])
+            elev = parse_elev(record[0])
+            coord = Coordinate(pt_id, 'utm', 'gda', 'gda', '2018', easting, northing, elev)
+            setup = InstSetup(pt_id, coord, obs_list)
+    return setup
+
     """
-    # Parse Easting
-    easting = readgsiword16(line, '84..')
-    easting = easting / 10000
-    # Parse Northing
-    northing = readgsiword16(line, '85..')
-    northing = northing / 10000
-    # Parse Elev
-    elev = readgsiword16(line, '86..')
-    elev = elev / 10000
     # Create Coordinate and Instrument Setup Objects
     coord = Coordinate(pt_id, 'utm', 'gda', 'gda', '2018', easting, northing, elev)
     setup = InstSetup(pt_id, coord)
@@ -149,7 +202,7 @@ def gsi2class(gsi_stnplusobs):
 def readgsiword16(linestring, word_id):
     wordstart = str.find(linestring, word_id)
     word_val = linestring[(wordstart + 7):(wordstart + 23)]
-    word_val = int(word_val.lstrip('0'))
+    word_val = 0.0 if word_val.lstrip('0') == '' else int(word_val.lstrip('0'))
     return word_val
 
 
