@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/geodesy.iml" filepath="$PROJECT_DIR$/.idea/geodesy.iml" />
+      <module fileurl="file://$USER_HOME$/PycharmProjects/vlbi/.idea/vlbi.iml" filepath="$USER_HOME$/PycharmProjects/vlbi/.idea/vlbi.iml" />
     </modules>
   </component>
 </project>
