@@ -187,7 +187,8 @@ def gsi2class(gsi_list):
             setup = InstSetup(pt_id, coord, obs_list)
     return setup
 
-    """
+
+"""
     # Create Coordinate and Instrument Setup Objects
     coord = Coordinate(pt_id, 'utm', 'gda', 'gda', '2018', easting, northing, elev)
     setup = InstSetup(pt_id, coord)
@@ -195,8 +196,8 @@ def gsi2class(gsi_list):
     project.update({'InstSetup_' + str(stncount): setup})
         # Add Observation Records to InstSetup Objects
 
-    return project
-    """
+return project
+"""
 
 
 def readgsiword16(linestring, word_id):

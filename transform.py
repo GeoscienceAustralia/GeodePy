@@ -59,16 +59,18 @@ from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, a
 import numpy as np
 import os
 import csv
-from constants import grs80
+from constants import grs80, utm
 from conversions import dd2dms, dms2dd
 
 
 getcontext().prec = 28
 # Universal Transverse Mercator Projection Parameters
-proj = grs80
+# proj = grs80
+proj = utm
 # Ellipsoidal Constants
-f = 1 / proj[1]
-semi_maj = proj[0]
+ellipsoid = grs80
+f = 1 / ellipsoid.inversef
+semi_maj = ellipsoid.semimaj
 semi_min = float(semi_maj * (1 - f))
 ecc1sq = float(f * (2 - f))
 ecc2sq = float(ecc1sq/(1 - ecc1sq))
@@ -79,7 +81,7 @@ n2 = n ** 2
 
 
 # Rectifying Radius (Horner Form)
-A = proj[0] / (1 + n) * ((n2 *
+A = ellipsoid.semimaj / (1 + n) * ((n2 *
                           (n2 *
                            (n2 *
                             (25 * n2 + 64)
@@ -157,6 +159,7 @@ a14 = ((n ** 7 *
        / 12454041600.)
 
 a16 = (1424729850961 * n ** 8) / 743921418240.
+a = (a2, a4, a6, a8, a10, a12, a14, a16)
 
 # Beta Coefficients (Horner Form)
 b2 = ((n *
@@ -224,55 +227,99 @@ b14 = ((n ** 7 *
        / 49816166400.)
 
 b16 = ((-191773887257 * n ** 8) / 3719607091200.)
+b = (b2, b4, b6, b8, b10, b12, b14, b16)
 
 
-def geo2grid(lat, long):
+def geo2grid(lat, long, zone=0):
     """
-    input: Latitude and Longitude in Decimal Degrees.
-
-    output: Zone, Easting and Northing of a point in metres.
-    (Default projection is Universal Transverse Mercator.)
+    Takes a geographic co-ordinate (latitude, longitude) and returns its corresponding
+    Hemisphere, Zone and Projection Easting and Northing, Point Scale Factor and Grid
+    Convergence. Default Projection is Universal Transverse Mercator Projection using
+    GRS80 Ellipsoid parameters.
+    :param lat: Latitude in Decimal Degrees
+    :param long: Longitude in Decimal Degrees
+    :param zone: Optional Zone Number - Only required if calculating grid co-ordinate
+                outside zone boundaries
+    :return:
     """
+    # Input Exception Handling - UTM Extents and Values
+    try:
+        zone = int(zone)
+        if zone < 0 or zone > 60:
+            raise ValueError
+    except ValueError:
+        print('ValueError: Invalid Zone - Zones from 1 to 60')
+        return
+    try:
+        if lat < -80 or lat > 84:
+            raise ValueError
+    except ValueError:
+        print('ValueError: Invalid Latitude - Latitudes from -80 to +84')
+        return
+    try:
+        if long < -180 or long > 180:
+            raise ValueError
+    except ValueError:
+        print('ValueError: Invalid Longitude - Longitudes from -180 to +180')
+        return
+
+    lat = radians(lat)
     # Calculate Zone
-    zone = int((float(long) - (proj[6] - (1.5 * proj[5]))) / proj[5])
-    centmeridian = float(zone * proj[5]) + (proj[6] - proj[5])
+    if zone == 0:
+        zone = int((float(long) - (proj.initialcm - (1.5 * proj.zonewidth))) / proj.zonewidth)
+    cm = float(zone * proj.zonewidth) + (proj.initialcm - proj.zonewidth)
+
     # Conformal Latitude
-    sigx = (ecc1 * tan(radians(lat))) / sqrt(1 + (tan(radians(lat)) ** 2))
+    sigx = (ecc1 * tan(lat)) / sqrt(1 + (tan(lat) ** 2))
     sig = sinh(ecc1 * (0.5 * log((1 + sigx) / (1 - sigx))))
-    conf_lat = tan(radians(lat)) * sqrt(1 + sig ** 2) - sig * sqrt(1 + (tan(radians(lat)) ** 2))
+    conf_lat = tan(lat) * sqrt(1 + sig ** 2) - sig * sqrt(1 + (tan(lat) ** 2))
     conf_lat = atan(conf_lat)
+
     # Longitude Difference
-    long_diff = radians(Decimal(long) - Decimal(str(centmeridian)))
+    long_diff = radians(Decimal(long) - Decimal(str(cm)))
+
     # Gauss-Schreiber Ratios
     xi1 = atan(tan(conf_lat) / cos(long_diff))
     eta1x = sin(long_diff) / (sqrt(tan(conf_lat) ** 2 + cos(long_diff) ** 2))
     eta1 = log(eta1x + sqrt(1 + eta1x ** 2))
+
     # Transverse Mercator Ratios
-    eta2 = a2 * cos(2 * xi1) * sinh(2 * eta1)
-    eta4 = a4 * cos(4 * xi1) * sinh(4 * eta1)
-    eta6 = a6 * cos(6 * xi1) * sinh(6 * eta1)
-    eta8 = a8 * cos(8 * xi1) * sinh(8 * eta1)
-    eta10 = a10 * cos(10 * xi1) * sinh(10 * eta1)
-    eta12 = a12 * cos(12 * xi1) * sinh(12 * eta1)
-    eta14 = a14 * cos(14 * xi1) * sinh(14 * eta1)
-    eta16 = a16 * cos(16 * xi1) * sinh(16 * eta1)
-    xi2 = a2 * sin(2 * xi1) * cosh(2 * eta1)
-    xi4 = a4 * sin(4 * xi1) * cosh(4 * eta1)
-    xi6 = a6 * sin(6 * xi1) * cosh(6 * eta1)
-    xi8 = a8 * sin(8 * xi1) * cosh(8 * eta1)
-    xi10 = a10 * sin(10 * xi1) * cosh(10 * eta1)
-    xi12 = a12 * sin(12 * xi1) * cosh(12 * eta1)
-    xi14 = a14 * sin(14 * xi1) * cosh(14 * eta1)
-    xi16 = a16 * sin(16 * xi1) * cosh(16 * eta1)
-    eta = eta1 + eta2 + eta4 + eta6 + eta8 + eta10 + eta12 + eta14 + eta16
-    xi = xi1 + xi2 + xi4 + xi6 + xi8 + xi10 + xi12 + xi14 + xi16
+    eta = eta1
+    xi = xi1
+    for r in range(1, 9):
+        eta += a[r-1] * cos(2*r * xi1) * sinh(2*r * eta1)
+        xi += a[r-1] * sin(2*r * xi1) * cosh(2*r * eta1)
+
     # Transverse Mercator Co-ordinates
     x = A * eta
     y = A * xi
-    # MGA Co-ordinates
-    east = proj[4] * Decimal(str(x)) + proj[2]
-    north = proj[4] * Decimal(str(y)) + proj[3]
-    return zone, round(float(east), 5), round(float(north), 5)
+
+    # Hemisphere-dependent UTM Projection Co-ordinates
+    east = proj.cmscale * Decimal(str(x)) + proj.falseeast
+    if y < 0:
+        hemisphere = 'South'
+        north = proj.cmscale * Decimal(str(y)) + proj.falsenorth
+    else:
+        hemisphere = 'North'
+        falsenorth = 0
+        north = proj.cmscale * Decimal(str(y)) + falsenorth
+
+    # Point Scale Factor
+    p = 1
+    q = 0
+    for r in range(1, 9):
+        p += 2*r * a[r-1] * cos(2*r * xi1) * cosh(2*r * eta1)
+        q += 2*r * a[r-1] * sin(2*r * xi1) * sinh(2*r * eta1)
+    q = -q
+    psf = (float(proj.cmscale)
+           * (A / ellipsoid.semimaj)
+           * sqrt(q**2 + p**2)
+           * ((sqrt(1 + (tan(lat)**2)) * sqrt(1 - ecc1sq * (sin(lat)**2)))
+              / sqrt((tan(conf_lat)**2) + (cos(long_diff)**2))))
+
+    # Grid Convergence
+
+    return hemisphere, zone, round(float(east), 3), round(float(north), 3), psf, locals()
 
 
 def grid2geo(zone, easting, northing):
@@ -283,8 +330,8 @@ def grid2geo(zone, easting, northing):
     output: Latitude and Longitude in Decimal Degrees.
     """
     # Transverse Mercator Co-ordinates
-    x = (easting - float(proj[2])) / float(proj[4])
-    y = (northing - float(proj[3])) / float(proj[4])
+    x = (easting - float(ellipsoid.falseeast)) / float(ellipsoid.cmscale)
+    y = (northing - float(ellipsoid.falsenorth)) / float(ellipsoid.cmscale)
     # Transverse Mercator Ratios
     xi = y / A
     eta = x / A
@@ -335,7 +382,7 @@ def grid2geo(zone, easting, northing):
     # Compute Latitude
     lat = degrees(atan(t4))
     # Compute Longitude
-    cm = float((zone * proj[5]) + proj[6] - proj[5])
+    cm = float((zone * ellipsoid.zonewidth) + ellipsoid.initialcm - ellipsoid.zonewidth)
     long_diff = degrees(atan(sinh(eta1) / cos(xi1)))
     long = cm + long_diff
     return round(lat, 11), round(long, 11)
@@ -377,7 +424,7 @@ def llh2xyz(lat, long, ellht):
     long = radians(long)
     # Calculate Ellipsoid Radius of Curvature in the Prime Vertical - nu
     if lat == 0:
-        nu = proj[0]
+        nu = grs80.semimaj
     else:
         nu = semi_maj/(sqrt(1 - ecc1sq * (sin(lat)**2)))
     # Calculate x, y, z
