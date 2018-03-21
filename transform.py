@@ -319,7 +319,7 @@ def geo2grid(lat, long, zone=0):
 
     # Grid Convergence
 
-    return hemisphere, zone, round(float(east), 3), round(float(north), 3), psf, locals()
+    return hemisphere, zone, round(float(east), 3), round(float(north), 3), psf
 
 
 def grid2geo(zone, easting, northing):
