@@ -82,13 +82,13 @@ n2 = n ** 2
 
 # Rectifying Radius (Horner Form)
 A = ellipsoid.semimaj / (1 + n) * ((n2 *
-                          (n2 *
-                           (n2 *
-                            (25 * n2 + 64)
-                            + 256)
-                           + 4096)
-                          + 16384)
-                         / 16384.)
+                                    (n2 *
+                                     (n2 *
+                                      (25 * n2 + 64)
+                                      + 256)
+                                     + 4096)
+                                    + 16384)
+                                   / 16384.)
 
 # Alpha Coefficients (Horner Form)
 a2 = ((n *
@@ -230,6 +230,35 @@ b16 = ((-191773887257 * n ** 8) / 3719607091200.)
 b = (b2, b4, b6, b8, b10, b12, b14, b16)
 
 
+def psfandgridconv(xi1, eta1, lat, long, cm, conf_lat):
+    lat = radians(lat)
+    long_diff = radians(long - cm)
+
+    # Point Scale Factor
+    p = 1
+    q = 0
+    for r in range(1, 9):
+        p += 2*r * a[r-1] * cos(2*r * xi1) * cosh(2*r * eta1)
+        q += 2*r * a[r-1] * sin(2*r * xi1) * sinh(2*r * eta1)
+    q = -q
+    psf = (float(proj.cmscale)
+           * (A / ellipsoid.semimaj)
+           * sqrt(q**2 + p**2)
+           * ((sqrt(1 + (tan(lat)**2)) * sqrt(1 - ecc1sq * (sin(lat)**2)))
+              / sqrt((tan(conf_lat)**2) + (cos(long_diff)**2))))
+
+    # Grid Convergence
+    grid_conv = degrees(atan(abs(q / p))
+                        + atan(abs(tan(conf_lat) * tan(long_diff))
+                               / sqrt(1 + tan(conf_lat)**2)))
+    if cm > long and lat < 0:
+        grid_conv = -grid_conv
+    elif cm < long and lat > 0:
+        grid_conv = -grid_conv
+
+    return psf, grid_conv
+
+
 def geo2grid(lat, long, zone=0):
     """
     Takes a geographic co-ordinate (latitude, longitude) and returns its corresponding
@@ -240,7 +269,7 @@ def geo2grid(lat, long, zone=0):
     :param long: Longitude in Decimal Degrees
     :param zone: Optional Zone Number - Only required if calculating grid co-ordinate
                 outside zone boundaries
-    :return:
+    :return: hemisphere, zone, east (m), north (m), Point Scale Factor, Grid Convergence (Decimal Degrees)
     """
     # Input Exception Handling - UTM Extents and Values
     try:
@@ -276,7 +305,7 @@ def geo2grid(lat, long, zone=0):
     conf_lat = atan(conf_lat)
 
     # Longitude Difference
-    long_diff = radians(Decimal(long) - Decimal(str(cm)))
+    long_diff = radians(long - cm)
 
     # Gauss-Schreiber Ratios
     xi1 = atan(tan(conf_lat) / cos(long_diff))
@@ -304,88 +333,109 @@ def geo2grid(lat, long, zone=0):
         falsenorth = 0
         north = proj.cmscale * Decimal(str(y)) + falsenorth
 
-    # Point Scale Factor
-    p = 1
-    q = 0
-    for r in range(1, 9):
-        p += 2*r * a[r-1] * cos(2*r * xi1) * cosh(2*r * eta1)
-        q += 2*r * a[r-1] * sin(2*r * xi1) * sinh(2*r * eta1)
-    q = -q
-    psf = (float(proj.cmscale)
-           * (A / ellipsoid.semimaj)
-           * sqrt(q**2 + p**2)
-           * ((sqrt(1 + (tan(lat)**2)) * sqrt(1 - ecc1sq * (sin(lat)**2)))
-              / sqrt((tan(conf_lat)**2) + (cos(long_diff)**2))))
+    # Point Scale Factor and Grid Convergence
+    psf, grid_conv = psfandgridconv(xi1, eta1, degrees(lat), long, cm, conf_lat)
 
-    # Grid Convergence
-
-    return hemisphere, zone, round(float(east), 3), round(float(north), 3), psf
+    return hemisphere, zone, round(float(east), 3), round(float(north), 3), round(psf, 8), grid_conv
 
 
-def grid2geo(zone, easting, northing):
+def grid2geo(zone, east, north, hemisphere='south'):
     """
-    input: Zone, Easting and Northing of a point in metres.
-    (Default projection is Universal Transverse Mercator.)
-
-    output: Latitude and Longitude in Decimal Degrees.
+    Takes a Transverse Mercator grid co-ordinate (Zone, Easting, Northing, Hemisphere)
+    and returns its corresponding Geographic Latitude and Longitude, Point Scale Factor
+    and Grid Convergence. Default Projection is Universal Transverse Mercator Projection
+    using GRS80 Ellipsoid parameters.
+    :param zone: Zone Number - 1 to 60
+    :param east: Easting (m, within 3330km of Central Meridian)
+    :param north: Northing (m, 0 to 10,000,000m)
+    :param hemisphere: String - 'North' or 'South'(default)
+    :return: Latitude and Longitude (Decimal Degrees), Point Scale Factor, Grid Convergence (Decimal Degrees)
     """
+    # Input Exception Handling - UTM Extents and Values
+    try:
+        zone = int(zone)
+        if zone < 0 or zone > 60:
+            raise ValueError
+    except ValueError:
+        print('ValueError: Invalid Zone - Zones from 1 to 60')
+        return
+    try:
+        if east < -2830000 or east > 3830000:
+            raise ValueError
+    except ValueError:
+        print('ValueError: Invalid Easting - Must be within 3330km of Central Meridian')
+        return
+    try:
+        if north < 0 or north > 10000000:
+            raise ValueError
+    except ValueError:
+        print('ValueError: Invalid Northing - Must be between 0 and 10,000,000m')
+        return
+    try:
+        h = hemisphere.lower()
+        if h != 'north' and h != 'south':
+            raise ValueError
+    except ValueError:
+        print('ValueError: Invalid Hemisphere - String, either North or South')
+        return
+
     # Transverse Mercator Co-ordinates
-    x = (easting - float(ellipsoid.falseeast)) / float(ellipsoid.cmscale)
-    y = (northing - float(ellipsoid.falsenorth)) / float(ellipsoid.cmscale)
+    x = (east - float(proj.falseeast)) / float(proj.cmscale)
+    if hemisphere == 'north':
+        y = north / float(proj.cmscale)
+    else:
+        y = (north - float(proj.falsenorth)) / float(proj.cmscale)
+
     # Transverse Mercator Ratios
     xi = y / A
     eta = x / A
+
     # Gauss-Schreiber Ratios
-    xi2 = b2 * sin(2 * xi) * cosh(2 * eta)
-    xi4 = b4 * sin(4 * xi) * cosh(4 * eta)
-    xi6 = b6 * sin(6 * xi) * cosh(6 * eta)
-    xi8 = b8 * sin(8 * xi) * cosh(8 * eta)
-    xi10 = b10 * sin(10 * xi) * cosh(10 * eta)
-    xi12 = b12 * sin(12 * xi) * cosh(12 * eta)
-    xi14 = b14 * sin(14 * xi) * cosh(14 * eta)
-    xi16 = b16 * sin(16 * xi) * cosh(16 * eta)
-    eta2 = b2 * cos(2 * xi) * sinh(2 * eta)
-    eta4 = b4 * cos(4 * xi) * sinh(4 * eta)
-    eta6 = b6 * cos(6 * xi) * sinh(6 * eta)
-    eta8 = b8 * cos(8 * xi) * sinh(8 * eta)
-    eta10 = b10 * cos(10 * xi) * sinh(10 * eta)
-    eta12 = b12 * cos(12 * xi) * sinh(12 * eta)
-    eta14 = b14 * cos(14 * xi) * sinh(14 * eta)
-    eta16 = b16 * cos(16 * xi) * sinh(16 * eta)
-    xi1 = xi + xi2 + xi4 + xi6 + xi8 + xi10 + xi12 + xi14 + xi16
-    eta1 = eta + eta2 + eta4 + eta6 + eta8 + eta10 + eta12 + eta14 + eta16
+    eta1 = eta
+    xi1 = xi
+    for r in range(1, 9):
+        eta1 += b[r-1] * cos(2*r * xi) * sinh(2*r * eta)
+        xi1 += b[r-1] * sin(2*r * xi) * cosh(2*r * eta)
+
     # Conformal Latitude
     conf_lat = (sin(xi1)) / (sqrt((sinh(eta1)) ** 2 + (cos(xi1)) ** 2))
     t1 = conf_lat
     conf_lat = atan(conf_lat)
 
     # Finding t using Newtons Method
-    def sigma(t):
-        sigma = sinh(
-            ecc1 * 0.5 * log((1 + ((ecc1 * t) / (sqrt(1 + t ** 2)))) / (1 - ((ecc1 * t) / (sqrt(1 + t ** 2))))))
-        return sigma
+    def sigma(tn):
+        return (sinh(ecc1
+                     * 0.5
+                     * log((1 + ((ecc1 * tn) / (sqrt(1 + tn ** 2))))
+                           / (1 - ((ecc1 * tn) / (sqrt(1 + tn ** 2)))))))
 
-    def ftn(t):
-        ftn = t * sqrt(1 + (sigma(t)) ** 2) - sigma(t) * sqrt(1 + t ** 2) - t1
-        return ftn
+    def ftn(tn):
+        return t * sqrt(1 + (sigma(tn)) ** 2) - sigma(tn) * sqrt(1 + tn ** 2) - t1
 
-    def f1tn(t):
-        f1tn = (sqrt(1 + (sigma(t)) ** 2) * sqrt(1 + t ** 2) - sigma(t) * t) * (
-                ((1 - float(ecc1sq)) * sqrt(1 + t ** 2)) / (1 + (1 - float(ecc1sq)) * t ** 2))
-        return f1tn
+    def f1tn(tn):
+        return ((sqrt(1 + (sigma(tn)) ** 2) * sqrt(1 + tn ** 2) - sigma(tn) * tn)
+                * (((1 - float(ecc1sq)) * sqrt(1 + t ** 2))
+                   / (1 + (1 - float(ecc1sq)) * t ** 2)))
 
-    t2 = t1 - (ftn(t1)) / (f1tn(t1))
-    t3 = t2 - (ftn(t2)) / (f1tn(t2))
-    t4 = t3 - (ftn(t3)) / (f1tn(t3))
-    # Test No of Iterations Required (this will impact script performance)
-    # t5 = t4 - (ftn(t4))/(f1tn(t4))
-    # Compute Latitude
-    lat = degrees(atan(t4))
+    diff = 1
+    t = t1
+    loopcount = 0
+    while diff > 1e-50:
+        loopcount += 1
+        t_before = t
+        t = t - (ftn(t) / f1tn(t))
+        diff = abs(t - t_before)
+    lat = degrees(atan(t))
+
     # Compute Longitude
-    cm = float((zone * ellipsoid.zonewidth) + ellipsoid.initialcm - ellipsoid.zonewidth)
+    cm = float((zone * proj.zonewidth) + proj.initialcm - proj.zonewidth)
     long_diff = degrees(atan(sinh(eta1) / cos(xi1)))
     long = cm + long_diff
-    return round(lat, 11), round(long, 11)
+
+    # Point Scale Factor and Grid Convergence
+    psf, grid_conv = psfandgridconv(xi1, eta1, lat, long, cm, conf_lat)
+
+    return round(lat, 11), round(long, 11), round(psf, 8), grid_conv
 
 
 def xyz2llh(x, y, z):
@@ -444,28 +494,29 @@ conform_gda94to20 = [0.06155, -0.01087, -0.04019, -0.009994, -0.0394924, -0.0327
 """
 
 
-def conform7(x, y, z, conform7_param):
+def conform7(x, y, z, trans):
     """
-    input: x, y, z: 3D Cartesian Coordinate X, Y, Z in metres
-           conform7_param: list of 7 Helmert Parameters [tx, ty, tz, sc, rx, ry, rz]
-            tx, ty, tz: 3 Translations in metres
-            sc: Scale factor in parts per million
-            rx, ry, rz: 3 Rotations in decimal seconds
-    return: xnew, ynew, znew: Transformed 3D Cartesian Coordinate X, Y, Z in metres
+    Performs a Helmert 7 Parameter Transformation using Cartesian point co-ordinates
+    and a predefined transformation object.
+    :param x: Cartesian X
+    :param y: Cartesian Y
+    :param z: Cartesian Z
+    :param trans: Transformation Object
+    :return: Transformed X, Y, Z Cartesian Co-ordinates
     """
     # Create XYZ Vector
     xyz_before = np.array([[x],
                            [y],
                            [z]])
     # Convert Units for Transformation Parameters
-    scale = conform7_param[3] / 1000000
-    rx = radians(dms2dd(conform7_param[4] / 10000))
-    ry = radians(dms2dd(conform7_param[5] / 10000))
-    rz = radians(dms2dd(conform7_param[6] / 10000))
+    scale = trans.sc / 1000000
+    rx = radians(dms2dd(trans.rx / 10000))
+    ry = radians(dms2dd(trans.ry / 10000))
+    rz = radians(dms2dd(trans.rz / 10000))
     # Create Translation Vector
-    translation = np.array([[conform7_param[0]],
-                            [conform7_param[1]],
-                            [conform7_param[2]]])
+    translation = np.array([[trans.tx],
+                            [trans.ty],
+                            [trans.tz]])
     # Create Rotation Matrix
     rotation = np.array([[1., rz, -ry],
                          [-rz, 1., rx],
