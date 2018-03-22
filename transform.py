@@ -1,74 +1,28 @@
+#!/usr/bin/env python3
+
 """
-Functions: geo2grid, grid2geo, xyz2llh, llh2xyz, geo2gridio, grid2geoio
-
-geo2grid:
-    input: Latitude and Longitude in Decimal Degrees.
-
-    output: Zone, Easting and Northing of a point in metres.
-    (Default projection is Universal Transverse Mercator.)
-
-grid2geo:
-    input: Zone, Easting and Northing of a point in metres.
-    (Default projection is Universal Transverse Mercator.)
-
-    output: Latitude and Longitude in Decimal Degrees.
-
-xyz2llh:
-    Input: Cartesian XYZ coordinate in metres.
-
-    Output: Latitude and Longitude in Decimal.
-    Degrees and Ellipsoidal Height in Metres.
-
-
-def llh2xyz:
-    Input: Latitude and Longitude in Decimal Degrees, Ellipsoidal Height in metres.
-
-    Output: Cartesian X, Y, Z Coordinates in metres.
-
-
-geo2gridio:
-    No Input:
-    Prompts the user for the name of a file in csv format. Data in the file
-    must be in the form Point ID, Latitude, Longitude in Decimal Degrees with
-    no header line.
-
-    No Output:
-    Uses the function geo2grid to convert each row in the csv file into a
-    coordinate with UTM Zone, Easting (m), Northing (m). This data is written
-    to a new file with the name <inputfile>_out.csv
-
-grid2geoio:
-    No Input:
-    Prompts the user for the name of a file in csv format. Data in the file
-    must be in the form Point ID, UTM Zone, Easting (m), Northing (m) with
-    no header line.
-
-    No Output:
-    Uses the function grid2geo to convert each row in the csv file into a
-    latitude and longitude in Degrees, Minutes and Seconds. This data is
-    written to a new file with the name <inputfile>_out.csv
-
 Ref: http://www.icsm.gov.au/gda/tech.html
 Ref: http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 """
 
 # Author: Josh Batchelor <josh.batchelor@ga.gov.au>
 
+import os
+import csv
 from decimal import *
 from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2
 import numpy as np
-import os
-import csv
 from constants import grs80, utm
 from conversions import dd2dms, dms2dd
 
 
 getcontext().prec = 28
 # Universal Transverse Mercator Projection Parameters
-# proj = grs80
 proj = utm
+
 # Ellipsoidal Constants
 ellipsoid = grs80
+
 f = 1 / ellipsoid.inversef
 semi_maj = ellipsoid.semimaj
 semi_min = float(semi_maj * (1 - f))
