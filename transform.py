@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
 """
-Ref: http://www.icsm.gov.au/gda/tech.html
-Ref: http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
+Geoscience Australia - Python Geodesy Package
+Transform Module
+
+Ref1: http://www.icsm.gov.au/gda/tech.html
+Ref2: http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 """
 
-# Author: Josh Batchelor <josh.batchelor@ga.gov.au>
 
 import os
 import csv
@@ -24,8 +26,7 @@ proj = utm
 ellipsoid = grs80
 
 f = 1 / ellipsoid.inversef
-semi_maj = ellipsoid.semimaj
-semi_min = float(semi_maj * (1 - f))
+semi_min = float(ellipsoid.semimaj * (1 - f))
 ecc1sq = float(f * (2 - f))
 ecc2sq = float(ecc1sq/(1 - ecc1sq))
 ecc1 = sqrt(ecc1sq)
@@ -34,154 +35,183 @@ n = float(n)
 n2 = n ** 2
 
 
-# Rectifying Radius (Horner Form)
-A = ellipsoid.semimaj / (1 + n) * ((n2 *
-                                    (n2 *
-                                     (n2 *
-                                      (25 * n2 + 64)
-                                      + 256)
-                                     + 4096)
-                                    + 16384)
-                                   / 16384.)
+def rect_radius(inversef):
+    """
+    Computes the Rectifying Radius of an Ellipsoid with specified Inverse Flattening
+    (See Ref 2 Equation 3)
+    :param inversef: Ellipsoid Inverse Flattening
+    :return: Ellipsoid Rectifying Radius
+    """
+    nval = (1 / float(inversef)) / (2 - (1 / float(inversef)))
+    nval2 = nval ** 2
+    return (ellipsoid.semimaj / (1 + nval) * ((nval2 *
+                                              (nval2 *
+                                               (nval2 *
+                                                (25 * nval2 + 64)
+                                                + 256)
+                                               + 4096)
+                                              + 16384)
+                                              / 16384.))
 
-# Alpha Coefficients (Horner Form)
-a2 = ((n *
-       (n *
-        (n *
-         (n *
-          (n *
-           (n *
-            ((37884525 - 75900428 * n)
-             * n + 42422016)
-            - 89611200)
-           + 46287360)
-          + 63504000)
-         - 135475200)
-        + 101606400))
-      / 203212800.)
 
-a4 = ((n2 *
-       (n *
-        (n *
-         (n *
-          (n *
-           (n *
-            (148003883 * n + 83274912)
-            - 178508970)
-           + 77690880)
-          + 67374720)
-         - 104509440)
-        + 47174400))
-      / 174182400.)
+def alpha_coeff(inversef):
+    """
+    Computes the set of Alpha coefficients of an Ellipsoid with specified Inverse Flattening
+    (See Ref 2 Equation 5)
+    :param inversef: Ellipsoid Inverse Flattening
+    :return: Alpha coefficients a2, a4 ... a16
+    """
+    nval = (1 / float(inversef)) / (2 - (1 / float(inversef)))
+    a2 = ((nval *
+           (nval *
+            (nval *
+             (nval *
+              (nval *
+               (nval *
+                ((37884525 - 75900428 * nval)
+                 * nval + 42422016)
+                - 89611200)
+               + 46287360)
+              + 63504000)
+             - 135475200)
+            + 101606400))
+          / 203212800.)
 
-a6 = ((n ** 3 *
-       (n *
-        (n *
-         (n *
-          (n *
-           (318729724 * n - 738126169)
-           + 294981280)
-          + 178924680)
-         - 234938880)
-        + 81164160))
-      / 319334400.)
+    a4 = ((nval ** 2 *
+           (nval *
+            (nval *
+             (nval *
+              (nval *
+               (nval *
+                (148003883 * nval + 83274912)
+                - 178508970)
+               + 77690880)
+              + 67374720)
+             - 104509440)
+            + 47174400))
+          / 174182400.)
 
-a8 = ((n ** 4 *
-       (n *
-        (n *
-         ((14967552000 - 40176129013 * n) * n + 6971354016)
-         - 8165836800)
-        + 2355138720))
-      / 7664025600.)
+    a6 = ((nval ** 3 *
+           (nval *
+            (nval *
+             (nval *
+              (nval *
+               (318729724 * nval - 738126169)
+               + 294981280)
+              + 178924680)
+             - 234938880)
+            + 81164160))
+          / 319334400.)
 
-a10 = ((n ** 5 *
-        (n *
-         (n *
-          (10421654396 * n + 3997835751)
-          - 4266773472)
-         + 1072709352))
-       / 2490808320.)
+    a8 = ((nval ** 4 *
+           (nval *
+            (nval *
+             ((14967552000 - 40176129013 * nval) * nval + 6971354016)
+             - 8165836800)
+            + 2355138720))
+          / 7664025600.)
 
-a12 = ((n ** 6 *
-        (n *
-         (175214326799 * n - 171950693600)
-         + 38652967262))
-       / 58118860800.)
+    a10 = ((nval ** 5 *
+            (nval *
+             (nval *
+              (10421654396 * nval + 3997835751)
+              - 4266773472)
+             + 1072709352))
+           / 2490808320.)
 
-a14 = ((n ** 7 *
-        (13700311101 - 67039739596 * n))
-       / 12454041600.)
+    a12 = ((nval ** 6 *
+            (nval *
+             (175214326799 * nval - 171950693600)
+             + 38652967262))
+           / 58118860800.)
 
-a16 = (1424729850961 * n ** 8) / 743921418240.
-a = (a2, a4, a6, a8, a10, a12, a14, a16)
+    a14 = ((nval ** 7 *
+            (13700311101 - 67039739596 * nval))
+           / 12454041600.)
 
-# Beta Coefficients (Horner Form)
-b2 = ((n *
-       (n *
-        (n *
-         (n *
-          (n *
-           (n *
-            ((37845269 - 31777436 * n) - 43097152)
-            + 42865200)
-           + 752640)
-          - 104428800)
-         + 180633600)
-        - 135475200))
-      / 270950400.)
+    a16 = (1424729850961 * nval ** 8) / 743921418240.
+    return a2, a4, a6, a8, a10, a12, a14, a16
 
-b4 = ((n ** 2 *
-       (n *
-        (n *
-         (n *
-          (n *
-           ((-24749483 * n - 14930208) * n + 100683990)
-           - 152616960)
-          + 105719040)
-         - 23224320)
-        - 7257600))
-      / 348364800.)
 
-b6 = ((n ** 3 *
-       (n *
-        (n *
-         (n *
-          (n *
-           (232468668 * n - 101880889)
-           - 39205760)
-          + 29795040)
-         + 28131840)
-        - 22619520))
-      / 638668800.)
+def beta_coeff(inversef):
+    """
+    Computes the set of Beta coefficients of an Ellipsoid with specified Inverse Flattening
+    (See Ref 2 Equation 23)
+    :param inversef: Ellipsoid Inverse Flattening
+    :return: Alpha coefficients a2, a4 ... a16
+    """
+    nval = (1 / float(inversef)) / (2 - (1 / float(inversef)))
+    b2 = ((nval *
+           (nval *
+            (nval *
+             (nval *
+              (nval *
+               (nval *
+                ((37845269 - 31777436 * nval) - 43097152)
+                + 42865200)
+               + 752640)
+              - 104428800)
+             + 180633600)
+            - 135475200))
+          / 270950400.)
 
-b8 = ((n ** 4 *
-       (n *
-        (n *
-         ((-324154477 * n - 1433121792) * n + 876745056)
-         + 167270400)
-        - 208945440))
-      / 7664025600.)
+    b4 = ((nval ** 2 *
+           (nval *
+            (nval *
+             (nval *
+              (nval *
+               ((-24749483 * nval - 14930208) * nval + 100683990)
+               - 152616960)
+              + 105719040)
+             - 23224320)
+            - 7257600))
+          / 348364800.)
 
-b10 = ((n ** 5 *
-        (n *
-         (n *
-          (312227409 - 457888660 * n)
-          + 67920528)
-         - 70779852))
-       / 2490808320.)
+    b6 = ((nval ** 3 *
+           (nval *
+            (nval *
+             (nval *
+              (nval *
+               (232468668 * nval - 101880889)
+               - 39205760)
+              + 29795040)
+             + 28131840)
+            - 22619520))
+          / 638668800.)
 
-b12 = ((n ** 6 *
-        (n *
-         (19841813847 * n + 3665348512)
-         - 3758062126))
-       / 116237721600.)
+    b8 = ((nval ** 4 *
+           (nval *
+            (nval *
+             ((-324154477 * nval - 1433121792) * nval + 876745056)
+             + 167270400)
+            - 208945440))
+          / 7664025600.)
 
-b14 = ((n ** 7 *
-        (1989295244 * n - 1979471673))
-       / 49816166400.)
+    b10 = ((nval ** 5 *
+            (nval *
+             (nval *
+              (312227409 - 457888660 * nval)
+              + 67920528)
+             - 70779852))
+           / 2490808320.)
 
-b16 = ((-191773887257 * n ** 8) / 3719607091200.)
-b = (b2, b4, b6, b8, b10, b12, b14, b16)
+    b12 = ((nval ** 6 *
+            (nval *
+             (19841813847 * nval + 3665348512)
+             - 3758062126))
+           / 116237721600.)
+
+    b14 = ((nval ** 7 *
+            (1989295244 * nval - 1979471673))
+           / 49816166400.)
+
+    b16 = ((-191773887257 * nval ** 8) / 3719607091200.)
+    return b2, b4, b6, b8, b10, b12, b14, b16
+
+
+A = rect_radius(ellipsoid.inversef)
+a = alpha_coeff(ellipsoid.inversef)
+b = beta_coeff(ellipsoid.inversef)
 
 
 def psfandgridconv(xi1, eta1, lat, long, cm, conf_lat):
@@ -407,10 +437,10 @@ def xyz2llh(x, y, z):
     lat = latinit
     itercheck = 1
     while abs(itercheck) > 1e-10:
-        nu = semi_maj/(sqrt(1 - ecc1sq * (sin(lat))**2))
+        nu = ellipsoid.semimaj/(sqrt(1 - ecc1sq * (sin(lat))**2))
         itercheck = lat - atan((z + nu * ecc1sq * sin(lat))/p)
         lat = atan((z + nu * ecc1sq * sin(lat))/p)
-    nu = semi_maj/(sqrt(1 - ecc1sq * (sin(lat))**2))
+    nu = ellipsoid.semimaj/(sqrt(1 - ecc1sq * (sin(lat))**2))
     ellht = p/(cos(lat)) - nu
     # Convert Latitude and Longitude to Degrees
     lat = degrees(lat)
@@ -430,22 +460,20 @@ def llh2xyz(lat, long, ellht):
     if lat == 0:
         nu = grs80.semimaj
     else:
-        nu = semi_maj/(sqrt(1 - ecc1sq * (sin(lat)**2)))
+        nu = ellipsoid.semimaj/(sqrt(1 - ecc1sq * (sin(lat)**2)))
     # Calculate x, y, z
     x = Decimal(str((nu + ellht) * cos(lat) * cos(long)))
     y = Decimal(str((nu + ellht) * cos(lat) * sin(long)))
-    z = Decimal(str(((semi_min**2 / semi_maj**2) * nu + ellht) * sin(lat)))
+    z = Decimal(str(((semi_min**2 / ellipsoid.semimaj**2) * nu + ellht) * sin(lat)))
     return x, y, z
 
 
-"""
-# conform7 Debug - Test Values ALIC
-x = -4052051.7643
-y = 4212836.2017
-z = -2545106.0245
-# Debug - Test Helmert Params (GDA94 to GDA2020, scale in ppm and rotations in seconds)
-conform_gda94to20 = [0.06155, -0.01087, -0.04019, -0.009994, -0.0394924, -0.0327221, -0.0328979]
-"""
+# # conform7 Debug - Test Values ALIC
+# x = -4052051.7643
+# y = 4212836.2017
+# z = -2545106.0245
+# # Debug - Test Helmert Params (GDA94 to GDA2020, scale in ppm and rotations in seconds)
+# conform_gda94to20 = [0.06155, -0.01087, -0.04019, -0.009994, -0.0394924, -0.0327221, -0.0328979]
 
 
 def conform7(x, y, z, trans):
@@ -508,17 +536,19 @@ def grid2geoio():
     outfile = open(fn_out, 'w')
     # Write Output
     outfilewriter = csv.writer(outfile)
-    # outfilewriter.writerow(['Pt', 'Latitude', 'Longitude'])
+    # Optional Header Row
+    # outfilewriter.writerow(['Pt', 'Latitude', 'Longitude', 'Point Scale Factor', 'Grid Convergence'])
     for row in csvreader:
         pt_num = row[0]
         zone = float(row[1])
         east = float(row[2])
         north = float(row[3])
         # Calculate Conversion
-        lat, long = grid2geo(zone, east, north)
+        lat, long, psf, grid_conv = grid2geo(zone, east, north)
         lat = dd2dms(lat)
         long = dd2dms(long)
-        output = [pt_num, lat, long]
+        grid_conv = dd2dms(grid_conv)
+        output = [pt_num, lat, long, psf, grid_conv]
         outfilewriter.writerow(output)
     # Close Files
     outfile.close()
@@ -549,14 +579,16 @@ def geo2gridio():
     outfile = open(fn_out, 'w')
     # Write Output
     outfilewriter = csv.writer(outfile)
-    # outfilewriter.writerow(['Pt', 'Zone', 'Easting', 'Northing'])
+    # Optional Header Row
+    # outfilewriter.writerow(['Pt', 'Zone', 'Easting', 'Northing', 'Point Scale Factor', 'Grid Convergence'])
     for row in csvreader:
         pt_num = row[0]
         lat = dms2dd(float(row[1]))
         long = dms2dd(float(row[2]))
         # Calculate Conversion
-        output = geo2grid(lat, long)
-        output = [pt_num] + list(output)
+        hemisphere, zone, east, north, psf, grid_conv = geo2grid(lat, long)
+        grid_conv = dms2dd(grid_conv)
+        output = [pt_num] + [hemisphere, zone, east, north, psf, grid_conv]
         outfilewriter.writerow(output)
     # Close Files
     outfile.close()

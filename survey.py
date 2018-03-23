@@ -9,16 +9,16 @@ from conversions import dd2dms, dms2dd
 
 
 class AngleObs(object):
-    def __init__(self, degrees=0, minutes=0, seconds=0):
-        self.degrees = int(degrees)
-        self.minutes = int(minutes)
-        self.seconds = float(seconds)
+    def __init__(self, degree=0, minute=0, second=0):
+        self.degree = int(degree)
+        self.minute = int(minute)
+        self.second = float(second)
 
     def __repr__(self):
-        return repr(self.degrees) + 'd ' + repr(self.minutes) + '\' ' + repr(self.seconds) + '\"'
+        return repr(self.degree) + 'd ' + repr(self.minute) + '\' ' + repr(self.second) + '\"'
 
     def decimal(self):
-        dd = abs(self.degrees + self.minutes / 60 + self.seconds / 3600)
+        dd = abs(self.degree + self.minute / 60 + self.second / 3600)
         return dd
 
 
@@ -118,7 +118,7 @@ def gsi2class(gsi_list):
     Takes a list where first entry is station record and
     all remaining records are observations and creates
     a InstSetup Object with Observation Objects included.
-    :param gsi_stnplusobs:
+    :param gsi_list:
     :return:
     """
     def readgsiword16(linestring, word_id):
@@ -143,9 +143,9 @@ def gsi2class(gsi_list):
 
     def parse_hz(gsi_line):
         dms = readgsiword16(gsi_line, '21.324') / 100000
-        degmin, seconds = divmod(abs(dms) * 1000, 10)
-        degrees, minutes = divmod(degmin, 100)
-        return AngleObs(degrees, minutes, seconds * 10)
+        degmin, second = divmod(abs(dms) * 1000, 10)
+        degree, minute = divmod(degmin, 100)
+        return AngleObs(degree, minute, second * 10)
 
     def parse_slope(gsi_line):
         return (readgsiword16(gsi_line, '31..')) / 10000
@@ -281,9 +281,11 @@ def va_conv(verta_hp, slope_dist, height_inst=0, height_tgt=0):
     return verta_pt_hp, slope_dist_pt, hz_dist, delta_ht
 
 
+"""
 to_stn = ['GA03', 'GA02', 'SYM2', 'ATWR', 'MAHON', 'MAHON', 'ATWR', 'SYM2', 'GA02', 'GA03']
 flfr = [359.59597, 14.48289, 25.35515, 215.57043, 300.59046, 120.59060, 35.57045, 205.35530, 194.48282, 179.59581]
 flfr_vert = [90.30228, 90.09547, 89.50396, 88.03600, 87.58014, 272.01587, 271.55593, 270.09227, 269.50091, 269.29414]
+"""
 
 
 def hz_round(brg_list):
@@ -315,7 +317,7 @@ def va_round(va_list):
         va_avg.append(round(dd2dms(ang_avg), 7))
     return va_avg
 
-
+"""
 # Test for round of obs
 if to_stn == to_stn[::-1] and len(to_stn) % 2 == 0:
     brg_avg = hz_round(flfr)
@@ -323,3 +325,4 @@ if to_stn == to_stn[::-1] and len(to_stn) % 2 == 0:
     to_stn_avg = to_stn[0:int(len(to_stn)/2)]
 else:
     brg_avg = ['nope']
+"""
