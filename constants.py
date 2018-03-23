@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+"""
+Geoscience Australia - Python Geodesy Package
+Constants Module
+"""
+
 from decimal import *
 
 c_vac = 299792.458

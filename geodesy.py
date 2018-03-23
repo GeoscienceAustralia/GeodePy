@@ -1,10 +1,24 @@
-import numpy as np
-from math import (pi, degrees, radians, sqrt, sin,
-                  cos, tan, asin, atan, atan2)
+#!/usr/bin/env python3
+
+"""
+Geoscience Australia - Python Geodesy Package
+Geodesy Module
+"""
+
 import os
 import csv
+from math import (pi, degrees, radians, sqrt, sin,
+                  cos, tan, asin, atan, atan2)
+import numpy as np
 from conversions import dd2dms, dms2dd
 from constants import grs80
+
+
+# Universal Transverse Mercator Projection Parameters
+proj = grs80
+f = float(1 / proj[1])
+a = proj[0]
+b = a * (1 - f)
 
 
 def enu2xyz(lat, long, east, north, up):
@@ -65,21 +79,15 @@ def xyz2enu(lat, long, x, y, z):
     return east, north, up
 
 
-# Universal Transverse Mercator Projection Parameters
-proj = grs80
-f = float(1 / proj[1])
-a = proj[0]
-b = a * (1 - f)
-
-
-def vincdir(lat1, long1, azimuth1to2, dist):
+def vincdir(lat1, long1, azimuth1to2, ell_dist):
     """
-    input: Latitude, Longitude of Point 1 in Decimal Degrees,
-    Geodetic Azimuth from Point 1 to 2 in Decimal Degrees,
-    Ellipsoidal Distance in metres.
-
-    output: Latitude, Longitude of Point 1 in Decimal Degrees,
-    Azimuth from Point 2 to 1 in Decimal Degrees.
+    Vincentys Direct Formula
+    :param lat1: Latitude of Point 1 (Decimal Degrees)
+    :param long1: Longitude of Point 1 (Decimal Degrees)
+    :param azimuth1to2: Azimuth from Point 1 to 2
+    :param ell_dist: Ellipsoidal Distance from Point 1 to 2
+    :return: Latitude, Longitude of Point 2 (Decimal Degrees),
+            Azimuth from Point 2 to 1 (Decimal Degrees)
     """
     azimuth1to2 = radians(azimuth1to2)
 
@@ -99,11 +107,11 @@ def vincdir(lat1, long1, azimuth1to2, dist):
          * (4096 + u2
             * (-768 + u2
                * (320 - 175 * u2))))  # Eq. 92
-    B = (u2 / 1024) \
-        * (256 + u2
-           * (-128 + u2
-              * (74 - 47 * u2)))  # Eq. 93
-    sigma = dist / (b * A)  # Eq. 94
+    B = ((u2 / 1024)
+         * (256 + u2
+            * (-128 + u2
+               * (74 - 47 * u2))))  # Eq. 93
+    sigma = ell_dist / (b * A)  # Eq. 94
     # Sigma Iteration
     while True:
         sigm2 = 2 * sigma1 + sigma  # Eq. 95
@@ -117,7 +125,7 @@ def vincdir(lat1, long1, azimuth1to2, dist):
                             * (-3 + 4 * sin(sigma) ** 2)
                             * (-3 + 4 * cos(sigm2) ** 2)
                             )))  # Eq. 96
-        sigma = (dist / (b * A)) + sigma_change  # Eq. 97
+        sigma = (ell_dist / (b * A)) + sigma_change  # Eq. 97
         if abs(sigma_change) < 1e-5:
             break
     sin_sigma = sin(sigma)
@@ -224,7 +232,7 @@ def vincinv(lat1, long1, lat2, long2):
     if sigma < 0:
         sigma = sigma + pi
     # Eq. 85
-    dist = b * A * (sigma - delta_sigma)
+    ell_dist = b * A * (sigma - delta_sigma)
     # Calculate Alpha1
     azimuth1to2 = degrees(atan2((cos_u2 * sin(long_diff)),
                                 (cos_u1 * sin_u2 - sin_u1
@@ -238,10 +246,10 @@ def vincinv(lat1, long1, lat2, long2):
     azimuth2to1 = azimuth2to1 + 180
     # Meridian Critical Case Tests
     if long1 == long2 and lat1 > lat2:
-        return dist, 180, 0
+        return ell_dist, 180, 0
     if long1 == long2 and lat1 < lat2:
-        return dist, 0, 180
-    return dist, azimuth1to2, azimuth2to1
+        return ell_dist, 0, 180
+    return ell_dist, azimuth1to2, azimuth2to1
 
 
 def vincdirio():
@@ -274,8 +282,8 @@ def vincdirio():
         lat1 = dms2dd(float(row[0]))
         long1 = dms2dd(float(row[1]))
         azimuth1to2 = dms2dd(float(row[2]))
-        dist = float(row[3])
-        lat2, long2, azimuth2to1 = vincdir(lat1, long1, azimuth1to2, dist)
+        ell_dist = float(row[3])
+        lat2, long2, azimuth2to1 = vincdir(lat1, long1, azimuth1to2, ell_dist)
         lat2 = dd2dms(lat2)
         long2 = dd2dms(long2)
         azimuth2to1 = dd2dms(azimuth2to1)
@@ -305,10 +313,10 @@ def vincinvio():
         long1 = dms2dd(float(row[1]))
         lat2 = dms2dd(float(row[2]))
         long2 = dms2dd(float(row[3]))
-        dist, azimuth1to2, azimuth2to1 = vincinv(lat1, long1, lat2, long2)
+        ell_dist, azimuth1to2, azimuth2to1 = vincinv(lat1, long1, lat2, long2)
         azimuth1to2 = dd2dms(azimuth1to2)
         azimuth2to1 = dd2dms(azimuth2to1)
-        output = (dist, azimuth1to2, azimuth2to1)
+        output = (ell_dist, azimuth1to2, azimuth2to1)
         outfilewriter.writerow(output)
     # Close Files
     outfile.close()

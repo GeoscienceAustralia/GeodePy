@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+"""
+Geoscience Australia - Python Geodesy Package
+Conversions Module
+"""
+
 from math import modf
 
 
