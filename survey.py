@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+"""
+Geoscience Australia - Python Geodesy Package
+Survey Module
+"""
+
 import os
 from math import sqrt, degrees, radians, sin, cos, asin
 from conversions import dd2dms, dms2dd
