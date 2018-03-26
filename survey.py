@@ -17,7 +17,7 @@ class AngleObs(object):
     def __init__(self, degree=0, minute=0, second=0):
         self.degree = int(degree)
         self.minute = int(minute)
-        self.second = float(second)
+        self.second = round(float(second),3)
 
     def __repr__(self):
         return repr(self.degree) + 'd ' + repr(self.minute) + '\' ' + repr(self.second) + '\"'
@@ -37,6 +37,12 @@ class Coordinate(object):
         self.x = x
         self.y = y
         self.z = z
+
+    def __repr__(self):
+        return ('{' + str(self.hz_datum) + ', '
+                + str(self.x) + ', '
+                + str(self.y) + ', '
+                + str(self.z) + '}')
 
 
 class InstSetup(object):
@@ -129,8 +135,11 @@ def gsi2class(gsi_list):
     def readgsiword16(linestring, word_id):
         wordstart = str.find(linestring, word_id)
         word_val = linestring[(wordstart + 7):(wordstart + 23)]
-        word_val = int(word_val.lstrip('0'))
-        return word_val
+        word_val = word_val.lstrip('0')
+        if word_val == '':
+            return 0
+        else:
+            return int(word_val)
 
     def parse_ptid(gsi_line):
         ptid = gsi_line[8:24]
@@ -189,7 +198,9 @@ def gsi2class(gsi_list):
             northing = parse_northing(record[0])
             elev = parse_elev(record[0])
             coord = Coordinate(pt_id, 'utm', 'gda', 'gda', '2018', easting, northing, elev)
-            setup = InstSetup(pt_id, coord, obs_list)
+            setup = InstSetup(pt_id, coord)
+            for i in range(0, len(obs_list)):
+                setup.addobs(obs_list[i])
     return setup
 
 
@@ -217,8 +228,8 @@ def readgsiword16(linestring, word_id):
 
 def dnaout_sd(observation):
     return ('S '
-            + observation.from_name.ljust(20)
-            + observation.to_name.ljust(20)
+            + observation.from_id.ljust(20)
+            + observation.to_id.ljust(20)
             + ''.ljust(20)
             + str(observation.sd_obs).ljust(14)  # 76
             + ''.ljust(14)
