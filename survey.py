@@ -17,7 +17,7 @@ class AngleObs(object):
     def __init__(self, degree=0, minute=0, second=0):
         self.degree = int(degree)
         self.minute = int(minute)
-        self.second = round(float(second),3)
+        self.second = round(float(second), 3)
 
     def __repr__(self):
         return repr(self.degree) + 'd ' + repr(self.minute) + '\' ' + repr(self.second) + '\"'
@@ -63,6 +63,9 @@ class InstSetup(object):
 
     def addobs(self, observation):
         return self.observation.append(observation)
+
+    def __iter__(self):
+        return self
 
 
 class Observation(object):
@@ -179,6 +182,7 @@ def gsi2class(gsi_list):
         degrees, minutes = divmod(degmin, 100)
         return AngleObs(degrees, minutes, seconds * 10)
 
+    project = []
     for record in gsi_list:
         from_stn = parse_ptid(record[0])
         obs_list = []
@@ -197,23 +201,12 @@ def gsi2class(gsi_list):
             easting = parse_easting(record[0])
             northing = parse_northing(record[0])
             elev = parse_elev(record[0])
-            coord = Coordinate(pt_id, 'utm', 'gda', 'gda', '2018', easting, northing, elev)
+            coord = Coordinate(pt_id, 'utm', 'gda94', 'gda94', '2018.1', easting, northing, elev)
             setup = InstSetup(pt_id, coord)
             for i in range(0, len(obs_list)):
                 setup.addobs(obs_list[i])
-    return setup
-
-
-"""
-    # Create Coordinate and Instrument Setup Objects
-    coord = Coordinate(pt_id, 'utm', 'gda', 'gda', '2018', easting, northing, elev)
-    setup = InstSetup(pt_id, coord)
-    # Add Instrument Setup to Project
-    project.update({'InstSetup_' + str(stncount): setup})
-        # Add Observation Records to InstSetup Objects
-
-return project
-"""
+        project.append(setup)
+    return project
 
 
 def readgsiword16(linestring, word_id):
@@ -332,6 +325,7 @@ def va_round(va_list):
         ang_avg = (fl_ang + fr_ang)/2 + 90
         va_avg.append(round(dd2dms(ang_avg), 7))
     return va_avg
+
 
 """
 # Test for round of obs
