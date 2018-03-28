@@ -7,7 +7,7 @@ This is a package of tools for manipulating geospatial datasets using Python and
 This package requires the following non-standard Python modules installed:
 
 ```
-...
+Numpy
 ```
 
 ## Authors
