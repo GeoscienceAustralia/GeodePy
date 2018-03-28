@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+
+"""
+Geoscience Australia - Python Geodesy Package
+Geoid Module
+
+In Development
+"""
+
 import numpy as np
 from scipy import interpolate
 from conversions import dms2dd

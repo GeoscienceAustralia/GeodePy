@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 
-import math
+"""
+Geoscience Australia - Python Geodesy Package
+Conversions Module
+"""
+
+from math import modf
 
 
 def dec2hp(lon, lat):
@@ -50,8 +55,8 @@ def hp2dec(lon, lat):
             coord = abs(coord)
         else:
             flag = 1
-        min_sec, deg = math.modf(coord)
-        sec, min = math.modf(min_sec * 100)
+        min_sec, deg = modf(coord)
+        sec, min = modf(min_sec * 100)
         sec *= 100
         dec_coord = deg + min / 60 + sec / 3600
         dec_coord = float('{:.6f}'.format(dec_coord))
@@ -81,10 +86,10 @@ def dec2sex(lon, lat):
             coord = abs(coord)
         else:
             flag = 1
-        min_sec, deg = math.modf(coord)
+        min_sec, deg = modf(coord)
         deg = int(deg)
         deg *= flag  # deal with negatives
-        sec, min = math.modf(min_sec * 60)
+        sec, min = modf(min_sec * 60)
         min = round(min)
         sec *= 60
         sex_coord = '{} {:02d} {:05.2f}'.format(deg, min, sec)
@@ -199,3 +204,32 @@ def dms2dd(dms):
     degrees, minutes = divmod(degmin, 100)
     dd = degrees + (minutes / 60) + (seconds / 360)
     return dd if dms >= 0 else -dd
+
+
+class Angle(object):
+    def __init__(self, decdeg):
+        try:
+            self.decdeg = float(decdeg)
+        except ValueError:
+            print('ValueError: Angle must be numeric')
+
+    def __repr__(self):
+        return '{Decimal Angle: ' + str(self.decdeg) + '}'
+
+    def __add__(self, other):
+        return self.decdeg + float(other)
+
+    def __sub__(self, other):
+        return self.decdeg - float(other)
+
+    def __abs__(self):
+        return -self.decdeg if self.decdeg < 0 else self.decdeg
+
+    def __float__(self):
+        return self.decdeg
+
+    def hp(self):
+        minutes, seconds = divmod(abs(self) * 3600, 60)
+        degrees, minutes = divmod(minutes, 60)
+        hp = degrees + (minutes / 100) + (seconds / 10000)
+        return hp if float(self) >= 0 else -hp
