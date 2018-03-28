@@ -1,6 +1,6 @@
 # Geodesy Python Package
 
-This is a package of tools for manipulating geospatial datasets using Python and tested in Python 3.6.4
+This is a package of tools for manipulating geospatial datasets using Python and tested in Python 3.6.4.
 
 ### Dependencies
 
