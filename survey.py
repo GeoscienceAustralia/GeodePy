@@ -56,11 +56,12 @@ class AngleObs(object):
 
     def __truediv__(self, other):
         # Broken, doesn't pass fractional parts to minutes, seconds
-        degreediv = self.degree / other
-        minutediv = abs(self.minute) / other
-        seconddiv = abs(self.second) / other
+        degreediv, degreerem = divmod(self.degree, other)
+        minutediv, minuterem = divmod(self.minute, other)
+        seconddiv, secondrem = divmod(self.second, other)
+        minutediv = minutediv + ((minuterem / other) * 60)
+        seconddiv = seconddiv + ((secondrem / other) * 60)
         return AngleObs(degreediv, minutediv, seconddiv)
-
 
 
 class Coordinate(object):
