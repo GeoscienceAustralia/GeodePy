@@ -15,16 +15,52 @@ from conversions import dd2dms, dms2dd
 
 class AngleObs(object):
     def __init__(self, degree=0, minute=0, second=0):
-        self.degree = int(degree)
-        self.minute = int(minute)
-        self.second = round(float(second), 3)
+        self.degree = abs(int(degree))
+        self.minute = abs(int(minute))
+        self.second = abs(round(float(second), 3))
 
     def __repr__(self):
         return repr(self.degree) + 'd ' + repr(self.minute) + '\' ' + repr(self.second) + '\"'
 
     def decimal(self):
         dd = abs(self.degree + self.minute / 60 + self.second / 3600)
-        return dd
+        return dd if self.degree >= 0 else -dd
+
+    def __add__(self, other):
+        degreeadd = self.degree + other.degree
+        minuteadd = abs(self.minute) + abs(other.minute)
+        secondadd = abs(self.second) + abs(other.second)
+        while secondadd >= 60:
+            minuteadd += 1
+            secondadd -= 60
+        while minuteadd >= 60:
+            degreeadd += 1
+            minuteadd -= 60
+        while degreeadd >= 360:
+            degreeadd -= 360
+        return AngleObs(degreeadd, minuteadd, secondadd)
+
+    def __sub__(self, other):
+        degreesub = self.degree - other.degree
+        minutesub = abs(self.minute) - abs(other.minute)
+        secondsub = abs(self.second) - abs(other.second)
+        while secondsub < 0:
+            secondsub += 60
+            minutesub -= 1
+        while minutesub < 0:
+            minutesub += 60
+            degreesub -= 1
+        while degreesub < 0:
+            degreesub += 360
+        return AngleObs(degreesub, minutesub, secondsub)
+
+    def __truediv__(self, other):
+        # Broken, doesn't pass fractional parts to minutes, seconds
+        degreediv = self.degree / other
+        minutediv = abs(self.minute) / other
+        seconddiv = abs(self.second) / other
+        return AngleObs(degreediv, minutediv, seconddiv)
+
 
 
 class Coordinate(object):
