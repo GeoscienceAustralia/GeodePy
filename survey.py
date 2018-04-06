@@ -26,6 +26,10 @@ class AngleObs(object):
         dd = abs(self.degree + self.minute / 60 + self.second / 3600)
         return dd if self.degree >= 0 else -dd
 
+    def hp(self):
+        hp = abs(self.degree + self.minute / 100 + self.second / 10000)
+        return hp if self.degree >= 0 else -hp
+
     def __add__(self, other):
         degreeadd = self.degree + other.degree
         minuteadd = abs(self.minute) + abs(other.minute)
@@ -59,8 +63,8 @@ class AngleObs(object):
         degreediv, degreerem = divmod(self.degree, other)
         minutediv, minuterem = divmod(self.minute, other)
         seconddiv, secondrem = divmod(self.second, other)
-        minutediv = minutediv + ((minuterem / other) * 60)
-        seconddiv = seconddiv + ((secondrem / other) * 60)
+        minutediv = minutediv + ((degreerem / other) * 60)
+        seconddiv = seconddiv + ((minuterem / other) * 60) + (secondrem / other)
         return AngleObs(degreediv, minutediv, seconddiv)
 
 
@@ -254,6 +258,52 @@ def readgsiword16(linestring, word_id):
 
 
 # Functions to write out station and obs data to DNA format
+
+def anglerounds(allobsfromInstSetup):
+    # Work out what defines a round
+        # Repeated to_stn name
+        # Even Palindromic to_stn names
+    # Create new list of meaned rounds of obs
+    # For first and last in round
+        # mean_hz = (FL_hz + (FR_hz - 180)) / 2
+        # mean_va = (FL_va + FR_hz) / 2 (tbd)
+        # mean_sd = (FL_sd + FL_sd) / 2
+        # Observation(All same + mean_hz, mean_va, mean_sd)
+        # Add above to list of meaned rounds of obs
+        # Remove first and last in round
+    # Repeat until all obs in round meaned
+    # Repeat above until all rounds meaned
+    # Return new list of meaned obs per round (no non-round obs included)
+    pass
+
+
+def anglepairs(allobsfromInstSetup):
+    # For first to_stn
+        # Find next occurrence of to_stn
+        # Check (FL_hz ~= (FR_hz +- 180)
+    # Create new list of meaned rounds of obs
+    # For FL/FR pair of obs
+        # mean_hz = (FL_hz + (FR_hz - 180)) / 2
+        # check (FL_va ~= (FR_va +- blah))
+            # if true then mean_va = (FL_va + FR_hz) / 2 (tbd)
+            # else va = 0
+        # mean_sd = (FL_sd + FL_sd) / 2
+        # Observation(All same + mean_hz, mean_va, mean_sd)
+        # Remove pair from list
+    # Repeat until all pairs of obs in round meaned
+    # Return new list of meaned pairs of obs (no single-face obs included)
+    pass
+
+
+def dnaout_dirset(allobsfromInstSetup):
+    # Find index of next obs with same to_stn (defines direction set)
+    # If no next, include all obs
+    # Set default std_dev
+    # For obs in unique list
+        # First line is first obs
+        # For remaining obs
+            # Include to_stn and direction
+    pass
 
 
 def dnaout_sd(observation):
