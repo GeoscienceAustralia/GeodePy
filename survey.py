@@ -254,12 +254,12 @@ def readgsiword16(linestring, word_id):
 
 # Functions to write out station and obs data to DNA format
 
-def anglerounds(allobsfromInstSetup):
-    # Work out what defines a round
-        # Repeated to_stn name
-        # Even Palindromic to_stn names
-    # Create new list of meaned rounds of obs
-    # For first and last in round
+def anglerounds(setup):
+    """
+
+    :param setup:
+    :return:
+    """
     def meanhz(angle1, angle2):
         if angle1.degree < angle2.degree:
             return (angle1 + (angle2 - AngleObs(180))) / 2
@@ -271,6 +271,35 @@ def anglerounds(allobsfromInstSetup):
             return (angle1 + (AngleObs(360) - angle2)) / 2
         else:
             return (angle2 + (AngleObs(360) - angle1)) / 2
+    # Build a round of FL/FR obs
+    start_round = setup.observation[0].to_id
+    ind = []
+    roundofobs = []
+    for c, ob in enumerate(setup.observation):
+        if ob.to_id == start_round:
+            ind.append(c)
+    roundofobs = setup.observation[ind[0]:ind[1] + 1]
+    # Test for Even Palindromic to_stn names
+    meanround = []
+    fl = 0
+    fr = -1
+    while len(roundofobs)/2 > fl + 1:
+        meanhz = meanhz(roundofobs[fl].hz_obs, roundofobs[fr].hz_obs)
+        meanva = meanva(roundofobs[fr].va_obs, roundofobs[fr].va_obs)
+        meanob = Observation(roundofobs[fl].from_id,
+                             roundofobs[fl].to_id,
+                             roundofobs[fl].inst_height,
+                             roundofobs[fl].target_height,
+                             meanhz,
+                             meanva,
+                             roundofobs[fl].sd_obs,
+                             roundofobs[fl].hz_dist,
+                             roundofobs[fl].vert_dist)
+        meanround.append(meanob)
+        fl += 1
+        fr -= 1
+    # Create new list of meaned rounds of obs
+    # For first and last in round
         # mean_va = (FL_va + FR_hz) / 2 (tbd)
         # mean_sd = (FL_sd + FL_sd) / 2
         # Observation(All same + mean_hz, mean_va, mean_sd)
