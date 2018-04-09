@@ -40,8 +40,6 @@ class AngleObs(object):
         while minuteadd >= 60:
             degreeadd += 1
             minuteadd -= 60
-        while degreeadd >= 360:
-            degreeadd -= 360
         return AngleObs(degreeadd, minuteadd, secondadd)
 
     def __sub__(self, other):
@@ -54,12 +52,9 @@ class AngleObs(object):
         while minutesub < 0:
             minutesub += 60
             degreesub -= 1
-        while degreesub < 0:
-            degreesub += 360
         return AngleObs(degreesub, minutesub, secondsub)
 
     def __truediv__(self, other):
-        # Broken, doesn't pass fractional parts to minutes, seconds
         degreediv, degreerem = divmod(self.degree, other)
         minutediv, minuterem = divmod(self.minute, other)
         seconddiv, secondrem = divmod(self.second, other)
@@ -265,7 +260,17 @@ def anglerounds(allobsfromInstSetup):
         # Even Palindromic to_stn names
     # Create new list of meaned rounds of obs
     # For first and last in round
-        # mean_hz = (FL_hz + (FR_hz - 180)) / 2
+    def meanhz(angle1, angle2):
+        if angle1.degree < angle2.degree:
+            return (angle1 + (angle2 - AngleObs(180))) / 2
+        else:
+            return (angle1 + (angle2 + AngleObs(180))) / 2
+
+    def meanva(angle1, angle2):
+        if angle1.degree < 180:
+            return (angle1 + (AngleObs(360) - angle2)) / 2
+        else:
+            return (angle2 + (AngleObs(360) - angle1)) / 2
         # mean_va = (FL_va + FR_hz) / 2 (tbd)
         # mean_sd = (FL_sd + FL_sd) / 2
         # Observation(All same + mean_hz, mean_va, mean_sd)
@@ -283,10 +288,17 @@ def anglepairs(allobsfromInstSetup):
         # Check (FL_hz ~= (FR_hz +- 180)
     # Create new list of meaned rounds of obs
     # For FL/FR pair of obs
-        # mean_hz = (FL_hz + (FR_hz - 180)) / 2
-        # check (FL_va ~= (FR_va +- blah))
-            # if true then mean_va = (FL_va + FR_hz) / 2 (tbd)
-            # else va = 0
+    def meanhz(angle1, angle2):
+        if angle1.degree < angle2.degree:
+            return (angle1 + (angle2 - AngleObs(180))) / 2
+        else:
+            return (angle1 + (angle2 + AngleObs(180))) / 2
+
+    def meanva(angle1, angle2):
+        if angle1.degree < 180:
+            return (angle1 + (AngleObs(360) - angle2)) / 2
+        else:
+            return (angle2 + (AngleObs(360) - angle1)) / 2
         # mean_sd = (FL_sd + FL_sd) / 2
         # Observation(All same + mean_hz, mean_va, mean_sd)
         # Remove pair from list
@@ -320,14 +332,14 @@ def dnaout_sd(observation):
 
 def dnaout_va(observation):
     return ('V '
-            + observation.from_name.ljust(20)
-            + observation.to_name.ljust(20)
+            + observation.from_id.ljust(20)
+            + observation.to_id.ljust(20)
             + ''.ljust(34)
-            + str(observation.va_obs.degrees).rjust(3)
+            + str(observation.va_obs.degree).rjust(3)
             + ' '
-            + str('%02d' % observation.va_obs.minutes)
+            + str('%02d' % observation.va_obs.minute)
             + ' '
-            + str(observation.va_obs.seconds).ljust(8)
+            + str(observation.va_obs.second).ljust(8)
             + '1.0000'.ljust(9)         # add standard deviation
             + str(1.7960).ljust(7)      # add intrument height
             + str(observation.target_height).ljust(7))
