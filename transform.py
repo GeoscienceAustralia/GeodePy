@@ -12,7 +12,7 @@ Ref2: http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 import os
 import csv
 from decimal import *
-from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2
+from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2, modf
 import numpy as np
 from constants import grs80, utm
 from conversions import dd2dms, dms2dd
@@ -510,6 +510,29 @@ def conform7(x, y, z, trans):
     ytrans = float(xyz_after[1])
     ztrans = float(xyz_after[2])
     return xtrans, ytrans, ztrans
+
+
+def conform14(x, y, z, from_epoch, to_epoch, trans):
+    # Convert YYYY.DOY to Decimal Year
+    from_doy, from_year = modf(from_epoch)
+    to_doy, to_year = modf(to_epoch)
+    ref_doy, ref_year = modf(trans.ref_epoch)
+    from_epoch = from_year + (from_doy / 0.365)
+    to_epoch = to_year + (to_doy / 0.365)
+    ref_epoch = ref_year + (ref_doy / 0.365)
+    # Calc Transformation at 'From Epoch'
+    
+    # # Conditional transformation formation
+    # if from_epoch < to_epoch:
+    #     if ref_epoch < from_epoch:
+    #         pass
+    #     elif ref_epoch > from_epoch and ref_epoch < to_epoch:
+    #         pass
+    #     elif ref_epoch > to_epoch:
+    #         pass
+    # if from_epoch > to_epoch:
+    #     pass
+    # pass
 
 
 def grid2geoio():
