@@ -118,7 +118,8 @@ class Observation(object):
         self.vert_dist = vert_dist
 
     def __repr__(self):
-        return ('{to: ' + repr(self.to_id)
+        return ('{from: ' + repr(self.from_id)
+                + 'to: ' + repr(self.to_id)
                 + '; target_height ' + repr(self.target_height)
                 + '; hz_obs ' + repr(self.hz_obs)
                 + '; va_obs ' + repr(self.va_obs)
