@@ -423,6 +423,7 @@ def grid2geo(zone, east, north, hemisphere='south'):
 
 
 def xyz2llh(x, y, z):
+    # Add input for ellipsoid (default: grs80)
     """
     Input: Cartesian XYZ coordinate in metres
 
@@ -449,6 +450,7 @@ def xyz2llh(x, y, z):
 
 
 def llh2xyz(lat, long, ellht):
+    # Add input for ellipsoid (default: grs80)
     """
     Input: Latitude and Longitude in Decimal Degrees, Ellipsoidal Height in metres
     Output: Cartesian X, Y, Z Coordinates in metres

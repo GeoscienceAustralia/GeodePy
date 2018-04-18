@@ -20,6 +20,8 @@ class Ellipsoid(object):
 
 grs80 = Ellipsoid(6378137, Decimal('298.25722210088'))
 
+ans = Ellipsoid(6378160, Decimal('298.25'))
+
 
 # Projections
 class Projection(object):
@@ -169,9 +171,30 @@ def iers2trans(itrf_from, itrf_to, ref_epoch, tx, ty, tz, sc, rx, ry, rz, d_tx, 
 
 
 # GDA1994 to GDA2020 Transformation Parameters from GDA2020 Tech Manual v1.1.1
+# AGD66 and AGD84 to GDA94 Transformation Parameters from GDA94 Tech Manual v2.4
+# link: http://www.icsm.gov.au/datum/gda2020-and-gda94-technical-manuals
 
-gda94to20 = Transformation('GDA94', 'GDA2020', 0,
+gda94to20 = Transformation('GDA1994', 'GDA2020', 0,
                            0.06155, -0.01087, -0.04019, -0.009994, -0.0394924, -0.0327221, -0.0328979)
+
+agd84togda94 = Transformation('AGD84', 'GDA94', 0,
+                              -117.763, -51.510, 139.061, -0.191, -0.292, -0.443, -0.277)
+
+agd66togda94 = Transformation('AGD1966', 'GDA1994', 0,
+                              -117.808, -51.536, 137.784, -0.290, -0.303, -0.446, -0.234)
+
+agd66togda94_act = Transformation('AGD66', 'GDA94', 0,
+                                  -129.193, -41.212, 130.730, -2.955, -0.246, -0.374, -0.329)
+
+agd66togda94_tas = Transformation('AGD66', 'GDA94', 0,
+                                  -120.271, -64.543, 161.632, 2.499, -0.217, 0.067, 0.129)
+
+agd66togda94_vicnsw = Transformation('AGD66', 'GDA94', 0,
+                                     -119.353, -48.301, 139.484, -0.613, -0.415, -0.260, -0.437)
+
+agd66togda94_nt = Transformation('AGD66', 'GDA94', 0,
+                                 -124.133, -42.003, 137.400, -1.854, 0.008, -0.557, -0.178)
+
 
 # ITRF2014 Parameters
 # link: http://itrf.ign.fr/doc_ITRF/Transfo-ITRF2014_ITRFs.txt
