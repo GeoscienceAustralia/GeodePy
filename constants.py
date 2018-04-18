@@ -70,6 +70,11 @@ class Transformation(object):
                 + '  rz: ' + repr(self.rz) + '\" + ' + repr(self.d_rz) + '\"/yr' + '\n')
 
     def __neg__(self):
+        """
+        Reverses Direction of Transformation Object
+        i.e. ITRF2014 to ITRF2000 transformation becomes ITRF2000 to ITRF2014 transformation
+        :return: Reversed Direction Transformation Object
+        """
         return Transformation(self.to_datum,
                               self.from_datum,
                               self.ref_epoch,
@@ -79,6 +84,56 @@ class Transformation(object):
                               -self.d_tx, -self.d_ty, -self.d_tz,
                               -self.d_sc,
                               -self.d_rx, -self.d_ry, -self.d_rz)
+
+    def __add__(self, other):
+        """
+        Change Reference Epoch (add decimal year).
+        Advances all transformation parameters by their respective rates of change.
+        :param other: Decimal Year
+        :return: Transformation object with parameters and ref epoch advanced by input year
+        """
+        return Transformation(self.to_datum,
+                              self.from_datum,
+                              self.ref_epoch + other,
+                              round(self.tx + (self.d_tx * other), 8),
+                              round(self.ty + (self.d_ty * other), 8),
+                              round(self.tz + (self.d_tz * other), 8),
+                              round(self.sc + (self.d_sc * other), 8),
+                              round(self.rx + (self.d_rx * other), 8),
+                              round(self.ry + (self.d_ry * other), 8),
+                              round(self.rz + (self.d_rz * other), 8),
+                              self.d_tx,
+                              self.d_ty,
+                              self.d_tz,
+                              self.d_sc,
+                              self.d_rx,
+                              self.d_ry,
+                              self.d_rz)
+
+    def __sub__(self, other):
+        """
+        Change Reference Epoch (subtract decimal year).
+        Retracts all transformation parameters by their respective rates of change.
+        :param other: Decimal Year
+        :return: Transformation object with parameters and ref epoch advanced by input year
+        """
+        return Transformation(self.to_datum,
+                              self.from_datum,
+                              self.ref_epoch - other,
+                              round(self.tx - (self.d_tx * other), 8),
+                              round(self.ty - (self.d_ty * other), 8),
+                              round(self.tz - (self.d_tz * other), 8),
+                              round(self.sc - (self.d_sc * other), 8),
+                              round(self.rx - (self.d_rx * other), 8),
+                              round(self.ry - (self.d_ry * other), 8),
+                              round(self.rz - (self.d_rz * other), 8),
+                              self.d_tx,
+                              self.d_ty,
+                              self.d_tz,
+                              self.d_sc,
+                              self.d_rx,
+                              self.d_ry,
+                              self.d_rz)
 
 
 def iers2trans(itrf_from, itrf_to, ref_epoch, tx, ty, tz, sc, rx, ry, rz, d_tx, d_ty, d_tz, d_sc, d_rx, d_ry, d_rz):
@@ -135,15 +190,15 @@ itrf14to00 = iers2trans('ITRF2014', 'ITRF2000', 2010.0,
 
 itrf14to97 = iers2trans('ITRF2014', 'ITRF1997', 2010.0,
                         7.4, -0.5, -62.8, 3.80, 0, 0, 0.26,
-                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.2)
+                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
 
 itrf14to96 = iers2trans('ITRF2014', 'ITRF1996', 2010.0,
                         7.4, -0.5, -62.8, 3.80, 0, 0, 0.26,
-                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.2)
+                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
 
 itrf14to94 = iers2trans('ITRF2014', 'ITRF1994', 2010.0,
                         7.4, -0.5, -62.8, 3.80, 0, 0, 0.26,
-                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.2)
+                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
 
 itrf14to93 = iers2trans('ITRF2014', 'ITRF1993', 2010.0,
                         -50.4, 3.3, -60.2, 4.29, -2.81, -3.38, 0.40,
@@ -151,23 +206,23 @@ itrf14to93 = iers2trans('ITRF2014', 'ITRF1993', 2010.0,
 
 itrf14to92 = iers2trans('ITRF2014', 'ITRF1992', 2010.0,
                         15.4, 1.5, -70.8, 3.09, 0, 0, 0.26,
-                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.2)
+                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
 
 itrf14to91 = iers2trans('ITRF2014', 'ITRF1991', 2010.0,
                         27.4, 15.5, -76.8, 4.49, 0, 0, 0.26,
-                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.2)
+                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
 
 itrf14to90 = iers2trans('ITRF2014', 'ITRF1990', 2010.0,
                         25.4, 11.5, -92.8, 4.79, 0, 0, 0.26,
-                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.2)
+                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
 
 itrf14to89 = iers2trans('ITRF2014', 'ITRF1989', 2010.0,
                         30.4, 35.5, -130.8, 8.19, 0, 0, 0.26,
-                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.2)
+                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
 
 itrf14to88 = iers2trans('ITRF2014', 'ITRF1988', 2010.0,
                         25.4, -0.5, -154.8, 11.29, 0.1, 0, 0.26,
-                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.2)
+                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
 
 # ITRF2008 Parameters
 # link: http://itrf.ign.fr/doc_ITRF/Transfo-ITRF2008_ITRFs.txt
@@ -215,3 +270,51 @@ itrf08to89 = iers2trans('ITRF2008', 'ITRF1989', 2000.0,
 itrf08to88 = iers2trans('ITRF2008', 'ITRF1988', 2000.0,
                         22.8, 2.6, -125.2, 10.41, 0.10, 0, 0.06,
                         0.1, -0.5, -3.2, 0.09, 0, 0, 0.02)
+
+# ITRF2005 Parameters
+# link: http://itrf.ensg.ign.fr/ITRF_solutions/2005/tp_05-00.php
+
+itrf05to00 = iers2trans('ITRF2005', 'ITRF2000', 2000.0,
+                        0.1, -0.8, -5.8, 0.40, 0, 0, 0,
+                        -0.2, 0.1, -1.8, 0.08, 0, 0, 0)
+
+# ITRF2000 Parameters
+# link: ftp://itrf.ensg.ign.fr/pub/itrf/ITRF.TP
+# NOTE: This ref lists translations in centimetres. All other ITRF transformations are shown in millimetres.
+# NOTE: All translations and rates of translation shown below have been converted to millimetres.
+
+itrf00to97 = iers2trans('ITRF2000', 'ITRF1997', 1997.0,
+                        6.7, 6.1, -18.5, 1.55, 0, 0, 0,
+                        0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
+
+itrf00to96 = iers2trans('ITRF2000', 'ITRF1996', 1997.0,
+                        6.7, 6.1, -18.5, 1.55, 0, 0, 0,
+                        0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
+
+itrf00to94 = iers2trans('ITRF2000', 'ITRF1994', 1997.0,
+                        6.7, 6.1, -18.5, 1.55, 0, 0, 0,
+                        0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
+
+itrf00to93 = iers2trans('ITRF2000', 'ITRF1993', 1988.0,
+                        12.7, 6.5, -20.9, 1.95, -0.39, 0.80, -1.14,
+                        -2.9, -0.2, -0.6, 0.01, -0.11, -0.19, 0.07)
+
+itrf00to92 = iers2trans('ITRF2000', 'ITRF1992', 1988.0,
+                        14.7, 13.5, -13.9, 0.75, 0, 0, -0.18,
+                        0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
+
+itrf00to91 = iers2trans('ITRF2000', 'ITRF1991', 1988.0,
+                        26.7, 27.5, -19.9, 2.15, 0, 0, -0.18,
+                        0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
+
+itrf00to90 = iers2trans('ITRF2000', 'ITRF1990', 1988.0,
+                        14.7, 13.5, -13.9, 0.75, 0, 0, -0.18,
+                        0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
+
+itrf00to89 = iers2trans('ITRF2000', 'ITRF1989', 1988.0,
+                        29.7, 47.5, -73.9, 5.85, 0, 0, -0.18,
+                        0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
+
+itrf00to88 = iers2trans('ITRF2000', 'ITRF1988', 1988.0,
+                        24.7, 11.5, -97.9, 8.95, 0, 0, -0.18,
+                        0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
