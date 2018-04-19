@@ -6,6 +6,7 @@ Constants Module
 """
 
 from decimal import *
+from math import sqrt
 
 c_vac = 299792.458
 k_0 = 0.9996
@@ -16,6 +17,13 @@ class Ellipsoid(object):
     def __init__(self, semimaj, inversef):
         self.semimaj = semimaj
         self.inversef = inversef
+        self.f = 1 / self.inversef
+        self.semimin = float(self.semimaj * (1 - self.f))
+        self.ecc1sq = float(self.f * (2 - self.f))
+        self.ecc2sq = float(self.ecc1sq / (1 - self.ecc1sq))
+        self.ecc1 = sqrt(self.ecc1sq)
+        self.n = float(self.f / (2 - self.f))
+        self.n2 = self.n ** 2
 
 
 grs80 = Ellipsoid(6378137, Decimal('298.25722210088'))
