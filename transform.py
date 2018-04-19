@@ -394,7 +394,7 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
     diff = 1
     t = t1
     itercount = 0
-    while diff > 1e-50 and itercount < 100:
+    while diff > 1e-15 and itercount < 100:
         itercount += 1
         t_before = t
         t = t - (ftn(t, ellipsoid.ecc1) / f1tn(t, ellipsoid.ecc1, ellipsoid.ecc1sq))
