@@ -4,7 +4,7 @@
 Geoscience Australia - Python Geodesy Package
 Transform Module
 
-Ref1: http://www.icsm.gov.au/gda/tech.html
+Ref1: http://www.icsm.gov.au/sites/default/files/GDA2020TechnicalManualV1.1.1.pdf
 Ref2: http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 """
 
@@ -197,12 +197,9 @@ def beta_coeff(ellipsoid):
     return b2, b4, b6, b8, b10, b12, b14, b16
 
 
-A = rect_radius(grs80)
-a = alpha_coeff(grs80)
-b = beta_coeff(grs80)
-
-
 def psfandgridconv(xi1, eta1, lat, long, cm, conf_lat, ellipsoid=grs80):
+    A = rect_radius(ellipsoid)
+    a = alpha_coeff(ellipsoid)
     lat = radians(lat)
     long_diff = radians(long - cm)
 
@@ -265,6 +262,8 @@ def geo2grid(lat, long, zone=0, ellipsoid=grs80):
         print('ValueError: Invalid Longitude - Longitudes from -180 to +180')
         return
 
+    A = rect_radius(ellipsoid)
+    a = alpha_coeff(ellipsoid)
     lat = radians(lat)
     # Calculate Zone
     if zone == 0:
@@ -279,7 +278,6 @@ def geo2grid(lat, long, zone=0, ellipsoid=grs80):
 
     # Longitude Difference
     long_diff = radians(long - cm)
-
     # Gauss-Schreiber Ratios
     xi1 = atan(tan(conf_lat) / cos(long_diff))
     eta1x = sin(long_diff) / (sqrt(tan(conf_lat) ** 2 + cos(long_diff) ** 2))
@@ -353,6 +351,8 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
         print('ValueError: Invalid Hemisphere - String, either North or South')
         return
 
+    A = rect_radius(ellipsoid)
+    b = beta_coeff(ellipsoid)
     # Transverse Mercator Co-ordinates
     x = (east - float(proj.falseeast)) / float(proj.cmscale)
     if hemisphere == 'north':
@@ -377,19 +377,19 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
     conf_lat = atan(conf_lat)
 
     # Finding t using Newtons Method
-    def sigma(tn, ellipsoid):
-        return (sinh(ellipsoid.ecc1
+    def sigma(tn, ecc1):
+        return (sinh(ecc1
                      * 0.5
-                     * log((1 + ((ellipsoid.ecc1 * tn) / (sqrt(1 + tn ** 2))))
-                           / (1 - ((ellipsoid.ecc1 * tn) / (sqrt(1 + tn ** 2)))))))
+                     * log((1 + ((ecc1 * tn) / (sqrt(1 + tn ** 2))))
+                           / (1 - ((ecc1 * tn) / (sqrt(1 + tn ** 2)))))))
 
-    def ftn(tn, ellipsoid):
-        return t * sqrt(1 + (sigma(tn, ellipsoid)) ** 2) - sigma(tn, ellipsoid) * sqrt(1 + tn ** 2) - t1
+    def ftn(tn, ecc1):
+        return t * sqrt(1 + (sigma(tn, ecc1)) ** 2) - sigma(tn, ecc1) * sqrt(1 + tn ** 2) - t1
 
-    def f1tn(tn, ellipsoid):
-        return ((sqrt(1 + (sigma(tn, ellipsoid)) ** 2) * sqrt(1 + tn ** 2) - sigma(tn, ellipsoid) * tn)
-                * (((1 - float(ellipsoid.ecc1sq)) * sqrt(1 + t ** 2))
-                   / (1 + (1 - float(ellipsoid.ecc1sq)) * t ** 2)))
+    def f1tn(tn, ecc1, ecc1sq):
+        return ((sqrt(1 + (sigma(tn, ecc1)) ** 2) * sqrt(1 + tn ** 2) - sigma(tn, ecc1) * tn)
+                * (((1 - float(ecc1sq)) * sqrt(1 + t ** 2))
+                   / (1 + (1 - float(ecc1sq)) * t ** 2)))
 
     diff = 1
     t = t1
@@ -397,7 +397,7 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
     while diff > 1e-50 and itercount < 100:
         itercount += 1
         t_before = t
-        t = t - (ftn(t, ellipsoid) / f1tn(t, ellipsoid))
+        t = t - (ftn(t, ellipsoid.ecc1) / f1tn(t, ellipsoid.ecc1, ellipsoid.ecc1sq))
         diff = abs(t - t_before)
     lat = degrees(atan(t))
 
