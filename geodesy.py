@@ -184,10 +184,6 @@ def vincinv(lat1, long1, lat2, long2, ellipsoid=grs80):
              Azimuth from Point 1 to 2 (Decimal Degrees),
              Azimuth from Point 2 to 1 (Decimal Degrees)
     """
-    # input: Latitude and Longitude of Points 1 and 2 in Decimal Degreees
-    # output: Ellipsoid Arc Distance in metres between Points 1 and 2, forward
-    # and reverse azimuths between Points 1 and 2 in Decimal Degrees
-    # Same Point Test
     if lat1 == lat2 and long1 == long2:
         return 0, 0, 0
     # Equation numbering is from GDA2020 Tech Manual v1.0
