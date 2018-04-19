@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+
+"""
+Geoscience Australia - Python Geodesy Package
+mga2gda Program
+"""
+
 # Author: Josh Batchelor <josh.batchelor@ga.gov.au>
 
 

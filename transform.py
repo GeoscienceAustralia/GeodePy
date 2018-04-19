@@ -4,7 +4,7 @@
 Geoscience Australia - Python Geodesy Package
 Transform Module
 
-Ref1: http://www.icsm.gov.au/gda/tech.html
+Ref1: http://www.icsm.gov.au/sites/default/files/GDA2020TechnicalManualV1.1.1.pdf
 Ref2: http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 """
 
@@ -12,7 +12,7 @@ Ref2: http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 import os
 import csv
 from decimal import *
-from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2
+from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2, modf
 import numpy as np
 from constants import grs80, utm
 from conversions import dd2dms, dms2dd
@@ -22,27 +22,15 @@ getcontext().prec = 28
 # Universal Transverse Mercator Projection Parameters
 proj = utm
 
-# Ellipsoidal Constants
-ellipsoid = grs80
 
-f = 1 / ellipsoid.inversef
-semi_min = float(ellipsoid.semimaj * (1 - f))
-ecc1sq = float(f * (2 - f))
-ecc2sq = float(ecc1sq/(1 - ecc1sq))
-ecc1 = sqrt(ecc1sq)
-n = f / (2 - f)
-n = float(n)
-n2 = n ** 2
-
-
-def rect_radius(inversef):
+def rect_radius(ellipsoid):
     """
     Computes the Rectifying Radius of an Ellipsoid with specified Inverse Flattening
     (See Ref 2 Equation 3)
-    :param inversef: Ellipsoid Inverse Flattening
+    :param ellipsoid: Ellipsoid Object
     :return: Ellipsoid Rectifying Radius
     """
-    nval = (1 / float(inversef)) / (2 - (1 / float(inversef)))
+    nval = (1 / float(ellipsoid.inversef)) / (2 - (1 / float(ellipsoid.inversef)))
     nval2 = nval ** 2
     return (ellipsoid.semimaj / (1 + nval) * ((nval2 *
                                               (nval2 *
@@ -54,14 +42,14 @@ def rect_radius(inversef):
                                               / 16384.))
 
 
-def alpha_coeff(inversef):
+def alpha_coeff(ellipsoid):
     """
     Computes the set of Alpha coefficients of an Ellipsoid with specified Inverse Flattening
     (See Ref 2 Equation 5)
-    :param inversef: Ellipsoid Inverse Flattening
+    :param ellipsoid: Ellipsoid Object
     :return: Alpha coefficients a2, a4 ... a16
     """
-    nval = (1 / float(inversef)) / (2 - (1 / float(inversef)))
+    nval = ellipsoid.n
     a2 = ((nval *
            (nval *
             (nval *
@@ -133,14 +121,14 @@ def alpha_coeff(inversef):
     return a2, a4, a6, a8, a10, a12, a14, a16
 
 
-def beta_coeff(inversef):
+def beta_coeff(ellipsoid):
     """
     Computes the set of Beta coefficients of an Ellipsoid with specified Inverse Flattening
     (See Ref 2 Equation 23)
-    :param inversef: Ellipsoid Inverse Flattening
+    :param ellipsoid: Ellipsoid Object
     :return: Alpha coefficients a2, a4 ... a16
     """
-    nval = (1 / float(inversef)) / (2 - (1 / float(inversef)))
+    nval = ellipsoid.n
     b2 = ((nval *
            (nval *
             (nval *
@@ -209,12 +197,9 @@ def beta_coeff(inversef):
     return b2, b4, b6, b8, b10, b12, b14, b16
 
 
-A = rect_radius(ellipsoid.inversef)
-a = alpha_coeff(ellipsoid.inversef)
-b = beta_coeff(ellipsoid.inversef)
-
-
-def psfandgridconv(xi1, eta1, lat, long, cm, conf_lat):
+def psfandgridconv(xi1, eta1, lat, long, cm, conf_lat, ellipsoid=grs80):
+    A = rect_radius(ellipsoid)
+    a = alpha_coeff(ellipsoid)
     lat = radians(lat)
     long_diff = radians(long - cm)
 
@@ -228,7 +213,7 @@ def psfandgridconv(xi1, eta1, lat, long, cm, conf_lat):
     psf = (float(proj.cmscale)
            * (A / ellipsoid.semimaj)
            * sqrt(q**2 + p**2)
-           * ((sqrt(1 + (tan(lat)**2)) * sqrt(1 - ecc1sq * (sin(lat)**2)))
+           * ((sqrt(1 + (tan(lat)**2)) * sqrt(1 - ellipsoid.ecc1sq * (sin(lat)**2)))
               / sqrt((tan(conf_lat)**2) + (cos(long_diff)**2))))
 
     # Grid Convergence
@@ -243,7 +228,7 @@ def psfandgridconv(xi1, eta1, lat, long, cm, conf_lat):
     return psf, grid_conv
 
 
-def geo2grid(lat, long, zone=0):
+def geo2grid(lat, long, zone=0, ellipsoid=grs80):
     """
     Takes a geographic co-ordinate (latitude, longitude) and returns its corresponding
     Hemisphere, Zone and Projection Easting and Northing, Point Scale Factor and Grid
@@ -253,6 +238,7 @@ def geo2grid(lat, long, zone=0):
     :param long: Longitude in Decimal Degrees
     :param zone: Optional Zone Number - Only required if calculating grid co-ordinate
                 outside zone boundaries
+    :param ellipsoid: Ellipsoid Object
     :return: hemisphere, zone, east (m), north (m), Point Scale Factor, Grid Convergence (Decimal Degrees)
     """
     # Input Exception Handling - UTM Extents and Values
@@ -276,6 +262,8 @@ def geo2grid(lat, long, zone=0):
         print('ValueError: Invalid Longitude - Longitudes from -180 to +180')
         return
 
+    A = rect_radius(ellipsoid)
+    a = alpha_coeff(ellipsoid)
     lat = radians(lat)
     # Calculate Zone
     if zone == 0:
@@ -283,14 +271,13 @@ def geo2grid(lat, long, zone=0):
     cm = float(zone * proj.zonewidth) + (proj.initialcm - proj.zonewidth)
 
     # Conformal Latitude
-    sigx = (ecc1 * tan(lat)) / sqrt(1 + (tan(lat) ** 2))
-    sig = sinh(ecc1 * (0.5 * log((1 + sigx) / (1 - sigx))))
+    sigx = (ellipsoid.ecc1 * tan(lat)) / sqrt(1 + (tan(lat) ** 2))
+    sig = sinh(ellipsoid.ecc1 * (0.5 * log((1 + sigx) / (1 - sigx))))
     conf_lat = tan(lat) * sqrt(1 + sig ** 2) - sig * sqrt(1 + (tan(lat) ** 2))
     conf_lat = atan(conf_lat)
 
     # Longitude Difference
     long_diff = radians(long - cm)
-
     # Gauss-Schreiber Ratios
     xi1 = atan(tan(conf_lat) / cos(long_diff))
     eta1x = sin(long_diff) / (sqrt(tan(conf_lat) ** 2 + cos(long_diff) ** 2))
@@ -323,7 +310,7 @@ def geo2grid(lat, long, zone=0):
     return hemisphere, zone, round(float(east), 3), round(float(north), 3), round(psf, 8), grid_conv
 
 
-def grid2geo(zone, east, north, hemisphere='south'):
+def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
     """
     Takes a Transverse Mercator grid co-ordinate (Zone, Easting, Northing, Hemisphere)
     and returns its corresponding Geographic Latitude and Longitude, Point Scale Factor
@@ -333,6 +320,7 @@ def grid2geo(zone, east, north, hemisphere='south'):
     :param east: Easting (m, within 3330km of Central Meridian)
     :param north: Northing (m, 0 to 10,000,000m)
     :param hemisphere: String - 'North' or 'South'(default)
+    :param ellipsoid: Ellipsoid Object
     :return: Latitude and Longitude (Decimal Degrees), Point Scale Factor, Grid Convergence (Decimal Degrees)
     """
     # Input Exception Handling - UTM Extents and Values
@@ -363,6 +351,8 @@ def grid2geo(zone, east, north, hemisphere='south'):
         print('ValueError: Invalid Hemisphere - String, either North or South')
         return
 
+    A = rect_radius(ellipsoid)
+    b = beta_coeff(ellipsoid)
     # Transverse Mercator Co-ordinates
     x = (east - float(proj.falseeast)) / float(proj.cmscale)
     if hemisphere == 'north':
@@ -387,27 +377,27 @@ def grid2geo(zone, east, north, hemisphere='south'):
     conf_lat = atan(conf_lat)
 
     # Finding t using Newtons Method
-    def sigma(tn):
+    def sigma(tn, ecc1):
         return (sinh(ecc1
                      * 0.5
                      * log((1 + ((ecc1 * tn) / (sqrt(1 + tn ** 2))))
                            / (1 - ((ecc1 * tn) / (sqrt(1 + tn ** 2)))))))
 
-    def ftn(tn):
-        return t * sqrt(1 + (sigma(tn)) ** 2) - sigma(tn) * sqrt(1 + tn ** 2) - t1
+    def ftn(tn, ecc1):
+        return t * sqrt(1 + (sigma(tn, ecc1)) ** 2) - sigma(tn, ecc1) * sqrt(1 + tn ** 2) - t1
 
-    def f1tn(tn):
-        return ((sqrt(1 + (sigma(tn)) ** 2) * sqrt(1 + tn ** 2) - sigma(tn) * tn)
+    def f1tn(tn, ecc1, ecc1sq):
+        return ((sqrt(1 + (sigma(tn, ecc1)) ** 2) * sqrt(1 + tn ** 2) - sigma(tn, ecc1) * tn)
                 * (((1 - float(ecc1sq)) * sqrt(1 + t ** 2))
                    / (1 + (1 - float(ecc1sq)) * t ** 2)))
 
     diff = 1
     t = t1
-    loopcount = 0
-    while diff > 1e-15:
-        loopcount += 1
+    itercount = 0
+    while diff > 1e-15 and itercount < 100:
+        itercount += 1
         t_before = t
-        t = t - (ftn(t) / f1tn(t))
+        t = t - (ftn(t, ellipsoid.ecc1) / f1tn(t, ellipsoid.ecc1, ellipsoid.ecc1sq))
         diff = abs(t - t_before)
     lat = degrees(atan(t))
 
@@ -422,7 +412,8 @@ def grid2geo(zone, east, north, hemisphere='south'):
     return round(lat, 11), round(long, 11), round(psf, 8), grid_conv
 
 
-def xyz2llh(x, y, z):
+def xyz2llh(x, y, z, ellipsoid=grs80):
+    # Add input for ellipsoid (default: grs80)
     """
     Input: Cartesian XYZ coordinate in metres
 
@@ -433,14 +424,14 @@ def xyz2llh(x, y, z):
     long = atan2(y, x)
     # Calculate Latitude
     p = sqrt(x**2 + y**2)
-    latinit = atan((z*(1+ecc2sq))/p)
+    latinit = atan((z*(1+ellipsoid.ecc2sq))/p)
     lat = latinit
     itercheck = 1
     while abs(itercheck) > 1e-10:
-        nu = ellipsoid.semimaj/(sqrt(1 - ecc1sq * (sin(lat))**2))
-        itercheck = lat - atan((z + nu * ecc1sq * sin(lat))/p)
-        lat = atan((z + nu * ecc1sq * sin(lat))/p)
-    nu = ellipsoid.semimaj/(sqrt(1 - ecc1sq * (sin(lat))**2))
+        nu = ellipsoid.semimaj/(sqrt(1 - ellipsoid.ecc1sq * (sin(lat))**2))
+        itercheck = lat - atan((z + nu * ellipsoid.ecc1sq * sin(lat))/p)
+        lat = atan((z + nu * ellipsoid.ecc1sq * sin(lat))/p)
+    nu = ellipsoid.semimaj/(sqrt(1 - ellipsoid.ecc1sq * (sin(lat))**2))
     ellht = p/(cos(lat)) - nu
     # Convert Latitude and Longitude to Degrees
     lat = degrees(lat)
@@ -448,7 +439,8 @@ def xyz2llh(x, y, z):
     return lat, long, ellht
 
 
-def llh2xyz(lat, long, ellht):
+def llh2xyz(lat, long, ellht, ellipsoid=grs80):
+    # Add input for ellipsoid (default: grs80)
     """
     Input: Latitude and Longitude in Decimal Degrees, Ellipsoidal Height in metres
     Output: Cartesian X, Y, Z Coordinates in metres
@@ -460,11 +452,11 @@ def llh2xyz(lat, long, ellht):
     if lat == 0:
         nu = grs80.semimaj
     else:
-        nu = ellipsoid.semimaj/(sqrt(1 - ecc1sq * (sin(lat)**2)))
+        nu = ellipsoid.semimaj/(sqrt(1 - ellipsoid.ecc1sq * (sin(lat)**2)))
     # Calculate x, y, z
     x = Decimal(str((nu + ellht) * cos(lat) * cos(long)))
     y = Decimal(str((nu + ellht) * cos(lat) * sin(long)))
-    z = Decimal(str(((semi_min**2 / ellipsoid.semimaj**2) * nu + ellht) * sin(lat)))
+    z = Decimal(str(((ellipsoid.semimin**2 / ellipsoid.semimaj**2) * nu + ellht) * sin(lat)))
     return x, y, z
 
 
@@ -510,6 +502,29 @@ def conform7(x, y, z, trans):
     ytrans = float(xyz_after[1])
     ztrans = float(xyz_after[2])
     return xtrans, ytrans, ztrans
+
+
+def conform14(x, y, z, from_epoch, to_epoch, trans):
+    # Convert YYYY.DOY to Decimal Year
+    from_doy, from_year = modf(from_epoch)
+    to_doy, to_year = modf(to_epoch)
+    ref_doy, ref_year = modf(trans.ref_epoch)
+    from_epoch = from_year + (from_doy / 0.365)
+    to_epoch = to_year + (to_doy / 0.365)
+    ref_epoch = ref_year + (ref_doy / 0.365)
+    # Calc Transformation at 'From Epoch'
+    
+    # # Conditional transformation formation
+    # if from_epoch < to_epoch:
+    #     if ref_epoch < from_epoch:
+    #         pass
+    #     elif ref_epoch > from_epoch and ref_epoch < to_epoch:
+    #         pass
+    #     elif ref_epoch > to_epoch:
+    #         pass
+    # if from_epoch > to_epoch:
+    #     pass
+    # pass
 
 
 def grid2geoio():
