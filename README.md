@@ -11,6 +11,10 @@ NumPy
 SciPy
 ```
 
+## Testing
+
+Run: `python -m unittest discover tests/`
+
 ## Authors
 
 * **Craig Harrison** - *Project Management* - [harry093](https://github.com/harry093)
