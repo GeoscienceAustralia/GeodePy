@@ -7,22 +7,9 @@ import os
 import argparse
 import csv
 
-
-parser = argparse.ArgumentParser(description='Batch Converter of Map Grid of Australia grid co-ordinates to '
-                                             'Geodetic Datum of Australia geographic co-ordinates. Files must '
-                                             'be .csv and of the format Pt ID, Zone, Easting, Northing with no '
-                                             'header line.')
-parser.add_argument('f', metavar='--file', type=str, help='Input Filename')
-
-
-args = parser.parse_args()
-
-fn = args.f
-
 # Universal Transverse Mercator Projection Parameters
 proj = [6378137, Decimal('298.25722210088'), 500000,
         10000000, Decimal('0.9996'), 6, -177]
-
 
 # Ellipsoidal Constants
 f = 1 / proj[1]
@@ -225,4 +212,13 @@ def grid2geoio(fn):
     return 'Output saved as ' + str(fn_out)
 
 
-grid2geoio(fn)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Batch Converter of Map Grid of Australia grid co-ordinates to '
+                                                 'Geodetic Datum of Australia geographic co-ordinates. Files must '
+                                                 'be .csv and of the format Pt ID, Zone, Easting, Northing with no '
+                                                 'header line.')
+    parser.add_argument('f', metavar='--file', type=str, help='Input Filename')
+    args = parser.parse_args()
+    fn = args.f
+
+    grid2geoio(fn)

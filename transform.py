@@ -404,7 +404,7 @@ def grid2geo(zone, east, north, hemisphere='south'):
     diff = 1
     t = t1
     loopcount = 0
-    while diff > 1e-50:
+    while diff > 1e-15:
         loopcount += 1
         t_before = t
         t = t - (ftn(t) / f1tn(t))
