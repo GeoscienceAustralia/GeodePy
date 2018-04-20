@@ -1,5 +1,7 @@
 # Geodesy Python Package
 
+[![Travis](https://img.shields.io/travis/GeoscienceAustralia/geodesy-package/master.svg?label=Travis%20CI)](https://travis-ci.org/GeoscienceAustralia/geodesy-package)
+
 This is a package of tools for manipulating geospatial datasets using Python and tested in Python 3.6.4.
 
 ### Dependencies
