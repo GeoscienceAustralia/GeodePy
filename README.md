@@ -13,11 +13,11 @@ NumPy
 SciPy
 ```
 
-## Testing
+### Testing
 
 Run: `python -m unittest discover tests/`
 
-## Authors
+### Authors
 
 * **Craig Harrison** - *Project Management* - [harry093](https://github.com/harry093)
 * **Josh Batchelor** - *Initial Work, Geodesy and Surveying* - [BatchelorJ](https://github.com/BatchelorJ)
