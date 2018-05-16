@@ -14,7 +14,7 @@ import csv
 from decimal import *
 from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2, modf
 import numpy as np
-from constants import grs80, utm
+from constants import grs80, utm, Transformation
 from conversions import dd2dms, dms2dd
 
 
@@ -509,11 +509,11 @@ def conform14(x, y, z, from_epoch, to_epoch, trans):
     from_doy, from_year = modf(from_epoch)
     to_doy, to_year = modf(to_epoch)
     ref_doy, ref_year = modf(trans.ref_epoch)
-    from_epoch = from_year + (from_doy / 0.365)
-    to_epoch = to_year + (to_doy / 0.365)
+    from_epoch = from_year + ((from_doy - 0.0005) / 0.36525)
+    to_epoch = to_year + ((to_doy - 0.0005) / 0.36525)
     ref_epoch = ref_year + (ref_doy / 0.365)
-    # Calc Transformation at 'From Epoch'
-    
+    # Parameter Projection to Epoch of Interest
+    # Timeshift needs to be fixed to handle conversions between two dynamic datums (where from, to and ref are all diff)
     # # Conditional transformation formation
     # if from_epoch < to_epoch:
     #     if ref_epoch < from_epoch:
@@ -525,6 +525,18 @@ def conform14(x, y, z, from_epoch, to_epoch, trans):
     # if from_epoch > to_epoch:
     #     pass
     # pass
+    timeshift = from_epoch - to_epoch
+    timetrans = Transformation(trans.from_datum, trans.to_datum, from_epoch,
+                               trans.tx + (trans.d_tx * timeshift),
+                               trans.ty + (trans.d_ty * timeshift),
+                               trans.tz + (trans.d_tz * timeshift),
+                               trans.sc + (trans.d_sc * timeshift),
+                               trans.rx + (trans.d_rx * timeshift),
+                               trans.ry + (trans.d_ry * timeshift),
+                               trans.rz + (trans.d_rz * timeshift))
+    # Perform Conformal 7 Parameter Transformation
+    xtrans, ytrans, ztrans = conform7(x, y, z, timetrans)
+    return xtrans, ytrans, ztrans, timetrans
 
 
 def grid2geoio():

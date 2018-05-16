@@ -179,11 +179,20 @@ def iers2trans(itrf_from, itrf_to, ref_epoch, tx, ty, tz, sc, rx, ry, rz, d_tx, 
 
 
 # GDA1994 to GDA2020 Transformation Parameters from GDA2020 Tech Manual v1.1.1
+# GDA1994 to ITRF Transformation Parameters from Dawson and Woods (2010)
 # AGD66 and AGD84 to GDA94 Transformation Parameters from GDA94 Tech Manual v2.4
 # link: http://www.icsm.gov.au/datum/gda2020-and-gda94-technical-manuals
 
 gda94to20 = Transformation('GDA1994', 'GDA2020', 0,
                            0.06155, -0.01087, -0.04019, -0.009994, -0.0394924, -0.0327221, -0.0328979)
+
+itrf08togda94 = Transformation('ITRF2008', 'GDA1994', 1994.0,
+                               -0.08468, -0.01942, 0.03201, 0.00971, -0.0004254, 0.0022578, 0.0024015,
+                               0.00142, 0.00134, 0.00090, 0.000109, 0.0015461, 0.001820, 0.0011551)
+
+itrf05togda94 = Transformation('ITRF2005', 'GDA1994', 1994.0,
+                               -0.07973, -0.00686, 0.03803, 0.006636, -0.0000351, 0.0021211, 0.0021411,
+                               0.00225, -0.00062, -0.00056, 0.000294, 0.0014707, 0.0011443, 0.0011701)
 
 agd84togda94 = Transformation('AGD84', 'GDA94', 0,
                               -117.763, -51.510, 139.061, -0.191, -0.292, -0.443, -0.277)
