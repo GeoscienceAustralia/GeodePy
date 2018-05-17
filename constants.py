@@ -26,9 +26,9 @@ class Ellipsoid(object):
         self.n2 = self.n ** 2
 
 
-grs80 = Ellipsoid(6378137, Decimal('298.25722210088'))
+grs80 = Ellipsoid(6378137, 298.25722210088)
 
-ans = Ellipsoid(6378160, Decimal('298.25'))
+ans = Ellipsoid(6378160, 298.25)
 
 
 # Projections
