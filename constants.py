@@ -48,7 +48,7 @@ utm = Projection(500000, 10000000, Decimal('0.9996'), 6, -177)
 class Transformation(object):
     def __init__(self, from_datum, to_datum, ref_epoch,
                  tx, ty, tz, sc, rx, ry, rz,
-                 d_tx=0, d_ty=0, d_tz=0, d_sc=0, d_rx=0, d_ry=0, d_rz=0):
+                 d_tx=0.0, d_ty=0.0, d_tz=0.0, d_sc=0.0, d_rx=0.0, d_ry=0.0, d_rz=0.0):
         self.from_datum = from_datum    # Datum Transforming From
         self.to_datum = to_datum        # Datum Transforming To
         self.ref_epoch = ref_epoch      # Reference Epoch (YYYY.DOY)

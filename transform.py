@@ -14,7 +14,7 @@ import csv
 from decimal import *
 from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2, modf
 import numpy as np
-from constants import grs80, utm, Transformation
+from constants import grs80, utm
 from conversions import dd2dms, dms2dd
 
 
@@ -506,13 +506,12 @@ def conform7(x, y, z, trans):
 
 def conform14(x, y, z, to_epoch, trans):
     # Convert YYYY.DOY to Decimal Year
-    ref_epoch = trans.ref_epoch
     to_doy, to_year = modf(to_epoch)
     ref_doy, ref_year = modf(trans.ref_epoch)
     to_epoch = to_year + ((to_doy - 0.0005) / 0.36525)
     ref_epoch = ref_year + (ref_doy / 0.36525)
     # Perform Conformal 7 Parameter Transformation
-    # debug
+    # debug - output Transformation Object
     timetrans = (trans + (to_epoch - ref_epoch))
     xtrans, ytrans, ztrans = conform7(x, y, z, timetrans)
     return xtrans, ytrans, ztrans, timetrans
