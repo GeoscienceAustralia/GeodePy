@@ -5,8 +5,9 @@ from conversions import dms2dd_v
 import numpy as np
 import os.path
 
+
 class TestTransforms(unittest.TestCase):
-    def test_transform(self):
+    def test_geo_grid_transform_interoperability(self):
         abs_path = os.path.abspath(os.path.dirname(__file__))
 
         test_geo_coords = np.genfromtxt(os.path.join(abs_path, 'resources/Test_Conversion_Geo.csv'),
