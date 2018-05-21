@@ -5,7 +5,6 @@ Geoscience Australia - Python Geodesy Package
 Constants Module
 """
 
-from decimal import *
 from math import sqrt
 
 c_vac = 299792.458
@@ -43,7 +42,7 @@ class Projection(object):
         self.initialcm = initialcm
 
 
-utm = Projection(500000, 10000000, Decimal('0.9996'), 6, -177)
+utm = Projection(500000, 10000000, 0.9996, 6, -177)
 
 
 # Helmert 14 Parameter Transformation Parameters

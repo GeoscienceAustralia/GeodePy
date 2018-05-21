@@ -11,7 +11,6 @@ Ref2: http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 
 import os
 import csv
-from decimal import *
 from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2, modf
 import numpy as np
 from constants import grs80, utm, Transformation
@@ -295,14 +294,14 @@ def geo2grid(lat, long, zone=0, ellipsoid=grs80):
     y = A * xi
 
     # Hemisphere-dependent UTM Projection Co-ordinates
-    east = proj.cmscale * Decimal(str(x)) + proj.falseeast
+    east = proj.cmscale * x + proj.falseeast
     if y < 0:
         hemisphere = 'South'
-        north = proj.cmscale * Decimal(str(y)) + proj.falsenorth
+        north = proj.cmscale * y + proj.falsenorth
     else:
         hemisphere = 'North'
         falsenorth = 0
-        north = proj.cmscale * Decimal(str(y)) + falsenorth
+        north = proj.cmscale * y + falsenorth
 
     # Point Scale Factor and Grid Convergence
     psf, grid_conv = psfandgridconv(xi1, eta1, degrees(lat), long, cm, conf_lat)
@@ -454,9 +453,9 @@ def llh2xyz(lat, long, ellht, ellipsoid=grs80):
     else:
         nu = ellipsoid.semimaj/(sqrt(1 - ellipsoid.ecc1sq * (sin(lat)**2)))
     # Calculate x, y, z
-    x = Decimal(str((nu + ellht) * cos(lat) * cos(long)))
-    y = Decimal(str((nu + ellht) * cos(lat) * sin(long)))
-    z = Decimal(str(((ellipsoid.semimin**2 / ellipsoid.semimaj**2) * nu + ellht) * sin(lat)))
+    x = (nu + ellht) * cos(lat) * cos(long)
+    y = (nu + ellht) * cos(lat) * sin(long)
+    z = ((ellipsoid.semimin**2 / ellipsoid.semimaj**2) * nu + ellht) * sin(lat)
     return x, y, z
 
 
