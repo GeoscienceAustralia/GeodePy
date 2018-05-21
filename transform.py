@@ -14,7 +14,7 @@ import csv
 from decimal import *
 from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2, modf
 import numpy as np
-from constants import grs80, utm
+from constants import grs80, utm, Transformation
 from conversions import dd2dms, dms2dd
 
 
@@ -470,14 +470,16 @@ def llh2xyz(lat, long, ellht, ellipsoid=grs80):
 
 def conform7(x, y, z, trans):
     """
-    Performs a Helmert 7 Parameter Transformation using Cartesian point co-ordinates
+    Performs a Helmert 7 Parameter Conformal Transformation using Cartesian point co-ordinates
     and a predefined transformation object.
-    :param x: Cartesian X
-    :param y: Cartesian Y
-    :param z: Cartesian Z
+    :param x: Cartesian X (m)
+    :param y: Cartesian Y (m)
+    :param z: Cartesian Z (m)
     :param trans: Transformation Object
     :return: Transformed X, Y, Z Cartesian Co-ordinates
     """
+    if type(trans) != Transformation:
+        raise ValueError('trans must be a Transformation Object')
     # Create XYZ Vector
     xyz_before = np.array([[x],
                            [y],
@@ -505,6 +507,19 @@ def conform7(x, y, z, trans):
 
 
 def conform14(x, y, z, to_epoch, trans):
+    """
+    Performs a Helmert 14 Parameter Conformal Transformation using Cartesian point co-ordinates
+    and a predefined transformation object. The transformation parameters are projected from
+    the transformation objects reference epoch to a specified epoch.
+    :param x: Cartesian X (m)
+    :param y: Cartesian Y (m)
+    :param z: Cartesian Z (m)
+    :param to_epoch: Epoch co-ordinate transformation is performed at in YYYY.DOY notation
+    :param trans: Transformation Object
+    :return: Cartesian X, Y, Z co-ordinates transformed using Transformation parameters at desired epoch
+    """
+    if type(trans) != Transformation:
+        raise ValueError('trans must be a Transformation Object')
     # Convert YYYY.DOY to Decimal Year
     to_doy, to_year = modf(to_epoch)
     ref_doy, ref_year = modf(trans.ref_epoch)
@@ -514,7 +529,7 @@ def conform14(x, y, z, to_epoch, trans):
     # debug - output Transformation Object
     timetrans = (trans + (to_epoch - ref_epoch))
     xtrans, ytrans, ztrans = conform7(x, y, z, timetrans)
-    return xtrans, ytrans, ztrans, timetrans
+    return xtrans, ytrans, ztrans  # , timetrans
 
 
 def grid2geoio():

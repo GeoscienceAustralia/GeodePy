@@ -102,23 +102,45 @@ class Transformation(object):
         :param other: Decimal Year
         :return: Transformation object with parameters and ref epoch advanced by input year
         """
-        return Transformation(self.to_datum,
-                              self.from_datum,
-                              self.ref_epoch + other,
-                              round(self.tx + (self.d_tx * other), 8),
-                              round(self.ty + (self.d_ty * other), 8),
-                              round(self.tz + (self.d_tz * other), 8),
-                              round(self.sc + (self.d_sc * other), 8),
-                              round(self.rx + (self.d_rx * other), 8),
-                              round(self.ry + (self.d_ry * other), 8),
-                              round(self.rz + (self.d_rz * other), 8),
-                              self.d_tx,
-                              self.d_ty,
-                              self.d_tz,
-                              self.d_sc,
-                              self.d_rx,
-                              self.d_ry,
-                              self.d_rz)
+        if type(other) == int or type(other) == float:
+            return Transformation(self.to_datum,
+                                  self.from_datum,
+                                  self.ref_epoch + other,
+                                  round(self.tx + (self.d_tx * other), 8),
+                                  round(self.ty + (self.d_ty * other), 8),
+                                  round(self.tz + (self.d_tz * other), 8),
+                                  round(self.sc + (self.d_sc * other), 8),
+                                  round(self.rx + (self.d_rx * other), 8),
+                                  round(self.ry + (self.d_ry * other), 8),
+                                  round(self.rz + (self.d_rz * other), 8),
+                                  self.d_tx,
+                                  self.d_ty,
+                                  self.d_tz,
+                                  self.d_sc,
+                                  self.d_rx,
+                                  self.d_ry,
+                                  self.d_rz)
+        """ Experimental - Not Yet Functional
+        elif type(other) == Transformation:
+            epoch_diff = other.ref_epoch - self.ref_epoch
+            return Transformation(other.to_datum,
+                                  self.from_datum,
+                                  self.ref_epoch,
+                                  round(self.tx + (other.tx * epoch_diff), 8),
+                                  round(self.ty + (other.ty * epoch_diff), 8),
+                                  round(self.tz + (other.tz * epoch_diff), 8),
+                                  round(self.sc + (other.sc * epoch_diff), 8),
+                                  round(self.rx + (other.rx * epoch_diff), 8),
+                                  round(self.ry + (other.ry * epoch_diff), 8),
+                                  round(self.rz + (other.rz * epoch_diff), 8),
+                                  round(self.d_tx + (other.d_tx * epoch_diff), 8),
+                                  round(self.d_ty + (other.d_ty * epoch_diff), 8),
+                                  round(self.d_tz + (other.d_tz * epoch_diff), 8),
+                                  round(self.d_sc + (other.d_sc * epoch_diff), 8),
+                                  round(self.d_rx + (other.d_rx * epoch_diff), 8),
+                                  round(self.d_ry + (other.d_ry * epoch_diff), 8),
+                                  round(self.d_rz + (other.d_rz * epoch_diff), 8))
+            """
 
     def __sub__(self, other):
         """
