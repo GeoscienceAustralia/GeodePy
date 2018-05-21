@@ -17,7 +17,6 @@ from constants import grs80, utm, Transformation
 from conversions import dd2dms, dms2dd
 
 
-getcontext().prec = 28
 # Universal Transverse Mercator Projection Parameters
 proj = utm
 
