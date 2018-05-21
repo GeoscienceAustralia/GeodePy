@@ -27,10 +27,10 @@ class Ellipsoid(object):
 
 
 # Geodetic Reference System 1980
-grs80 = Ellipsoid(6378137, Decimal('298.25722210088'))
+grs80 = Ellipsoid(6378137, 298.25722210088)
 
 # Australian National Spheroid (See GDA94 Tech Manual v2.4 pp 7)
-ans = Ellipsoid(6378160, Decimal('298.25'))
+ans = Ellipsoid(6378160, 298.25)
 
 
 # Projections
