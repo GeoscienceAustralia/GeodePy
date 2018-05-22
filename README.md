@@ -1,4 +1,4 @@
-# Geodesy Python Package
+# GeodePy - Geodesy Python Package
 
 [![Travis](https://img.shields.io/travis/GeoscienceAustralia/geodesy-package/master.svg?label=Travis%20CI)](https://travis-ci.org/GeoscienceAustralia/geodesy-package)
 
