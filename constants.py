@@ -5,7 +5,6 @@ Geoscience Australia - Python Geodesy Package
 Constants Module
 """
 
-from decimal import *
 from math import sqrt
 
 c_vac = 299792.458
@@ -26,8 +25,10 @@ class Ellipsoid(object):
         self.n2 = self.n ** 2
 
 
+# Geodetic Reference System 1980
 grs80 = Ellipsoid(6378137, 298.25722210088)
 
+# Australian National Spheroid (See GDA94 Tech Manual v2.4 pp 7)
 ans = Ellipsoid(6378160, 298.25)
 
 
@@ -41,14 +42,14 @@ class Projection(object):
         self.initialcm = initialcm
 
 
-utm = Projection(500000, 10000000, Decimal('0.9996'), 6, -177)
+utm = Projection(500000, 10000000, 0.9996, 6, -177)
 
 
 # Helmert 14 Parameter Transformation Parameters
 class Transformation(object):
     def __init__(self, from_datum, to_datum, ref_epoch,
                  tx, ty, tz, sc, rx, ry, rz,
-                 d_tx=0, d_ty=0, d_tz=0, d_sc=0, d_rx=0, d_ry=0, d_rz=0):
+                 d_tx=0.0, d_ty=0.0, d_tz=0.0, d_sc=0.0, d_rx=0.0, d_ry=0.0, d_rz=0.0):
         self.from_datum = from_datum    # Datum Transforming From
         self.to_datum = to_datum        # Datum Transforming To
         self.ref_epoch = ref_epoch      # Reference Epoch (YYYY.DOY)
@@ -102,23 +103,45 @@ class Transformation(object):
         :param other: Decimal Year
         :return: Transformation object with parameters and ref epoch advanced by input year
         """
-        return Transformation(self.to_datum,
-                              self.from_datum,
-                              self.ref_epoch + other,
-                              round(self.tx + (self.d_tx * other), 8),
-                              round(self.ty + (self.d_ty * other), 8),
-                              round(self.tz + (self.d_tz * other), 8),
-                              round(self.sc + (self.d_sc * other), 8),
-                              round(self.rx + (self.d_rx * other), 8),
-                              round(self.ry + (self.d_ry * other), 8),
-                              round(self.rz + (self.d_rz * other), 8),
-                              self.d_tx,
-                              self.d_ty,
-                              self.d_tz,
-                              self.d_sc,
-                              self.d_rx,
-                              self.d_ry,
-                              self.d_rz)
+        if type(other) == int or type(other) == float:
+            return Transformation(self.to_datum,
+                                  self.from_datum,
+                                  self.ref_epoch + other,
+                                  round(self.tx + (self.d_tx * other), 8),
+                                  round(self.ty + (self.d_ty * other), 8),
+                                  round(self.tz + (self.d_tz * other), 8),
+                                  round(self.sc + (self.d_sc * other), 8),
+                                  round(self.rx + (self.d_rx * other), 8),
+                                  round(self.ry + (self.d_ry * other), 8),
+                                  round(self.rz + (self.d_rz * other), 8),
+                                  self.d_tx,
+                                  self.d_ty,
+                                  self.d_tz,
+                                  self.d_sc,
+                                  self.d_rx,
+                                  self.d_ry,
+                                  self.d_rz)
+        """ Experimental - Not Yet Functional
+        elif type(other) == Transformation:
+            epoch_diff = other.ref_epoch - self.ref_epoch
+            return Transformation(other.to_datum,
+                                  self.from_datum,
+                                  self.ref_epoch,
+                                  round(self.tx + (other.tx * epoch_diff), 8),
+                                  round(self.ty + (other.ty * epoch_diff), 8),
+                                  round(self.tz + (other.tz * epoch_diff), 8),
+                                  round(self.sc + (other.sc * epoch_diff), 8),
+                                  round(self.rx + (other.rx * epoch_diff), 8),
+                                  round(self.ry + (other.ry * epoch_diff), 8),
+                                  round(self.rz + (other.rz * epoch_diff), 8),
+                                  round(self.d_tx + (other.d_tx * epoch_diff), 8),
+                                  round(self.d_ty + (other.d_ty * epoch_diff), 8),
+                                  round(self.d_tz + (other.d_tz * epoch_diff), 8),
+                                  round(self.d_sc + (other.d_sc * epoch_diff), 8),
+                                  round(self.d_rx + (other.d_rx * epoch_diff), 8),
+                                  round(self.d_ry + (other.d_ry * epoch_diff), 8),
+                                  round(self.d_rz + (other.d_rz * epoch_diff), 8))
+            """
 
     def __sub__(self, other):
         """
@@ -179,11 +202,37 @@ def iers2trans(itrf_from, itrf_to, ref_epoch, tx, ty, tz, sc, rx, ry, rz, d_tx, 
 
 
 # GDA1994 to GDA2020 Transformation Parameters from GDA2020 Tech Manual v1.1.1
-# AGD66 and AGD84 to GDA94 Transformation Parameters from GDA94 Tech Manual v2.4
-# link: http://www.icsm.gov.au/datum/gda2020-and-gda94-technical-manuals
 
 gda94to20 = Transformation('GDA1994', 'GDA2020', 0,
                            0.06155, -0.01087, -0.04019, -0.009994, -0.0394924, -0.0327221, -0.0328979)
+
+itrf14togda20 = Transformation('ITRF2014', 'GDA2020', 2020,
+                               0, 0, 0, 0, 0, 0, 0,
+                               0, 0, 0, 0, 0.00150379, 0.00118346, 0.00120716)
+
+# GDA1994 to ITRF Transformation Parameters from Dawson and Woods (2010)
+# AGD66 and AGD84 to GDA94 Transformation Parameters from GDA94 Tech Manual v2.4
+# link: http://www.icsm.gov.au/datum/gda2020-and-gda94-technical-manuals
+
+itrf08togda94 = Transformation('ITRF2008', 'GDA1994', 1994.0,
+                               -0.08468, -0.01942, 0.03201, 0.00971, -0.0004254, 0.0022578, 0.0024015,
+                               0.00142, 0.00134, 0.00090, 0.000109, 0.0015461, 0.001820, 0.0011551)
+
+itrf05togda94 = Transformation('ITRF2005', 'GDA1994', 1994.0,
+                               -0.07973, -0.00686, 0.03803, 0.006636, -0.0000351, 0.0021211, 0.0021411,
+                               0.00225, -0.00062, -0.00056, 0.000294, 0.0014707, 0.0011443, 0.0011701)
+
+itrf00togda94 = Transformation('ITRF2000', 'GDA1994', 1994.0,
+                               -0.04591, -0.02985, -0.02037, 0.00707, -0.0016705, 0.0004594, 0.0019356,
+                               -0.00466, 0.00355, 0.01124, 0.000249, 0.0017454, 0.0014868, 0.001224)
+
+itrf97togda94 = Transformation('ITRF1997', 'GDA1994', 1994.0,
+                               -0.01463, -0.02762, -0.02532, 0.006695, -0.0017893, -0.0006047, 0.0009962,
+                               -0.00860, 0.00036, 0.01125, 0.000007, 0.0016394, 0.0015198, 0.0013801)
+
+itrf96togda94 = Transformation('ITRF1996', 'GDA1994', 1994.0,
+                               0.02454, -0.03643, -0.06812, 0.006901, -0.0027359, -0.0020431, 0.0003731,
+                               -0.02180, 0.00471, 0.02627, 0.000388, 0.0020203, 0.0021735, 0.0016290)
 
 agd84togda94 = Transformation('AGD84', 'GDA94', 0,
                               -117.763, -51.510, 139.061, -0.191, -0.292, -0.443, -0.277)

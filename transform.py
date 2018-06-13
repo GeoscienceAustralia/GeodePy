@@ -11,14 +11,12 @@ Ref2: http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 
 import os
 import csv
-from decimal import *
 from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2, modf
 import numpy as np
-from constants import grs80, utm
+from constants import grs80, utm, Transformation
 from conversions import dd2dms, dms2dd
 
 
-getcontext().prec = 28
 # Universal Transverse Mercator Projection Parameters
 proj = utm
 
@@ -295,14 +293,14 @@ def geo2grid(lat, long, zone=0, ellipsoid=grs80):
     y = A * xi
 
     # Hemisphere-dependent UTM Projection Co-ordinates
-    east = proj.cmscale * Decimal(str(x)) + proj.falseeast
+    east = proj.cmscale * x + proj.falseeast
     if y < 0:
         hemisphere = 'South'
-        north = proj.cmscale * Decimal(str(y)) + proj.falsenorth
+        north = proj.cmscale * y + proj.falsenorth
     else:
         hemisphere = 'North'
         falsenorth = 0
-        north = proj.cmscale * Decimal(str(y)) + falsenorth
+        north = proj.cmscale * y + falsenorth
 
     # Point Scale Factor and Grid Convergence
     psf, grid_conv = psfandgridconv(xi1, eta1, degrees(lat), long, cm, conf_lat)
@@ -454,9 +452,9 @@ def llh2xyz(lat, long, ellht, ellipsoid=grs80):
     else:
         nu = ellipsoid.semimaj/(sqrt(1 - ellipsoid.ecc1sq * (sin(lat)**2)))
     # Calculate x, y, z
-    x = Decimal(str((nu + ellht) * cos(lat) * cos(long)))
-    y = Decimal(str((nu + ellht) * cos(lat) * sin(long)))
-    z = Decimal(str(((ellipsoid.semimin**2 / ellipsoid.semimaj**2) * nu + ellht) * sin(lat)))
+    x = (nu + ellht) * cos(lat) * cos(long)
+    y = (nu + ellht) * cos(lat) * sin(long)
+    z = ((ellipsoid.semimin**2 / ellipsoid.semimaj**2) * nu + ellht) * sin(lat)
     return x, y, z
 
 
@@ -470,14 +468,16 @@ def llh2xyz(lat, long, ellht, ellipsoid=grs80):
 
 def conform7(x, y, z, trans):
     """
-    Performs a Helmert 7 Parameter Transformation using Cartesian point co-ordinates
+    Performs a Helmert 7 Parameter Conformal Transformation using Cartesian point co-ordinates
     and a predefined transformation object.
-    :param x: Cartesian X
-    :param y: Cartesian Y
-    :param z: Cartesian Z
+    :param x: Cartesian X (m)
+    :param y: Cartesian Y (m)
+    :param z: Cartesian Z (m)
     :param trans: Transformation Object
     :return: Transformed X, Y, Z Cartesian Co-ordinates
     """
+    if type(trans) != Transformation:
+        raise ValueError('trans must be a Transformation Object')
     # Create XYZ Vector
     xyz_before = np.array([[x],
                            [y],
@@ -504,27 +504,30 @@ def conform7(x, y, z, trans):
     return xtrans, ytrans, ztrans
 
 
-def conform14(x, y, z, from_epoch, to_epoch, trans):
+def conform14(x, y, z, to_epoch, trans):
+    """
+    Performs a Helmert 14 Parameter Conformal Transformation using Cartesian point co-ordinates
+    and a predefined transformation object. The transformation parameters are projected from
+    the transformation objects reference epoch to a specified epoch.
+    :param x: Cartesian X (m)
+    :param y: Cartesian Y (m)
+    :param z: Cartesian Z (m)
+    :param to_epoch: Epoch co-ordinate transformation is performed at in YYYY.DOY notation
+    :param trans: Transformation Object
+    :return: Cartesian X, Y, Z co-ordinates transformed using Transformation parameters at desired epoch
+    """
+    if type(trans) != Transformation:
+        raise ValueError('trans must be a Transformation Object')
     # Convert YYYY.DOY to Decimal Year
-    from_doy, from_year = modf(from_epoch)
     to_doy, to_year = modf(to_epoch)
     ref_doy, ref_year = modf(trans.ref_epoch)
-    from_epoch = from_year + (from_doy / 0.365)
-    to_epoch = to_year + (to_doy / 0.365)
-    ref_epoch = ref_year + (ref_doy / 0.365)
-    # Calc Transformation at 'From Epoch'
-    
-    # # Conditional transformation formation
-    # if from_epoch < to_epoch:
-    #     if ref_epoch < from_epoch:
-    #         pass
-    #     elif ref_epoch > from_epoch and ref_epoch < to_epoch:
-    #         pass
-    #     elif ref_epoch > to_epoch:
-    #         pass
-    # if from_epoch > to_epoch:
-    #     pass
-    # pass
+    to_epoch = to_year + ((to_doy - 0.0005) / 0.36525)
+    ref_epoch = ref_year + (ref_doy / 0.36525)
+    # Perform Conformal 7 Parameter Transformation
+    # debug - output Transformation Object
+    timetrans = (trans + (to_epoch - ref_epoch))
+    xtrans, ytrans, ztrans = conform7(x, y, z, timetrans)
+    return xtrans, ytrans, ztrans  # , timetrans
 
 
 def grid2geoio():
