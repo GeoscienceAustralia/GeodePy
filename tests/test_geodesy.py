@@ -5,6 +5,7 @@ import numpy.lib.recfunctions as rfn
 from conversions import dms2dd, dd2dms
 from geodesy import vincinv, vincdir
 
+
 class TestGeodesy(unittest.TestCase):
     def test_vincinv(self):
         # Flinders Peak
@@ -34,7 +35,7 @@ class TestGeodesy(unittest.TestCase):
         self.assertEqual(round(dd2dms(long2), 8), 143.55353840)
         self.assertEqual(round(dd2dms(azimuth2to1), 6), 127.102507)
 
-    # def test_vincentys(self):
+    def test_vincentys(self):
         # Test multiple point-to-point vincinv calculations
         abs_path = os.path.abspath(os.path.dirname(__file__))
 
@@ -51,17 +52,19 @@ class TestGeodesy(unittest.TestCase):
                                         usecols=('lat2', 'long2'))
 
         # Form array with point pairs from test file
-        np.roll(test_geo_coord2, 1)
-        test_pairs = rfn.merge_arrays([test_geo_coords, test_geo_coord2], flatten=True)
+        test_pairs = rfn.merge_arrays([test_geo_coords, np.roll(test_geo_coord2, 1)], flatten=True)
 
         # Calculate Vincenty's Inverse Result using Lat, Long Pairs
         vincinv_result = np.array(list(vincinv(*x) for x in test_pairs[['lat1', 'long1', 'lat2', 'long2']]))
 
-        # Then do a similar thing with vincdir, using the az1to2 and dist generated from vincinv to gen new latlong2
-        # np.testing.assert_almost_equal(original lat2, long2 comp w vincdir lat2, long2)
+        # Calculate Vincenty's Direct Result using Results from Inverse Function
+        vincdir_input = rfn.merge_arrays([test_geo_coords, vincinv_result[:, 1], vincinv_result[:, 0]], flatten=True)
+        vincdir_input.dtype.names = ['lat1', 'long1', 'az1to2', 'ell_dist']
+        vincdir_result = np.array(list(vincdir(*x) for x in vincdir_input[['lat1', 'long1', 'az1to2', 'ell_dist']]))
+
+        # Tests for Equality between Calculation Methods
+        # np.testing.assert_almost_equal(test_pairs['lat2'], vincdir_result[:, 0])
         # np.testing.assert_almost_equal(vincinv az2to1 comp w vincdir az2to1)
-
-
 
 
 if __name__ == '__main__':
