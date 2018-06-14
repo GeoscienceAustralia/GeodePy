@@ -169,8 +169,7 @@ def vincdir(lat1, long1, azimuth1to2, ell_dist, ellipsoid=grs80):
     long2 = float(long1) + degrees(omega)
 
     # Calculate Reverse Azimuth
-    azimuth2to1 = atan(sin_alpha / (-sin_u1 * sin_sigma + cos_u1 * cos_sigma * cos(azimuth1to2))) + pi
-    azimuth2to1 = degrees(azimuth2to1)
+    azimuth2to1 = degrees(atan2(sin_alpha, (-sin_u1 * sin_sigma + cos_u1 * cos_sigma * cos(azimuth1to2)))) + 180
     return round(lat2, 11), round(long2, 11), round(azimuth2to1, 9)
 
 

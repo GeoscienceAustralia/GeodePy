@@ -63,8 +63,10 @@ class TestGeodesy(unittest.TestCase):
         vincdir_result = np.array(list(vincdir(*x) for x in vincdir_input[['lat1', 'long1', 'az1to2', 'ell_dist']]))
 
         # Tests for Equality between Calculation Methods
-        # np.testing.assert_almost_equal(test_pairs['lat2'], vincdir_result[:, 0])
-        # np.testing.assert_almost_equal(vincinv az2to1 comp w vincdir az2to1)
+        # The first two tests need to get up to
+        np.testing.assert_almost_equal(test_pairs['lat2'], vincdir_result[:, 0], decimal=6)
+        np.testing.assert_almost_equal(test_pairs['long2'], vincdir_result[:, 1], decimal=6)
+        np.testing.assert_almost_equal(vincinv_result[:,2], vincdir_result[:, 2])
 
 
 if __name__ == '__main__':
