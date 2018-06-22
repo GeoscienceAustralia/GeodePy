@@ -9,7 +9,7 @@ In Development
 
 import numpy as np
 from scipy import interpolate
-from conversions import dms2dd
+from geodepy.conversions import dms2dd
 
 
 # Define test grid points

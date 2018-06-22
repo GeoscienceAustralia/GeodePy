@@ -10,8 +10,8 @@ import csv
 from math import (pi, degrees, radians, sqrt, sin,
                   cos, tan, asin, atan, atan2)
 import numpy as np
-from conversions import dd2dms, dms2dd
-from constants import grs80
+from geodepy.conversions import dd2dms, dms2dd
+from geodepy.constants import grs80
 
 
 def enu2xyz(lat, long, east, north, up):
