@@ -13,8 +13,8 @@ import os
 import csv
 from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2, modf
 import numpy as np
-from constants import grs80, utm, Transformation
-from conversions import dd2dms, dms2dd
+from geodepy.constants import grs80, utm, Transformation
+from geodepy.conversions import dd2dms, dms2dd
 
 
 # Universal Transverse Mercator Projection Parameters
