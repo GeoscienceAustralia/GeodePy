@@ -1,7 +1,7 @@
 import unittest
 
-from transform import geo2grid, grid2geo
-from conversions import dms2dd_v
+from geodepy.transform import geo2grid, grid2geo
+from geodepy.conversions import dms2dd_v
 import numpy as np
 import os.path
 

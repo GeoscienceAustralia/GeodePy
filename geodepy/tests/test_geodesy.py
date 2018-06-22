@@ -1,6 +1,6 @@
 import unittest
-from conversions import dms2dd, dd2dms
-from geodesy import vincinv
+from geodepy.conversions import dms2dd, dd2dms
+from geodepy.geodesy import vincinv
 
 class TestGeodesy(unittest.TestCase):
     def test_vincinv(self):
