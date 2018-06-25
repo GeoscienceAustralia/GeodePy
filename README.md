@@ -15,7 +15,7 @@ SciPy
 
 ### Testing
 
-Run: `python -m unittest discover tests/`
+Run: `python -m unittest discover geodepy/tests/`
 
 ### Authors
 
