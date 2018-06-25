@@ -10,7 +10,7 @@ import csv
 from math import (pi, degrees, radians, sqrt, sin,
                   cos, tan, asin, atan, atan2)
 import numpy as np
-from geodepy.conversions import dd2dms, dms2dd
+from geodepy.convert import dd2dms, dms2dd
 from geodepy.constants import grs80
 
 

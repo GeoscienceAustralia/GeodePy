@@ -1,5 +1,5 @@
 import unittest
-from geodepy.conversions import dms2dd, dd2dms
+from geodepy.convert import dms2dd, dd2dms
 from geodepy.geodesy import vincinv
 
 class TestGeodesy(unittest.TestCase):

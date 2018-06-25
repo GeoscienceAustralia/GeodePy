@@ -23,4 +23,3 @@ install:
 
 script:
   python -m unittest discover geodepy/tests/
-  
