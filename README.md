@@ -21,6 +21,7 @@ Run: `python -m unittest discover geodepy/tests/`
 
 * **Craig Harrison** - *Project Management* - [harry093](https://github.com/harry093)
 * **Josh Batchelor** - *Initial Work, Geodesy and Surveying* - [BatchelorJ](https://github.com/BatchelorJ)
+* **Jonathan Mettes** - *Testing, Integration and Deployment* - [jmettes](https://github.com/jmettes)
 
 See also the list of [contributors](https://github.com/GeoscienceAustralia/geodesy-package/graphs/contributors) who participated in this project.
 
