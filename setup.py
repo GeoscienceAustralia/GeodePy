@@ -6,7 +6,7 @@ setup(name='geodepy',
       url='https://github.com/GeoscienceAustralia/GeodePy',
       author='Jonathan Mettes',
       author_email='jonathan.mettes@ga.gov.au',
-      license='CC-BY-4.0',
+      license='Apache License 2.0',
       packages=['geodepy'],
       install_requires=['numpy', 'scipy'])
 
