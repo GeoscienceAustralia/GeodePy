@@ -3,7 +3,7 @@ import os.path
 import numpy as np
 import numpy.lib.recfunctions as rfn
 from geodepy.convert import dms2dd, dd2dms
-from geodepy.geodesy import vincinv
+from geodepy.geodesy import vincinv, vincdir
 
 class TestGeodesy(unittest.TestCase):
     def test_vincinv(self):
