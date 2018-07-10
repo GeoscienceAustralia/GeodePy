@@ -114,8 +114,9 @@ def vincdir(lat1, long1, azimuth1to2, ell_dist, ellipsoid=grs80):
                * (74 - 47 * u2))))
     # Eq. 94
     sigma = ell_dist / (ellipsoid.semimin * A)
+    itercount = 0
     # Sigma Iteration
-    while True:
+    while itercount < 1000:
         # Eq. 95
         sigm2 = 2 * sigma1 + sigma
         # Eq. 96
@@ -133,6 +134,7 @@ def vincdir(lat1, long1, azimuth1to2, ell_dist, ellipsoid=grs80):
         sigma = (ell_dist / (ellipsoid.semimin * A)) + sigma_change
         if abs(sigma_change) < 1e-5:
             break
+        itercount += 1
     sin_sigma = sin(sigma)
     cos_sigma = cos(sigma)
 
@@ -167,8 +169,7 @@ def vincdir(lat1, long1, azimuth1to2, ell_dist, ellipsoid=grs80):
     long2 = float(long1) + degrees(omega)
 
     # Calculate Reverse Azimuth
-    azimuth2to1 = atan(sin_alpha / (-sin_u1 * sin_sigma + cos_u1 * cos_sigma * cos(azimuth1to2))) + pi
-    azimuth2to1 = degrees(azimuth2to1)
+    azimuth2to1 = degrees(atan2(sin_alpha, (-sin_u1 * sin_sigma + cos_u1 * cos_sigma * cos(azimuth1to2)))) + 180
     return round(lat2, 11), round(long2, 11), round(azimuth2to1, 9)
 
 
