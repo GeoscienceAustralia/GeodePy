@@ -132,7 +132,7 @@ def vincdir(lat1, long1, azimuth1to2, ell_dist, ellipsoid=grs80):
                             )))
         # Eq. 97
         sigma = (ell_dist / (ellipsoid.semimin * A)) + sigma_change
-        if abs(sigma_change) < 1e-5:
+        if abs(sigma_change) < 1e-9:
             break
         itercount += 1
     sin_sigma = sin(sigma)
