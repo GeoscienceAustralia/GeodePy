@@ -24,7 +24,7 @@ class TestTransforms(unittest.TestCase):
 
         geoed_grid = np.array(list(grid2geo(*x) for x in test_grid_coords[['zone', 'east', 'north']]))
         np.testing.assert_almost_equal(geoed_grid[:, :2], dms2dd_v(np.array(test_geo_coords[['lat', 'lon']].tolist())),
-                                       decimal=3)
+                                       decimal=8)
 
         gridded_geo = np.stack(geo2grid(*x) for x in dms2dd_v(np.array(test_geo_coords[['lat', 'lon']].tolist())))
         np.testing.assert_almost_equal(gridded_geo[:, 2:4].astype(float), np.array(test_grid_coords[['east', 'north']].tolist()),
