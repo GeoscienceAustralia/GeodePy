@@ -53,8 +53,8 @@ def query_vincenty_inverse(lat1_deg, lat1_min, lat1_sec,
                                       lon2_deg, lon2_min, lon2_sec)
 
     data = urlopen(url).read()
-    with open('inverse.html', 'wb') as f:
-        f.write(data)
+    # with open('inverse.html', 'wb') as f:
+    #     f.write(data)
     soup = BeautifulSoup(data, 'html.parser')
     # abs_path = os.path.abspath(os.path.dirname(__file__))
     # soup = BeautifulSoup(open(abs_path + '/inverse.html').read(), 'html.parser')
@@ -121,8 +121,8 @@ def query_vincenty_direct(lat1_deg, lat1_min, lat1_sec,
                                         fa_deg, fa_min, fa_sec)
 
     data = urlopen(url).read()
-    with open('direct2.html', 'wb') as f:
-        f.write(data)
+    # with open('direct2.html', 'wb') as f:
+    #     f.write(data)
     soup = BeautifulSoup(data, 'html.parser')
     # abs_path = os.path.abspath(os.path.dirname(__file__))
     # soup = BeautifulSoup(open(abs_path + "/direct.html").read(), 'html.parser')
@@ -139,14 +139,12 @@ def query_vincenty_direct(lat1_deg, lat1_min, lat1_sec,
                                                      .replace('\'\'', ''))
                                          for lon in lon_row.td.next_siblings)[1]
 
-    reverse_azimuth = parse_coord(soup.find('td', text='Reverse Azimuth:')
-                                  .nextSibling
-                                  .nextSibling
-                                  .text
-                                  .replace(' ', '')
-                                  .replace('\'\'', ''))
-
-    ra_deg, ra_min, ra_sec = reverse_azimuth
+    ra_deg, ra_min, ra_sec = parse_coord(soup.find('td', text='Reverse Azimuth:')
+                                         .nextSibling
+                                         .nextSibling
+                                         .text
+                                         .replace(' ', '')
+                                         .replace('\'\'', ''))
 
     return (lat2_deg, lat2_min, lat2_sec,
             lon2_deg, lon2_min, lon2_sec,
@@ -159,8 +157,8 @@ def vincenty_from_website():
     coords = np.genfromtxt(os.path.join(abs_path, 'resources/natadjust_rvs_example.dat'),
                            usecols=[5, 6])
 
-    # pair first with last, second with second last...
-    coord_pairs = np.column_stack([coords, np.roll(coords, 2)])[0:2]
+    # pair (1st, last), (2nd, 1st), ..., (2nd last, 3rd last), (last, 2nd last)
+    coord_pairs = np.column_stack([coords, np.roll(coords, 2)])
 
     # coord_pairs = np.array([[-37.570372030, 144.252952440, -37.391015610, 143.553538390]])
 
@@ -178,9 +176,13 @@ def vincenty_from_website():
 
         inv_ell_dist, inv_az1to2, inv_az2to1 = vincinv(dms2dd(lat1), dms2dd(lon1), dms2dd(lat2), dms2dd(lon2))
 
-        np.testing.assert_almost_equal((inv_ell_dist, dd2dms(inv_az1to2), dd2dms(inv_az2to1)),
-                                       (float(web_inv_ell_dist), float(web_inv_az1to2), float(web_inv_az2to1)),
-                                       decimal=1,
+        np.testing.assert_almost_equal(inv_ell_dist, float(web_inv_ell_dist),
+                                       decimal=3,
+                                       err_msg=("vincentys_inverse({}, {}, {}, {})"
+                                                " on row {}").format(lat1, lon1, lat2, lon2, str(row_number)))
+        np.testing.assert_almost_equal((dd2dms(inv_az1to2), dd2dms(inv_az2to1)),
+                                       (float(web_inv_az1to2), float(web_inv_az2to1)),
+                                       decimal=6,
                                        err_msg=("vincentys_inverse({}, {}, {}, {})"
                                                 " on row {}").format(lat1, lon1, lat2, lon2, str(row_number)))
 
