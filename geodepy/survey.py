@@ -7,7 +7,7 @@ Survey Module
 
 import os
 from math import sqrt, degrees, radians, sin, cos, asin
-from geodepy.conversions import dd2dms, dms2dd
+from geodepy.convert import dd2dms, dms2dd
 
 
 # Defines a bunch of classes required to convert GSI (or any other format) to DynaNet v3 Format
