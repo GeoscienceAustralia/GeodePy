@@ -121,8 +121,8 @@ def query_vincenty_direct(lat1_deg, lat1_min, lat1_sec,
                                         fa_deg, fa_min, fa_sec)
 
     data = urlopen(url).read()
-    # with open('direct2.html', 'wb') as f:
-    #     f.write(data)
+    with open('direct2.html', 'wb') as f:
+        f.write(data)
     soup = BeautifulSoup(data, 'html.parser')
     # abs_path = os.path.abspath(os.path.dirname(__file__))
     # soup = BeautifulSoup(open(abs_path + "/direct.html").read(), 'html.parser')
@@ -204,14 +204,18 @@ def vincenty_from_website():
 
         dir_lat2, dir_lon2, dir_az2to1 = vincdir(dms2dd(lat1), dms2dd(lon1), inv_az1to2, inv_ell_dist)
 
-        np.testing.assert_almost_equal((float(web_dir_lat2), float(web_dir_lon2), float(web_dir_az2to1)),
-                                       (dd2dms(dir_lat2), dd2dms(dir_lon2), dd2dms(dir_az2to1)),
+        np.testing.assert_almost_equal((float(web_dir_lat2), float(web_dir_lon2)),
+                                       (dd2dms(dir_lat2), dd2dms(dir_lon2)),
+                                       decimal=8,
+                                       err_msg="vincentys_direct({}, {}, {}, {})"
+                                               "on row {}".format(lat1, lon1, dd2dms(inv_az1to2),
+                                                                  dd2dms(inv_ell_dist), str(row_number)))
+        np.testing.assert_almost_equal(float(web_dir_az2to1),
+                                       dd2dms(dir_az2to1),
                                        decimal=6,
-                                       err_msg="vincentys_direct({}, {}, {}, {}) on row {}".format(lat1,
-                                                                                                   lon1,
-                                                                                                   dd2dms(inv_az1to2),
-                                                                                                   dd2dms(inv_ell_dist),
-                                                                                                   str(row_number)))
+                                       err_msg="vincentys_direct({}, {}, {}, {})"
+                                               "on row {}".format(lat1, lon1, dd2dms(inv_az1to2),
+                                                                  dd2dms(inv_ell_dist), str(row_number)))
         print("--------")
 
 
