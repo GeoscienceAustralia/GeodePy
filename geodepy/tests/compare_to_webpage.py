@@ -209,13 +209,13 @@ def vincenty_from_website():
                                        decimal=8,
                                        err_msg="vincentys_direct({}, {}, {}, {})"
                                                "on row {}".format(lat1, lon1, dd2dms(inv_az1to2),
-                                                                  dd2dms(inv_ell_dist), str(row_number)))
+                                                                  inv_ell_dist, str(row_number)))
         np.testing.assert_almost_equal(float(web_dir_az2to1),
                                        dd2dms(dir_az2to1),
                                        decimal=6,
                                        err_msg="vincentys_direct({}, {}, {}, {})"
                                                "on row {}".format(lat1, lon1, dd2dms(inv_az1to2),
-                                                                  dd2dms(inv_ell_dist), str(row_number)))
+                                                                  inv_ell_dist, str(row_number)))
         print("--------")
 
 
