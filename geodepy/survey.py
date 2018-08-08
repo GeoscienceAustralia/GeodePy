@@ -6,11 +6,13 @@ Survey Module
 """
 
 import os
+import numpy as np
 from math import sqrt, degrees, radians, sin, cos, asin
 from geodepy.convert import dd2dms, dms2dd
 
 
-# Defines a bunch of classes required to convert GSI (or any other format) to DynaNet v3 Format
+# Defines a bunch of classes required to
+# convert GSI (or any other format) to DynaNet v3 Format
 
 
 class AngleObs(object):
@@ -20,7 +22,9 @@ class AngleObs(object):
         self.second = abs(round(float(second), 3))
 
     def __repr__(self):
-        return repr(self.degree) + 'd ' + repr(self.minute) + '\' ' + repr(self.second) + '\"'
+        return repr(self.degree) + 'd '\
+               + repr(self.minute) + '\' '\
+               + repr(self.second) + '\"'
 
     def decimal(self):
         dd = abs(self.degree + self.minute / 60 + self.second / 3600)
@@ -64,7 +68,8 @@ class AngleObs(object):
 
 
 class Coordinate(object):
-    def __init__(self, pt_id, system, hz_datum, vert_datum, epoch, x=0.0, y=0.0, z=0.0):
+    def __init__(self, pt_id, system, hz_datum,
+                 vert_datum, epoch, x=0.0, y=0.0, z=0.0):
         self.pt_id = pt_id
         self.system = system
         self.hz_datum = hz_datum
@@ -106,11 +111,13 @@ class InstSetup(object):
 
 class Observation(object):
     def __init__(self, from_id, to_id, inst_height=0.0, target_height=0.0,
-                 hz_obs=AngleObs(0, 0, 0), va_obs=AngleObs(0, 0, 0), sd_obs=0.0, hz_dist=0.0, vert_dist=0.0):
+                 face='FL', hz_obs=AngleObs(0, 0, 0), va_obs=AngleObs(0, 0, 0),
+                 sd_obs=0.0, hz_dist=0.0, vert_dist=0.0):
         self.from_id = from_id
         self.to_id = to_id
         self.inst_height = inst_height
         self.target_height = target_height
+        self.face = face
         self.hz_obs = hz_obs
         self.va_obs = va_obs
         self.sd_obs = sd_obs
@@ -128,7 +135,97 @@ class Observation(object):
                 + '}')
 
 
-# Functions to read in data to classes from Leica GSI format file (GA_Survey2.frt)
+# Functions to read in data from fbk format (Geomax Zoom90 Theodolite used
+# in Surat Survey
+
+testfbk = '\\geodepy\\tests\\resources\\Site01-152.fbk'
+
+terms = ['PRISM', 'STN', 'F1', 'F2']
+
+
+def stripfile(filedata, listofterms):
+    """
+    Creates a list with lines starting with strings from a list
+    :param filedata: File Data in list form
+    :param listofterms: list of strings to use as search terms
+    :return: list of file lines starting with strings from list of terms
+    """
+    datawithterms = []
+    for line in filedata:
+        for i in listofterms:
+            if line.startswith(i):
+                datawithterms.append(line)
+    return datawithterms
+
+
+def addprismht(fbklist):
+    prismlist = []
+    rowto = []
+    numlines = 0
+    # Build array with prism height, startline and endline
+    for num, line in enumerate(fbklist, 1):
+        numlines += 1
+        if line.startswith('PRISM'):
+            prismlist.append([line[6:11], num])
+    prismarray = np.asarray(prismlist)
+    prismarrayrows = prismarray.shape[0]
+    for num, row in enumerate(prismarray, 1):
+        if num > prismarrayrows:
+            break
+        elif num == prismarrayrows:
+            rowto.append(numlines)
+        else:
+            rowto.append(prismarray[num, 1])
+    rowtoarray = np.asarray(rowto)
+    prismrange = np.append(prismarray,
+                           rowtoarray.reshape(rowtoarray.size, 1),
+                           axis=1)
+    # Add Prism Heights to each observation in file
+    filecontents = [x.strip() for x in fbklist]
+    for prism in prismrange:
+        for i in range(int(prism[1]), int(prism[2])):
+            if not (not filecontents[i].startswith('F1')
+                    and not filecontents[i].startswith('F2')):
+                filecontents[i] = filecontents[i] + ' ' + prism[0]
+    filecontents = [x + '\n' for x in filecontents]
+    return filecontents
+
+
+def readfbk(filepath):
+    with open(filepath) as f:
+        # Remove non-obs data
+        stage1 = stripfile(f, ['PRISM', 'STN', 'F1', 'F2'])
+        # Add prism heights to each observation
+        stage2 = addprismht(stage1)
+        # Remove Prism Records
+        stage3 = stripfile(stage2, ['STN', 'F1', 'F2'])
+        # *Optional* Write current stage to file
+        # filepathin, ext = os.path.splitext(filepath)
+        # filepathout = filepathin + '_partial1' + ext
+        # with open(filepathout, 'w+') as f_out:
+        #     for line in stage3:
+        #         f_out.write(line)
+        # Split obs and group by setup
+        stage4 = []
+        for num, i in enumerate(stage3):
+            stage4.append(stage3[num].split())
+        stn_index = [0]
+        for num, i in enumerate(stage4, 1):
+            # Create list of line numbers of station records
+            # (Only stations have '84..' string)
+            if 'STN' in i:
+                lnid = num
+                stn_index.append(lnid)
+        fbk_listbystation = []
+        # Create lists of gsi data with station records as first element
+        for i in range(0, (len(stn_index) - 1)):
+            fbk_listbystation.append(stage4[(stn_index[i])
+                                            - 1:(stn_index[i + 1])])
+        del fbk_listbystation[0]
+    return fbk_listbystation
+
+
+# Functions to read data to classes from Leica GSI format file (GA_Survey2.frt)
 
 
 def readgsi(filepath):
@@ -151,7 +248,8 @@ def readgsi(filepath):
         gsidata = file.readlines()
         stn_index = [0]
         for i in gsidata:
-            # Create list of line numbers of station records (Only stations have '84..' string)
+            # Create list of line numbers of station records
+            # (Only stations have '84..' string)
             if '84..' in i:
                 lnid = i[3:7]
                 lnid = int(lnid.lstrip('0'))
@@ -159,7 +257,8 @@ def readgsi(filepath):
         gsi_listbystation = []
         # Create lists of gsi data with station records as first element
         for i in range(0, (len(stn_index) - 1)):
-            gsi_listbystation.append(gsidata[(stn_index[i]) - 1:(stn_index[i + 1])])
+            gsi_listbystation.append(gsidata[(stn_index[i])
+                                             - 1:(stn_index[i + 1])])
         del gsi_listbystation[0]
     return gsi_listbystation
 
@@ -231,14 +330,16 @@ def gsi2class(gsi_list):
                 slope = parse_slope(line)
                 tgtht = parse_tgtht(line)
                 instht = parse_instht(line)
-                obs = Observation(from_stn, to_stn, instht, tgtht, hz, vert, slope)
+                obs = Observation(from_stn, to_stn, instht, tgtht,
+                                  'FL', hz, vert, slope)
                 obs_list.append(obs)
         if '84..' in record[0]:
             pt_id = parse_ptid(record[0])
             easting = parse_easting(record[0])
             northing = parse_northing(record[0])
             elev = parse_elev(record[0])
-            coord = Coordinate(pt_id, 'utm', 'gda94', 'gda94', '2018.1', easting, northing, elev)
+            coord = Coordinate(pt_id, 'utm', 'gda94', 'gda94',
+                               '2018.1', easting, northing, elev)
             setup = InstSetup(pt_id, coord)
             for i in range(0, len(obs_list)):
                 setup.addobs(obs_list[i])
@@ -267,45 +368,45 @@ def anglerounds(setup):
         else:
             return (angle1 + (angle2 + AngleObs(180))) / 2
 
-    def meanva(angle1, angle2):
-        if angle1.degree < 180:
-            return (angle1 + (AngleObs(360) - angle2)) / 2
-        else:
-            return (angle2 + (AngleObs(360) - angle1)) / 2
-    # Build a round of FL/FR obs
-    start_round = setup.observation[0].to_id
-    ind = []
-    roundofobs = []
-    for c, ob in enumerate(setup.observation):
-        if ob.to_id == start_round:
-            ind.append(c)
-    roundofobs = setup.observation[ind[0]:ind[1] + 1]
-    # Test for Even Palindromic to_stn names
-    meanround = []
-    fl = 0
-    fr = -1
-    while len(roundofobs)/2 > fl + 1:
-        meanhz = meanhz(roundofobs[fl].hz_obs, roundofobs[fr].hz_obs)
-        meanva = meanva(roundofobs[fr].va_obs, roundofobs[fr].va_obs)
-        meanob = Observation(roundofobs[fl].from_id,
-                             roundofobs[fl].to_id,
-                             roundofobs[fl].inst_height,
-                             roundofobs[fl].target_height,
-                             meanhz,
-                             meanva,
-                             roundofobs[fl].sd_obs,
-                             roundofobs[fl].hz_dist,
-                             roundofobs[fl].vert_dist)
-        meanround.append(meanob)
-        fl += 1
-        fr -= 1
+    # def meanva(angle1, angle2):
+    #     "Broken - Need to incorporate new FL/FR from Class Attribute"
+    #     if angle1.degree < 180:
+    #         return (angle1 + (AngleObs(360) - angle2)) / 2
+    #     else:
+    #         return (angle2 + (AngleObs(360) - angle1)) / 2
+    # # Build a round of FL/FR obs
+    # start_round = setup.observation[0].to_id
+    # ind = []
+    # for c, ob in enumerate(setup.observation):
+    #     if ob.to_id == start_round:
+    #         ind.append(c)
+    # roundofobs = setup.observation[ind[0]:ind[1] + 1]
+    # # Test for Even Palindromic to_stn names
+    # meanround = []
+    # fl = 0
+    # fr = -1
+    # while len(roundofobs)/2 > fl + 1:
+    #     meanhz = meanhz(roundofobs[fl].hz_obs, roundofobs[fr].hz_obs)
+    #     meanva = meanva(roundofobs[fr].va_obs, roundofobs[fr].va_obs)
+    #     meanob = Observation(roundofobs[fl].from_id,
+    #                          roundofobs[fl].to_id,
+    #                          roundofobs[fl].inst_height,
+    #                          roundofobs[fl].target_height,
+    #                          meanhz,
+    #                          meanva,
+    #                          roundofobs[fl].sd_obs,
+    #                          roundofobs[fl].hz_dist,
+    #                          roundofobs[fl].vert_dist)
+    #     meanround.append(meanob)
+    #     fl += 1
+    #     fr -= 1
     # Create new list of meaned rounds of obs
     # For first and last in round
-        # mean_va = (FL_va + FR_hz) / 2 (tbd)
-        # mean_sd = (FL_sd + FL_sd) / 2
-        # Observation(All same + mean_hz, mean_va, mean_sd)
-        # Add above to list of meaned rounds of obs
-        # Remove first and last in round
+    #     mean_va = (FL_va + FR_hz) / 2 (tbd)
+    #     mean_sd = (FL_sd + FL_sd) / 2
+    #     Observation(All same + mean_hz, mean_va, mean_sd)
+    #     Add above to list of meaned rounds of obs
+    #     Remove first and last in round
     # Repeat until all obs in round meaned
     # Repeat above until all rounds meaned
     # Return new list of meaned obs per round (no non-round obs included)
@@ -377,16 +478,19 @@ def dnaout_va(observation):
 
 def va_conv(verta_hp, slope_dist, height_inst=0, height_tgt=0):
     """
-    Function to convert vertical angles (zenith distances) and slope distances into horizontal
-    distances and changes in height. Instrument and Target heights can be entered to allow
-    computation of zenith and slope distances between ground points.
+    Function to convert vertical angles (zenith distances) and slope distances
+    into horizontal distances and changes in height. Instrument and Target
+    heights can be entered to allow computation of zenith and slope distances
+    between ground points.
 
-    :param verta_hp:        Vertical Angle from Instrument to Target, expressed in HP Format (DDD.MMSSSSSS)
+    :param verta_hp:        Vertical Angle from Instrument to Target, expressed
+                            in HP Format (DDD.MMSSSSSS)
     :param slope_dist:      Slope Distance from Instrument to Target in metres
     :param height_inst:     Height of Instrument. Optional - Default Value of 0m
     :param height_tgt:      Height of Target. Optional - Default Value of 0m
 
-    :return: verta_pt_hp:   Vertical Angle between Ground Points, expressed in HP Format (DDD.MMSSSSSS)
+    :return: verta_pt_hp:   Vertical Angle between Ground Points, expressed
+                            in HP Format (DDD.MMSSSSSS)
     :return: slope_dist_pt: Slope Distance between Ground Points in metres
     :return: hz_dist:       Horizontal Distance
     :return: delta_ht:      Change in height between Ground Points in metres
