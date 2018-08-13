@@ -127,11 +127,12 @@ class Observation(object):
     def __repr__(self):
         return ('{from: ' + repr(self.from_id)
                 + 'to: ' + repr(self.to_id)
+                + '; inst_height ' + repr(self.inst_height)
                 + '; target_height ' + repr(self.target_height)
+                + '; face ' + repr(self.face)
                 + '; hz_obs ' + repr(self.hz_obs)
                 + '; va_obs ' + repr(self.va_obs)
                 + '; sd_obs ' + repr(self.sd_obs)
-                + '; target_height ' + repr(self.target_height)
                 + '}')
 
 
@@ -205,12 +206,28 @@ def readfbk(filepath):
         # with open(filepathout, 'w+') as f_out:
         #     for line in stage3:
         #         f_out.write(line)
-        # Split obs and group by setup
+        # Remove Spaces from Obs Descriptions (inside "")
+
+        def wscommstrip(string):
+            string_list = list(string)
+            commrange = [pos for pos, char in enumerate(string) if char == '\"']
+            if len(commrange) != 2:
+                return string
+            else:
+                for char in range(commrange[0] + 1, commrange[1]):
+                    if string_list[char] == ' ':
+                        string_list[char] = '_'
+                string_us = ''.join(string_list)
+                return string_us
         stage4 = []
-        for num, i in enumerate(stage3):
-            stage4.append(stage3[num].split())
+        for line in stage3:
+            stage4.append(wscommstrip(line))
+        # Split obs and group by setup
+        stage5 = []
+        for num, i in enumerate(stage4):
+            stage5.append(stage4[num].split())
         stn_index = [0]
-        for num, i in enumerate(stage4, 1):
+        for num, i in enumerate(stage5, 1):
             # Create list of line numbers of station records
             # (Only stations have '84..' string)
             if 'STN' in i:
@@ -219,10 +236,56 @@ def readfbk(filepath):
         fbk_listbystation = []
         # Create lists of gsi data with station records as first element
         for i in range(0, (len(stn_index) - 1)):
-            fbk_listbystation.append(stage4[(stn_index[i])
+            fbk_listbystation.append(stage5[(stn_index[i])
                                             - 1:(stn_index[i + 1])])
         del fbk_listbystation[0]
     return fbk_listbystation
+
+
+def fbk2class(fbk_list):
+
+    def parse_angle(obs_string):
+        dms = float(obs_string)
+        degmin, second = divmod(abs(dms) * 1000, 10)
+        degree, minute = divmod(degmin, 100)
+        return AngleObs(degree, minute, second * 10)
+
+    for setup in fbk_list:
+        for record in setup:
+            if record[0] == 'STN':
+                # This is the station information part
+                from_id = record[1]
+                inst_height = float(record[2])
+            elif record[0] == 'F1' or record[0] == 'F2':
+                """
+                This is the obs information part
+                from_id, to_id, inst_height, target_height
+                face
+                hz_obs
+                va_obs
+                sd_obs
+                hz_dist
+                vert_dist
+                """
+                # Read Face
+                if int(float(record[5])) in range(0,180):
+                    face = 'FL'
+                elif int(float(record[5])) in range(180,360):
+                    face = 'FR'
+                else:
+                    ValueError('Invalid Vertical Angle in ' + record)
+                to_id = record[2] # Read To ID
+                hz_obs = parse_angle(record[3])# 3 is Hz Ob (HP)
+                sd_obs = record[4]
+                va_obs = parse_angle(record[5])# 5 is Vert Ob (HP)
+                target_height = float(record[7])
+                obs = Observation(from_id, to_id,
+                                  inst_height, target_height,
+                                  face, hz_obs, va_obs, sd_obs)
+                print(obs)
+            else:
+                raise ValueError('Unexpected format found')
+    pass
 
 
 # Functions to read data to classes from Leica GSI format file (GA_Survey2.frt)
