@@ -195,9 +195,16 @@ def addprismht(fbklist):
 def readfbk(filepath):
     with open(filepath) as f:
         # Remove non-obs data
-        stage1 = stripfile(f, ['PRISM', 'STN', 'F1', 'F2'])
+        stage1 = stripfile(f, ['PRISM', 'NEZ', 'STN', 'F1', 'F2'])
         # Add prism heights to each observation
         stage2 = addprismht(stage1)
+        ### Add Stn Coordinates here!!!!!
+        for line in stage2:
+            if line.startswith('NEZ'):
+                line.split()
+
+                # dostuff
+                pass
         # Remove Prism Records
         stage3 = stripfile(stage2, ['STN', 'F1', 'F2'])
         # *Optional* Write current stage to file
@@ -229,12 +236,12 @@ def readfbk(filepath):
         stn_index = [0]
         for num, i in enumerate(stage5, 1):
             # Create list of line numbers of station records
-            # (Only stations have '84..' string)
+            # (Only stations have 'STN' string)
             if 'STN' in i:
                 lnid = num
                 stn_index.append(lnid)
         fbk_listbystation = []
-        # Create lists of gsi data with station records as first element
+        # Create lists of fbk data with station records as first element
         for i in range(0, (len(stn_index) - 1)):
             fbk_listbystation.append(stage5[(stn_index[i])
                                             - 1:(stn_index[i + 1])])
@@ -250,6 +257,7 @@ def fbk2class(fbk_list):
         degree, minute = divmod(degmin, 100)
         return AngleObs(degree, minute, second * 10)
 
+    project = []
     for setup in fbk_list:
         for record in setup:
             if record[0] == 'STN':
@@ -285,6 +293,17 @@ def fbk2class(fbk_list):
                 print(obs)
             else:
                 raise ValueError('Unexpected format found')
+    #         pt_id = parse_ptid(record[0])
+    #         easting = parse_easting(record[0])
+    #         northing = parse_northing(record[0])
+    #         elev = parse_elev(record[0])
+    #         coord = Coordinate(pt_id, 'utm', 'gda94', 'gda94',
+    #                            '2018.1', easting, northing, elev)
+    #         setup = InstSetup(pt_id, coord)
+    #         for i in range(0, len(obs_list)):
+    #             setup.addobs(obs_list[i])
+    #     project.append(setup)
+    # return project
     pass
 
 
