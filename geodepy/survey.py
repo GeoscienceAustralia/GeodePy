@@ -100,7 +100,7 @@ class InstSetup(object):
         return ('{InstSetup: ' + repr(self.pt_id)
                 + ' ' + repr(self.coordinate)
                 + '}\n Observations:\n'
-                + repr(self.observation))
+                + repr(self.observation)) + '\n\n'
 
     def addobs(self, observation):
         return self.observation.append(observation)
@@ -203,12 +203,6 @@ def readfbk(filepath):
         stage1 = stripfile(f, ['PRISM', 'NEZ', 'STN', 'F1', 'F2'])
         # Add prism heights to each observation
         stage2 = addprismht(stage1)
-        # *Optional* Write current stage to file
-        # filepathin, ext = os.path.splitext(filepath)
-        # filepathout = filepathin + '_partial1' + ext
-        # with open(filepathout, 'w+') as f_out:
-        #     for line in stage3:
-        #         f_out.write(line)
         # Remove Spaces from Obs Descriptions (inside "")
         def wscommstrip(string):
             string_list = list(string)
@@ -264,13 +258,26 @@ def fbk2class(fbk_list):
         return AngleObs(degree, minute, second * 10)
 
     project = []
-    for setup in fbk_list:
-        for record in setup:
-            if record[0] == 'STN':
-                # This is the station information part
-                from_id = record[1]
-                inst_height = float(record[2])
-            elif record[0] == 'F1' or record[0] == 'F2':
+    for setup_list in fbk_list:
+        obs_list = []
+        if setup_list[0][0] == 'STN' and len(setup_list[0]) <= 3:
+            # This is the station information part
+            from_id = setup_list[0][1]
+            inst_height = setup_list[0][2]
+            coord = Coordinate(from_id, 'utm', 'gda94', 'gda94',
+                               '2018.1', 0, 0, 0)
+            setup = InstSetup(from_id, coord)
+        elif setup_list[0][0] == 'STN' and len(setup_list[0]) > 3:
+            from_id = setup_list[0][1]
+            inst_height = setup_list[0][2]
+            east = float(setup_list[0][3])
+            north = float(setup_list[0][4])
+            elev = float(setup_list[0][5])
+            coord = Coordinate(from_id, 'utm', 'gda94', 'gda94',
+                               '2018.1', east, north, elev)
+            setup = InstSetup(from_id, coord)
+        for record in setup_list:
+            if record[0] == 'F1' or record[0] == 'F2':
                 """
                 This is the obs information part
                 from_id, to_id, inst_height, target_height
@@ -288,17 +295,19 @@ def fbk2class(fbk_list):
                     face = 'FR'
                 else:
                     ValueError('Invalid Vertical Angle in ' + record)
-                to_id = record[2] # Read To ID
-                hz_obs = parse_angle(record[3])# 3 is Hz Ob (HP)
+                to_id = record[2]  # Read To ID
+                hz_obs = parse_angle(record[3])  # 3 is Hz Ob (HP)
                 sd_obs = record[4]
-                va_obs = parse_angle(record[5])# 5 is Vert Ob (HP)
+                va_obs = parse_angle(record[5])  # 5 is Vert Ob (HP)
                 target_height = float(record[7])
                 obs = Observation(from_id, to_id,
                                   inst_height, target_height,
                                   face, hz_obs, va_obs, sd_obs)
-                print(obs)
-            else:
-                raise ValueError('Unexpected format found')
+                obs_list.append(obs)
+            # else:
+            #     raise ValueError('Unexpected format found')
+        for i in obs_list:
+                setup.addobs(i)
     #         pt_id = parse_ptid(record[0])
     #         easting = parse_easting(record[0])
     #         northing = parse_northing(record[0])
@@ -308,9 +317,8 @@ def fbk2class(fbk_list):
     #         setup = InstSetup(pt_id, coord)
     #         for i in range(0, len(obs_list)):
     #             setup.addobs(obs_list[i])
-    #     project.append(setup)
-    # return project
-    pass
+        project.append(setup)
+    return project
 
 
 # Functions to read data to classes from Leica GSI format file (GA_Survey2.frt)
