@@ -153,9 +153,14 @@ def stripfile(filedata, listofterms):
     """
     datawithterms = []
     for line in filedata:
-        for i in listofterms:
-            if line.startswith(i):
-                datawithterms.append(line)
+        if type(line) == str:
+            for i in listofterms:
+                if line.startswith(i):
+                    datawithterms.append(line)
+        elif type(line) == list:
+            for i in listofterms:
+                if line[0] == i:
+                    datawithterms.append(line)
     return datawithterms
 
 
@@ -198,15 +203,6 @@ def readfbk(filepath):
         stage1 = stripfile(f, ['PRISM', 'NEZ', 'STN', 'F1', 'F2'])
         # Add prism heights to each observation
         stage2 = addprismht(stage1)
-        ### Add Stn Coordinates here!!!!!
-        for line in stage2:
-            if line.startswith('NEZ'):
-                line.split()
-
-                # dostuff
-                pass
-        # Remove Prism Records
-        stage3 = stripfile(stage2, ['STN', 'F1', 'F2'])
         # *Optional* Write current stage to file
         # filepathin, ext = os.path.splitext(filepath)
         # filepathout = filepathin + '_partial1' + ext
@@ -214,7 +210,6 @@ def readfbk(filepath):
         #     for line in stage3:
         #         f_out.write(line)
         # Remove Spaces from Obs Descriptions (inside "")
-
         def wscommstrip(string):
             string_list = list(string)
             commrange = [pos for pos, char in enumerate(string) if char == '\"']
@@ -226,13 +221,24 @@ def readfbk(filepath):
                         string_list[char] = '_'
                 string_us = ''.join(string_list)
                 return string_us
+        stage3 = []
+        for line in stage2:
+            stage3.append(wscommstrip(line))
+        # Split obs
         stage4 = []
-        for line in stage3:
-            stage4.append(wscommstrip(line))
-        # Split obs and group by setup
-        stage5 = []
-        for num, i in enumerate(stage4):
-            stage5.append(stage4[num].split())
+        for num, i in enumerate(stage3):
+            stage4.append(stage3[num].split())
+        # Add coordinates in file to stations
+        coordlist = []
+        for i in stage4:
+            if i[0] == 'NEZ':
+                coordlist.append(i)
+        stage5 = stripfile(stage4, ['STN', 'F1', 'F2'])
+        for coord in coordlist:
+            for num, line in enumerate(stage4):
+                if line[1] == coord[1]:
+                   stage5[num] = line + coord[2:]
+        # Group by Setup
         stn_index = [0]
         for num, i in enumerate(stage5, 1):
             # Create list of line numbers of station records
