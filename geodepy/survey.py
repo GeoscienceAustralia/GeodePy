@@ -327,7 +327,7 @@ def fbk2class(fbk_list):
                     ValueError('Invalid Vertical Angle in ' + record)
                 to_id = record[2]  # Read To ID
                 hz_obs = parse_angle(record[3])  # 3 is Hz Ob (HP)
-                sd_obs = record[4]
+                sd_obs = float(record[4])
                 va_obs = parse_angle(record[5])  # 5 is Vert Ob (HP)
                 target_height = float(record[7])
                 obs = Observation(from_id, to_id,
@@ -483,71 +483,53 @@ def readgsiword16(linestring, word_id):
 # Functions to write out station and obs data to DNA format
 
 
-def reducedataset(project):
-    reducedproj = []
-    # Change all obs to FL sense
-    for setup in project:
-        for num, obs in enumerate(setup.observation):
-            if obs.face == 'FR':
-                setup.observation[num] = obs.changeface()
-    # todo sort out how to mean obs into new list and return to object
-    return reducedproj
-
-def anglerounds(setup):
+def meanfaces(ob1, ob2):
     """
-
-    :param setup:
-    :return:
+    Take two Observations and return their mean Face Left Sense Observation
+    :param ob1: Observation Object
+    :param ob2: Observation Object
+    :return: Meaned Observation Object of ob1 and ob2 (Face Left Sense)
     """
-    def meanhz(angle1, angle2):
-        if angle1.degree < angle2.degree:
-            return (angle1 + (angle2 - AngleObs(180))) / 2
+    if type(ob1) != Observation or type(ob2) != Observation:
+        raise TypeError('Inputs must be Observation Objects.')
+    elif (ob1.from_id != ob2.from_id
+            or ob1.to_id != ob2.to_id
+            or ob1.inst_height != ob2.inst_height
+            or ob1.target_height != ob2.target_height):
+        raise ValueError('Inputs must be Observation Objects. '
+                         'From, To, Instrument and Target Height must be the same to mean two observations')
+    else:
+        # Check Face Inputs, convert all to Face Left Sense
+        if ob1.face == 'FL' and ob2.face == 'FR':
+            op_ob1 = ob1
+            op_ob2 = ob2.changeface()
+        elif ob1.face == 'FR' and ob2.face == 'FL':
+            op_ob1 = ob1.changeface()
+            op_ob2 = ob2
+        elif ob1.face == 'FR' and ob2.face == 'FR':
+            op_ob1 = ob1.changeface()
+            op_ob2 = ob2.changeface()
+        elif ob1.face == 'FL' and ob2.face == 'FL':
+            op_ob1 = ob1
+            op_ob2 = ob2
         else:
-            return (angle1 + (angle2 + AngleObs(180))) / 2
+            raise ValueError('Incompatible Face Values')
+        # Calculate means, return new observation
+        meaned_hz = (op_ob1.hz_obs + op_ob2.hz_obs) / 2
+        meaned_va = (op_ob1.va_obs + op_ob2.va_obs) / 2
+        meaned_sd = (op_ob1.sd_obs + op_ob2.sd_obs) / 2
+        return Observation(op_ob1.from_id,
+                           op_ob1.to_id,
+                           op_ob1.inst_height,
+                           op_ob1.target_height,
+                           op_ob1.face,
+                           meaned_hz,
+                           meaned_va,
+                           meaned_sd)
 
-    # def meanva(angle1, angle2):
-    #     "Broken - Need to incorporate new FL/FR from Class Attribute"
-    #     if angle1.degree < 180:
-    #         return (angle1 + (AngleObs(360) - angle2)) / 2
-    #     else:
-    #         return (angle2 + (AngleObs(360) - angle1)) / 2
-    # # Build a round of FL/FR obs
-    # start_round = setup.observation[0].to_id
-    # ind = []
-    # for c, ob in enumerate(setup.observation):
-    #     if ob.to_id == start_round:
-    #         ind.append(c)
-    # roundofobs = setup.observation[ind[0]:ind[1] + 1]
-    # # Test for Even Palindromic to_stn names
-    # meanround = []
-    # fl = 0
-    # fr = -1
-    # while len(roundofobs)/2 > fl + 1:
-    #     meanhz = meanhz(roundofobs[fl].hz_obs, roundofobs[fr].hz_obs)
-    #     meanva = meanva(roundofobs[fr].va_obs, roundofobs[fr].va_obs)
-    #     meanob = Observation(roundofobs[fl].from_id,
-    #                          roundofobs[fl].to_id,
-    #                          roundofobs[fl].inst_height,
-    #                          roundofobs[fl].target_height,
-    #                          meanhz,
-    #                          meanva,
-    #                          roundofobs[fl].sd_obs,
-    #                          roundofobs[fl].hz_dist,
-    #                          roundofobs[fl].vert_dist)
-    #     meanround.append(meanob)
-    #     fl += 1
-    #     fr -= 1
-    # Create new list of meaned rounds of obs
-    # For first and last in round
-    #     mean_va = (FL_va + FR_hz) / 2 (tbd)
-    #     mean_sd = (FL_sd + FL_sd) / 2
-    #     Observation(All same + mean_hz, mean_va, mean_sd)
-    #     Add above to list of meaned rounds of obs
-    #     Remove first and last in round
-    # Repeat until all obs in round meaned
-    # Repeat above until all rounds meaned
-    # Return new list of meaned obs per round (no non-round obs included)
-    pass
+
+# TODO Apply meanfaces to setup iteratively: must find next point with same to_id and different face
+# TODO should also reduce list to ensure only true pairs found
 
 
 def anglepairs(allobsfromInstSetup):
@@ -555,21 +537,6 @@ def anglepairs(allobsfromInstSetup):
         # Find next occurrence of to_stn
         # Check (FL_hz ~= (FR_hz +- 180)
     # Create new list of meaned rounds of obs
-    # For FL/FR pair of obs
-    def meanhz(angle1, angle2):
-        if angle1.degree < angle2.degree:
-            return (angle1 + (angle2 - AngleObs(180))) / 2
-        else:
-            return (angle1 + (angle2 + AngleObs(180))) / 2
-
-    def meanva(angle1, angle2):
-        if angle1.degree < 180:
-            return (angle1 + (AngleObs(360) - angle2)) / 2
-        else:
-            return (angle2 + (AngleObs(360) - angle1)) / 2
-        # mean_sd = (FL_sd + FL_sd) / 2
-        # Observation(All same + mean_hz, mean_va, mean_sd)
-        # Remove pair from list
     # Repeat until all pairs of obs in round meaned
     # Return new list of meaned pairs of obs (no single-face obs included)
     pass
@@ -594,7 +561,7 @@ def dnaout_sd(observation):
             + str(observation.sd_obs).ljust(14)  # 76
             + ''.ljust(14)
             + '0.0010'.ljust(9)         # add standard deviation
-            + str(1.7960).ljust(7)      # add intrument height
+            + observation.inst_height.ljust(7)      # add intrument height
             + str(observation.target_height).ljust(7))
 
 
