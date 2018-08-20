@@ -136,6 +136,36 @@ class Observation(object):
                 + '}')
 
 
+    def changeface(self):
+        # Change Horizontal Angle
+        if 0 <= self.hz_obs.degree < 180:
+            hz_switch = self.hz_obs + AngleObs(180)
+        elif 180 <= self.hz_obs.degree < 360:
+            hz_switch = self.hz_obs - AngleObs(180)
+        else:
+            raise ValueError('Horizontal Angle out of range (0 to 360 degrees)')
+        # Change Vertical Angle
+        if 0 <= self.va_obs.degree < 360:
+            va_switch = AngleObs(360) - self.va_obs
+        else:
+            raise ValueError('Vertical Angle out of range (0 to 360 degrees)')
+        # Change Face Label
+        if self.face == 'FL':
+            newface = 'FR'
+        elif self.face == 'FR':
+            newface = 'FL'
+        return Observation(self.from_id,
+                           self.to_id,
+                           self.inst_height,
+                           self.target_height,
+                           newface,
+                           hz_switch,
+                           va_switch,
+                           self.sd_obs,
+                           self.hz_obs,
+                           self.vert_dist)
+
+
 # Functions to read in data from fbk format (Geomax Zoom90 Theodolite used
 # in Surat Survey
 
@@ -451,6 +481,17 @@ def readgsiword16(linestring, word_id):
 
 
 # Functions to write out station and obs data to DNA format
+
+
+def reducedataset(project):
+    reducedproj = []
+    # Change all obs to FL sense
+    for setup in project:
+        for num, obs in enumerate(setup.observation):
+            if obs.face == 'FR':
+                setup.observation[num] = obs.changeface()
+    # todo sort out how to mean obs into new list and return to object
+    return reducedproj
 
 def anglerounds(setup):
     """
