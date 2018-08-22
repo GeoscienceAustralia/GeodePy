@@ -214,6 +214,12 @@ def fbk2dna(path):
               + str(obscount))
     msr = [line for sublist in msr_raw for line in sublist]
     msr = [header] + msr
+    # Output MSR File
+    fn, ext = os.path.splitext(path)
+    msr_fn = fn + '.msr'
+    with open(msr_fn, 'w+') as msr_file:
+        for line in msr:
+            msr_file.write(line + '\n')
     # output will be dna meas and stn files
     # TODO output msr to file
     # TODO check DNA format spacing and test import to Dynanet
