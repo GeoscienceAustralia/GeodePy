@@ -657,23 +657,23 @@ def dnaout_dirset(obslist):
              + obslist[0].from_id.ljust(20)
              + obslist[0].to_id.ljust(20)
              + str(len(obslist)-1).ljust(20)
-             + str(obslist[0].hz_obs.degree).rjust(3)
+             + str(obslist[0].hz_obs.degree).rjust(17)
              + ' '
              + str('%02d' % obslist[0].hz_obs.minute)
              + ' '
-             + str(obslist[0].hz_obs.second).ljust(8)
+             + str('{:.3f}'.format(obslist[0].hz_obs.second).rjust(6, '0').ljust(8))
              + '1.0000'.ljust(9))  # add standard deviation
     dnaobs.append(line1)
     # create other lines using range(1:)
-    for num in range(1,len(obslist)):
+    for num in range(1, len(obslist)):
         line = ('D '
                 + ''.ljust(40)
                 + obslist[num].to_id.ljust(20)
-                + str(obslist[num].hz_obs.degree).rjust(3)
+                + str(obslist[num].hz_obs.degree).rjust(17)
                 + ' '
                 + str('%02d' % obslist[num].hz_obs.minute)
                 + ' '
-                + str(obslist[num].hz_obs.second).ljust(8)
+                + str('{:.3f}'.format(obslist[num].hz_obs.second).rjust(6, '0').ljust(8))
                 + '1.0000'.ljust(9))  # add standard deviation
         dnaobs.append(line)
     return dnaobs
@@ -685,10 +685,10 @@ def dnaout_sd(obslist):
         line = ('S '
                 + observation.from_id.ljust(20)
                 + observation.to_id.ljust(20)
-                + ''.ljust(20)
-                + str(observation.sd_obs).ljust(14)  # 76
-                + ''.ljust(14)
-                + '0.0010'.ljust(9)         # add standard deviation
+                + ''.ljust(19)
+                + ('{:.4f}'.format(observation.sd_obs)).rjust(9)
+                + ''.ljust(21)
+                + '0.0010'.ljust(8)         # add standard deviation
                 + observation.inst_height.ljust(7)      # add intrument height
                 + str(observation.target_height).ljust(7))
         dnaobs.append(line)
@@ -704,10 +704,10 @@ def dnaout_va(obslist):
                 + ''.ljust(34)
                 + str(observation.va_obs.degree).rjust(3)
                 + ' '
-                + str('%02d' % observation.va_obs.minute)
+                + str(observation.va_obs.minute).rjust(2, '0')
                 + ' '
-                + str(observation.va_obs.second).ljust(8)
-                + '1.0000'.ljust(9)         # add standard deviation
+                + str(('{:.3f}'.format(observation.va_obs.second).rjust(6, '0')).ljust(8))
+                + '1.0000'.ljust(8)         # add standard deviation
                 + observation.inst_height.ljust(7)      # add intrument height
                 + str(observation.target_height).ljust(7))
         dnaobs.append(line)
