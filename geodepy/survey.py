@@ -136,7 +136,6 @@ class Observation(object):
                 + '; sd_obs ' + repr(self.sd_obs)
                 + '}')
 
-
     def changeface(self):
         # Change Horizontal Angle
         if 0 <= self.hz_obs.degree < 180:
@@ -151,6 +150,7 @@ class Observation(object):
         else:
             raise ValueError('Vertical Angle out of range (0 to 360 degrees)')
         # Change Face Label
+        newface = None
         if self.face == 'FL':
             newface = 'FR'
         elif self.face == 'FR':
@@ -172,15 +172,6 @@ class Observation(object):
 
 def fbk2dna(path):
     fbk_class = fbk2class(readfbk(path))
-    # Build msr header
-    day, month, year = fbkdate(path)
-    date = day + '.' + month + '.' + year
-    header = ('!#=DNA 3.01 MSR'.ljust(15)
-              + date.ljust(20)
-              + 'GDA94'.ljust(10)
-              + date.ljust(20)
-              # + obsnumber
-              )
     # Reduce observations in setups
     for setup in fbk_class:
         reduced_obs = reducesetup(setup.observation)
@@ -196,8 +187,8 @@ def fbk2dna(path):
     dircount = 0
     vacount = 0
     sdcount = 0
-    for set in msr_raw:
-        for line in set:
+    for group in msr_raw:
+        for line in group:
             if line.startswith('D'):
                 dircount = 1
             elif line.startswith('V'):
@@ -221,11 +212,11 @@ def fbk2dna(path):
         for line in msr:
             msr_file.write(line + '\n')
     # output will be dna meas and stn files
-    # TODO output msr to file
-    # TODO check DNA format spacing and test import to Dynanet
+    # TODO work out how to write stn file
     return msr
 
-testfbk = '\\geodepy\\tests\\resources\\Site01-152.fbk'
+# Debug - Example fbk file
+# testfbk = '\\geodepy\\tests\\resources\\Site01-152.fbk'
 
 
 def stripfile(filedata, listofterms):
@@ -288,6 +279,7 @@ def readfbk(filepath):
         # Add prism heights to each observation
         stage2 = addprismht(stage1)
         # Remove Spaces from Obs Descriptions (inside "")
+
         def wscommstrip(string):
             string_list = list(string)
             commrange = [pos for pos, char in enumerate(string) if char == '\"']
@@ -315,7 +307,7 @@ def readfbk(filepath):
         for coord in coordlist:
             for num, line in enumerate(stage4):
                 if line[1] == coord[1]:
-                   stage5[num] = line + coord[2:]
+                    stage5[num] = line + coord[2:]
         # Group by Setup
         stn_index = [0]
         for num, i in enumerate(stage5, 1):
@@ -335,6 +327,9 @@ def readfbk(filepath):
 
 def fbkdate(filepath):
     with open(filepath) as f:
+        day = None
+        month = None
+        year = None
         for line in f:
             if line.startswith('! DT'):
                 day = line[4:6]
@@ -384,9 +379,9 @@ def fbk2class(fbk_list):
                 vert_dist
                 """
                 # Read Face
-                if int(float(record[5])) in range(0,180):
+                if int(float(record[5])) in range(0, 180):
                     face = 'FL'
-                elif int(float(record[5])) in range(180,360):
+                elif int(float(record[5])) in range(180, 360):
                     face = 'FR'
                 else:
                     ValueError('Invalid Vertical Angle in ' + record)
@@ -626,14 +621,14 @@ def reducesetup(obslist, strict=False):
                 raise ValueError('Invalid Face')
         obsdict = {unique_id: {'FL': fl_list, 'FR': fr_list}}
         # Group Obs into FL, FR pairs and mean (Remove all non-paired obs)
-        if strict == True:
+        if strict:
             for key in obsdict:
                 pairedlist = list(zip(obsdict[key]['FL'], obsdict[key]['FR']))
                 for pair in pairedlist:
                     meanob = meanfaces(pair[0], pair[1])
                     meanedobs.append(meanob)
         # Group Obs into FL, FR pairs and mean (Keep all non-paired obs)
-        elif strict == False:
+        elif not strict:
             for key in obsdict:
                 pairedlist = list(itertools.zip_longest(obsdict[key]['FL'], obsdict[key]['FR'], fillvalue=None))
                 for pair in pairedlist:
