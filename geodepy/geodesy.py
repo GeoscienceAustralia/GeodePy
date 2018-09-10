@@ -264,7 +264,10 @@ def vincinv(lat1, lon1, lat2, lon2, ellipsoid=grs80):
     # Calculate the azimuth from point 1 to point 2
     azimuth1to2 = degrees(atan2((cos(u2)*sin(lon)),
                                 (cos(u1)*sin(u2)
-                                 - sin(u1)*cos(u2)*cos(lon)))) + 360
+                                 - sin(u1)*cos(u2)*cos(lon))))
+
+    if azimuth1to2 < 0:
+        azimuth1to2 = azimuth1to2 + 360
 
     # Calculate the azimuth from point 2 to point 1
     azimuth2to1 = degrees(atan2(cos(u1)*sin(lon),
