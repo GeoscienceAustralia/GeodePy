@@ -171,6 +171,11 @@ class Observation(object):
 # in Surat Survey
 
 def fbk2dna(path):
+    """
+    Converts .fbk format survey observations to DNA v3 Format files for use with DynAdjust
+    :param path: .fbk file path
+    :return: .msr file (same directory as source .fbk file)
+    """
     fbk_class = fbk2class(readfbk(path))
     # Reduce observations in setups
     for setup in fbk_class:
@@ -316,11 +321,11 @@ def readfbk(filepath):
             if 'STN' in i:
                 lnid = num
                 stn_index.append(lnid)
+        stn_index.append(len(stage5))
         fbk_listbystation = []
         # Create lists of fbk data with station records as first element
         for i in range(0, (len(stn_index) - 1)):
-            fbk_listbystation.append(stage5[(stn_index[i])
-                                            - 1:(stn_index[i + 1])])
+            fbk_listbystation.append(stage5[(stn_index[i]) - 1:(stn_index[i + 1])])
         del fbk_listbystation[0]
     return fbk_listbystation
 
@@ -433,9 +438,8 @@ def readgsi(filepath):
                 stn_index.append(lnid)
         gsi_listbystation = []
         # Create lists of gsi data with station records as first element
-        for i in range(0, (len(stn_index) - 1)):
-            gsi_listbystation.append(gsidata[(stn_index[i])
-                                             - 1:(stn_index[i + 1])])
+        for i in range(0, len(stn_index)):
+            gsi_listbystation.append(gsidata[(stn_index[i]) - 1:(stn_index[i])])
         del gsi_listbystation[0]
     return gsi_listbystation
 
