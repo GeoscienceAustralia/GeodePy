@@ -205,6 +205,11 @@ def dd2dms(dd):
     dms = degrees + (minutes / 100) + (seconds / 10000)
     return dms if dd >= 0 else -dms
 
+def dd2sec(dd):
+    minutes, seconds = divmod(abs(dd) * 3600, 60)
+    degrees, minutes = divmod(minutes, 60)
+    sec = (degrees * 3600) + (minutes * 60) + seconds
+    return sec if dd >= 0 else -sec
 
 def dms2dd_v(dms):
     degmin, seconds = divmod(abs(dms) * 1000, 10)

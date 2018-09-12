@@ -8,8 +8,8 @@ Survey Module
 import os
 import numpy as np
 import itertools
-from math import sqrt, degrees, radians, sin, cos, asin
-from geodepy.convert import dd2dms, dms2dd
+from math import sqrt, degrees, radians, sin, cos, asin, atan
+from geodepy.convert import dd2dms, dms2dd, dd2sec
 
 
 # Defines a bunch of classes required to
@@ -184,8 +184,8 @@ def fbk2dna(path):
     # Produce Measurement format data from setups
     msr_raw = []
     for setup in fbk_class:
-        dna_dirset = dnaout_dirset(setup.observation)
-        dna_va = dnaout_va(setup.observation)
+        dna_dirset = dnaout_dirset(setup.observation, same_stdev=False)
+        dna_va = dnaout_va(setup.observation, same_stdev=False)
         dna_sd = dnaout_sd(setup.observation)
         msr_raw.append(dna_dirset + dna_va + dna_sd)
     # Build msr header
@@ -337,8 +337,8 @@ def fbkdate(filepath):
         year = None
         for line in f:
             if line.startswith('! DT'):
-                day = line[4:6]
-                month = line[7:9]
+                month = line[4:6]
+                day = line[7:9]
                 year = line[10:14]
                 break
     return day, month, year
@@ -641,8 +641,10 @@ def reducesetup(obslist, strict=False):
     return meanedobs
 
 
-def dnaout_dirset(obslist):
+def dnaout_dirset(obslist, same_stdev=True):
     fromlist = []
+    pointing_err = 0.001
+    stdev = '1.0000'
     for ob in obslist:
         fromlist.append(ob.from_id)
     fromlist = list(set(fromlist))
@@ -651,30 +653,58 @@ def dnaout_dirset(obslist):
     else:
         pass
     dnaobs = []
-    # create first line using obslist[0]
-    line1 = ('D '
-             + obslist[0].from_id.ljust(20)
-             + obslist[0].to_id.ljust(20)
-             + str(len(obslist)-1).ljust(20)
-             + str(obslist[0].hz_obs.degree).rjust(17)
-             + ' '
-             + str('%02d' % obslist[0].hz_obs.minute)
-             + ' '
-             + str('{:.3f}'.format(obslist[0].hz_obs.second).rjust(6, '0').ljust(8))
-             + '1.0000'.ljust(9))  # add standard deviation
-    dnaobs.append(line1)
-    # create other lines using range(1:)
-    for num in range(1, len(obslist)):
-        line = ('D '
-                + ''.ljust(40)
-                + obslist[num].to_id.ljust(20)
-                + str(obslist[num].hz_obs.degree).rjust(17)
-                + ' '
-                + str('%02d' % obslist[num].hz_obs.minute)
-                + ' '
-                + str('{:.3f}'.format(obslist[num].hz_obs.second).rjust(6, '0').ljust(8))
-                + '1.0000'.ljust(9))  # add standard deviation
-        dnaobs.append(line)
+    if same_stdev:
+        # create first line using obslist[0]
+        line1 = ('D '
+                 + obslist[0].from_id.ljust(20)
+                 + obslist[0].to_id.ljust(20)
+                 + str(len(obslist)-1).ljust(20)
+                 + str(obslist[0].hz_obs.degree).rjust(17)
+                 + ' '
+                 + str('%02d' % obslist[0].hz_obs.minute)
+                 + ' '
+                 + str('{:.3f}'.format(obslist[0].hz_obs.second).rjust(6, '0').ljust(8))
+                 + stdev.ljust(9))  # add standard deviation
+        dnaobs.append(line1)
+        # create other lines using range(1:)
+        for num in range(1, len(obslist)):
+            line = ('D '
+                    + ''.ljust(40)
+                    + obslist[num].to_id.ljust(20)
+                    + str(obslist[num].hz_obs.degree).rjust(17)
+                    + ' '
+                    + str('%02d' % obslist[num].hz_obs.minute)
+                    + ' '
+                    + str('{:.3f}'.format(obslist[num].hz_obs.second).rjust(6, '0').ljust(8))
+                    + stdev.ljust(9))  # add standard deviation
+            dnaobs.append(line)
+    else:
+        stdev = str(dd2sec(degrees(atan(pointing_err / obslist[0].sd_obs))))
+        # create first line using obslist[0]
+        line1 = ('D '
+                 + obslist[0].from_id.ljust(20)
+                 + obslist[0].to_id.ljust(20)
+                 + str(len(obslist)-1).ljust(20)
+                 + str(obslist[0].hz_obs.degree).rjust(17)
+                 + ' '
+                 + str('%02d' % obslist[0].hz_obs.minute)
+                 + ' '
+                 + str('{:.3f}'.format(obslist[0].hz_obs.second).rjust(6, '0').ljust(8))
+                 + stdev[0:6].ljust(9))  # add standard deviation
+        dnaobs.append(line1)
+        # create other lines using range(1:)
+        for num in range(1, len(obslist)):
+            stdev = str(dd2sec(degrees(atan(pointing_err / obslist[num].sd_obs))))
+            line = ('D '
+                    + ''.ljust(40)
+                    + obslist[num].to_id.ljust(20)
+                    + str(obslist[num].hz_obs.degree).rjust(17)
+                    + ' '
+                    + str('%02d' % obslist[num].hz_obs.minute)
+                    + ' '
+                    + str('{:.3f}'.format(obslist[num].hz_obs.second).rjust(6, '0').ljust(8))
+                    + stdev[0:6].ljust(9))  # add standard deviation
+            dnaobs.append(line)
     return dnaobs
 
 
@@ -694,22 +724,44 @@ def dnaout_sd(obslist):
     return dnaobs
 
 
-def dnaout_va(obslist):
+def dnaout_va(obslist, same_stdev=True):
     dnaobs = []
-    for observation in obslist:
-        line = ('V '
-                + observation.from_id.ljust(20)
-                + observation.to_id.ljust(20)
-                + ''.ljust(34)
-                + str(observation.va_obs.degree).rjust(3)
-                + ' '
-                + str(observation.va_obs.minute).rjust(2, '0')
-                + ' '
-                + str(('{:.3f}'.format(observation.va_obs.second).rjust(6, '0')).ljust(8))
-                + '1.0000'.ljust(8)         # add standard deviation
-                + observation.inst_height.ljust(7)      # add intrument height
-                + str(observation.target_height).ljust(7))
-        dnaobs.append(line)
+    pointing_err = 0.001
+    stdev = '1.0000'
+    if same_stdev:
+        for observation in obslist:
+            # Format Line
+            line = ('V '
+                    + observation.from_id.ljust(20)
+                    + observation.to_id.ljust(20)
+                    + ''.ljust(34)
+                    + str(observation.va_obs.degree).rjust(3)
+                    + ' '
+                    + str(observation.va_obs.minute).rjust(2, '0')
+                    + ' '
+                    + str(('{:.3f}'.format(observation.va_obs.second).rjust(6, '0')).ljust(8))
+                    + stdev[0:6].ljust(8)         # add standard deviation
+                    + observation.inst_height.ljust(7)      # add intrument height
+                    + str(observation.target_height).ljust(7))
+            dnaobs.append(line)
+    else:
+        for observation in obslist:
+            # Calc Standard Deviation (in seconds) based on pointing error (in metres)
+            stdev = str(dd2sec(degrees(atan(pointing_err / observation.sd_obs))))
+            # Format Line
+            line = ('V '
+                    + observation.from_id.ljust(20)
+                    + observation.to_id.ljust(20)
+                    + ''.ljust(34)
+                    + str(observation.va_obs.degree).rjust(3)
+                    + ' '
+                    + str(observation.va_obs.minute).rjust(2, '0')
+                    + ' '
+                    + str(('{:.3f}'.format(observation.va_obs.second).rjust(6, '0')).ljust(8))
+                    + stdev[0:6].ljust(8)  # add standard deviation
+                    + observation.inst_height.ljust(7)  # add intrument height
+                    + str(observation.target_height).ljust(7))
+            dnaobs.append(line)
     return dnaobs
 
 
