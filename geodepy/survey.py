@@ -170,11 +170,11 @@ class Observation(object):
 # Functions to read in data from fbk format (Geomax Zoom90 Theodolite used
 # in Surat Survey
 
-def fbk2dna(path):
+def fbk2msr(path):
     """
-    Converts .fbk format survey observations to DNA v3 Format files for use with DynAdjust
+    Converts .fbk format survey observations to DNA v3 .msr for use with DynAdjust
     :param path: .fbk file path
-    :return: .msr file (same directory as source .fbk file)
+    :return: DNA v3 .msr file (same directory as source .fbk file)
     """
     fbk_class = fbk2class(readfbk(path))
     # Reduce observations in setups
@@ -216,12 +216,62 @@ def fbk2dna(path):
     with open(msr_fn, 'w+') as msr_file:
         for line in msr:
             msr_file.write(line + '\n')
-    # output will be dna meas and stn files
-    # TODO work out how to write stn file
+    # output will be dna msr file
     return msr
 
 # Debug - Example fbk file
 # testfbk = '\\geodepy\\tests\\resources\\Site01-152.fbk'
+
+
+def writestn(file):
+    """
+    Converts coordinate list file (.txt) associated with .fbk file into DNA v3 stn file
+    :param file: .txt co-ordinate list associated with .fbk file
+    :return: DNA v3 .stn file (same directory as source .fbk file)
+    """
+    # Read Data from file
+    with open(file) as raw:
+        ptlist = raw.readlines()
+    # Split comma separated values
+    for num, line in enumerate(ptlist):
+        ptlist[num] = ptlist[num].strip()
+        ptlist[num] = ptlist[num].split(',')
+    # Get Date from last point
+    for i in ptlist[-1]:
+        if i.startswith('DATE'):
+            month = i[5:7]
+            day = i[8:10]
+            year = i[11:15]
+    # Write header line
+    stn = []
+    header = ('!#=DNA 3.01 STN    '
+              + day + '.'
+              + month + '.'
+              + year
+              + 'GDA94'.rjust(14)
+              + (str(len(ptlist))).rjust(25))
+    stn.append(header)
+    # Write line strings in stn format
+    for pt in ptlist:
+        line = (pt[0].ljust(20)  # Pt ID
+                + 'FFF UTM'  # Constraint and Projection
+                + pt[1].rjust(13)  # Easting
+                + pt[2].rjust(18)  # Northing
+                + pt[3].rjust(16)  # Elevation
+                + 'S56'.rjust(16)  # Hemisphere/Zone input
+                + ' '
+                + pt[4])  # Pt Description
+        stn.append(line)
+    # Write line strings to file
+    fn, ext = os.path.splitext(file)
+    stn_fn = fn + '.stn'
+    with open(stn_fn, 'w+') as stn_file:
+        for line in stn:
+            stn_file.write(line + '\n')
+    return stn
+
+# Debug - Example txt file
+# testcoord = '\\geodepy\\tests\\resources\\Site01-152.txt'
 
 
 def stripfile(filedata, listofterms):
