@@ -9,6 +9,7 @@ import os
 import numpy as np
 import itertools
 from math import sqrt, degrees, radians, sin, cos, asin, atan
+from datetime import datetime
 from geodepy.convert import dd2dms, dms2dd, dd2sec
 
 
@@ -460,12 +461,59 @@ def fbk2class(fbk_list):
 # Functions to read data to classes from Leica GSI format file (GA_Survey2.frt)
 
 
+def gsi2msr(path):
+    gsi_class = gsi2class(readgsi(path))
+    # Reduce observations in setups
+    for setup in gsi_class:
+        reduced_obs = reducesetup(setup.observation)
+        setup.observation = reduced_obs
+    # Produce Measurement format data from setups
+    msr_raw = []
+    for setup in gsi_class:
+        dna_dirset = dnaout_dirset(setup.observation, same_stdev=True)
+        dna_va = dnaout_va(setup.observation, same_stdev=True)
+        dna_sd = dnaout_sd(setup.observation)
+        msr_raw.append(dna_dirset + dna_va + dna_sd)
+    # Build msr header
+    dircount = 0
+    vacount = 0
+    sdcount = 0
+    for group in msr_raw:
+        for line in group:
+            if line.startswith('D'):
+                dircount = 1
+            elif line.startswith('V'):
+                vacount += 1
+            elif line.startswith('S'):
+                sdcount += 1
+    obscount = dircount + vacount + sdcount
+    now = datetime.now()
+    date = (str(now.day).rjust(2,'0') + '.'
+            + str(now.month).rjust(2,'0') + '.'
+            + str(now.year))
+    header = ('!#=DNA 3.01 MSR'.ljust(19)
+              + date.ljust(19)
+              + 'GDA94'.ljust(9)
+              + date.ljust(18)
+              + str(obscount))
+    msr = [line for sublist in msr_raw for line in sublist]
+    msr = [header] + msr
+    # Output MSR File
+    fn, ext = os.path.splitext(path)
+    msr_fn = fn + '.msr'
+    with open(msr_fn, 'w+') as msr_file:
+        for line in msr:
+            msr_file.write(line + '\n')
+    # output will be dna msr file
+    return msr
+
+
 def readgsi(filepath):
     """
     Takes in a gsi file (GA_Survey2.frt) and returns a list
     of stations with their associated observations.
-    :param filepath:
-    :return:
+    :param filepath: full directory of .gsi file
+    :return: gsi data in list form
     """
     # Check file extension, throw except if not .gsi
     ext = os.path.splitext(filepath)[-1].lower()
@@ -478,18 +526,17 @@ def readgsi(filepath):
     # Read data from gsi file
     with open(filepath, 'r') as file:
         gsidata = file.readlines()
-        stn_index = [0]
-        for i in gsidata:
+        stn_index = []
+        for num, line in enumerate(gsidata):
             # Create list of line numbers of station records
             # (Only stations have '84..' string)
-            if '84..' in i:
-                lnid = i[3:7]
-                lnid = int(lnid.lstrip('0'))
-                stn_index.append(lnid)
+            if '84..' in line:
+                stn_index.append(num + 1)
+        stn_index.append(len(gsidata))
         gsi_listbystation = []
         # Create lists of gsi data with station records as first element
-        for i in range(0, len(stn_index)):
-            gsi_listbystation.append(gsidata[(stn_index[i]) - 1:(stn_index[i])])
+        for j in range(0, len(stn_index)):
+            gsi_listbystation.append(gsidata[(stn_index[j - 1] - 1):(stn_index[j] - 1)])
         del gsi_listbystation[0]
     return gsi_listbystation
 
@@ -503,7 +550,14 @@ def gsi2class(gsi_list):
     :return:
     """
     def readgsiword16(linestring, word_id):
-        wordstart = str.find(linestring, word_id)
+        try:
+            wordstart = str.find(linestring, word_id)
+            if wordstart == -1:
+                raise ValueError
+        except ValueError:
+            print('ValueError: GSI record type ' + word_id + ' not found\n'
+                  'Line Data: ' + linestring)
+            return None
         word_val = linestring[(wordstart + 7):(wordstart + 23)]
         word_val = word_val.lstrip('0')
         if word_val == '':
@@ -547,7 +601,13 @@ def gsi2class(gsi_list):
         dms = readgsiword16(gsi_line, '22.324') / 100000
         degmin, seconds = divmod(abs(dms) * 1000, 10)
         degrees, minutes = divmod(degmin, 100)
-        return AngleObs(degrees, minutes, seconds * 10)
+        if 0 < degrees <= 180:
+            face = 'FL'
+        elif 180 < degrees <= 360:
+            face = 'FR'
+        else:
+            face = 'FL'
+        return face, AngleObs(degrees, minutes, seconds * 10)
 
     project = []
     for record in gsi_list:
@@ -557,12 +617,12 @@ def gsi2class(gsi_list):
             if '31..' in line:
                 to_stn = parse_ptid(line)
                 hz = parse_hz(line)
-                vert = parse_vert(line)
+                face, vert = parse_vert(line)
                 slope = parse_slope(line)
                 tgtht = parse_tgtht(line)
                 instht = parse_instht(line)
                 obs = Observation(from_stn, to_stn, instht, tgtht,
-                                  'FL', hz, vert, slope)
+                                  face, hz, vert, slope)
                 obs_list.append(obs)
         if '84..' in record[0]:
             pt_id = parse_ptid(record[0])
@@ -693,8 +753,8 @@ def reducesetup(obslist, strict=False):
 
 def dnaout_dirset(obslist, same_stdev=True):
     fromlist = []
-    pointing_err = 0.001
-    stdev = '1.0000'
+    pointing_err = 0.001  # 0.001m
+    stdev = '1.0000'  # 1sec
     for ob in obslist:
         fromlist.append(ob.from_id)
     fromlist = list(set(fromlist))
@@ -768,7 +828,7 @@ def dnaout_sd(obslist):
                 + ('{:.4f}'.format(observation.sd_obs)).rjust(9)
                 + ''.ljust(21)
                 + '0.0010'.ljust(8)         # add standard deviation
-                + observation.inst_height.ljust(7)      # add intrument height
+                + str(observation.inst_height).ljust(7)      # add intrument height
                 + str(observation.target_height).ljust(7))
         dnaobs.append(line)
     return dnaobs
@@ -791,7 +851,7 @@ def dnaout_va(obslist, same_stdev=True):
                     + ' '
                     + str(('{:.3f}'.format(observation.va_obs.second).rjust(6, '0')).ljust(8))
                     + stdev[0:6].ljust(8)         # add standard deviation
-                    + observation.inst_height.ljust(7)      # add intrument height
+                    + str(observation.inst_height).ljust(7)      # add intrument height
                     + str(observation.target_height).ljust(7))
             dnaobs.append(line)
     else:
@@ -809,7 +869,7 @@ def dnaout_va(obslist, same_stdev=True):
                     + ' '
                     + str(('{:.3f}'.format(observation.va_obs.second).rjust(6, '0')).ljust(8))
                     + stdev[0:6].ljust(8)  # add standard deviation
-                    + observation.inst_height.ljust(7)  # add intrument height
+                    + str(observation.inst_height).ljust(7)  # add intrument height
                     + str(observation.target_height).ljust(7))
             dnaobs.append(line)
     return dnaobs
