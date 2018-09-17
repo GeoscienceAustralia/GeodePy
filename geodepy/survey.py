@@ -168,6 +168,23 @@ class Observation(object):
                            self.vert_dist)
 
 
+# Functions to read data from a DNA conversion config file
+def readconfig(path):
+    """
+    Read data in from a DNA conversion config file to a list
+    :param path: .gpy file path
+    :return: config data in a list
+    """
+    with open(path) as f:
+        fstring = f.read()
+        cfg_list = fstring.split('\n\n')
+        for num, linegroup in enumerate(cfg_list):
+            cfg_list[num] = cfg_list[num].lstrip('\n')
+            cfg_list[num] = cfg_list[num].rstrip('\n')
+            cfg_list[num] = cfg_list[num].splitlines()
+    return cfg_list
+
+
 # Functions to read in data from fbk format (Geomax Zoom90 Theodolite used
 # in Surat Survey
 
