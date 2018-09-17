@@ -168,7 +168,7 @@ class Observation(object):
                            self.vert_dist)
 
 
-# Functions to read data from a DNA conversion config file
+# Functions to configure data in a project using a DNA conversion config file
 def readconfig(path):
     """
     Read data in from a DNA conversion config file to a list
@@ -183,6 +183,24 @@ def readconfig(path):
             cfg_list[num] = cfg_list[num].rstrip('\n')
             cfg_list[num] = cfg_list[num].splitlines()
     return cfg_list
+
+# TODO write functions for rename, remove, pointing_error (remove from function) and dist_error
+
+
+def renameobs():
+    pass
+
+
+def removeobs():
+    pass
+
+
+def dist_sd():
+    pass
+
+
+def pointing_sd():
+    pass
 
 
 # Functions to read in data from fbk format (Geomax Zoom90 Theodolite used
