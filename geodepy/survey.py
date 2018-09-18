@@ -187,12 +187,30 @@ def readconfig(path):
 # TODO write functions for rename, remove, pointing_error (remove from function) and dist_error
 
 
-def renameobs():
-    pass
+def renameobs(cfg_list, project=True):
+    # Find entry in cfg_list startswith rename
+    rename_list = []
+    for group in cfg_list:
+        group_header = group[0].lower()
+        if group_header.startswith('rename'):
+            rename_list = group[1:]
+    for num, i in enumerate(rename_list):
+        rename_list[num] = i.split(',')
+    # if old in obs.to_id, replace with new in obs.to_id
+    # for set in
+    # if old in obs.from_id, replace with new in obs.to_id
+    # if old in setup info, replace with new
+    return rename_list
 
 
-def removeobs():
-    pass
+def removeobs(cfg_list, project=True):
+    # Find entry in cfg_list startswith remove
+    remove_list = []
+    for group in cfg_list:
+        group_header = group[0].lower()
+        if group_header.startswith('remove'):
+            remove_list = group[1:]
+    return remove_list
 
 
 def dist_sd():
@@ -212,14 +230,14 @@ def fbk2msr(path):
     :param path: .fbk file path
     :return: DNA v3 .msr file (same directory as source .fbk file)
     """
-    fbk_class = fbk2class(readfbk(path))
+    fbk_project = fbk2class(readfbk(path))
     # Reduce observations in setups
-    for setup in fbk_class:
+    for setup in fbk_project:
         reduced_obs = reducesetup(setup.observation)
         setup.observation = reduced_obs
     # Produce Measurement format data from setups
     msr_raw = []
-    for setup in fbk_class:
+    for setup in fbk_project:
         dna_dirset = dnaout_dirset(setup.observation, same_stdev=False)
         dna_va = dnaout_va(setup.observation, same_stdev=False)
         dna_sd = dnaout_sd(setup.observation)
@@ -438,7 +456,7 @@ def fbk2class(fbk_list):
         degree, minute = divmod(degmin, 100)
         return AngleObs(degree, minute, second * 10)
 
-    project = []
+    fbk_project = []
     for setup_list in fbk_list:
         obs_list = []
         if setup_list[0][0] == 'STN' and len(setup_list[0]) <= 3:
@@ -489,8 +507,8 @@ def fbk2class(fbk_list):
             #     raise ValueError('Unexpected format found')
         for i in obs_list:
                 setup.addobs(i)
-        project.append(setup)
-    return project
+        fbk_project.append(setup)
+    return fbk_project
 
 
 # Functions to read data to classes from Leica GSI format file (GA_Survey2.frt)
@@ -644,7 +662,7 @@ def gsi2class(gsi_list):
             face = 'FL'
         return face, AngleObs(degrees, minutes, seconds * 10)
 
-    project = []
+    gsi_project = []
     for record in gsi_list:
         from_stn = parse_ptid(record[0])
         obs_list = []
@@ -669,8 +687,8 @@ def gsi2class(gsi_list):
             setup = InstSetup(pt_id, coord)
             for i in range(0, len(obs_list)):
                 setup.addobs(obs_list[i])
-        project.append(setup)
-    return project
+        gsi_project.append(setup)
+    return gsi_project
 
 
 def readgsiword16(linestring, word_id):
