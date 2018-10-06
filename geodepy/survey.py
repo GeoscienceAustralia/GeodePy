@@ -187,7 +187,7 @@ def readconfig(path):
 # TODO write functions for rename, remove, pointing_error (remove from function) and dist_error
 
 
-def renameobs(cfg_list, project=True):
+def renameobs(cfg_list, project):
     # Find entry in cfg_list startswith rename
     rename_list = []
     for group in cfg_list:
@@ -196,21 +196,40 @@ def renameobs(cfg_list, project=True):
             rename_list = group[1:]
     for num, i in enumerate(rename_list):
         rename_list[num] = i.split(',')
-    # if old in obs.to_id, replace with new in obs.to_id
-    # for set in
-    # if old in obs.from_id, replace with new in obs.to_id
+    # if old in obs.to_id or obs.from_id, replace with new
+    for setup in project:
+        for obs in setup.observation:
+            for rename_pair in rename_list:
+                if rename_pair[0] == obs.from_id:
+                    obs.from_id = rename_pair[1]
+                elif rename_pair[0] == obs.to_id:
+                    obs.to_id = rename_pair[1]
     # if old in setup info, replace with new
-    return rename_list
+    for setup in project:
+        for rename_pair in rename_list:
+            if setup.pt_id == rename_pair[0]:
+                setup.pt_id = rename_pair[1]
+    return project
 
 
-def removeobs(cfg_list, project=True):
+def removeobs(cfg_list, project):
     # Find entry in cfg_list startswith remove
     remove_list = []
     for group in cfg_list:
         group_header = group[0].lower()
         if group_header.startswith('remove'):
             remove_list = group[1:]
-    return remove_list
+    for remove_id in remove_list:
+        for setup in project:
+            if remove_id == setup.pt_id:
+                del setup
+        for setup in project:
+            for num, obs in enumerate(setup.observation):
+                if remove_id == obs.from_id:
+                    del setup.observation[num]
+                elif remove_id == obs.to_id:
+                    del setup.observation[num]
+    return project
 
 
 def dist_sd():
@@ -224,13 +243,19 @@ def pointing_sd():
 # Functions to read in data from fbk format (Geomax Zoom90 Theodolite used
 # in Surat Survey
 
-def fbk2msr(path):
+def fbk2msr(path, cfg_path):
     """
     Converts .fbk format survey observations to DNA v3 .msr for use with DynAdjust
     :param path: .fbk file path
     :return: DNA v3 .msr file (same directory as source .fbk file)
     """
     fbk_project = fbk2class(readfbk(path))
+    # Read config file
+    cfg = readconfig(cfg_path)
+    # Rename obs as per config file
+    fbk_project = renameobs(cfg, fbk_project)
+    # Remove obs as per config file
+    fbk_project = removeobs(cfg, fbk_project)
     # Reduce observations in setups
     for setup in fbk_project:
         reduced_obs = reducesetup(setup.observation)
@@ -305,13 +330,31 @@ def writestn(file):
               + 'GDA94'.rjust(14)
               + (str(len(ptlist))).rjust(25))
     stn.append(header)
+
+    # Read Config to set point constraints
+    fn, ext = os.path.splitext(file)
+    cfg_list = readconfig(fn + '.gpy')
+    # Find entry in cfg_list startswith constrain
+    constrain_list = []
+    for group in cfg_list:
+        group_header = group[0].lower()
+        if group_header.startswith('constrain'):
+            constrain_list = group[1:]
+    for num, pt in enumerate(ptlist):
+        ptlist[num] = ['FFF'] + pt
+    for pt_constrain in constrain_list:
+        for num, pt in enumerate(ptlist):
+            if pt[1] == pt_constrain:
+                ptlist[num][0] = 'CCC'
+
     # Write line strings in stn format
     for pt in ptlist:
-        line = (pt[0].ljust(20)  # Pt ID
-                + 'FFF UTM'  # Constraint and Projection
-                + pt[1].rjust(13)  # Easting
-                + pt[2].rjust(18)  # Northing
-                + pt[3].rjust(16)  # Elevation
+        line = (pt[1].ljust(20)  # Pt ID
+                + pt[0]  # Constraint
+                + ' UTM'  # Projection
+                + pt[2].rjust(13)  # Easting
+                + pt[3].rjust(18)  # Northing
+                + pt[4].rjust(16)  # Elevation
                 + 'S56'.rjust(16)  # Hemisphere/Zone input
                 + ' '
                 + pt[4])  # Pt Description
@@ -413,10 +456,11 @@ def readfbk(filepath):
             if i[0] == 'NEZ':
                 coordlist.append(i)
         stage5 = stripfile(stage4, ['STN', 'F1', 'F2'])
-        for coord in coordlist:
-            for num, line in enumerate(stage4):
-                if line[1] == coord[1]:
-                    stage5[num] = line + coord[2:]
+        # Add Coord to setup without coord info (broken)
+        # for coord in coordlist:
+        #     for num, line in enumerate(stage4):
+        #         if line[1] == coord[1]:
+        #             stage5[num] = line + coord[2:]
         # Group by Setup
         stn_index = [0]
         for num, i in enumerate(stage5, 1):
@@ -428,9 +472,12 @@ def readfbk(filepath):
         stn_index.append(len(stage5))
         fbk_listbystation = []
         # Create lists of fbk data with station records as first element
-        for i in range(0, (len(stn_index) - 1)):
-            fbk_listbystation.append(stage5[(stn_index[i]) - 1:(stn_index[i + 1])])
+        for i in range(0,len(stn_index) - 1):
+            fbk_listbystation.append(stage5[stn_index[i] - 1:stn_index[i + 1] - 1])
         del fbk_listbystation[0]
+        # for i in range(0, (len(stn_index) - 1)):
+        #     fbk_listbystation.append(stage5[(stn_index[i]) - 1:(stn_index[i + 1])])
+        # del fbk_listbystation[0]
     return fbk_listbystation
 
 
