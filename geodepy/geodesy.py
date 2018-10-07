@@ -12,6 +12,7 @@ from math import (pi, degrees, radians, sqrt, sin,
 import numpy as np
 from geodepy.convert import dd2dms, dms2dd
 from geodepy.constants import grs80
+from geodepy.transform import grid2geo
 
 
 def enu2xyz(lat, long, east, north, up):
@@ -283,6 +284,14 @@ def vincinv(lat1, lon1, lat2, lon2, ellipsoid=grs80):
     #    azimuth2to1 = 180
 
     return round(ell_dist, 3), round(azimuth1to2, 9), round(azimuth2to1, 9)
+
+
+def vincinv_utm(zone1, east1, north1, zone2, east2, north2, hemisphere1='south', hemisphere2='south', ellipsoid=grs80):
+    # Convert utm to geographic
+    pt1 = grid2geo(zone1, east1, north1, hemisphere1, ellipsoid)
+    pt2 = grid2geo(zone2, east2, north2, hemisphere2, ellipsoid)
+    # Use vincinv
+    return vincinv(pt1[0], pt1[1], pt2[0], pt2[1], ellipsoid)
 
 
 def vincdirio():
