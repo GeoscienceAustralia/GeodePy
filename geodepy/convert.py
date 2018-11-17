@@ -31,11 +31,50 @@ class DMSAngle(object):
     def __repr__(self):
         return '{DMSAngle: ' + str(self.degree) + 'd ' + str(self.minute) + 'm ' + str(self.second) + 's}'
 
+    def __add__(self, other):
+        return dec2dms(self.dec() + other.dec())
+
+    def __sub__(self, other):
+        return dec2dms(self.dec() - other.dec())
+
+    def __mul__(self, other):
+        try:
+            return dec2dms(self.dec() * other)
+        except ValueError:
+            raise ValueError('Multiply only defined between DMSAngle Object and Int or Float')
+
+    def __rmul__(self, other):
+        try:
+            return dec2dms(other * self.dec())
+        except ValueError:
+            raise ValueError('Multiply only defined between DMSAngle Object and Int or Float')
+
+    def __truediv__(self, other):
+        return dec2dms(self.dec() / other)
+
+    def __abs__(self):
+        return DMSAngle(abs(self.degree), self.minute, self.second)
+
+    def __neg__(self):
+        return DMSAngle(-self.degree, self.minute, self.second)
+
+    def __eq__(self, other):
+        return self.dec() == other.dec()
+
+    def __ne__(self, other):
+        return self.dec() != other.dec()
+
     def dec(self):
-        return self.degree + (self.minute / 60) + (self.second / 3600)
+        if self.degree >= 0:
+            return self.degree + (self.minute / 60) + (self.second / 3600)
+        else:
+            return -(abs(self.degree) + (self.minute / 60) + (self.second / 3600))
 
     def hp(self):
-        return self.degree + (self.minute / 100) + (self.second / 10000)
+        if self.degree >= 0:
+            return self.degree + (self.minute / 100) + (self.second / 10000)
+        else:
+            return -(abs(self.degree) + (self.minute / 100) + (self.second / 10000))
 
     def ddm(self):
         return DDMAngle(self.degree, self.minute + (self.second/60))
@@ -49,12 +88,51 @@ class DDMAngle(object):
     def __repr__(self):
         return '{DDMAngle: ' + str(self.degree) + 'd ' + str(self.minute) + 'm}'
 
+    def __add__(self, other):
+        return dec2ddm(self.dec() + other.dec())
+
+    def __sub__(self, other):
+        return dec2ddm(self.dec() - other.dec())
+
+    def __mul__(self, other):
+        try:
+            return dec2ddm(self.dec() * other)
+        except ValueError:
+            raise ValueError('Multiply only defined between DMSAngle Object and Int or Float')
+
+    def __rmul__(self, other):
+        try:
+            return dec2ddm(other * self.dec())
+        except ValueError:
+            raise ValueError('Multiply only defined between DMSAngle Object and Int or Float')
+
+    def __truediv__(self, other):
+        return dec2ddm(self.dec() / other)
+
+    def __abs__(self):
+        return DDMAngle(abs(self.degree), self.minute)
+
+    def __neg__(self):
+        return DDMAngle(-self.degree, self.minute)
+
+    def __eq__(self, other):
+        return self.dec() == other.dec()
+
+    def __ne__(self, other):
+        return self.dec() != other.dec()
+
     def dec(self):
-        return self.degree + (self.minute / 60)
+        if self.degree >= 0:
+            return self.degree + (self.minute / 60)
+        else:
+            return -(abs(self.degree) + (self.minute / 60))
 
     def hp(self):
         minute_int, second = divmod(self.minute, 1)
-        return self.degree + (minute_int / 100) + (second * 0.006)
+        if self.degree >= 0:
+            return self.degree + (minute_int / 100) + (second * 0.006)
+        else:
+            return -(abs(self.degree) + (minute_int / 100) + (second * 0.006))
 
     def dms(self):
         minute_int, second = divmod(self.minute, 1)
@@ -240,36 +318,6 @@ def dms2dd_v(dms):
     dd = degrees + (minutes / 60) + (seconds / 360)
     dd[dms <= 0] = -dd[dms <= 0]
     return dd
-
-
-# To be removed
-class Angle(object):
-    def __init__(self, decdeg):
-        try:
-            self.decdeg = float(decdeg)
-        except ValueError:
-            print('ValueError: Angle must be numeric')
-
-    def __repr__(self):
-        return '{Decimal Angle: ' + str(self.decdeg) + '}'
-
-    def __add__(self, other):
-        return self.decdeg + float(other)
-
-    def __sub__(self, other):
-        return self.decdeg - float(other)
-
-    def __abs__(self):
-        return -self.decdeg if self.decdeg < 0 else self.decdeg
-
-    def __float__(self):
-        return self.decdeg
-
-    def hp(self):
-        minutes, seconds = divmod(abs(self) * 3600, 60)
-        degrees, minutes = divmod(minutes, 60)
-        hp = degrees + (minutes / 100) + (seconds / 10000)
-        return hp if float(self) >= 0 else -hp
 
 
 class DNACoord(object):
