@@ -8,69 +8,40 @@ Conversions Module
 from math import modf
 
 
-def dec2hp(lon, lat):
-    """Convert decimal degrees to HP notation
-
-    Longitudes go from -180 to 180
-    Latitudes go from -90 to 90
-    """
-    def fmt_hp(coord):
-        """Function to piece together a coordinate in HP notation
-        """
-        coord = float(coord)
-        if coord < 0:
-            flag = -1
-            coord = abs(coord)
-        else:
-            flag = 1
-        deg = int(coord)
-        min = int(60 * (coord - deg))
-        sec = 60 * (60 * (coord - deg) - min)
-        # Move decimal over two places and round to an integer
-        sec = round(sec * 100)
-        deg *= flag  # deal with negatives
-        hp_coord = '{}.{:02d}{:04d}'.format(deg, min, sec)
-
-        return hp_coord
-
-# Convert the coordinates
-    hp_lon = fmt_hp(lon)
-    hp_lat = fmt_hp(lat)
-
-    return hp_lon, hp_lat
+def dec2hp(dec):
+    minutes, seconds = divmod(abs(dec) * 3600, 60)
+    degrees, minutes = divmod(minutes, 60)
+    hp = degrees + (minutes / 100) + (seconds / 10000)
+    return hp if dec >= 0 else -hp
 
 
-def hp2dec(lon, lat):
-    """Convert HP notation to decimal degrees
-
-    Longitudes go from -180 to 180
-    Latitudes go from -90 to 90
-    """
-    def fmt_dec(coord):
-        """Function to piece together a decimal coordinate
-        """
-        coord = float(coord)
-        if coord < 0:
-            flag = -1
-            coord = abs(coord)
-        else:
-            flag = 1
-        min_sec, deg = modf(coord)
-        sec, min = modf(min_sec * 100)
-        sec *= 100
-        dec_coord = deg + min / 60 + sec / 3600
-        dec_coord = float('{:.6f}'.format(dec_coord))
-        dec_coord *= flag  # deal with negatives
-
-        return dec_coord
-
-# Convert the coordinates
-    dec_lon = fmt_dec(lon)
-    dec_lat = fmt_dec(lat)
-
-    return dec_lon, dec_lat
+def hp2dec(hp):
+    degmin, seconds = divmod(abs(hp) * 1000, 10)
+    degrees, minutes = divmod(degmin, 100)
+    dec = degrees + (minutes / 60) + (seconds / 360)
+    return dec if hp >= 0 else -dec
 
 
+class DMSAngle(object):
+    def __init__(self, degree, minute, second):
+        self.degree = degree
+        self.minute = minute
+        self.second = second
+
+    def __repr__(self):
+        return '{DMSAngle: ' + str(self.degree) + 'd ' + str(self.minute) + 'm ' + str(self.second) + 's}'
+
+
+class DDMAngle(object):
+    def __init__(self, degree, minute):
+        self.degree = degree
+        self.minute = minute
+
+    def __repr__(self):
+        return '{DDMAngle: ' + str(self.degree) + 'd ' + str(self.minute) + 'm}'
+
+
+# Legacy Functions
 def dec2sex(lon, lat):
     """Convert decimal degrees to sexagesimal format
 
@@ -199,12 +170,6 @@ def dd2dms_v(dd):
     dms[dd <= 0] = -dms[dd <= 0]
     return dms
 
-def dd2dms(dd):
-    minutes, seconds = divmod(abs(dd) * 3600, 60)
-    degrees, minutes = divmod(minutes, 60)
-    dms = degrees + (minutes / 100) + (seconds / 10000)
-    return dms if dd >= 0 else -dms
-
 
 def dms2dd_v(dms):
     degmin, seconds = divmod(abs(dms) * 1000, 10)
@@ -214,13 +179,26 @@ def dms2dd_v(dms):
     return dd
 
 
-def dms2dd(dms):
-    degmin, seconds = divmod(abs(dms) * 1000, 10)
-    degrees, minutes = divmod(degmin, 100)
-    dd = degrees + (minutes / 60) + (seconds / 360)
-    return dd if dms >= 0 else -dd
+class DMSAngle(object):
+    def __init__(self, degree, minute, second):
+        self.degree = degree
+        self.minute = minute
+        self.second = second
+
+    def __repr__(self):
+        return '{DMSAngle: ' + str(self.degree) + 'd ' + str(self.minute) + 'm ' + str(self.second) + 's}'
 
 
+class DDMAngle(object):
+    def __init__(self, degree, minute):
+        self.degree = degree
+        self.minute = minute
+
+    def __repr__(self):
+        return '{DDMAngle: ' + str(self.degree) + 'd ' + str(self.minute) + 'm}'
+
+
+# To be removed
 class Angle(object):
     def __init__(self, decdeg):
         try:
@@ -249,6 +227,7 @@ class Angle(object):
         hp = degrees + (minutes / 100) + (seconds / 10000)
         return hp if float(self) >= 0 else -hp
 
+
 class DNACoord(object):
     def __init__(self, pointid, const, easting, northing, zone, lat,
                  long, ortho_ht, ell_ht, x, y, z, x_sd, y_sd, z_sd, desc):
@@ -270,8 +249,9 @@ class DNACoord(object):
         self.desc = desc
 
     def converthptodd(self):
-        self.lat = dms2dd(self.lat)
-        self.long = dms2dd(self.long)
+        self.lat = hp2dec(self.lat)
+        self.long = hp2dec(self.long)
+
 
 def read_dnacoord(fn):
     coord_list = []

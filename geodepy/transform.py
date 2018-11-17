@@ -14,7 +14,7 @@ import csv
 from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2, modf
 import numpy as np
 from geodepy.constants import grs80, utm, Transformation
-from geodepy.convert import dd2dms, dms2dd
+from geodepy.convert import dec2hp, hp2dec
 
 
 # Universal Transverse Mercator Projection Parameters
@@ -484,9 +484,9 @@ def conform7(x, y, z, trans):
                            [z]])
     # Convert Units for Transformation Parameters
     scale = trans.sc / 1000000
-    rx = radians(dms2dd(trans.rx / 10000))
-    ry = radians(dms2dd(trans.ry / 10000))
-    rz = radians(dms2dd(trans.rz / 10000))
+    rx = radians(hp2dec(trans.rx / 10000))
+    ry = radians(hp2dec(trans.ry / 10000))
+    rz = radians(hp2dec(trans.rz / 10000))
     # Create Translation Vector
     translation = np.array([[trans.tx],
                             [trans.ty],
@@ -563,9 +563,9 @@ def grid2geoio():
         north = float(row[3])
         # Calculate Conversion
         lat, long, psf, grid_conv = grid2geo(zone, east, north)
-        lat = dd2dms(lat)
-        long = dd2dms(long)
-        grid_conv = dd2dms(grid_conv)
+        lat = dec2hp(lat)
+        long = dec2hp(long)
+        grid_conv = dec2hp(grid_conv)
         output = [pt_num, lat, long, psf, grid_conv]
         outfilewriter.writerow(output)
     # Close Files
@@ -601,11 +601,11 @@ def geo2gridio():
     # outfilewriter.writerow(['Pt', 'Zone', 'Easting', 'Northing', 'Point Scale Factor', 'Grid Convergence'])
     for row in csvreader:
         pt_num = row[0]
-        lat = dms2dd(float(row[1]))
-        long = dms2dd(float(row[2]))
+        lat = hp2dec(float(row[1]))
+        long = hp2dec(float(row[2]))
         # Calculate Conversion
         hemisphere, zone, east, north, psf, grid_conv = geo2grid(lat, long)
-        grid_conv = dms2dd(grid_conv)
+        grid_conv = hp2dec(grid_conv)
         output = [pt_num] + [hemisphere, zone, east, north, psf, grid_conv]
         outfilewriter.writerow(output)
     # Close Files

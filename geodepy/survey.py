@@ -7,7 +7,7 @@ Survey Module
 
 import os
 from math import sqrt, degrees, radians, sin, cos, asin
-from geodepy.convert import dd2dms, dms2dd
+from geodepy.convert import dec2hp, hp2dec
 
 
 # Defines a bunch of classes required to convert GSI (or any other format) to DynaNet v3 Format
@@ -396,9 +396,9 @@ def va_conv(verta_hp, slope_dist, height_inst=0, height_tgt=0):
         if verta_hp == 0 or verta_hp == 180:
             raise ValueError
         elif 0 < verta_hp < 180:
-            verta = radians(90 - dms2dd(verta_hp))
+            verta = radians(90 - hp2dec(verta_hp))
         elif 180 < verta_hp < 360:
-            verta = radians(270 - dms2dd(verta_hp))
+            verta = radians(270 - hp2dec(verta_hp))
         else:
             raise ValueError
     except ValueError:
@@ -415,7 +415,7 @@ def va_conv(verta_hp, slope_dist, height_inst=0, height_tgt=0):
         delta_ht = height_inst + delta_ht - height_tgt
         slope_dist_pt = sqrt(delta_ht ** 2 + hz_dist ** 2)
         verta_pt = asin(delta_ht / slope_dist)
-        verta_pt_hp = dd2dms(degrees(verta_pt) + 90)
+        verta_pt_hp = dec2hp(degrees(verta_pt) + 90)
     return verta_pt_hp, slope_dist_pt, hz_dist, delta_ht
 
 
@@ -435,8 +435,8 @@ def hz_round(brg_list):
     brg_avg = []
     obs = int((len(brg_list))/2)
     for i in range(0, obs):
-        hz_avg = (dms2dd(brg_list[i]) + (dms2dd(brg_list[-(i+1)])-180))/2
-        brg_avg.append(round(dd2dms(hz_avg), 7))
+        hz_avg = (hp2dec(brg_list[i]) + (hp2dec(brg_list[-(i + 1)]) - 180)) / 2
+        brg_avg.append(round(dec2hp(hz_avg), 7))
     return brg_avg
 
 
@@ -449,10 +449,10 @@ def va_round(va_list):
     va_avg = []
     obs = int((len(va_list))/2)
     for i in range(0, obs):
-        fl_ang = dms2dd(va_list[i]) - 90
-        fr_ang = 270 - dms2dd(va_list[-(i+1)])
+        fl_ang = hp2dec(va_list[i]) - 90
+        fr_ang = 270 - hp2dec(va_list[-(i + 1)])
         ang_avg = (fl_ang + fr_ang)/2 + 90
-        va_avg.append(round(dd2dms(ang_avg), 7))
+        va_avg.append(round(dec2hp(ang_avg), 7))
     return va_avg
 
 

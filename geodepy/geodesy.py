@@ -10,7 +10,7 @@ import csv
 from math import (pi, degrees, radians, sqrt, sin,
                   cos, tan, asin, atan, atan2)
 import numpy as np
-from geodepy.convert import dd2dms, dms2dd
+from geodepy.convert import dec2hp, hp2dec
 from geodepy.constants import grs80
 
 
@@ -296,14 +296,14 @@ def vincdirio():
     outfilewriter = csv.writer(outfile)
     # outfilewriter.writerow(['Latitude2', 'Longitude2', 'azimuth2to1'])
     for row in csvreader:
-        lat1 = dms2dd(float(row[0]))
-        long1 = dms2dd(float(row[1]))
-        azimuth1to2 = dms2dd(float(row[2]))
+        lat1 = hp2dec(float(row[0]))
+        long1 = hp2dec(float(row[1]))
+        azimuth1to2 = hp2dec(float(row[2]))
         ell_dist = float(row[3])
         lat2, long2, azimuth2to1 = vincdir(lat1, long1, azimuth1to2, ell_dist)
-        lat2 = dd2dms(lat2)
-        long2 = dd2dms(long2)
-        azimuth2to1 = dd2dms(azimuth2to1)
+        lat2 = dec2hp(lat2)
+        long2 = dec2hp(long2)
+        azimuth2to1 = dec2hp(azimuth2to1)
         output = [lat2, long2, azimuth2to1]
         outfilewriter.writerow(output)
     # Close Files
@@ -326,13 +326,13 @@ def vincinvio():
     outfilewriter = csv.writer(outfile)
     outfilewriter.writerow(['Ell_Dist', 'Azimuth1to2', 'Azimuth2to1'])
     for row in csvreader:
-        lat1 = dms2dd(float(row[0]))
-        long1 = dms2dd(float(row[1]))
-        lat2 = dms2dd(float(row[2]))
-        long2 = dms2dd(float(row[3]))
+        lat1 = hp2dec(float(row[0]))
+        long1 = hp2dec(float(row[1]))
+        lat2 = hp2dec(float(row[2]))
+        long2 = hp2dec(float(row[3]))
         ell_dist, azimuth1to2, azimuth2to1 = vincinv(lat1, long1, lat2, long2)
-        azimuth1to2 = dd2dms(azimuth1to2)
-        azimuth2to1 = dd2dms(azimuth2to1)
+        azimuth1to2 = dec2hp(azimuth1to2)
+        azimuth2to1 = dec2hp(azimuth2to1)
         output = (ell_dist, azimuth1to2, azimuth2to1)
         outfilewriter.writerow(output)
     # Close Files

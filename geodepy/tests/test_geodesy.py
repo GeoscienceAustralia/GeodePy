@@ -2,33 +2,33 @@ import unittest
 import os.path
 import numpy as np
 import numpy.lib.recfunctions as rfn
-from geodepy.convert import dms2dd, dd2dms
+from geodepy.convert import hp2dec, dec2hp
 from geodepy.geodesy import vincinv, vincdir
 
 class TestGeodesy(unittest.TestCase):
     def test_vincinv(self):
         # Flinders Peak
-        lat1 = dms2dd(-37.57037203)
-        long1 = dms2dd(144.25295244)
+        lat1 = hp2dec(-37.57037203)
+        long1 = hp2dec(144.25295244)
         # Buninyong
-        lat2 = dms2dd(-37.39101561)
-        long2 = dms2dd(143.55353839)
+        lat2 = hp2dec(-37.39101561)
+        long2 = hp2dec(143.55353839)
         ell_dist, azimuth1to2, azimuth2to1 = vincinv(lat1, long1, lat2, long2)
         self.assertEqual(round(ell_dist, 3), 54972.271)
-        self.assertEqual(round(dd2dms(azimuth1to2), 6), 306.520537)
-        self.assertEqual(round(dd2dms(azimuth2to1), 6), 127.102507)
+        self.assertEqual(round(dec2hp(azimuth1to2), 6), 306.520537)
+        self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
 
     def test_vincdir(self):
         # Flinders Peak
-        lat1 = dms2dd(-37.57037203)
-        long1 = dms2dd(144.25295244)
+        lat1 = hp2dec(-37.57037203)
+        long1 = hp2dec(144.25295244)
         # To Buninyong
-        azimuth1to2 = dms2dd(306.520537)
+        azimuth1to2 = hp2dec(306.520537)
         ell_dist = 54972.271
         lat2, long2, azimuth2to1 = vincdir(lat1, long1, azimuth1to2, ell_dist)
-        self.assertEqual(round(dd2dms(lat2), 8), -37.39101561)
-        self.assertEqual(round(dd2dms(long2), 8), 143.55353839)
-        self.assertEqual(round(dd2dms(azimuth2to1), 6), 127.102507)
+        self.assertEqual(round(dec2hp(lat2), 8), -37.39101561)
+        self.assertEqual(round(dec2hp(long2), 8), 143.55353839)
+        self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
 
     def test_equality_vincentys(self):
         # Test multiple point-to-point vincinv calculations

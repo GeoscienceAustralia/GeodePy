@@ -11,7 +11,7 @@ import numpy as np
 from bs4 import BeautifulSoup
 import re
 from geodepy.geodesy import vincdir, vincinv
-from geodepy.transform import dd2dms, dms2dd
+from geodepy.transform import dec2hp, hp2dec
 
 
 def parse_coord(coord):
@@ -174,13 +174,13 @@ def vincenty_from_website():
         web_inv_az1to2, web_inv_az2to1 = (join_dms(web_inv_fa_deg, web_inv_fa_min, web_inv_fa_sec),
                                           join_dms(web_inv_ra_deg, web_inv_ra_min, web_inv_ra_sec))
 
-        inv_ell_dist, inv_az1to2, inv_az2to1 = vincinv(dms2dd(lat1), dms2dd(lon1), dms2dd(lat2), dms2dd(lon2))
+        inv_ell_dist, inv_az1to2, inv_az2to1 = vincinv(hp2dec(lat1), hp2dec(lon1), hp2dec(lat2), hp2dec(lon2))
 
         np.testing.assert_almost_equal(inv_ell_dist, float(web_inv_ell_dist),
                                        decimal=3,
                                        err_msg=("vincentys_inverse({}, {}, {}, {})"
                                                 " on row {}").format(lat1, lon1, lat2, lon2, str(row_number)))
-        np.testing.assert_almost_equal((dd2dms(inv_az1to2), dd2dms(inv_az2to1)),
+        np.testing.assert_almost_equal((dec2hp(inv_az1to2), dec2hp(inv_az2to1)),
                                        (float(web_inv_az1to2), float(web_inv_az2to1)),
                                        decimal=6,
                                        err_msg=("vincentys_inverse({}, {}, {}, {})"
@@ -189,8 +189,8 @@ def vincenty_from_website():
         # direct vincentys
         print("Testing vincentys_direct({}, {}, {}, {}) on row {}".format(lat1,
                                                                           lon1,
-                                                                          dd2dms(inv_az1to2),
-                                                                          dd2dms(inv_ell_dist),
+                                                                          dec2hp(inv_az1to2),
+                                                                          dec2hp(inv_ell_dist),
                                                                           str(row_number)))
         (lat2_deg, lat2_min, lat2_sec,
          lon2_deg, lon2_min, lon2_sec,
@@ -202,19 +202,19 @@ def vincenty_from_website():
                                                       join_dms(lon2_deg, lon2_min, lon2_sec),
                                                       join_dms(web_dir_ra_deg, web_dir_ra_min, web_dir_ra_sec))
 
-        dir_lat2, dir_lon2, dir_az2to1 = vincdir(dms2dd(lat1), dms2dd(lon1), inv_az1to2, inv_ell_dist)
+        dir_lat2, dir_lon2, dir_az2to1 = vincdir(hp2dec(lat1), hp2dec(lon1), inv_az1to2, inv_ell_dist)
 
         np.testing.assert_almost_equal((float(web_dir_lat2), float(web_dir_lon2)),
-                                       (dd2dms(dir_lat2), dd2dms(dir_lon2)),
+                                       (dec2hp(dir_lat2), dec2hp(dir_lon2)),
                                        decimal=8,
                                        err_msg="vincentys_direct({}, {}, {}, {})"
-                                               "on row {}".format(lat1, lon1, dd2dms(inv_az1to2),
+                                               "on row {}".format(lat1, lon1, dec2hp(inv_az1to2),
                                                                   inv_ell_dist, str(row_number)))
         np.testing.assert_almost_equal(float(web_dir_az2to1),
-                                       dd2dms(dir_az2to1),
+                                       dec2hp(dir_az2to1),
                                        decimal=6,
                                        err_msg="vincentys_direct({}, {}, {}, {})"
-                                               "on row {}".format(lat1, lon1, dd2dms(inv_az1to2),
+                                               "on row {}".format(lat1, lon1, dec2hp(inv_az1to2),
                                                                   inv_ell_dist, str(row_number)))
         print("--------")
 
