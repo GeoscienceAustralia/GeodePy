@@ -9,39 +9,102 @@ from math import modf
 
 
 def dec2hp(dec):
-    minutes, seconds = divmod(abs(dec) * 3600, 60)
-    degrees, minutes = divmod(minutes, 60)
-    hp = degrees + (minutes / 100) + (seconds / 10000)
+    minute, second = divmod(abs(dec) * 3600, 60)
+    degree, minute = divmod(minute, 60)
+    hp = degree + (minute / 100) + (second / 10000)
     return hp if dec >= 0 else -hp
 
 
 def hp2dec(hp):
-    degmin, seconds = divmod(abs(hp) * 1000, 10)
-    degrees, minutes = divmod(degmin, 100)
-    dec = degrees + (minutes / 60) + (seconds / 360)
+    degmin, second = divmod(abs(hp) * 1000, 10)
+    degree, minute = divmod(degmin, 100)
+    dec = degree + (minute / 60) + (second / 360)
     return dec if hp >= 0 else -dec
 
 
 class DMSAngle(object):
     def __init__(self, degree, minute, second):
-        self.degree = degree
-        self.minute = minute
-        self.second = second
+        self.degree = int(degree)
+        self.minute = abs(int(minute))
+        self.second = abs(second)
 
     def __repr__(self):
         return '{DMSAngle: ' + str(self.degree) + 'd ' + str(self.minute) + 'm ' + str(self.second) + 's}'
 
+    def dec(self):
+        return self.degree + (self.minute / 60) + (self.second / 3600)
+
+    def hp(self):
+        return self.degree + (self.minute / 100) + (self.second / 10000)
+
+    def ddm(self):
+        return DDMAngle(self.degree, self.minute + (self.second/60))
+
 
 class DDMAngle(object):
     def __init__(self, degree, minute):
-        self.degree = degree
-        self.minute = minute
+        self.degree = int(degree)
+        self.minute = abs(minute)
 
     def __repr__(self):
         return '{DDMAngle: ' + str(self.degree) + 'd ' + str(self.minute) + 'm}'
 
+    def dec(self):
+        return self.degree + (self.minute / 60)
 
+    def hp(self):
+        minute_int, second = divmod(self.minute, 1)
+        return self.degree + (minute_int / 100) + (second * 0.006)
+
+    def dms(self):
+        minute_int, second = divmod(self.minute, 1)
+        return DMSAngle(self.degree, minute_int, second * 60)
+
+
+def dec2dms(dec):
+    minute, second = divmod(abs(dec) * 3600, 60)
+    degree, minute = divmod(minute, 60)
+    return DMSAngle(degree, minute, second) if dec >= 0 else DMSAngle(-degree, minute, second)
+
+
+def dec2ddm(dec):
+    minute, second = divmod(abs(dec) * 3600, 60)
+    degree, minute = divmod(minute, 60)
+    minute = minute + (second / 60)
+    return DDMAngle(degree, minute) if dec >= 0 else DDMAngle(-degree, minute)
+
+
+def hp2dms(hp):
+    degmin, second = divmod(abs(hp) * 1000, 10)
+    degree, minute = divmod(degmin, 100)
+    return DMSAngle(degree, minute, second * 10) if hp >= 0 else DMSAngle(-degree, minute, second * 10)
+
+
+def hp2ddm(hp):
+    degmin, second = divmod(abs(hp) * 1000, 10)
+    degree, minute = divmod(degmin, 100)
+    minute = minute + (second / 6)
+    return DDMAngle(degree, minute) if hp >= 0 else DDMAngle(-degree, minute)
+
+
+# ----------------
 # Legacy Functions
+# dd2dms refactored as dec2hp
+def dd2dms(dd):
+    minutes, seconds = divmod(abs(dd) * 3600, 60)
+    degrees, minutes = divmod(minutes, 60)
+    dms = degrees + (minutes / 100) + (seconds / 10000)
+    return dms if dd >= 0 else -dms
+
+
+# dms2dd refactored as hp2dec
+def dms2dd(dms):
+    degmin, seconds = divmod(abs(dms) * 1000, 10)
+    degrees, minutes = divmod(degmin, 100)
+    dd = degrees + (minutes / 60) + (seconds / 360)
+    return dd if dms >= 0 else -dd
+
+
 def dec2sex(lon, lat):
     """Convert decimal degrees to sexagesimal format
 
@@ -177,25 +240,6 @@ def dms2dd_v(dms):
     dd = degrees + (minutes / 60) + (seconds / 360)
     dd[dms <= 0] = -dd[dms <= 0]
     return dd
-
-
-class DMSAngle(object):
-    def __init__(self, degree, minute, second):
-        self.degree = degree
-        self.minute = minute
-        self.second = second
-
-    def __repr__(self):
-        return '{DMSAngle: ' + str(self.degree) + 'd ' + str(self.minute) + 'm ' + str(self.second) + 's}'
-
-
-class DDMAngle(object):
-    def __init__(self, degree, minute):
-        self.degree = degree
-        self.minute = minute
-
-    def __repr__(self):
-        return '{DDMAngle: ' + str(self.degree) + 'd ' + str(self.minute) + 'm}'
 
 
 # To be removed
