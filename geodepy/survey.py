@@ -8,7 +8,7 @@ Survey Module
 import os
 import numpy as np
 import itertools
-from math import sqrt, degrees, radians, sin, cos, asin
+from math import sqrt, degrees, radians, sin, cos, asin, atan
 from datetime import datetime
 from geodepy.convert import dec2hp, hp2dec, dd2sec
 
