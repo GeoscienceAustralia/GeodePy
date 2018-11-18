@@ -8,8 +8,9 @@ Survey Module
 import os
 import numpy as np
 import itertools
-from math import sqrt, degrees, radians, sin, cos, asin
-from geodepy.convert import dd2dms, dms2dd
+from math import sqrt, degrees, radians, sin, cos, asin, atan
+from datetime import datetime
+from geodepy.convert import dd2dms, dms2dd, dd2sec
 
 
 # Defines a bunch of classes required to
@@ -167,25 +168,101 @@ class Observation(object):
                            self.vert_dist)
 
 
+# Functions to configure data in a project using a DNA conversion config file
+def readconfig(path):
+    """
+    Read data in from a DNA conversion config file to a list
+    :param path: .gpy file path
+    :return: config data in a list
+    """
+    with open(path) as f:
+        fstring = f.read()
+        cfg_list = fstring.split('\n\n')
+        for num, linegroup in enumerate(cfg_list):
+            cfg_list[num] = cfg_list[num].lstrip('\n')
+            cfg_list[num] = cfg_list[num].rstrip('\n')
+            cfg_list[num] = cfg_list[num].splitlines()
+    return cfg_list
+
+
+def renameobs(cfg_list, project):
+    # Find entry in cfg_list startswith rename
+    rename_list = []
+    for group in cfg_list:
+        group_header = group[0].lower()
+        if group_header.startswith('rename'):
+            rename_list = group[1:]
+    for num, i in enumerate(rename_list):
+        rename_list[num] = i.split(',')
+    # if old in obs.to_id or obs.from_id, replace with new
+    for setup in project:
+        for obs in setup.observation:
+            for rename_pair in rename_list:
+                if rename_pair[0] == obs.from_id:
+                    obs.from_id = rename_pair[1]
+                elif rename_pair[0] == obs.to_id:
+                    obs.to_id = rename_pair[1]
+    # if old in setup info, replace with new
+    for setup in project:
+        for rename_pair in rename_list:
+            if setup.pt_id == rename_pair[0]:
+                setup.pt_id = rename_pair[1]
+    return project
+
+
+def removeobs(cfg_list, project):
+    # Find entry in cfg_list startswith remove
+    remove_list = []
+    for group in cfg_list:
+        group_header = group[0].lower()
+        if group_header.startswith('remove'):
+            remove_list = group[1:]
+    for remove_id in remove_list:
+        for setup in project:
+            if remove_id == setup.pt_id:
+                del setup
+        for setup in project:
+            for num, obs in enumerate(setup.observation):
+                if remove_id == obs.from_id:
+                    del setup.observation[num]
+                elif remove_id == obs.to_id:
+                    del setup.observation[num]
+    return project
+
+
+# def dist_sd():
+#     pass
+#
+#
+# def pointing_sd():
+#     pass
+
+
 # Functions to read in data from fbk format (Geomax Zoom90 Theodolite used
 # in Surat Survey
 
-def fbk2dna(path):
+def fbk2msr(path, cfg_path):
     """
-    Converts .fbk format survey observations to DNA v3 Format files for use with DynAdjust
+    Converts .fbk format survey observations to DNA v3 .msr for use with DynAdjust
     :param path: .fbk file path
-    :return: .msr file (same directory as source .fbk file)
+    :return: DNA v3 .msr file (same directory as source .fbk file)
     """
-    fbk_class = fbk2class(readfbk(path))
+    fbk_project = fbk2class(readfbk(path))
+    # Read config file
+    cfg = readconfig(cfg_path)
+    # Rename obs as per config file
+    fbk_project = renameobs(cfg, fbk_project)
+    # Remove obs as per config file
+    fbk_project = removeobs(cfg, fbk_project)
     # Reduce observations in setups
-    for setup in fbk_class:
+    for setup in fbk_project:
         reduced_obs = reducesetup(setup.observation)
         setup.observation = reduced_obs
     # Produce Measurement format data from setups
     msr_raw = []
-    for setup in fbk_class:
-        dna_dirset = dnaout_dirset(setup.observation)
-        dna_va = dnaout_va(setup.observation)
+    for setup in fbk_project:
+        dna_dirset = dnaout_dirset(setup.observation, same_stdev=False)
+        dna_va = dnaout_va(setup.observation, same_stdev=False)
         dna_sd = dnaout_sd(setup.observation)
         msr_raw.append(dna_dirset + dna_va + dna_sd)
     # Build msr header
@@ -216,12 +293,102 @@ def fbk2dna(path):
     with open(msr_fn, 'w+') as msr_file:
         for line in msr:
             msr_file.write(line + '\n')
-    # output will be dna meas and stn files
-    # TODO work out how to write stn file
+    # output will be dna msr file
     return msr
 
 # Debug - Example fbk file
 # testfbk = '\\geodepy\\tests\\resources\\Site01-152.fbk'
+
+
+def writestn(file):
+    """
+    Converts coordinate list file (.txt) associated with .fbk file into DNA v3 stn file
+    :param file: .txt co-ordinate list associated with .fbk file
+    :return: DNA v3 .stn file (same directory as source .fbk file)
+    """
+    # Read Data from file
+    with open(file) as raw:
+        ptlist = raw.readlines()
+    # Split comma separated values
+    for num, line in enumerate(ptlist):
+        ptlist[num] = ptlist[num].strip()
+        ptlist[num] = ptlist[num].split(',')
+    # Get Date from last point
+    for i in ptlist[-1]:
+        if i.startswith('DATE'):
+            month = i[5:7]
+            day = i[8:10]
+            year = i[11:15]
+
+    # Read Config file contents
+    fn, ext = os.path.splitext(file)
+    cfg_list = readconfig(fn + '.gpy')
+    constrain_list = []
+    rename_list = []
+    remove_list = []
+    for group in cfg_list:
+        group_header = group[0].lower()
+        if group_header.startswith('constrain'):
+            constrain_list = group[1:]
+        elif group_header.startswith('rename'):
+            rename_list = group[1:]
+        elif group_header.startswith('remove'):
+            remove_list = group[1:]
+
+    # Rename Points as per Config file
+    for num, i in enumerate(rename_list):
+        rename_list[num] = i.split(',')
+    for pt_rename in rename_list:
+        for num, pt in enumerate(ptlist):
+            if pt[0] == pt_rename[0]:
+                ptlist[num][0] = pt_rename[1]
+
+    # Remove Points as per Config file
+    for pt_rem in remove_list:
+        for num, pt in enumerate(ptlist):
+            if pt[0] == pt_rem:
+                del ptlist[num]
+
+    # Set Points in Config Constrains list to 'CCC'
+    for num, pt in enumerate(ptlist):
+        ptlist[num] = ['FFF'] + pt
+    for pt_constrain in constrain_list:
+        for num, pt in enumerate(ptlist):
+            if pt[1] == pt_constrain:
+                ptlist[num][0] = 'CCC'
+
+    # Write header line
+    stn = []
+    header = ('!#=DNA 3.01 STN    '
+              + day + '.'
+              + month + '.'
+              + year
+              + 'GDA94'.rjust(14)
+              + (str(len(ptlist))).rjust(25))
+    stn.append(header)
+
+    # Write line strings in stn format
+    for pt in ptlist:
+        line = (pt[1].ljust(20)  # Pt ID
+                + pt[0]  # Constraint
+                + ' UTM'  # Projection
+                + pt[2].rjust(13)  # Easting
+                + pt[3].rjust(18)  # Northing
+                + pt[4].rjust(16)  # Elevation
+                + 'S56'.rjust(16)  # Hemisphere/Zone input
+                + ' '
+                + pt[4])  # Pt Description
+        stn.append(line)
+    # Write line strings to file
+    fn, ext = os.path.splitext(file)
+    stn_fn = fn + '.stn'
+    with open(stn_fn, 'w+') as stn_file:
+        for line in stn:
+            stn_file.write(line + '\n')
+    return stn
+
+# Debug - Example txt file
+# testcoord = '\\geodepy\\tests\\resources\\Site01-152.txt'
 
 
 def stripfile(filedata, listofterms):
@@ -309,10 +476,11 @@ def readfbk(filepath):
             if i[0] == 'NEZ':
                 coordlist.append(i)
         stage5 = stripfile(stage4, ['STN', 'F1', 'F2'])
-        for coord in coordlist:
-            for num, line in enumerate(stage4):
-                if line[1] == coord[1]:
-                    stage5[num] = line + coord[2:]
+        # Add Coord to setup without coord info (broken)
+        # for coord in coordlist:
+        #     for num, line in enumerate(stage4):
+        #         if line[1] == coord[1]:
+        #             stage5[num] = line + coord[2:]
         # Group by Setup
         stn_index = [0]
         for num, i in enumerate(stage5, 1):
@@ -324,9 +492,12 @@ def readfbk(filepath):
         stn_index.append(len(stage5))
         fbk_listbystation = []
         # Create lists of fbk data with station records as first element
-        for i in range(0, (len(stn_index) - 1)):
-            fbk_listbystation.append(stage5[(stn_index[i]) - 1:(stn_index[i + 1])])
+        for i in range(0,len(stn_index) - 1):
+            fbk_listbystation.append(stage5[stn_index[i] - 1:stn_index[i + 1] - 1])
         del fbk_listbystation[0]
+        # for i in range(0, (len(stn_index) - 1)):
+        #     fbk_listbystation.append(stage5[(stn_index[i]) - 1:(stn_index[i + 1])])
+        # del fbk_listbystation[0]
     return fbk_listbystation
 
 
@@ -337,8 +508,8 @@ def fbkdate(filepath):
         year = None
         for line in f:
             if line.startswith('! DT'):
-                day = line[4:6]
-                month = line[7:9]
+                month = line[4:6]
+                day = line[7:9]
                 year = line[10:14]
                 break
     return day, month, year
@@ -352,7 +523,7 @@ def fbk2class(fbk_list):
         degree, minute = divmod(degmin, 100)
         return AngleObs(degree, minute, second * 10)
 
-    project = []
+    fbk_project = []
     for setup_list in fbk_list:
         obs_list = []
         if setup_list[0][0] == 'STN' and len(setup_list[0]) <= 3:
@@ -403,19 +574,66 @@ def fbk2class(fbk_list):
             #     raise ValueError('Unexpected format found')
         for i in obs_list:
                 setup.addobs(i)
-        project.append(setup)
-    return project
+        fbk_project.append(setup)
+    return fbk_project
 
 
 # Functions to read data to classes from Leica GSI format file (GA_Survey2.frt)
+
+
+def gsi2msr(path):
+    gsi_class = gsi2class(readgsi(path))
+    # Reduce observations in setups
+    for setup in gsi_class:
+        reduced_obs = reducesetup(setup.observation)
+        setup.observation = reduced_obs
+    # Produce Measurement format data from setups
+    msr_raw = []
+    for setup in gsi_class:
+        dna_dirset = dnaout_dirset(setup.observation, same_stdev=True)
+        dna_va = dnaout_va(setup.observation, same_stdev=True)
+        dna_sd = dnaout_sd(setup.observation)
+        msr_raw.append(dna_dirset + dna_va + dna_sd)
+    # Build msr header
+    dircount = 0
+    vacount = 0
+    sdcount = 0
+    for group in msr_raw:
+        for line in group:
+            if line.startswith('D'):
+                dircount = 1
+            elif line.startswith('V'):
+                vacount += 1
+            elif line.startswith('S'):
+                sdcount += 1
+    obscount = dircount + vacount + sdcount
+    now = datetime.now()
+    date = (str(now.day).rjust(2, '0') + '.'
+            + str(now.month).rjust(2, '0') + '.'
+            + str(now.year))
+    header = ('!#=DNA 3.01 MSR'.ljust(19)
+              + date.ljust(19)
+              + 'GDA94'.ljust(9)
+              + date.ljust(18)
+              + str(obscount))
+    msr = [line for sublist in msr_raw for line in sublist]
+    msr = [header] + msr
+    # Output MSR File
+    fn, ext = os.path.splitext(path)
+    msr_fn = fn + '.msr'
+    with open(msr_fn, 'w+') as msr_file:
+        for line in msr:
+            msr_file.write(line + '\n')
+    # output will be dna msr file
+    return msr
 
 
 def readgsi(filepath):
     """
     Takes in a gsi file (GA_Survey2.frt) and returns a list
     of stations with their associated observations.
-    :param filepath:
-    :return:
+    :param filepath: full directory of .gsi file
+    :return: gsi data in list form
     """
     # Check file extension, throw except if not .gsi
     ext = os.path.splitext(filepath)[-1].lower()
@@ -428,18 +646,17 @@ def readgsi(filepath):
     # Read data from gsi file
     with open(filepath, 'r') as file:
         gsidata = file.readlines()
-        stn_index = [0]
-        for i in gsidata:
+        stn_index = []
+        for num, line in enumerate(gsidata):
             # Create list of line numbers of station records
             # (Only stations have '84..' string)
-            if '84..' in i:
-                lnid = i[3:7]
-                lnid = int(lnid.lstrip('0'))
-                stn_index.append(lnid)
+            if '84..' in line:
+                stn_index.append(num + 1)
+        stn_index.append(len(gsidata))
         gsi_listbystation = []
         # Create lists of gsi data with station records as first element
-        for i in range(0, len(stn_index)):
-            gsi_listbystation.append(gsidata[(stn_index[i]) - 1:(stn_index[i])])
+        for j in range(0, len(stn_index)):
+            gsi_listbystation.append(gsidata[(stn_index[j - 1] - 1):(stn_index[j] - 1)])
         del gsi_listbystation[0]
     return gsi_listbystation
 
@@ -453,7 +670,14 @@ def gsi2class(gsi_list):
     :return:
     """
     def readgsiword16(linestring, word_id):
-        wordstart = str.find(linestring, word_id)
+        try:
+            wordstart = str.find(linestring, word_id)
+            if wordstart == -1:
+                raise ValueError
+        except ValueError:
+            print('ValueError: GSI record type ' + word_id + ' not found\n'
+                  'Line Data: ' + linestring)
+            return None
         word_val = linestring[(wordstart + 7):(wordstart + 23)]
         word_val = word_val.lstrip('0')
         if word_val == '':
@@ -497,9 +721,15 @@ def gsi2class(gsi_list):
         dms = readgsiword16(gsi_line, '22.324') / 100000
         degmin, seconds = divmod(abs(dms) * 1000, 10)
         degrees, minutes = divmod(degmin, 100)
-        return AngleObs(degrees, minutes, seconds * 10)
+        if 0 < degrees <= 180:
+            face = 'FL'
+        elif 180 < degrees <= 360:
+            face = 'FR'
+        else:
+            face = 'FL'
+        return face, AngleObs(degrees, minutes, seconds * 10)
 
-    project = []
+    gsi_project = []
     for record in gsi_list:
         from_stn = parse_ptid(record[0])
         obs_list = []
@@ -507,12 +737,12 @@ def gsi2class(gsi_list):
             if '31..' in line:
                 to_stn = parse_ptid(line)
                 hz = parse_hz(line)
-                vert = parse_vert(line)
+                face, vert = parse_vert(line)
                 slope = parse_slope(line)
                 tgtht = parse_tgtht(line)
                 instht = parse_instht(line)
                 obs = Observation(from_stn, to_stn, instht, tgtht,
-                                  'FL', hz, vert, slope)
+                                  face, hz, vert, slope)
                 obs_list.append(obs)
         if '84..' in record[0]:
             pt_id = parse_ptid(record[0])
@@ -524,8 +754,8 @@ def gsi2class(gsi_list):
             setup = InstSetup(pt_id, coord)
             for i in range(0, len(obs_list)):
                 setup.addobs(obs_list[i])
-        project.append(setup)
-    return project
+        gsi_project.append(setup)
+    return gsi_project
 
 
 def readgsiword16(linestring, word_id):
@@ -641,8 +871,13 @@ def reducesetup(obslist, strict=False):
     return meanedobs
 
 
-def dnaout_dirset(obslist):
+def dnaout_dirset(obslist, same_stdev=True):
+    # Test for Single Observation
+    if len(obslist) < 2:
+        return []
     fromlist = []
+    pointing_err = 0.001  # 0.001m
+    stdev = '1.0000'  # 1sec
     for ob in obslist:
         fromlist.append(ob.from_id)
     fromlist = list(set(fromlist))
@@ -651,30 +886,58 @@ def dnaout_dirset(obslist):
     else:
         pass
     dnaobs = []
-    # create first line using obslist[0]
-    line1 = ('D '
-             + obslist[0].from_id.ljust(20)
-             + obslist[0].to_id.ljust(20)
-             + str(len(obslist)-1).ljust(20)
-             + str(obslist[0].hz_obs.degree).rjust(17)
-             + ' '
-             + str('%02d' % obslist[0].hz_obs.minute)
-             + ' '
-             + str('{:.3f}'.format(obslist[0].hz_obs.second).rjust(6, '0').ljust(8))
-             + '1.0000'.ljust(9))  # add standard deviation
-    dnaobs.append(line1)
-    # create other lines using range(1:)
-    for num in range(1, len(obslist)):
-        line = ('D '
-                + ''.ljust(40)
-                + obslist[num].to_id.ljust(20)
-                + str(obslist[num].hz_obs.degree).rjust(17)
-                + ' '
-                + str('%02d' % obslist[num].hz_obs.minute)
-                + ' '
-                + str('{:.3f}'.format(obslist[num].hz_obs.second).rjust(6, '0').ljust(8))
-                + '1.0000'.ljust(9))  # add standard deviation
-        dnaobs.append(line)
+    if same_stdev:
+        # create first line using obslist[0]
+        line1 = ('D '
+                 + obslist[0].from_id.ljust(20)
+                 + obslist[0].to_id.ljust(20)
+                 + str(len(obslist)-1).ljust(20)
+                 + str(obslist[0].hz_obs.degree).rjust(17)
+                 + ' '
+                 + str('%02d' % obslist[0].hz_obs.minute)
+                 + ' '
+                 + str('{:.3f}'.format(obslist[0].hz_obs.second).rjust(6, '0').ljust(8))
+                 + stdev.ljust(9))  # add standard deviation
+        dnaobs.append(line1)
+        # create other lines using range(1:)
+        for num in range(1, len(obslist)):
+            line = ('D '
+                    + ''.ljust(40)
+                    + obslist[num].to_id.ljust(20)
+                    + str(obslist[num].hz_obs.degree).rjust(17)
+                    + ' '
+                    + str('%02d' % obslist[num].hz_obs.minute)
+                    + ' '
+                    + str('{:.3f}'.format(obslist[num].hz_obs.second).rjust(6, '0').ljust(8))
+                    + stdev.ljust(9))  # add standard deviation
+            dnaobs.append(line)
+    else:
+        stdev = str(dd2sec(degrees(atan(pointing_err / obslist[0].sd_obs))))
+        # create first line using obslist[0]
+        line1 = ('D '
+                 + obslist[0].from_id.ljust(20)
+                 + obslist[0].to_id.ljust(20)
+                 + str(len(obslist)-1).ljust(20)
+                 + str(obslist[0].hz_obs.degree).rjust(17)
+                 + ' '
+                 + str('%02d' % obslist[0].hz_obs.minute)
+                 + ' '
+                 + str('{:.3f}'.format(obslist[0].hz_obs.second).rjust(6, '0').ljust(8))
+                 + stdev[0:6].ljust(9))  # add standard deviation
+        dnaobs.append(line1)
+        # create other lines using range(1:)
+        for num in range(1, len(obslist)):
+            stdev = str(dd2sec(degrees(atan(pointing_err / obslist[num].sd_obs))))
+            line = ('D '
+                    + ''.ljust(40)
+                    + obslist[num].to_id.ljust(20)
+                    + str(obslist[num].hz_obs.degree).rjust(17)
+                    + ' '
+                    + str('%02d' % obslist[num].hz_obs.minute)
+                    + ' '
+                    + str('{:.3f}'.format(obslist[num].hz_obs.second).rjust(6, '0').ljust(8))
+                    + stdev[0:6].ljust(9))  # add standard deviation
+            dnaobs.append(line)
     return dnaobs
 
 
@@ -688,28 +951,50 @@ def dnaout_sd(obslist):
                 + ('{:.4f}'.format(observation.sd_obs)).rjust(9)
                 + ''.ljust(21)
                 + '0.0010'.ljust(8)         # add standard deviation
-                + observation.inst_height.ljust(7)      # add intrument height
+                + str(observation.inst_height).ljust(7)      # add intrument height
                 + str(observation.target_height).ljust(7))
         dnaobs.append(line)
     return dnaobs
 
 
-def dnaout_va(obslist):
+def dnaout_va(obslist, same_stdev=True):
     dnaobs = []
-    for observation in obslist:
-        line = ('V '
-                + observation.from_id.ljust(20)
-                + observation.to_id.ljust(20)
-                + ''.ljust(34)
-                + str(observation.va_obs.degree).rjust(3)
-                + ' '
-                + str(observation.va_obs.minute).rjust(2, '0')
-                + ' '
-                + str(('{:.3f}'.format(observation.va_obs.second).rjust(6, '0')).ljust(8))
-                + '1.0000'.ljust(8)         # add standard deviation
-                + observation.inst_height.ljust(7)      # add intrument height
-                + str(observation.target_height).ljust(7))
-        dnaobs.append(line)
+    pointing_err = 0.001
+    stdev = '1.0000'
+    if same_stdev:
+        for observation in obslist:
+            # Format Line
+            line = ('V '
+                    + observation.from_id.ljust(20)
+                    + observation.to_id.ljust(20)
+                    + ''.ljust(34)
+                    + str(observation.va_obs.degree).rjust(3)
+                    + ' '
+                    + str(observation.va_obs.minute).rjust(2, '0')
+                    + ' '
+                    + str(('{:.3f}'.format(observation.va_obs.second).rjust(6, '0')).ljust(8))
+                    + stdev[0:6].ljust(8)         # add standard deviation
+                    + str(observation.inst_height).ljust(7)      # add intrument height
+                    + str(observation.target_height).ljust(7))
+            dnaobs.append(line)
+    else:
+        for observation in obslist:
+            # Calc Standard Deviation (in seconds) based on pointing error (in metres)
+            stdev = str(dd2sec(degrees(atan(pointing_err / observation.sd_obs))))
+            # Format Line
+            line = ('V '
+                    + observation.from_id.ljust(20)
+                    + observation.to_id.ljust(20)
+                    + ''.ljust(34)
+                    + str(observation.va_obs.degree).rjust(3)
+                    + ' '
+                    + str(observation.va_obs.minute).rjust(2, '0')
+                    + ' '
+                    + str(('{:.3f}'.format(observation.va_obs.second).rjust(6, '0')).ljust(8))
+                    + stdev[0:6].ljust(8)  # add standard deviation
+                    + str(observation.inst_height).ljust(7)  # add intrument height
+                    + str(observation.target_height).ljust(7))
+            dnaobs.append(line)
     return dnaobs
 
 
