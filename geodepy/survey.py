@@ -184,8 +184,6 @@ def readconfig(path):
             cfg_list[num] = cfg_list[num].splitlines()
     return cfg_list
 
-# TODO write functions for rename, remove, pointing_error (remove from function) and dist_error
-
 
 def renameobs(cfg_list, project):
     # Find entry in cfg_list startswith rename
@@ -232,12 +230,12 @@ def removeobs(cfg_list, project):
     return project
 
 
-def dist_sd():
-    pass
-
-
-def pointing_sd():
-    pass
+# def dist_sd():
+#     pass
+#
+#
+# def pointing_sd():
+#     pass
 
 
 # Functions to read in data from fbk format (Geomax Zoom90 Theodolite used
@@ -321,6 +319,44 @@ def writestn(file):
             month = i[5:7]
             day = i[8:10]
             year = i[11:15]
+
+    # Read Config file contents
+    fn, ext = os.path.splitext(file)
+    cfg_list = readconfig(fn + '.gpy')
+    constrain_list = []
+    rename_list = []
+    remove_list = []
+    for group in cfg_list:
+        group_header = group[0].lower()
+        if group_header.startswith('constrain'):
+            constrain_list = group[1:]
+        elif group_header.startswith('rename'):
+            rename_list = group[1:]
+        elif group_header.startswith('remove'):
+            remove_list = group[1:]
+
+    # Rename Points as per Config file
+    for num, i in enumerate(rename_list):
+        rename_list[num] = i.split(',')
+    for pt_rename in rename_list:
+        for num, pt in enumerate(ptlist):
+            if pt[0] == pt_rename[0]:
+                ptlist[num][0] = pt_rename[1]
+
+    # Remove Points as per Config file
+    for pt_rem in remove_list:
+        for num, pt in enumerate(ptlist):
+            if pt[0] == pt_rem:
+                del ptlist[num]
+
+    # Set Points in Config Constrains list to 'CCC'
+    for num, pt in enumerate(ptlist):
+        ptlist[num] = ['FFF'] + pt
+    for pt_constrain in constrain_list:
+        for num, pt in enumerate(ptlist):
+            if pt[1] == pt_constrain:
+                ptlist[num][0] = 'CCC'
+
     # Write header line
     stn = []
     header = ('!#=DNA 3.01 STN    '
@@ -330,22 +366,6 @@ def writestn(file):
               + 'GDA94'.rjust(14)
               + (str(len(ptlist))).rjust(25))
     stn.append(header)
-
-    # Read Config to set point constraints
-    fn, ext = os.path.splitext(file)
-    cfg_list = readconfig(fn + '.gpy')
-    # Find entry in cfg_list startswith constrain
-    constrain_list = []
-    for group in cfg_list:
-        group_header = group[0].lower()
-        if group_header.startswith('constrain'):
-            constrain_list = group[1:]
-    for num, pt in enumerate(ptlist):
-        ptlist[num] = ['FFF'] + pt
-    for pt_constrain in constrain_list:
-        for num, pt in enumerate(ptlist):
-            if pt[1] == pt_constrain:
-                ptlist[num][0] = 'CCC'
 
     # Write line strings in stn format
     for pt in ptlist:
@@ -588,8 +608,8 @@ def gsi2msr(path):
                 sdcount += 1
     obscount = dircount + vacount + sdcount
     now = datetime.now()
-    date = (str(now.day).rjust(2,'0') + '.'
-            + str(now.month).rjust(2,'0') + '.'
+    date = (str(now.day).rjust(2, '0') + '.'
+            + str(now.month).rjust(2, '0') + '.'
             + str(now.year))
     header = ('!#=DNA 3.01 MSR'.ljust(19)
               + date.ljust(19)
@@ -852,6 +872,9 @@ def reducesetup(obslist, strict=False):
 
 
 def dnaout_dirset(obslist, same_stdev=True):
+    # Test for Single Observation
+    if len(obslist) < 2:
+        return []
     fromlist = []
     pointing_err = 0.001  # 0.001m
     stdev = '1.0000'  # 1sec
