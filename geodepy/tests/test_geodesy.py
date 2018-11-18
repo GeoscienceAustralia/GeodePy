@@ -5,6 +5,7 @@ import numpy.lib.recfunctions as rfn
 from geodepy.convert import hp2dec, dec2hp
 from geodepy.geodesy import vincinv, vincdir
 
+
 class TestGeodesy(unittest.TestCase):
     def test_vincinv(self):
         # Flinders Peak
@@ -34,13 +35,17 @@ class TestGeodesy(unittest.TestCase):
         # Test multiple point-to-point vincinv calculations
         abs_path = os.path.abspath(os.path.dirname(__file__))
 
-        test_geo_coords = np.genfromtxt(os.path.join(abs_path, 'resources/Test_Conversion_Geo.csv'),
+        test_geo_coords =\
+            np.genfromtxt(os.path.join(abs_path,
+                                       'resources/Test_Conversion_Geo.csv'),
                                         delimiter=',',
                                         dtype='S4,f8,f8',
                                         names=['site', 'lat1', 'long1'],
                                         usecols=('lat1', 'long1'))
 
-        test_geo_coord2 = np.genfromtxt(os.path.join(abs_path, 'resources/Test_Conversion_Geo.csv'),
+        test_geo_coord2 = \
+            np.genfromtxt(os.path.join(abs_path,
+                                       'resources/Test_Conversion_Geo.csv'),
                                         delimiter=',',
                                         dtype='S4,f8,f8',
                                         names=['site', 'lat2', 'long2'],
@@ -57,9 +62,12 @@ class TestGeodesy(unittest.TestCase):
         vincdir_input.dtype.names = ['lat1', 'long1', 'az1to2', 'ell_dist']
         vincdir_result = np.array(list(vincdir(*x) for x in vincdir_input[['lat1', 'long1', 'az1to2', 'ell_dist']]))
 
-        np.testing.assert_almost_equal(test_pairs['lat2'], vincdir_result[:, 0], decimal=8)
-        np.testing.assert_almost_equal(test_pairs['long2'], vincdir_result[:, 1], decimal=8)
-        np.testing.assert_almost_equal(vincinv_result[:,2], vincdir_result[:, 2])
+        np.testing.assert_almost_equal(test_pairs['lat2'],
+                                       vincdir_result[:, 0], decimal=8)
+        np.testing.assert_almost_equal(test_pairs['long2'],
+                                       vincdir_result[:, 1], decimal=8)
+        np.testing.assert_almost_equal(vincinv_result[:,2],
+                                       vincdir_result[:, 2])
 
 
 if __name__ == '__main__':

@@ -8,7 +8,7 @@ In Development
 """
 
 from numpy import zeros
-
+import sys
 
 def rd_snx_est(file):
     """This function reads in the SOLUTION/ESTIMATE block of a SINEX file. It
@@ -159,3 +159,33 @@ def rd_snx_mat(file):
         print(line)
 
     return code_solns
+
+def rd_dyna_adj_coords(file):
+
+    stat = ''
+    const = ''
+    easting = ''
+    northing = ''
+    zone = ''
+    lat = ''
+    lon = ''
+    h_ortho = ''
+    h_ellipse = ''
+    x = ''
+    y = ''
+    z = ''
+    sd_e = ''
+    sd_n = ''
+    sd_u = ''
+
+    lines = []
+    go = False
+    with open(file) as f:
+        for line in f:
+            line = line.rstrip()
+            if line[:20] == 'Adjusted Coordinates':
+                go = True
+            if go and line != '':
+                lines.append(line)
+    for line in lines[5:]:
+        print(line)
