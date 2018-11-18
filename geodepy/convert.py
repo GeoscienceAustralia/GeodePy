@@ -182,6 +182,13 @@ def dms2dd(dms):
     dd = degrees + (minutes / 60) + (seconds / 360)
     return dd if dms >= 0 else -dd
 
+  
+def dd2sec(dd):
+    minutes, seconds = divmod(abs(dd) * 3600, 60)
+    degrees, minutes = divmod(minutes, 60)
+    sec = (degrees * 3600) + (minutes * 60) + seconds
+    return sec if dd >= 0 else -sec
+
 
 def dec2sex(lon, lat):
     """Convert decimal degrees to sexagesimal format
