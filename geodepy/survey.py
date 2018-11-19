@@ -10,11 +10,10 @@ import numpy as np
 import itertools
 from math import sqrt, degrees, radians, sin, cos, asin, atan
 from datetime import datetime
-from geodepy.convert import dd2dms, dms2dd, dd2sec
+from geodepy.convert import dec2hp, hp2dec, dd2sec
 
 
-# Defines a bunch of classes required to
-# convert GSI (or any other format) to DynaNet v3 Format
+# Defines a bunch of classes required to convert GSI (or any other format) to DynaNet v3 Format
 
 
 class AngleObs(object):
@@ -1022,9 +1021,9 @@ def va_conv(verta_hp, slope_dist, height_inst=0, height_tgt=0):
         if verta_hp == 0 or verta_hp == 180:
             raise ValueError
         elif 0 < verta_hp < 180:
-            verta = radians(90 - dms2dd(verta_hp))
+            verta = radians(90 - hp2dec(verta_hp))
         elif 180 < verta_hp < 360:
-            verta = radians(270 - dms2dd(verta_hp))
+            verta = radians(270 - hp2dec(verta_hp))
         else:
             raise ValueError
     except ValueError:
@@ -1041,5 +1040,53 @@ def va_conv(verta_hp, slope_dist, height_inst=0, height_tgt=0):
         delta_ht = height_inst + delta_ht - height_tgt
         slope_dist_pt = sqrt(delta_ht ** 2 + hz_dist ** 2)
         verta_pt = asin(delta_ht / slope_dist)
-        verta_pt_hp = dd2dms(degrees(verta_pt) + 90)
+        verta_pt_hp = dec2hp(degrees(verta_pt) + 90)
     return verta_pt_hp, slope_dist_pt, hz_dist, delta_ht
+
+
+"""
+to_stn = ['GA03', 'GA02', 'SYM2', 'ATWR', 'MAHON', 'MAHON', 'ATWR', 'SYM2', 'GA02', 'GA03']
+flfr = [359.59597, 14.48289, 25.35515, 215.57043, 300.59046, 120.59060, 35.57045, 205.35530, 194.48282, 179.59581]
+flfr_vert = [90.30228, 90.09547, 89.50396, 88.03600, 87.58014, 272.01587, 271.55593, 270.09227, 269.50091, 269.29414]
+"""
+
+
+def hz_round(brg_list):
+    """
+    Input: an even palindromic list of horizontal angle observations in two faces
+    (e.g. [fl1, fl2, fl3, fr3, fr2, fr1])
+    Output: an averaged face-left sense list of horizontal angles.
+    """
+    brg_avg = []
+    obs = int((len(brg_list))/2)
+    for i in range(0, obs):
+        hz_avg = (hp2dec(brg_list[i]) + (hp2dec(brg_list[-(i + 1)]) - 180)) / 2
+        brg_avg.append(round(dec2hp(hz_avg), 7))
+    return brg_avg
+
+
+def va_round(va_list):
+    """
+    Input: an even palindromic list of vertical angle observations in two faces
+    (e.g. [fl1, fl2, fl3, fr3, fr2, fr1])
+    Output: an averaged face-left sense list of vertical angles.
+    """
+    va_avg = []
+    obs = int((len(va_list))/2)
+    for i in range(0, obs):
+        fl_ang = hp2dec(va_list[i]) - 90
+        fr_ang = 270 - hp2dec(va_list[-(i + 1)])
+        ang_avg = (fl_ang + fr_ang)/2 + 90
+        va_avg.append(round(dec2hp(ang_avg), 7))
+    return va_avg
+
+
+"""
+# Test for round of obs
+if to_stn == to_stn[::-1] and len(to_stn) % 2 == 0:
+    brg_avg = hz_round(flfr)
+    va_avg = va_round(flfr_vert)
+    to_stn_avg = to_stn[0:int(len(to_stn)/2)]
+else:
+    brg_avg = ['nope']
+"""
