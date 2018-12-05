@@ -24,4 +24,5 @@ install:
 script:
   python -m unittest discover geodepy/tests/
   
-after_success: "sbt coveralls"
+after_success:
+  - coveralls
