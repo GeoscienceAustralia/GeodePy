@@ -1,6 +1,10 @@
 language: python
 python:
   - "3.6"
+
+before_install:
+  - pip install coveralls
+
 install:
   - sudo apt-get update
   # We do this conditionally because it saves us some downloading if the
