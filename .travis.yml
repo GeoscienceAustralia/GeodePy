@@ -3,7 +3,7 @@ python:
   - "3.6"
 
 before_install:
-  - pip install coveralls
+  - pip install pytest pytest-cov coveralls
 
 install:
   - sudo apt-get update
@@ -26,7 +26,7 @@ install:
   - source activate test-environment
 
 script:
-  python -m unittest discover geodepy/tests/
+  pytest --cov-report term-missing:skip-covered --cov=geodepy tests/
   
 after_success:
   - coveralls
