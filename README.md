@@ -1,6 +1,6 @@
 # GeodePy - Geodesy Python Package
 
-[![Travis](https://img.shields.io/travis/GeoscienceAustralia/GeodePy/master.svg?label=Travis%20CI)](https://travis-ci.org/GeoscienceAustralia/GeodePy)
+[![Travis](https://img.shields.io/travis/GeoscienceAustralia/GeodePy/master.svg?label=Travis%20CI)](https://travis-ci.org/GeoscienceAustralia/GeodePy)  [![Coverage Status](https://coveralls.io/repos/github/GeoscienceAustralia/GeodePy/badge.svg?branch=master)](https://coveralls.io/github/GeoscienceAustralia/GeodePy?branch=master)
 
 This is a package of tools for manipulating geospatial datasets using Python and tested in Python 3.6.4.
 
@@ -10,7 +10,6 @@ This package requires the following non-standard Python modules installed:
 
 ```
 NumPy
-SciPy
 ```
 
 ### Testing
