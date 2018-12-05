@@ -26,7 +26,7 @@ install:
   - source activate test-environment
 
 script:
-  pytest --cov-report term-missing:skip-covered --cov=geodepy tests/
+  - pytest --cov-report term-missing:skip-covered
   
 after_success:
   - coveralls
