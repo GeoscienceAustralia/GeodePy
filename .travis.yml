@@ -1,6 +1,10 @@
 language: python
 python:
   - "3.6"
+
+before_install:
+  - pip install pytest pytest-cov coveralls
+
 install:
   - sudo apt-get update
   # We do this conditionally because it saves us some downloading if the
@@ -22,4 +26,8 @@ install:
   - source activate test-environment
 
 script:
-  python -m unittest discover geodepy/tests/
+  - pytest --cov-report term-missing:skip-covered
+
+
+after_success:
+  - coveralls
