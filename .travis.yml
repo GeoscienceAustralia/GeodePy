@@ -27,6 +27,7 @@ install:
 
 script:
   - pytest --cov-report term-missing:skip-covered
-  
+
+
 after_success:
   - coveralls
