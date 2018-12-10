@@ -8,7 +8,6 @@ In Development
 """
 
 import numpy as np
-from scipy import interpolate
 from geodepy.convert import hp2dec
 
 
