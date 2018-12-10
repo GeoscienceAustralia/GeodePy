@@ -8,5 +8,5 @@ setup(name='geodepy',
       author_email='jonathan.mettes@ga.gov.au',
       license='Apache License 2.0',
       packages=['geodepy'],
-      install_requires=['numpy', 'scipy'])
+      install_requires=['numpy'])
 
