@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import request
+from flask import url_for
 from geodepy.geodesy import vincdir
 from geodepy.geodesy import vincinv
 from geodepy.convert import dms2dd
@@ -16,6 +17,11 @@ dd2coord = {
     'dd': lambda x: x,
     'dms': dd2dms,
 }
+
+
+@app.route('/')
+def list_routes():
+    return str(tuple(url_for(rule.endpoint) for rule in app.url_map.iter_rules() if rule.endpoint != 'static'))
 
 
 @app.route('/vincinv')

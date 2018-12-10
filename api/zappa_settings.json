@@ -2,6 +2,7 @@
     "dev": {
         "project_name": "geodepy-api",
         "s3_bucket": "geodepy-api-dev",
-        "app_function": "api.app"
+        "app_function": "app.app",
+        "use_precompiled_packages": true
     }
 }
