@@ -24,7 +24,7 @@ install:
   - pip install pytest pytest-cov coveralls
 
 script:
-  - pytest --cov-report term-missing:skip-covered --cov=geodepy geodepy.tests/
+  - py.test --cov=geodepy
 
 
 after_success:
