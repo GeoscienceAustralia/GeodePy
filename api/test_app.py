@@ -1,5 +1,6 @@
 import unittest
 from api.app import app
+import json
 
 
 class TestAPI(unittest.TestCase):
@@ -13,9 +14,13 @@ class TestAPI(unittest.TestCase):
             'to_coord': 'dms'
         }
 
-        expected_response = b'(54972.17204, 306.52053231124, 127.10250207968)'
+        expected_response = {
+            'ell_dist': 54972.17204,
+            'azimuth1to2': 306.52053231124,
+            'azimuth2to1': 127.10250207968
+        }
         response = app.test_client().get('/vincinv', query_string=query)
-        self.assertEqual(response.data, expected_response)
+        self.assertEqual(json.loads(response.data), expected_response)
 
     def test_vincdir(self):
         query = {
@@ -27,8 +32,12 @@ class TestAPI(unittest.TestCase):
             'to_coord': 'dms'
         }
 
-        expected_response = b'(-37.3910156124268, 143.5535383883988, 127.10250671432)'
+        expected_response = {
+            'lat2': -37.3910156124268,
+            'lon2': 143.5535383883988,
+            'azimuth2to1': 127.10250671432
+        }
         response = app.test_client().get('/vincdir', query_string=query)
-        self.assertEqual(response.data, expected_response)
+        self.assertEqual(json.loads(response.data), expected_response)
 
 

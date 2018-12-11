@@ -5,6 +5,8 @@ from geodepy.geodesy import vincdir
 from geodepy.geodesy import vincinv
 from geodepy.convert import dms2dd
 from geodepy.convert import dd2dms
+import json
+
 
 app = Flask(__name__)
 
@@ -41,7 +43,11 @@ def handle_vincinv():
     coord = dd2coord[to_coord]
     ell_dist, azimuth1to2, azimuth2to1 = coord(ell_dist_dd), coord(azimuth1to2_dd), coord(azimuth2to1_dd)
 
-    return str((ell_dist, azimuth1to2, azimuth2to1)), 200
+    return json.dumps({
+        'ell_dist': ell_dist,
+        'azimuth1to2': azimuth1to2,
+        'azimuth2to1': azimuth2to1
+    }), 200
 
 
 @app.route('/vincdir')
@@ -61,7 +67,11 @@ def handle_vincdir():
     coord = dd2coord[to_coord]
     lat2, lon2, azimuth2to1 = coord(lat2_dd), coord(lon2_dd), coord(azimuth2to1_dd)
 
-    return str((lat2, lon2, azimuth2to1)), 200
+    return json.dumps({
+        'lat2': lat2,
+        'lon2': lon2,
+        'azimuth2to1': azimuth2to1
+    }), 200
 
 
 if __name__ == '__main__':
