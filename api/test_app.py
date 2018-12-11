@@ -10,8 +10,8 @@ class TestAPI(unittest.TestCase):
             'lon1': 144.25295244,
             'lat2': -37.39101561,
             'lon2': 143.5535383,
-            'from_coord': 'dms',
-            'to_coord': 'dms'
+            'from_angle_type': 'dms',
+            'to_angle_type': 'dms'
         }
 
         expected_response = {
@@ -28,8 +28,8 @@ class TestAPI(unittest.TestCase):
             'lon1': 144.25295244,
             'azimuth1to2': 306.520537,
             'ell_dist': 54972.271,
-            'from_coord': 'dms',
-            'to_coord': 'dms'
+            'from_angle_type': 'dms',
+            'to_angle_type': 'dms'
         }
 
         expected_response = {
