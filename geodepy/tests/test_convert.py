@@ -1,5 +1,5 @@
 import unittest
-from geodepy.convert import dec2hp, hp2dec, DMSAngle, DDMAngle, dec2dms, dec2ddm, hp2dms, hp2ddm
+from geodepy.convert import dec2hp, hp2dec, DMSAngle, DDMAngle, dec2dms, dec2ddm, hp2dms, hp2ddm, dd2dms
 
 dec_ex = 123.74875
 dec_ex2 = 12.575
@@ -77,3 +77,7 @@ class TestConvert(unittest.TestCase):
     def test_hp2ddm(self):
         self.assertEqual(ddm_ex, hp2ddm(hp_ex))
         self.assertEqual(-ddm_ex, hp2ddm(-hp_ex))
+
+    def test_dd2dms(self):
+        self.assertEqual(hp_ex, dd2dms(dec_ex))
+        self.assertEqual(-hp_ex, dd2dms(-dec_ex))

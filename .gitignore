@@ -9,3 +9,7 @@ __pycache__
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
+
+# Ignore test-related files
+/coverage.data
+/coverage/
