@@ -16,6 +16,10 @@ NumPy
 
 Run: `python -m unittest discover geodepy/tests/`
 
+### Tutorials
+
+See [here](https://github.com/GeoscienceAustralia/GeodePy/tree/master/docs/tutorials) for worked examples of common GeodePy functions and routines.
+
 ### Authors
 
 * **Craig Harrison** - *Project Management* - [harry093](https://github.com/harry093)
