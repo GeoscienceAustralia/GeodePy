@@ -38,10 +38,10 @@ def handle_vincinv():
     dd = angle_type_to_dd[from_angle_type]
     lat1_dd, lon1_dd, lat2_dd, lon2_dd = dd(lat1), dd(lon1), dd(lat2), dd(lon2)
 
-    ell_dist_dd, azimuth1to2_dd, azimuth2to1_dd = vincinv(lat1_dd, lon1_dd, lat2_dd, lon2_dd)
+    ell_dist, azimuth1to2_dd, azimuth2to1_dd = vincinv(lat1_dd, lon1_dd, lat2_dd, lon2_dd)
 
     angle = dd_to_angle_type[to_angle_type]
-    ell_dist, azimuth1to2, azimuth2to1 = angle(ell_dist_dd), angle(azimuth1to2_dd), angle(azimuth2to1_dd)
+    azimuth1to2, azimuth2to1 = angle(azimuth1to2_dd), angle(azimuth2to1_dd)
 
     return json.dumps({
         'ell_dist': ell_dist,

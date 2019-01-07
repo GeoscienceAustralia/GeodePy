@@ -15,7 +15,7 @@ class TestAPI(unittest.TestCase):
         }
 
         expected_response = {
-            'ell_dist': 54972.17204,
+            'ell_dist': 54972.289,
             'azimuth1to2': 306.52053231124,
             'azimuth2to1': 127.10250207968
         }
