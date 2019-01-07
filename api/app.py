@@ -28,8 +28,8 @@ def list_routes():
 
 @app.route('/vincinv')
 def handle_vincinv():
-    from_angle_type = request.args.get('from_angle_type')
-    to_angle_type = request.args.get('to_angle_type')
+    from_angle_type = request.args.get('from_angle_type', default='dd')
+    to_angle_type = request.args.get('to_angle_type', default='dd')
     lat1 = request.args.get('lat1', type=float)
     lon1 = request.args.get('lon1', type=float)
     lat2 = request.args.get('lat2', type=float)
@@ -52,8 +52,8 @@ def handle_vincinv():
 
 @app.route('/vincdir')
 def handle_vincdir():
-    from_angle_type = request.args.get('from_angle_type')
-    to_angle_type = request.args.get('to_angle_type')
+    from_angle_type = request.args.get('from_angle_type', default='dd')
+    to_angle_type = request.args.get('to_angle_type', default='dd')
     lat1 = request.args.get('lat1', type=float)
     lon1 = request.args.get('lon1', type=float)
     azimuth1to2 = request.args.get('azimuth1to2', type=float)
