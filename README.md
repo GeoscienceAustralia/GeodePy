@@ -20,6 +20,18 @@ Run: `python -m unittest discover geodepy/tests/`
 
 See [here](https://github.com/GeoscienceAustralia/GeodePy/tree/master/docs/tutorials) for worked examples of common GeodePy functions and routines.
 
+## API
+
+```
+cd api/
+virtualenv env
+source env/bin/activate
+pip install -r requirements.txt
+zappa deploy dev
+```
+
+For subsequent updating run: `zappa update dev`
+
 ### Authors
 
 * **Craig Harrison** - *Project Management* - [harry093](https://github.com/harry093)
