@@ -325,7 +325,6 @@ def writestn(file):
     constrain_list = []
     rename_list = []
     remove_list = []
-    shift_list = []
     for group in cfg_list:
         group_header = group[0].lower()
         if group_header.startswith('constrain'):
@@ -342,9 +341,9 @@ def writestn(file):
             delta_north = shift_list[1]
             delta_up = shift_list[2]
             for pt in ptlist:
-                pt[2] = round(pt[2] + delta_east, 4)
-                pt[3] = round(pt[3] + delta_north, 4)
-                pt[4] = round(pt[4] + delta_up, 4)
+                pt[1] = str('{:.3f}'.format(float(pt[1]) + float(delta_east)))
+                pt[2] = str('{:.3f}'.format(float(pt[2]) + float(delta_north)))
+                pt[3] = str('{:.3f}'.format(float(pt[3]) + float(delta_up)))
 
     # Rename Points as per Config file
     for num, i in enumerate(rename_list):
