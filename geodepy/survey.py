@@ -325,6 +325,7 @@ def writestn(file):
     constrain_list = []
     rename_list = []
     remove_list = []
+    shift_list = []
     for group in cfg_list:
         group_header = group[0].lower()
         if group_header.startswith('constrain'):
@@ -333,6 +334,17 @@ def writestn(file):
             rename_list = group[1:]
         elif group_header.startswith('remove'):
             remove_list = group[1:]
+
+        # Perform Block Shift of Coordinates as Specified in Config
+        elif group_header.startswith('blockshift'):
+            shift_list = group[1:]
+            delta_east = shift_list[0]
+            delta_north = shift_list[1]
+            delta_up = shift_list[2]
+            for pt in ptlist:
+                pt[2] = round(pt[2] + delta_east, 4)
+                pt[3] = round(pt[3] + delta_north, 4)
+                pt[4] = round(pt[4] + delta_up, 4)
 
     # Rename Points as per Config file
     for num, i in enumerate(rename_list):
