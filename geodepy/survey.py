@@ -255,7 +255,7 @@ def fbk2msr(path, cfg_path):
     fbk_project = removeobs(cfg, fbk_project)
     # Reduce observations in setups
     for setup in fbk_project:
-        reduced_obs = reducesetup(setup.observation, strict=False, zerodist=True)
+        reduced_obs = reducesetup(setup.observation, strict=False, zerodist=False)
         setup.observation = reduced_obs
     # Produce Measurement format data from setups
     msr_raw = []
