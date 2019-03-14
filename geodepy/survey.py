@@ -341,9 +341,9 @@ def writestn(file):
             delta_north = shift_list[1]
             delta_up = shift_list[2]
             for pt in ptlist:
-                pt[1] = str('{:.3f}'.format(float(pt[1]) + float(delta_east)))
-                pt[2] = str('{:.3f}'.format(float(pt[2]) + float(delta_north)))
-                pt[3] = str('{:.3f}'.format(float(pt[3]) + float(delta_up)))
+                pt[1] = str('{:.4f}'.format(float(pt[1]) + float(delta_east)))
+                pt[2] = str('{:.4f}'.format(float(pt[2]) + float(delta_north)))
+                pt[3] = str('{:.4f}'.format(float(pt[3]) + float(delta_up)))
 
     # Rename Points as per Config file
     for num, i in enumerate(rename_list):
@@ -367,6 +367,17 @@ def writestn(file):
             if pt[1] == pt_constrain:
                 ptlist[num][0] = 'CCC'
 
+    # Remove Duplicate Station Points
+    cleanlist = []
+    deduplist = []
+    dedupnum = []
+    for num, pt in enumerate(ptlist):
+        if pt[1] not in deduplist:
+            deduplist.append(pt[1])
+            dedupnum.append(num)
+    for num in dedupnum:
+        cleanlist.append(ptlist[num])
+
     # Write header line
     stn = []
     header = ('!#=DNA 3.01 STN    '
@@ -374,20 +385,20 @@ def writestn(file):
               + month + '.'
               + year
               + 'GDA94'.rjust(14)
-              + (str(len(ptlist))).rjust(25))
+              + (str(len(cleanlist))).rjust(25))
     stn.append(header)
 
     # Write line strings in stn format
-    for pt in ptlist:
+    for pt in cleanlist:
         line = (pt[1].ljust(20)  # Pt ID
                 + pt[0]  # Constraint
-                + ' UTM'  # Projection
+                + ' UTM '  # Projection
                 + pt[2].rjust(13)  # Easting
                 + pt[3].rjust(18)  # Northing
                 + pt[4].rjust(16)  # Elevation
-                + 'S56'.rjust(16)  # Hemisphere/Zone input
+                + 'S56'.rjust(15)  # Hemisphere/Zone input
                 + ' '
-                + pt[4])  # Pt Description
+                + pt[5])  # Pt Description
         stn.append(line)
     # Write line strings to file
     fn, ext = os.path.splitext(file)
