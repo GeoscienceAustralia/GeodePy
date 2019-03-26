@@ -1,7 +1,9 @@
 import unittest
 
-from geodepy.transform import geo2grid, grid2geo, llh2xyz, xyz2llh
+from geodepy.transform import geo2grid, grid2geo, llh2xyz, xyz2llh, conform7, conform14
 from geodepy.convert import dms2dd_v, read_dnacoord
+from geodepy.constants import itrf14togda20, gda94to20
+from datetime import date
 import numpy as np
 import os.path
 
@@ -74,6 +76,34 @@ class TestTransforms(unittest.TestCase):
             latcomp, longcomp, psf, grid_conv = grid2geo(coord.zone, coord.easting, coord.northing)
             assert (abs(latcomp - coord.lat) < 5e-9)
             assert (abs(longcomp - coord.long) < 5e-9)
+
+
+    def test_conform7(self):
+        # Replication of tests in GDA2020 Tech Manual v1.2 - Sect 3.1.1
+        alic_gda1994 = (-4052051.7643, 4212836.2017, -2545106.0245)
+        alic_gda2020 = (-4052052.7379, 4212835.9897, -2545104.5898)
+        alic_gda2020_comp = conform7(*alic_gda1994, gda94to20)
+        alic_gda1994_comp = conform7(*alic_gda2020, -gda94to20)
+        assert (abs(alic_gda2020_comp[0] - alic_gda2020[0]) < 5e-5)
+        assert (abs(alic_gda2020_comp[1] - alic_gda2020[1]) < 5e-5)
+        assert (abs(alic_gda2020_comp[2] - alic_gda2020[2]) < 5e-5)
+        assert (abs(alic_gda1994_comp[0] - alic_gda1994[0]) < 5e-5)
+        assert (abs(alic_gda1994_comp[1] - alic_gda1994[1]) < 5e-5)
+        assert (abs(alic_gda1994_comp[2] - alic_gda1994[2]) < 5e-5)
+
+
+    def test_conform14(self):
+        # Replication of tests in GDA2020 Tech Manual v1.2 - Sect 3.3.1
+        alic_gda2020 = (-4052052.7373, 4212835.9835, -2545104.5867)
+        alic_itrf14at2018 = (-4052052.6588, 4212835.9938, -2545104.6946)
+        alic_itrf14at2018_comp = conform14(*alic_gda2020, date(2018, 1, 1), -itrf14togda20)
+        alic_gda2020_comp = conform14(*alic_itrf14at2018, date(2018, 1, 1), itrf14togda20)
+        assert (abs(alic_itrf14at2018_comp[0] - alic_itrf14at2018[0]) < 5e-5)
+        assert (abs(alic_itrf14at2018_comp[1] - alic_itrf14at2018[1]) < 5e-5)
+        assert (abs(alic_itrf14at2018_comp[2] - alic_itrf14at2018[2]) < 5e-5)
+        assert (abs(alic_gda2020_comp[0] - alic_gda2020[0]) < 5e-5)
+        assert (abs(alic_gda2020_comp[1] - alic_gda2020[1]) < 5e-5)
+        assert (abs(alic_gda2020_comp[2] - alic_gda2020[2]) < 5e-5)
 
 
 if __name__ == '__main__':
