@@ -66,8 +66,21 @@ class TestGeodesy(unittest.TestCase):
                                        vincdir_result[:, 0], decimal=8)
         np.testing.assert_almost_equal(test_pairs['long2'],
                                        vincdir_result[:, 1], decimal=8)
-        np.testing.assert_almost_equal(vincinv_result[:,2],
+        np.testing.assert_almost_equal(vincinv_result[:, 2],
                                        vincdir_result[:, 2])
+
+    def test_vincinv_edgecases(self):
+        lat1 = -32.153892
+        lon1 = -15.394827
+        lat2 = -31.587369
+        lon2 = -13.487739
+        gdist, az12, az21 = vincinv(lat1, lon1, lat2, lon2)
+        lon1 = lon1 + 14
+        lon2 = lon2 + 14
+        gdist_2, az12_2, az21_2 = vincinv(lat1, lon1, lat2, lon2)
+        self.assertEqual(gdist, gdist_2)
+        self.assertEqual(az12, az12_2)
+        self.assertEqual(az21, az21_2)
 
 
 if __name__ == '__main__':

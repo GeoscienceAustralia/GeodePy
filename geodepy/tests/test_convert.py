@@ -81,3 +81,7 @@ class TestConvert(unittest.TestCase):
     def test_dd2dms(self):
         self.assertEqual(hp_ex, dd2dms(dec_ex))
         self.assertEqual(-hp_ex, dd2dms(-dec_ex))
+
+
+if __name__ == '__main__':
+    unittest.main()
