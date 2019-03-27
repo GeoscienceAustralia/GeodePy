@@ -12,9 +12,9 @@ Ref2: http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 import os
 import csv
 import datetime
-from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2, modf
+from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2
 import numpy as np
-from geodepy.constants import grs80, utm, Transformation
+from geodepy.constants import grs80, utm, Transformation, atrf_gda2020
 from geodepy.convert import dec2hp, hp2dec
 
 
@@ -526,6 +526,33 @@ def conform14(x, y, z, to_epoch, trans):
     # Perform Transformation
     xtrans, ytrans, ztrans = conform7(x, y, z, timetrans)
     return xtrans, ytrans, ztrans
+
+
+def atrftogda2020(x, y, z, epoch_from):
+    """
+    Transforms Cartesian (x, y, z) Coordinates in terms of the Australian Terrestrial Reference Frame (ATRF) at
+    a specified epoch to coordinates in terms of Geocentric Datum of Australia 2020 (GDA2020 - reference epoch 2020.0)
+    :param x: ATRF Cartesian X Coordinate (m)
+    :param y: ATRF Cartesian Y Coordinate (m)
+    :param z: ATRF Cartesian Z Coordinate (m)
+    :param epoch_from: ATRF Coordinate Epoch (datetime.date Object)
+    :return: Cartesian X, Y, Z Coordinates in terms of GDA2020
+    """
+    return conform14(x, y, z, epoch_from, atrf_gda2020)
+
+
+def gda2020toatrf(x, y, z, epoch_to):
+    """
+    Transforms Cartesian (x, y, z) Coordinates in terms of Geocentric Datum of Australia 2020
+    (GDA2020 - reference epoch 2020.0) to coordinates in terms of the Australian Terrestrial Reference Frame (ATRF) at
+    a specified epoch
+    :param x: GDA2020 Cartesian X Coordinate (m)
+    :param y: GDA2020 Cartesian Y Coordinate (m)
+    :param z: GDA2020 Cartesian Z Coordinate (m)
+    :param epoch_to: ATRF Coordinate Epoch (datetime.date Object)
+    :return: Cartesian X, Y, Z Coordinate in terms of ATRF at the specified Epoch
+    """
+    return conform14(x, y, z, epoch_to, -atrf_gda2020)
 
 
 def grid2geoio():
