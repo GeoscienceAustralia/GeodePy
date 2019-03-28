@@ -2,11 +2,13 @@ This API uses [Zappa](https://www.zappa.io/), a serverless python web framework 
 
 ## Deploying
 
+```
 $ virtualenv env
 $ source env/bin/activate
 $ pip install -r requirements.txt
 $ zappa deploy
 $ zappa update # further updates
+```
 
 ## Testing
 
