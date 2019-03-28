@@ -1,6 +1,6 @@
 import unittest
 
-from geodepy.transform import geo2grid, grid2geo, llh2xyz, xyz2llh, conform7, conform14
+from geodepy.transform import geo2grid, grid2geo, llh2xyz, xyz2llh, conform7, conform14, atrftogda2020, gda2020toatrf
 from geodepy.convert import dms2dd_v, read_dnacoord
 from geodepy.constants import itrf14togda20, gda94to20
 from datetime import date
@@ -98,6 +98,19 @@ class TestTransforms(unittest.TestCase):
         alic_itrf14at2018 = (-4052052.6588, 4212835.9938, -2545104.6946)
         alic_itrf14at2018_comp = conform14(*alic_gda2020, date(2018, 1, 1), -itrf14togda20)
         alic_gda2020_comp = conform14(*alic_itrf14at2018, date(2018, 1, 1), itrf14togda20)
+        assert (abs(alic_itrf14at2018_comp[0] - alic_itrf14at2018[0]) < 5e-5)
+        assert (abs(alic_itrf14at2018_comp[1] - alic_itrf14at2018[1]) < 5e-5)
+        assert (abs(alic_itrf14at2018_comp[2] - alic_itrf14at2018[2]) < 5e-5)
+        assert (abs(alic_gda2020_comp[0] - alic_gda2020[0]) < 5e-5)
+        assert (abs(alic_gda2020_comp[1] - alic_gda2020[1]) < 5e-5)
+        assert (abs(alic_gda2020_comp[2] - alic_gda2020[2]) < 5e-5)
+
+
+    def test_atrftogda2020(self):
+        alic_gda2020 = (-4052052.7373, 4212835.9835, -2545104.5867)
+        alic_itrf14at2018 = (-4052052.6588, 4212835.9938, -2545104.6946)
+        alic_itrf14at2018_comp = gda2020toatrf(*alic_gda2020, date(2018, 1, 1))
+        alic_gda2020_comp = atrftogda2020(*alic_itrf14at2018, date(2018, 1, 1))
         assert (abs(alic_itrf14at2018_comp[0] - alic_itrf14at2018[0]) < 5e-5)
         assert (abs(alic_itrf14at2018_comp[1] - alic_itrf14at2018[1]) < 5e-5)
         assert (abs(alic_itrf14at2018_comp[2] - alic_itrf14at2018[2]) < 5e-5)
