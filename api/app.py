@@ -1,11 +1,11 @@
 from flask import Flask
+from flask import jsonify
 from flask import request
 from flask import url_for
 from geodepy.geodesy import vincdir
 from geodepy.geodesy import vincinv
 from geodepy.convert import dms2dd
 from geodepy.convert import dd2dms
-import json
 
 
 app = Flask(__name__)
@@ -43,7 +43,7 @@ def handle_vincinv():
     angle = dd_to_angle_type[to_angle_type]
     azimuth1to2, azimuth2to1 = angle(azimuth1to2_dd), angle(azimuth2to1_dd)
 
-    return json.dumps({
+    return jsonify({
         'ell_dist': ell_dist,
         'azimuth1to2': azimuth1to2,
         'azimuth2to1': azimuth2to1
@@ -67,7 +67,7 @@ def handle_vincdir():
     angle_type = dd_to_angle_type[to_angle_type]
     lat2, lon2, azimuth2to1 = angle_type(lat2_dd), angle_type(lon2_dd), angle_type(azimuth2to1_dd)
 
-    return json.dumps({
+    return jsonify({
         'lat2': lat2,
         'lon2': lon2,
         'azimuth2to1': azimuth2to1
