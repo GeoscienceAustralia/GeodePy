@@ -12,6 +12,14 @@ $ zappa update # further updates
 
 ## Testing
 
+Local testing:
+
+```
+pytest
+```
+
+Using cURL to test Zappa deployed API endpoint:
+
 ```
 $ curl -XGET -G -d "lat1=-37.57037203" -d "lon1=144.25295244" \ 
 >               -d "azimuth1to2=306.520537" -d "ell_dist=54972.271" \
