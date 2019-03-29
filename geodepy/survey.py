@@ -8,64 +8,13 @@ Survey Module
 import os
 import numpy as np
 import itertools
+import operator
 from math import sqrt, degrees, radians, sin, cos, asin, atan
 from datetime import datetime
-from geodepy.convert import dec2hp, hp2dec, dd2sec
+from geodepy.convert import dec2hp, hp2dec, dd2sec, DMSAngle
 
 
 # Defines a bunch of classes required to convert GSI (or any other format) to DynaNet v3 Format
-
-
-class AngleObs(object):
-    def __init__(self, degree=0, minute=0, second=0):
-        self.degree = abs(int(degree))
-        self.minute = abs(int(minute))
-        self.second = abs(round(float(second), 3))
-
-    def __repr__(self):
-        return repr(self.degree) + 'd '\
-               + repr(self.minute) + '\' '\
-               + repr(self.second) + '\"'
-
-    def decimal(self):
-        dd = abs(self.degree + self.minute / 60 + self.second / 3600)
-        return dd if self.degree >= 0 else -dd
-
-    def hp(self):
-        hp = abs(self.degree + self.minute / 100 + self.second / 10000)
-        return hp if self.degree >= 0 else -hp
-
-    def __add__(self, other):
-        degreeadd = self.degree + other.degree
-        minuteadd = abs(self.minute) + abs(other.minute)
-        secondadd = abs(self.second) + abs(other.second)
-        while secondadd >= 60:
-            minuteadd += 1
-            secondadd -= 60
-        while minuteadd >= 60:
-            degreeadd += 1
-            minuteadd -= 60
-        return AngleObs(degreeadd, minuteadd, secondadd)
-
-    def __sub__(self, other):
-        degreesub = self.degree - other.degree
-        minutesub = abs(self.minute) - abs(other.minute)
-        secondsub = abs(self.second) - abs(other.second)
-        while secondsub < 0:
-            secondsub += 60
-            minutesub -= 1
-        while minutesub < 0:
-            minutesub += 60
-            degreesub -= 1
-        return AngleObs(degreesub, minutesub, secondsub)
-
-    def __truediv__(self, other):
-        degreediv, degreerem = divmod(self.degree, other)
-        minutediv, minuterem = divmod(self.minute, other)
-        seconddiv, secondrem = divmod(self.second, other)
-        minutediv = minutediv + ((degreerem / other) * 60)
-        seconddiv = seconddiv + ((minuterem / other) * 60) + (secondrem / other)
-        return AngleObs(degreediv, minutediv, seconddiv)
 
 
 class Coordinate(object):
@@ -112,7 +61,7 @@ class InstSetup(object):
 
 class Observation(object):
     def __init__(self, from_id, to_id, inst_height=0.0, target_height=0.0,
-                 face='FL', hz_obs=AngleObs(0, 0, 0), va_obs=AngleObs(0, 0, 0),
+                 face='FL', hz_obs=DMSAngle(0, 0, 0), va_obs=DMSAngle(0, 0, 0),
                  sd_obs=0.0, hz_dist=0.0, vert_dist=0.0):
         self.from_id = from_id
         self.to_id = to_id
@@ -139,14 +88,14 @@ class Observation(object):
     def changeface(self):
         # Change Horizontal Angle
         if 0 <= self.hz_obs.degree < 180:
-            hz_switch = self.hz_obs + AngleObs(180)
+            hz_switch = self.hz_obs + DMSAngle(180)
         elif 180 <= self.hz_obs.degree < 360:
-            hz_switch = self.hz_obs - AngleObs(180)
+            hz_switch = self.hz_obs - DMSAngle(180)
         else:
             raise ValueError('Horizontal Angle out of range (0 to 360 degrees)')
         # Change Vertical Angle
         if 0 <= self.va_obs.degree < 360:
-            va_switch = AngleObs(360) - self.va_obs
+            va_switch = DMSAngle(360) - self.va_obs
         else:
             raise ValueError('Vertical Angle out of range (0 to 360 degrees)')
         # Change Face Label
@@ -240,10 +189,16 @@ def removeobs(cfg_list, project):
 # Functions to read in data from fbk format (Geomax Zoom90 Theodolite used
 # in Surat Survey
 
-def fbk2msr(path, cfg_path):
+def fbk2msr(path, cfg_path, strict=False, zerodist=False, same_stdev=False):
     """
     Converts .fbk format survey observations to DNA v3 .msr for use with DynAdjust
     :param path: .fbk file path
+    :param cfg_path: .gpy DNA conversion config file
+    :param strict: If True, all single-face Obs are ignored. If False, all
+    single-face Obs are included and converted to Face Left
+    :param zerodist: If True, Obs with Slope Distance of Zero are included.
+    If False, these are ignored
+    :param same_stdev:
     :return: DNA v3 .msr file (same directory as source .fbk file)
     """
     fbk_project = fbk2class(readfbk(path))
@@ -255,13 +210,13 @@ def fbk2msr(path, cfg_path):
     fbk_project = removeobs(cfg, fbk_project)
     # Reduce observations in setups
     for setup in fbk_project:
-        reduced_obs = reducesetup(setup.observation, strict=False, zerodist=False)
+        reduced_obs = reducesetup(setup.observation, strict, zerodist)
         setup.observation = reduced_obs
     # Produce Measurement format data from setups
     msr_raw = []
     for setup in fbk_project:
-        dna_dirset = dnaout_dirset(setup.observation, same_stdev=False)
-        dna_va = dnaout_va(setup.observation, same_stdev=False)
+        dna_dirset = dnaout_dirset(setup.observation, same_stdev)
+        dna_va = dnaout_va(setup.observation, same_stdev)
         dna_sd = dnaout_sd(setup.observation)
         msr_raw.append(dna_dirset + dna_va + dna_sd)
     # Build msr header
@@ -299,7 +254,7 @@ def fbk2msr(path, cfg_path):
 # testfbk = '\\geodepy\\tests\\resources\\Site01-152.fbk'
 
 
-def writestn(file):
+def writestn(file, utmzone):
     """
     Converts coordinate list file (.txt) associated with .fbk file into DNA v3 stn file
     :param file: .txt co-ordinate list associated with .fbk file
@@ -396,7 +351,7 @@ def writestn(file):
                 + pt[2].rjust(13)  # Easting
                 + pt[3].rjust(18)  # Northing
                 + pt[4].rjust(16)  # Elevation
-                + 'S56'.rjust(15)  # Hemisphere/Zone input
+                + utmzone.rjust(15)  # Hemisphere/Zone input
                 + ' '
                 + pt[5])  # Pt Description
         stn.append(line)
@@ -543,7 +498,7 @@ def fbk2class(fbk_list):
         dms = float(obs_string)
         degmin, second = divmod(abs(dms) * 1000, 10)
         degree, minute = divmod(degmin, 100)
-        return AngleObs(degree, minute, second * 10)
+        return DMSAngle(degree, minute, second * 10)
 
     fbk_project = []
     for setup_list in fbk_list:
@@ -603,17 +558,30 @@ def fbk2class(fbk_list):
 # Functions to read data to classes from Leica GSI format file (GA_Survey2.frt)
 
 
-def gsi2msr(path):
-    gsi_class = gsi2class(readgsi(path))
+def gsi2msr(path, cfg_path=None):
+    """
+    Converts .gsi format survey observations to DNA v3 .msr for use with DynAdjust
+    :param path: .gsi file path
+    :param cfg_path: .gpy conversion configuration file
+    :return: DNA v3 .msr file (same directory as source .fbk file)
+    """
+    gsi_project = gsi2class(readgsi(path))
+    # Read config file
+    if cfg_path is not None:
+        cfg = readconfig(cfg_path)
+        # Rename obs as per config file
+        gsi_project = renameobs(cfg, gsi_project)
+        # Remove obs as per config file
+        gsi_project = removeobs(cfg, gsi_project)
     # Reduce observations in setups
-    for setup in gsi_class:
-        reduced_obs = reducesetup(setup.observation)
+    for setup in gsi_project:
+        reduced_obs = reducesetup(setup.observation, strict=False, zerodist=False)
         setup.observation = reduced_obs
     # Produce Measurement format data from setups
     msr_raw = []
-    for setup in gsi_class:
-        dna_dirset = dnaout_dirset(setup.observation, same_stdev=True)
-        dna_va = dnaout_va(setup.observation, same_stdev=True)
+    for setup in gsi_project:
+        dna_dirset = dnaout_dirset(setup.observation, same_stdev=False)
+        dna_va = dnaout_va(setup.observation, same_stdev=False)
         dna_sd = dnaout_sd(setup.observation)
         msr_raw.append(dna_dirset + dna_va + dna_sd)
     # Build msr header
@@ -725,7 +693,7 @@ def gsi2class(gsi_list):
         dms = readgsiword16(gsi_line, '21.324') / 100000
         degmin, second = divmod(abs(dms) * 1000, 10)
         degree, minute = divmod(degmin, 100)
-        return AngleObs(degree, minute, second * 10)
+        return DMSAngle(degree, minute, second * 10)
 
     def parse_slope(gsi_line):
         return (readgsiword16(gsi_line, '31..')) / 10000
@@ -749,7 +717,7 @@ def gsi2class(gsi_list):
             face = 'FR'
         else:
             face = 'FL'
-        return face, AngleObs(degrees, minutes, seconds * 10)
+        return face, DMSAngle(degrees, minutes, seconds * 10)
 
     gsi_project = []
     for record in gsi_list:
@@ -834,7 +802,18 @@ def meanfaces(ob1, ob2):
         else:
             raise ValueError('Incompatible Face Values')
         # Calculate means, return new observation
-        meaned_hz = (ob1.hz_obs + ob2.hz_obs) / 2
+        if abs(ob1.hz_obs.dec() - ob2.hz_obs.dec()) < 180:
+            meaned_hz = (ob1.hz_obs + ob2.hz_obs) / 2
+        elif ob1.hz_obs < ob2.hz_obs:
+            ob2_shift = DMSAngle(360) - ob2.hz_obs
+            meaned_hz = (ob1.hz_obs + ob2_shift) / 2
+            if meaned_hz < DMSAngle(0):
+                meaned_hz = meaned_hz + DMSAngle(360)
+        elif ob2.hz_obs < ob1.hz_obs:
+            ob1_shift = DMSAngle(360) - ob1.hz_obs
+            meaned_hz = (ob1_shift + ob2.hz_obs) / 2
+            if meaned_hz < DMSAngle(0):
+                meaned_hz = meaned_hz + DMSAngle(360)
         meaned_va = (ob1.va_obs + ob2.va_obs) / 2
         meaned_sd = round(((ob1.sd_obs + ob2.sd_obs) / 2), 4)
         return Observation(ob1.from_id,
@@ -900,16 +879,16 @@ def reducesetup(obslist, strict=False, zerodist=False):
                 for pair in pairedlist:
                     meanob = meanfaces(pair[0], pair[1])
                     meanedobs.append(meanob)
-    return meanedobs
+    # Order list of meaned obs
+    sorted_meanedobs = sorted(meanedobs, key=operator.attrgetter('hz_obs'))
+    return sorted_meanedobs
 
 
-def dnaout_dirset(obslist, same_stdev=True):
+def dnaout_dirset(obslist, same_stdev=True, stdev='1.0000', pointing_err=0.001):
     # Test for Single Observation
     if len(obslist) < 2:
         return []
     fromlist = []
-    pointing_err = 0.001  # 0.001m
-    stdev = '1.0000'  # 1sec
     for ob in obslist:
         fromlist.append(ob.from_id)
     fromlist = list(set(fromlist))
@@ -1000,10 +979,8 @@ def dnaout_sd(obslist):
     return dnaobs
 
 
-def dnaout_va(obslist, same_stdev=True):
+def dnaout_va(obslist, same_stdev=True, stdev='1.0000', pointing_err=0.001):
     dnaobs = []
-    pointing_err = 0.001
-    stdev = '1.0000'
     if same_stdev:
         for observation in obslist:
             # Format Line
