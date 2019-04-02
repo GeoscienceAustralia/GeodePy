@@ -1,0 +1,31 @@
+DNA Converter Config File
+
+Constrain Points
+SB13
+
+Rename Observations (old id, new id)
+13,SB13
+1306,1302
+1307,1305
+1317,1308
+1318,1309
+1319,1310
+1320,1311
+1321,1312
+1326,1316
+1327,1302
+1328,1302
+
+Remove Observations (id)
+1313
+1314
+1315
+1322
+1323
+1324
+1325
+
+Blockshift (east, north, up)
+0.6019
+1.4193
+-0.1436
