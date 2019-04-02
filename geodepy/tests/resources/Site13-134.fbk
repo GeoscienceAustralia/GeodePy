@@ -18,9 +18,9 @@ PRISM 2.108
 STN 13 1.652
 BS 1302 256.3353
 F1 VA 1302 256.3353 152.758 88.3029 "Bs"
-! Calculated: AR256°33'53", HD152.714, Z397.528
-! Measured: AR256°33'53", HD152.706, Z397.529
-! Delta: AR0°00'00", HD-0.008, Z0.001
+! Calculated: AR256Â°33'53", HD152.714, Z397.528
+! Measured: AR256Â°33'53", HD152.706, Z397.529
+! Delta: AR0Â°00'00", HD-0.008, Z0.001
 ! P.C. mm Applied: -30.0000 (-30mm:foresight)
 ! P.C. mm Applied: -11.3000 (Leica 360:backsight)
 ! P.C. mm Applied: -30.0000 (-30mm:foresight)
@@ -99,9 +99,9 @@ PRISM 1.599
 STN 1304 1.827
 BS 13 178.3404
 F1 VA 13 178.3404 40.975 91.2107 ""
-! Calculated: AR178°34'04", HD40.963, Z394.008
-! Measured: AR178°34'04", HD40.963, Z394.011
-! Delta: AR0°00'00", HD0.000, Z0.003
+! Calculated: AR178Â°34'04", HD40.963, Z394.008
+! Measured: AR178Â°34'04", HD40.963, Z394.011
+! Delta: AR0Â°00'00", HD0.000, Z0.003
 ! P.C. mm Applied: -30.0000 (-30mm:foresight)
 ! P.C. mm Applied: 0.0000 (Reflectorless:foresight)
 ! P.C. mm Applied: -30.0000 (-30mm:foresight)
@@ -140,18 +140,18 @@ F1 VA 1316 30.0228 3.305 111.2112 "Bolt"
 ! TM16:13:01
 ! P.C. mm Applied: -11.3000 (Leica 360:backsight)
 ! Backsight Check: PT 13
-! Calculated: AR178°34'04", HD40.963, Z394.008
-! Measured: AR178°34'04", HD40.963, Z394.010
-! Delta: AR0°00'01", HD0.000, Z0.002
+! Calculated: AR178Â°34'04", HD40.963, Z394.008
+! Measured: AR178Â°34'04", HD40.963, Z394.010
+! Delta: AR0Â°00'01", HD0.000, Z0.002
 ! P.C. mm Applied: 0.0000 (Reflectorless:foresight)
 ! P.C. mm Applied: -11.3000 (Leica 360:backsight)
 PRISM 1.599
 STN 1305 1.767
 BS 13 177.1803
 F1 VA 13 177.1803 45.318 91.1311 ""
-! Calculated: AR177°18'03", HD45.307, Z394.008
-! Measured: AR177°18'03", HD45.307, Z394.011
-! Delta: AR0°00'00", HD0.000, Z0.003
+! Calculated: AR177Â°18'03", HD45.307, Z394.008
+! Measured: AR177Â°18'03", HD45.307, Z394.011
+! Delta: AR0Â°00'00", HD0.000, Z0.003
 ! P.C. mm Applied: 0.0000 (Reflectorless:foresight)
 ! P.C. mm Applied: -30.0000 (-30mm:foresight)
 ! P.C. mm Applied: 0.0000 (Reflectorless:foresight)
@@ -191,9 +191,9 @@ F1 VA 1326 121.4749 3.343 111.0323 "Bolt"
 ! TM16:34:38
 ! P.C. mm Applied: -11.3000 (Leica 360:backsight)
 ! Backsight Check: PT 13
-! Calculated: AR177°18'03", HD45.307, Z394.008
-! Measured: AR177°18'18", HD45.308, Z394.010
-! Delta: AR0°00'15", HD0.001, Z0.002
+! Calculated: AR177Â°18'03", HD45.307, Z394.008
+! Measured: AR177Â°18'18", HD45.308, Z394.010
+! Delta: AR0Â°00'15", HD0.001, Z0.002
 ! P.C. mm Applied: 0.0000 (Reflectorless:foresight)
 ! P.C. mm Applied: -30.0000 (-30mm:foresight)
 PRISM 2.111
@@ -202,16 +202,16 @@ F1 VA 1327 241.0732 167.211 88.5650 "chk1302"
 ! TM16:41:51
 ! P.C. mm Applied: -11.3000 (Leica 360:backsight)
 ! Backsight Check: PT 13
-! Calculated: AR177°18'03", HD45.307, Z394.008
-! Measured: AR177°18'10", HD45.308, Z394.011
-! Delta: AR0°00'07", HD0.000, Z0.003
+! Calculated: AR177Â°18'03", HD45.307, Z394.008
+! Measured: AR177Â°18'10", HD45.308, Z394.011
+! Delta: AR0Â°00'07", HD0.000, Z0.003
 ! P.C. mm Applied: -30.0000 (-30mm:foresight)
 F1 VA 1328 241.0733 167.211 88.5648 "chk1302"
 ! DT05-14-2018
 ! TM16:43:30
 ! P.C. mm Applied: -11.3000 (Leica 360:backsight)
 ! Backsight Check: PT 13
-! Calculated: AR177°18'03", HD45.307, Z394.008
-! Measured: AR177°18'10", HD45.307, Z394.011
-! Delta: AR0°00'07", HD0.000, Z0.003
+! Calculated: AR177Â°18'03", HD45.307, Z394.008
+! Measured: AR177Â°18'10", HD45.307, Z394.011
+! Delta: AR0Â°00'07", HD0.000, Z0.003
 ! P.C. mm Applied: -30.0000 (-30mm:foresight)

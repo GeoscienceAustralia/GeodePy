@@ -15,8 +15,11 @@ class TestSurveyConvert(unittest.TestCase):
         temp_fbk_filepath = os.path.join(tempdir.name, 'Site13-134.fbk')
         temp_gpy_filepath = os.path.join(tempdir.name, 'Site13-134.gpy')
         fbk2msr(temp_fbk_filepath, temp_gpy_filepath, strict=False, zerodist=False, same_stdev=False)
-        assert ([row for row in open(os.path.join(abs_path, 'resources/Site13-134.msr'))]
-                == [row for row in open(os.path.join(tempdir.name, 'Site13-134.msr'))])
+        original_msr = open(os.path.join(abs_path, 'resources/Site13-134.msr'))
+        temp_msr = open(os.path.join(tempdir.name, 'Site13-134.msr'))
+        assert [row for row in original_msr] == [row for row in temp_msr]
+        original_msr.close()
+        temp_msr.close()
 
     def test_writestn(self):
         abs_path = os.path.abspath(os.path.dirname(__file__))
@@ -26,8 +29,11 @@ class TestSurveyConvert(unittest.TestCase):
             shutil.copy(os.path.join(abs_path, 'resources', f), tempdir.name)
         temp_txt_filepath = os.path.join(tempdir.name, 'Site13-134.txt')
         writestn(temp_txt_filepath, 'S56')
-        assert([row for row in open(os.path.join(abs_path, 'resources/Site13-134.stn'))]
-               == [row for row in open(os.path.join(tempdir.name, 'Site13-134.stn'))])
+        original_stn = open(os.path.join(abs_path, 'resources/Site13-134.stn'))
+        temp_stn = open(os.path.join(tempdir.name, 'Site13-134.stn'))
+        assert [row for row in original_stn] == [row for row in temp_stn]
+        original_stn.close()
+        temp_stn.close()
 
 
 if __name__ == '__main__':
