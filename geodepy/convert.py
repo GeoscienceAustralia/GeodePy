@@ -23,7 +23,7 @@ def hp2dec(hp):
 
 
 class DMSAngle(object):
-    def __init__(self, degree, minute, second):
+    def __init__(self, degree=0, minute=0, second=0):
         self.degree = int(degree)
         self.minute = abs(int(minute))
         self.second = abs(second)
@@ -63,6 +63,12 @@ class DMSAngle(object):
 
     def __ne__(self, other):
         return self.dec() != other.dec()
+
+    def __lt__(self, other):
+        return self.dec() < other.dec()
+
+    def __gt__(self, other):
+        return self.dec() > other.dec()
 
     def dec(self):
         if self.degree >= 0:
