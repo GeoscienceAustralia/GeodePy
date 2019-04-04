@@ -8,6 +8,7 @@ Survey Data Converter - Class Tools Module
 import itertools
 import operator
 from geodepy.convert import DMSAngle
+from geodepy.survey import first_vel_corrn
 
 
 class Coordinate(object):
@@ -232,3 +233,18 @@ def reducesetup(obslist, strict=False, zerodist=False):
     # Order list of meaned obs
     sorted_meanedobs = sorted(meanedobs, key=operator.attrgetter('hz_obs'))
     return sorted_meanedobs
+
+
+def first_vel_observations(obslist, params, temp, pressure, rel_humidity):
+    """
+    Performs a first velocity correction for all observed slope distances in a list of Observations
+    :param obslist: List of Observations (i.e. from one InstSetup)
+    :param params: Tuple of First Velocity Parameters C and D (see function first_vel_params)
+    :param temp: Observed Temperature (degrees Celsius)
+    :param pressure: Observed Pressure (hectopascals or millibars)
+    :param rel_humidity: Observed Relative Humidity (percentage)
+    :return: List of Observations with First Velocity Correction applied
+    """
+    for obs in obslist:
+        obs.sd_obs = obs.sd_obs + first_vel_corrn(obs.sd_obs, params, temp, pressure, rel_humidity)
+    return obslist
