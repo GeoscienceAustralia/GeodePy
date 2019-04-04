@@ -53,7 +53,7 @@ def gsi2msr(path, cfg_path=None):
             elif line.startswith('S'):
                 sdcount += 1
     obscount = dircount + vacount + sdcount
-    now = datetime.now()
+    now = datetime(2020, 1, 1)
     date = (str(now.day).rjust(2, '0') + '.'
             + str(now.month).rjust(2, '0') + '.'
             + str(now.year))
