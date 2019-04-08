@@ -9,8 +9,9 @@ Note: These tools are designed to work with the Leica GSI Format File xxxxxxxxxx
 import os
 from datetime import datetime
 from geodepy.convert import DMSAngle
-from geodepy.surveyconvert.config import readconfig, renameobs, removeobs
-from geodepy.surveyconvert.classtools import Coordinate, InstSetup, Observation, reducesetup
+from geodepy.survey import first_vel_params
+from geodepy.surveyconvert.config import readconfig, renameobs, removeobs, first_vel_cfg
+from geodepy.surveyconvert.classtools import Coordinate, InstSetup, Observation, reducesetup, first_vel_observations
 from geodepy.surveyconvert.dna import dnaout_dirset, dnaout_va, dnaout_sd
 
 
@@ -29,10 +30,25 @@ def gsi2msr(path, cfg_path=None):
         gsi_project = renameobs(cfg, gsi_project)
         # Remove obs as per config file
         gsi_project = removeobs(cfg, gsi_project)
+        # Get First Velocity Correction Observations
+        first_vel_obs = first_vel_cfg(cfg)
+    else:
+        first_vel_obs = None
     # Reduce observations in setups
     for setup in gsi_project:
         reduced_obs = reducesetup(setup.observation, strict=False, zerodist=False)
         setup.observation = reduced_obs
+    # Perform First Velocity Correction
+    if first_vel_obs is not None:
+        # Use wavelength and standard atmospheric parameters to get Parameters C and D
+        params = first_vel_params(first_vel_obs[0])
+        for setup in gsi_project:
+            corrected_obs = first_vel_observations(setup.observation,
+                                                   params,
+                                                   first_vel_obs[1],  # Observed Temperature
+                                                   first_vel_obs[2],  # Observed Pressure
+                                                   first_vel_obs[3])  # Observed Relative Humidity
+            setup.observation = corrected_obs
     # Produce Measurement format data from setups
     msr_raw = []
     for setup in gsi_project:

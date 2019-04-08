@@ -65,3 +65,17 @@ def removeobs(cfg_list, project):
                 elif remove_id == obs.to_id:
                     del setup.observation[num]
     return project
+
+
+def first_vel_cfg(cfg_list):
+    # Find First Velocity Parameter Inputs in cfg_list
+    for group in cfg_list:
+        group_header = group[0].lower()
+        if group_header.startswith('first vel'):
+            wavelength = float(group[1])
+            temperature = float(group[2])
+            pressure = float(group[3])
+            rel_humidity = float(group[4])
+            return wavelength, temperature, pressure, rel_humidity
+    else:
+        return None
