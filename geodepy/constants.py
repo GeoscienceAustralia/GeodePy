@@ -26,11 +26,17 @@ class Ellipsoid(object):
         self.n2 = self.n ** 2
 
 
-# Geodetic Reference System 1980
-grs80 = Ellipsoid(6378137, 298.25722210088)
+# Geodetic Reference System 1980 (http://www.epsg-registry.org/export.htm?gml=urn:ogc:def:ellipsoid:EPSG::7019)
+grs80 = Ellipsoid(6378137, 298.257222101)
 
-# Australian National Spheroid (See GDA94 Tech Manual v2.4 pp 7)
+# World Geodetic System 1984 (http://www.epsg-registry.org/export.htm?gml=urn:ogc:def:ellipsoid:EPSG::7030)
+wgs84 = Ellipsoid(6378137, 298.257223563)
+
+# Australian National Spheroid (http://www.epsg-registry.org/export.htm?gml=urn:ogc:def:ellipsoid:EPSG::7003)
 ans = Ellipsoid(6378160, 298.25)
+
+# International (Hayford) 1924 (http://www.epsg-registry.org/export.htm?gml=urn:ogc:def:ellipsoid:EPSG::7022)
+intl24 = Ellipsoid(6378388, 297)
 
 
 # Projections
