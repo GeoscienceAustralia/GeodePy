@@ -88,9 +88,6 @@ def fbk2msr(path, cfg_path, strict=False, zerodist=False, same_stdev=False):
     # output will be dna msr file
     return msr
 
-# Debug - Example fbk file
-# testfbk = '\\geodepy\\tests\\resources\\Site01-152.fbk'
-
 
 def writestn(file, utmzone):
     """
@@ -201,9 +198,6 @@ def writestn(file, utmzone):
             stn_file.write(line + '\n')
     return stn
 
-# Debug - Example txt file
-# testcoord = '\\geodepy\\tests\\resources\\Site01-152.txt'
-
 
 def stripfile(filedata, listofterms):
     """
@@ -307,7 +301,7 @@ def readfbk(filepath):
         stn_index.append(len(stage5))
         fbk_listbystation = []
         # Create lists of fbk data with station records as first element
-        for i in range(0,len(stn_index) - 1):
+        for i in range(0, len(stn_index) - 1):
             fbk_listbystation.append(stage5[stn_index[i] - 1:stn_index[i + 1] - 1])
         del fbk_listbystation[0]
         # for i in range(0, (len(stn_index) - 1)):
@@ -344,13 +338,13 @@ def fbk2class(fbk_list):
         if setup_list[0][0] == 'STN' and len(setup_list[0]) <= 3:
             # This is the station information part
             from_id = setup_list[0][1]
-            inst_height = setup_list[0][2]
+            inst_height = float(setup_list[0][2])
             coord = Coordinate(from_id, 'utm', 'gda94', 'gda94',
                                '2018.1', 0, 0, 0)
             setup = InstSetup(from_id, coord)
         elif setup_list[0][0] == 'STN' and len(setup_list[0]) > 3:
             from_id = setup_list[0][1]
-            inst_height = setup_list[0][2]
+            inst_height = float(setup_list[0][2])
             east = float(setup_list[0][3])
             north = float(setup_list[0][4])
             elev = float(setup_list[0][5])
