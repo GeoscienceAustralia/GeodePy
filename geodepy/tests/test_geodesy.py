@@ -3,7 +3,7 @@ import os.path
 import numpy as np
 import numpy.lib.recfunctions as rfn
 from geodepy.convert import hp2dec, dec2hp
-from geodepy.geodesy import vincinv, vincdir
+from geodepy.geodesy import vincinv, vincdir, vincinv_utm, vincdir_utm
 
 
 class TestGeodesy(unittest.TestCase):
@@ -29,6 +29,35 @@ class TestGeodesy(unittest.TestCase):
         lat2, long2, azimuth2to1 = vincdir(lat1, long1, azimuth1to2, ell_dist)
         self.assertEqual(round(dec2hp(lat2), 8), -37.39101561)
         self.assertEqual(round(dec2hp(long2), 8), 143.55353839)
+        self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
+
+    def test_vincinv_utm(self):
+        # Flinders Peak (UTM)
+        zone1 = 55
+        east1 = 273741.2966
+        north1 = 5796489.7769
+        # Buninyong (UTM)
+        zone2 = 54
+        east2 = 758173.7973
+        north2 = 5828674.3402
+        ell_dist, azimuth1to2, azimuth2to1 = vincinv_utm(zone1, east1, north1, zone2, east2, north2)
+        self.assertEqual(round(ell_dist, 3), 54972.271)
+        self.assertEqual(round(dec2hp(azimuth1to2), 6), 306.520537)
+        self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
+
+    def test_vincdir_utm(self):
+        # Flinders Peak (UTM)
+        zone1 = 55
+        east1 = 273741.2966
+        north1 = 5796489.7769
+        # To Buninyong
+        azimuth1to2 = hp2dec(306.520537)
+        ell_dist = 54972.271
+        hemisphere2, zone2, east2, north2, azimuth2to1 = vincdir_utm(zone1, east1, north1, azimuth1to2, ell_dist)
+        self.assertEqual(hemisphere2, 'South')
+        self.assertEqual(zone2, 54)
+        self.assertEqual(round(east2, 4), 758173.7968)
+        self.assertEqual(round(north2, 4), 5828674.3395)
         self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
 
     def test_equality_vincentys(self):
