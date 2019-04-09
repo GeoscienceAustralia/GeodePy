@@ -79,3 +79,17 @@ def first_vel_cfg(cfg_list):
             return wavelength, temperature, pressure, rel_humidity
     else:
         return None
+
+
+def stdev_cfg(cfg_list):
+    # Find Survey Apriori Standard Deviations in cfg_list
+    for group in cfg_list:
+        group_header = group[0].lower()
+        if group_header.startswith('standard dev'):
+            stdev_angular = float(group[1])
+            stdev_pointing = float(group[2])
+            stdev_distconst = float(group[3])
+            stdev_distppm = float(group[4])
+            return stdev_angular, stdev_pointing, stdev_distconst, stdev_distppm
+    else:
+        return None

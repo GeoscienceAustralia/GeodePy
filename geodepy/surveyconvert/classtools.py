@@ -109,6 +109,7 @@ class Observation(object):
                            self.hz_obs,
                            self.vert_dist)
 
+
 def meanfaces(ob1, ob2):
     """
     Take two Observations and return their mean Face Left Sense Observation

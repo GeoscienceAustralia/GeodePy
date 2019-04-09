@@ -10,7 +10,7 @@ import os
 from datetime import datetime
 from geodepy.convert import DMSAngle
 from geodepy.survey import first_vel_params
-from geodepy.surveyconvert.config import readconfig, renameobs, removeobs, first_vel_cfg
+from geodepy.surveyconvert.config import readconfig, renameobs, removeobs, first_vel_cfg, stdev_cfg
 from geodepy.surveyconvert.classtools import Coordinate, InstSetup, Observation, reducesetup, first_vel_observations
 from geodepy.surveyconvert.dna import dnaout_dirset, dnaout_va, dnaout_sd
 
@@ -32,8 +32,11 @@ def gsi2msr(path, cfg_path=None):
         gsi_project = removeobs(cfg, gsi_project)
         # Get First Velocity Correction Observations
         first_vel_obs = first_vel_cfg(cfg)
+        # Get Standard Deviation Parameters
+        stdev_params = stdev_cfg(cfg)
     else:
         first_vel_obs = None
+        stdev_params = None
     # Reduce observations in setups
     for setup in gsi_project:
         reduced_obs = reducesetup(setup.observation, strict=False, zerodist=False)
@@ -51,10 +54,12 @@ def gsi2msr(path, cfg_path=None):
             setup.observation = corrected_obs
     # Produce Measurement format data from setups
     msr_raw = []
+    if stdev_params is None:
+        stdev_params = (1, 0.001, 0.001, 1)  # Default standard deviation parameters
     for setup in gsi_project:
-        dna_dirset = dnaout_dirset(setup.observation, same_stdev=False)
-        dna_va = dnaout_va(setup.observation, same_stdev=False)
-        dna_sd = dnaout_sd(setup.observation)
+        dna_dirset = dnaout_dirset(setup.observation, False, stdev_params[0], stdev_params[1])
+        dna_va = dnaout_va(setup.observation, False, stdev_params[0], stdev_params[1])
+        dna_sd = dnaout_sd(setup.observation, stdev_params[2], stdev_params[3])
         msr_raw.append(dna_dirset + dna_va + dna_sd)
     # Build msr header
     dircount = 0

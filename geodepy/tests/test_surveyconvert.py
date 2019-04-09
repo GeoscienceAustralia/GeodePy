@@ -51,6 +51,20 @@ class TestSurveyConvert(unittest.TestCase):
         original_stn.close()
         temp_stn.close()
 
+    def test_gsi2msr_no_config(self):
+        abs_path = os.path.abspath(os.path.dirname(__file__))
+        tempdir = tempfile.TemporaryDirectory()
+        files = ['ST0618HZ.gsi']
+        for f in files:
+            shutil.copy(os.path.join(abs_path, 'resources', f), tempdir.name)
+        temp_gsi_filepath = os.path.join(tempdir.name, 'ST0618HZ.gsi')
+        gsi2msr(temp_gsi_filepath)
+        original_stn = open(os.path.join(abs_path, 'resources/ST0618HZ_noconfig.msr'))
+        temp_stn = open(os.path.join(tempdir.name, 'ST0618HZ.msr'))
+        assert [row for row in original_stn] == [row for row in temp_stn]
+        original_stn.close()
+        temp_stn.close()
+
 
 if __name__ == '__main__':
     unittest.main()
