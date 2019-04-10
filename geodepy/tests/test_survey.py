@@ -1,5 +1,5 @@
 import unittest
-from geodepy.survey import first_vel_params, first_vel_corrn
+from geodepy.survey import first_vel_params, first_vel_corrn, va_conv
 
 
 class TestSurveyConvert(unittest.TestCase):
@@ -23,6 +23,31 @@ class TestSurveyConvert(unittest.TestCase):
         correction = first_vel_corrn(raw_obs_distance, params, obs_temperature, obs_pressure, obs_relative_humidity)
         corrected_obs_distance = raw_obs_distance + correction
         self.assertEqual(round(corrected_obs_distance, 4), 1117.8618)
+
+    def test_va_conv(self):
+        test1 = va_conv(92.24305555555556, 2116.254)
+        self.assertAlmostEqual(test1[0], -2.243055555555556, 14)
+        self.assertEqual(test1[1], 2116.254)
+        self.assertAlmostEqual(test1[2], 2114.6325, 5)
+        self.assertAlmostEqual(test1[3], -82.82744, 5)
+        test2 = va_conv(83.18694444444445, 145.145, 1.62, 0.05)
+        self.assertEqual(test2[0], 7.427622182644272)
+        self.assertAlmostEqual(test2[1], 145.33961, 5)
+        self.assertAlmostEqual(test2[2], 144.12006, 5)
+        self.assertAlmostEqual(test2[3], 18.78858, 5)
+        test3 = va_conv(1.25, 12.23, 2.05)
+        self.assertAlmostEqual(test3[0], 88.92943808746813, 14)
+        self.assertAlmostEqual(test3[1], 14.27958, 5)
+        self.assertAlmostEqual(test3[2], 0.266796, 5)
+        self.assertAlmostEqual(test3[3], 14.277089, 5)
+        test4 = va_conv(264.70444444444445, 3.25, 1.4)
+        self.assertAlmostEqual(test4[0], 27.71315483945665, 14)
+        self.assertAlmostEqual(test4[1], 3.65546, 5)
+        self.assertAlmostEqual(test4[2], 3.23613, 5)
+        self.assertAlmostEqual(test4[3], 1.69995, 5)
+        with self.assertRaises(ValueError):
+            va_conv(-3.62, 1.5)
+            va_conv('brian', 16)
 
 
 if __name__ == '__main__':

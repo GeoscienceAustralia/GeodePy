@@ -50,7 +50,7 @@ def dnaout_dirset(obslist, same_stdev=True, stdev_angular=1, stdev_pointing=0.00
     else:
         # calc stdev for first ob
         if obslist[0].sd_obs == 0:
-            stdev_pt = stdev_angular
+            stdev_pt = str(stdev_angular)
         else:
             pointing_err_pt = dd2sec(degrees(atan(stdev_pointing / obslist[0].sd_obs)))
             stdev_pt = str(sqrt((pointing_err_pt ** 2) + (stdev_angular ** 2)))
@@ -69,7 +69,7 @@ def dnaout_dirset(obslist, same_stdev=True, stdev_angular=1, stdev_pointing=0.00
         # create other lines using range(1:)
         for num in range(1, len(obslist)):
             if obslist[num].sd_obs == 0:  # keep
-                stdev_pt = stdev_angular
+                stdev_pt = str(stdev_angular)
             else:
                 pointing_err_pt = dd2sec(degrees(atan(stdev_pointing / obslist[num].sd_obs)))
                 stdev_pt = str(sqrt((pointing_err_pt ** 2) + (stdev_angular ** 2)))
@@ -127,7 +127,7 @@ def dnaout_va(obslist, same_stdev=True, stdev=1, stdev_pointing=0.001):
             # Calc Standard Deviation (in seconds) based on pointing error (in metres)
             # and angular standard deviation (in seconds)
             if observation.sd_obs == 0:
-                stdev_pt = stdev
+                stdev_pt = str(stdev)
             else:
                 pointing_err_pt = dd2sec(degrees(atan(stdev_pointing / observation.sd_obs)))
                 stdev_pt = str(sqrt((pointing_err_pt ** 2) + (stdev ** 2)))

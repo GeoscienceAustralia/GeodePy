@@ -5,7 +5,7 @@ Geoscience Australia - Python Geodesy Package
 Survey Module
 """
 
-from math import sqrt, sin, cos, asin, radians, degrees, exp
+from math import sqrt, sin, cos, atan, radians, degrees, exp
 from geodepy.convert import hp2dec, dec2hp
 
 
@@ -49,48 +49,45 @@ def first_vel_corrn(dist, first_vel_param, temp, pressure, rel_humidity):
     return first_vel_corrn_metres
 
 
-def va_conv(verta_hp, slope_dist, height_inst=0, height_tgt=0):
+def va_conv(zenith_angle, slope_dist, height_inst=0, height_tgt=0):
     """
     Function to convert vertical angles (zenith distances) and slope distances
     into horizontal distances and changes in height. Instrument and Target
     heights can be entered to allow computation of zenith and slope distances
     between ground points.
 
-    :param verta_hp:        Vertical Angle from Instrument to Target, expressed
-                            in HP Format (DDD.MMSSSSSS)
+    :param zenith_angle:    Zenith Angle from Instrument to Target, expressed
+                            in decimal degrees
     :param slope_dist:      Slope Distance from Instrument to Target in metres
     :param height_inst:     Height of Instrument. Optional - Default Value of 0m
     :param height_tgt:      Height of Target. Optional - Default Value of 0m
 
-    :return: verta_pt_hp:   Vertical Angle between Ground Points, expressed
-                            in HP Format (DDD.MMSSSSSS)
+    :return: vert_angle_pt: Vertical Angle between Ground Points, expressed
+                            in decimal degrees
     :return: slope_dist_pt: Slope Distance between Ground Points in metres
     :return: hz_dist:       Horizontal Distance
     :return: delta_ht:      Change in height between Ground Points in metres
     """
     # Convert Zenith Angle to Vertical Angle
     try:
-        if verta_hp == 0 or verta_hp == 180:
+        if zenith_angle == 0 or zenith_angle == 180:
             raise ValueError
-        elif 0 < verta_hp < 180:
-            verta = radians(90 - hp2dec(verta_hp))
-        elif 180 < verta_hp < 360:
-            verta = radians(270 - hp2dec(verta_hp))
+        elif 0 < zenith_angle < 180:
+            zenith_angle = radians(90 - zenith_angle)
+        elif 180 < zenith_angle < 360:
+            zenith_angle = radians(270 - zenith_angle)
         else:
             raise ValueError
     except ValueError:
         print('ValueError: Vertical Angle Invalid')
+        raise ValueError
         return
     # Calculate Horizontal Dist and Delta Height
-    hz_dist = slope_dist * cos(verta)
-    delta_ht = slope_dist * sin(verta)
+    hz_dist = slope_dist * cos(zenith_angle)
+    delta_ht = slope_dist * sin(zenith_angle)
     # Account for Target and Instrument Heights
-    if height_inst == 0 and height_tgt == 0:
-        verta_pt_hp = verta_hp
-        slope_dist_pt = slope_dist
-    else:
-        delta_ht = height_inst + delta_ht - height_tgt
-        slope_dist_pt = sqrt(delta_ht ** 2 + hz_dist ** 2)
-        verta_pt = asin(delta_ht / slope_dist)
-        verta_pt_hp = dec2hp(degrees(verta_pt) + 90)
-    return verta_pt_hp, slope_dist_pt, hz_dist, delta_ht
+    delta_ht = height_inst + delta_ht - height_tgt
+    slope_dist_pt = sqrt(delta_ht ** 2 + hz_dist ** 2)
+    vert_angle_pt = atan(delta_ht / hz_dist)
+    vert_angle_pt = degrees(vert_angle_pt)
+    return vert_angle_pt, slope_dist_pt, hz_dist, delta_ht
