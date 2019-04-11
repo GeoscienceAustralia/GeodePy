@@ -1,5 +1,5 @@
 import unittest
-from geodepy.survey import first_vel_params, first_vel_corrn, va_conv
+from geodepy.survey import first_vel_params, first_vel_corrn, precise_inst_ht, va_conv
 
 
 class TestSurveyConvert(unittest.TestCase):
@@ -48,6 +48,20 @@ class TestSurveyConvert(unittest.TestCase):
         with self.assertRaises(ValueError):
             va_conv(-3.62, 1.5)
             va_conv('brian', 16)
+
+    def test_precise_inst_ht(self):
+        va1 = 99.50920833333333
+        va2 = 95.67597222222223
+        va3 = 91.80145833333333
+        va4 = 87.90518055555556
+        test1 = precise_inst_ht([va1, va2, va3, va4], 0.4, 0.8)
+        self.assertEqual(test1[0], 1.78458)
+        self.assertEqual(test1[1], 0.00083)
+        test2 = precise_inst_ht([va3, va1, va2], 0.4, 0.8)
+        self.assertEqual(test2[0], 1.78441)
+        self.assertEqual(test2[1], 0.00109)
+        with self.assertRaises(ValueError):
+            precise_inst_ht([va1, va2], 0.4, 0.8)
 
 
 if __name__ == '__main__':

@@ -39,7 +39,7 @@ def gsi2msr(path, cfg_path=None):
         stdev_params = None
     # Reduce observations in setups
     for setup in gsi_project:
-        reduced_obs = reducesetup(setup.observation, strict=False, zerodist=False)
+        reduced_obs = reducesetup(setup.observation, strict=False, zerodist=True)
         setup.observation = reduced_obs
     # Perform First Velocity Correction
     if first_vel_obs is not None:
@@ -86,8 +86,12 @@ def gsi2msr(path, cfg_path=None):
     msr = [line for sublist in msr_raw for line in sublist]
     msr = [header] + msr
     # Output MSR File
-    fn, ext = os.path.splitext(path)
-    msr_fn = fn + '.msr'
+    if cfg_path is not None:
+        fn, ext = os.path.splitext(cfg_path)
+        msr_fn = fn + '.msr'
+    else:
+        fn, ext = os.path.splitext(path)
+        msr_fn = fn + '.msr'
     with open(msr_fn, 'w+') as msr_file:
         for line in msr:
             msr_file.write(line + '\n')
@@ -194,8 +198,12 @@ def gsi2stn(path, utmzone, cfg_path=None):
                 + utmzone.rjust(15))  # Hemisphere/Zone input
         stn.append(line)
     # Write line strings to file
-    fn, ext = os.path.splitext(path)
-    stn_fn = fn + '.stn'
+    if cfg_path is not None:
+        fn, ext = os.path.splitext(cfg_path)
+        stn_fn = fn + '.stn'
+    else:
+        fn, ext = os.path.splitext(path)
+        stn_fn = fn + '.stn'
     with open(stn_fn, 'w+') as stn_file:
         for line in stn:
             stn_file.write(line + '\n')

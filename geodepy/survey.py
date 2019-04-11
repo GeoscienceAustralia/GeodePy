@@ -6,7 +6,7 @@ Survey Module
 """
 
 from math import sqrt, sin, cos, atan, radians, degrees, exp
-from geodepy.convert import hp2dec, dec2hp
+from statistics import mean, stdev
 
 
 def first_vel_params(wavelength, temp=12, pressure=1013.25, rel_humidity=60):
@@ -49,6 +49,31 @@ def first_vel_corrn(dist, first_vel_param, temp, pressure, rel_humidity):
     return first_vel_corrn_metres
 
 
+def precise_inst_ht(vert_list, spacing, offset):
+    """
+    Uses a set of Vertical Angle Observations taken to a
+    levelling staff at regular intervals to determine the
+    height of the instrument above a reference mark
+    :param vert_list: List of Vertical (Zenith) Angle Observations (minimum of 3) in Decimal Degrees format
+    :param spacing: Distance in metres between each vertical angle observation
+    :param offset: Lowest observed height above reference mark
+    :return: Instrument Height above reference mark and its standard deviation
+    """
+    if len(vert_list) < 3:
+        raise ValueError('ValueError: 3 or more vertical angles required')
+    vert_list.sort(reverse=True)
+    vert_pairs = [(va1, va2) for va1, va2 in zip(vert_list, vert_list[1:])]
+    base_ht = []
+    height_comp = []
+    for num, pair in enumerate(vert_pairs):
+        base_ht_pair = offset + num * spacing
+        base_ht.append(base_ht_pair)
+        dist_a = sin(radians(pair[1])) * (spacing / (sin(radians(pair[0] - pair[1]))))
+        delta_ht = dist_a * (sin(radians(pair[0] - 90)))
+        height_comp.append(delta_ht + base_ht[num])
+    return round(mean(height_comp), 5), round(stdev(height_comp), 5)
+
+
 def va_conv(zenith_angle, slope_dist, height_inst=0, height_tgt=0):
     """
     Function to convert vertical angles (zenith distances) and slope distances
@@ -81,7 +106,6 @@ def va_conv(zenith_angle, slope_dist, height_inst=0, height_tgt=0):
     except ValueError:
         print('ValueError: Vertical Angle Invalid')
         raise ValueError
-        return
     # Calculate Horizontal Dist and Delta Height
     hz_dist = slope_dist * cos(zenith_angle)
     delta_ht = slope_dist * sin(zenith_angle)
