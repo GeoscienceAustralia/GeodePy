@@ -127,6 +127,12 @@ class DDMAngle(object):
     def __ne__(self, other):
         return self.dec() != other.dec()
 
+    def __lt__(self, other):
+        return self.dec() < other.dec()
+
+    def __gt__(self, other):
+        return self.dec() > other.dec()
+
     def dec(self):
         if self.degree >= 0:
             return self.degree + (self.minute / 60)

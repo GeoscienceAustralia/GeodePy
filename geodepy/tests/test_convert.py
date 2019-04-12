@@ -60,16 +60,29 @@ class TestConvert(unittest.TestCase):
         self.assertEqual(dec_ex, ddm_ex.dec())
         self.assertEqual(hp_ex, ddm_ex.hp())
         self.assertEqual(dms_ex, ddm_ex.dms())
+        self.assertEqual(hp_ex3, ddm_ex3.hp())
 
         # Test DDMAngle Overloads
         self.assertEqual(dec_ex + dec_ex2, (ddm_ex + ddm_ex2).dec())
         self.assertEqual(dec_ex - dec_ex2, (ddm_ex - ddm_ex2).dec())
         self.assertEqual(dec_ex * 5, (ddm_ex * 5).dec())
+        self.assertEqual(5 * dec_ex, (5 * ddm_ex).dec())
         self.assertEqual(dec_ex / 3, (ddm_ex / 3).dec())
         self.assertEqual(abs(-ddm_ex), ddm_ex)
         self.assertEqual(-ddm_ex2, ddm_ex3)
         self.assertEqual(ddm_ex2, abs(ddm_ex3))
         self.assertEqual(ddm_ex, dms_ex)
+        self.assertTrue(ddm_ex == ddm_ex)
+        self.assertFalse(ddm_ex == ddm_ex2)
+        self.assertTrue(ddm_ex != ddm_ex2)
+        self.assertFalse(ddm_ex != ddm_ex)
+        self.assertTrue(ddm_ex > ddm_ex2)
+        self.assertFalse(ddm_ex2 > ddm_ex)
+        self.assertTrue(ddm_ex2 < ddm_ex)
+        self.assertFalse(ddm_ex < ddm_ex2)
+        with self.assertRaises(TypeError):
+            ddm_ex * 'a'
+            'a' * ddm_ex
 
     def test_dec2dms(self):
         self.assertEqual(dms_ex, dec2dms(dec_ex))
