@@ -53,6 +53,7 @@ class TestConvert(unittest.TestCase):
         self.assertFalse(dms_ex < dms_ex2)
         with self.assertRaises(TypeError):
             dms_ex * 'a'
+        with self.assertRaises(TypeError):
             'a' * dms_ex
 
     def test_DDMAngle(self):
@@ -82,6 +83,7 @@ class TestConvert(unittest.TestCase):
         self.assertFalse(ddm_ex < ddm_ex2)
         with self.assertRaises(TypeError):
             ddm_ex * 'a'
+        with self.assertRaises(TypeError):
             'a' * ddm_ex
 
     def test_dec2dms(self):

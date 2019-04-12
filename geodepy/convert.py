@@ -103,14 +103,14 @@ class DDMAngle(object):
     def __mul__(self, other):
         try:
             return dec2ddm(self.dec() * other)
-        except ValueError:
-            raise ValueError('Multiply only defined between DMSAngle Object and Int or Float')
+        except TypeError:
+            raise TypeError('Multiply only defined between DMSAngle Object and Int or Float')
 
     def __rmul__(self, other):
         try:
             return dec2ddm(other * self.dec())
-        except ValueError:
-            raise ValueError('Multiply only defined between DMSAngle Object and Int or Float')
+        except TypeError:
+            raise TypeError('Multiply only defined between DMSAngle Object and Int or Float')
 
     def __truediv__(self, other):
         return dec2ddm(self.dec() / other)
