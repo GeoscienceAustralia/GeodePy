@@ -5,6 +5,7 @@ dec_ex = 123.74875
 dec_ex2 = 12.575
 hp_ex = 123.44555
 hp_ex2 = 12.3430
+hp_ex3 = -12.3430
 
 dms_ex = DMSAngle(123, 44, 55.5)
 dms_ex2 = DMSAngle(12, 34, 30)
@@ -29,17 +30,30 @@ class TestConvert(unittest.TestCase):
         # Test DMSAngle Methods
         self.assertEqual(dec_ex, dms_ex.dec())
         self.assertEqual(hp_ex, dms_ex.hp())
+        self.assertEqual(hp_ex3, dms_ex3.hp())
         self.assertEqual(ddm_ex, dms_ex.ddm())
 
         # Test DMSAngle Overloads
         self.assertEqual(dec_ex + dec_ex2, (dms_ex + dms_ex2).dec())
         self.assertEqual(dec_ex - dec_ex2, (dms_ex - dms_ex2).dec())
         self.assertEqual(dec_ex * 5, (dms_ex * 5).dec())
+        self.assertEqual(5 * dec_ex, (5 * dms_ex).dec())
         self.assertEqual(dec_ex / 3, (dms_ex / 3).dec())
         self.assertEqual(abs(-dms_ex), dms_ex)
         self.assertEqual(-dms_ex2, dms_ex3)
         self.assertEqual(dms_ex2, abs(dms_ex3))
         self.assertEqual(dms_ex, ddm_ex)
+        self.assertTrue(dms_ex == dms_ex)
+        self.assertFalse(dms_ex == dms_ex2)
+        self.assertTrue(dms_ex != dms_ex2)
+        self.assertFalse(dms_ex != dms_ex)
+        self.assertTrue(dms_ex > dms_ex2)
+        self.assertFalse(dms_ex2 > dms_ex)
+        self.assertTrue(dms_ex2 < dms_ex)
+        self.assertFalse(dms_ex < dms_ex2)
+        with self.assertRaises(TypeError):
+            dms_ex * 'a'
+            'a' * dms_ex
 
     def test_DDMAngle(self):
         # Test DDMAngle Methods
