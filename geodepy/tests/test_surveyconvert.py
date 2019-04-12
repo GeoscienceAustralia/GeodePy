@@ -21,6 +21,7 @@ class TestSurveyConvert(unittest.TestCase):
         assert [row for row in original_msr] == [row for row in temp_msr]
         original_msr.close()
         temp_msr.close()
+        tempdir.cleanup()
 
     def test_writestn(self):
         abs_path = os.path.abspath(os.path.dirname(__file__))
@@ -35,6 +36,7 @@ class TestSurveyConvert(unittest.TestCase):
         assert [row for row in original_stn] == [row for row in temp_stn]
         original_stn.close()
         temp_stn.close()
+        tempdir.cleanup()
 
     def test_gsi2msr(self):
         abs_path = os.path.abspath(os.path.dirname(__file__))
@@ -50,6 +52,7 @@ class TestSurveyConvert(unittest.TestCase):
         assert [row for row in original_stn] == [row for row in temp_stn]
         original_stn.close()
         temp_stn.close()
+        tempdir.cleanup()
 
     def test_gsi2msr_no_config(self):
         abs_path = os.path.abspath(os.path.dirname(__file__))
@@ -64,6 +67,18 @@ class TestSurveyConvert(unittest.TestCase):
         assert [row for row in original_stn] == [row for row in temp_stn]
         original_stn.close()
         temp_stn.close()
+        tempdir.cleanup()
+
+    def test_gsi2stn(self):
+        abs_path = os.path.abspath(os.path.dirname(__file__))
+        tempdir = tempfile.TemporaryDirectory()
+        files = ['ST0618HZ.gsi']
+        for f in files:
+            shutil.copy(os.path.join(abs_path, 'resources', f), tempdir.name)
+        temp_gsi_filepath = os.path.join(tempdir.name, 'ST0618HZ.gsi')
+        #TODO: finish test_gsi2stn testing
+        tempdir.cleanup()
+        pass
 
 
 if __name__ == '__main__':

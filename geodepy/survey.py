@@ -7,6 +7,7 @@ Survey Module
 
 from math import sqrt, sin, cos, atan, radians, degrees, exp
 from statistics import mean, stdev
+from geodepy.convert import rect2polar, polar2rect
 
 
 def first_vel_params(wavelength, temp=12, pressure=1013.25, rel_humidity=60):
@@ -74,6 +75,15 @@ def precise_inst_ht(vert_list, spacing, offset):
     return round(mean(height_comp), 5), round(stdev(height_comp), 5)
 
 
+def joins(east1, north1, east2, north2):
+    return rect2polar(east2 - east1, north2 - north1)
+
+
+def radiations(east1, north1, brg1to2, dist, rotation=0, psf=1):
+    delta_east, delta_north = polar2rect(dist * psf, brg1to2 + rotation)
+    return east1 + delta_east, north1 + delta_north
+
+
 def va_conv(zenith_angle, slope_dist, height_inst=0, height_tgt=0):
     """
     Function to convert vertical angles (zenith distances) and slope distances
@@ -104,8 +114,7 @@ def va_conv(zenith_angle, slope_dist, height_inst=0, height_tgt=0):
         else:
             raise ValueError
     except ValueError:
-        print('ValueError: Vertical Angle Invalid')
-        raise ValueError
+        raise ValueError('ValueError: Vertical Angle Invalid')
     # Calculate Horizontal Dist and Delta Height
     hz_dist = slope_dist * cos(zenith_angle)
     delta_ht = slope_dist * sin(zenith_angle)

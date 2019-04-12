@@ -1,5 +1,6 @@
 import unittest
-from geodepy.survey import first_vel_params, first_vel_corrn, precise_inst_ht, va_conv
+from geodepy.survey import first_vel_params, first_vel_corrn, precise_inst_ht, va_conv, radiations, joins
+from geodepy.convert import DMSAngle
 
 
 class TestSurveyConvert(unittest.TestCase):
@@ -62,6 +63,31 @@ class TestSurveyConvert(unittest.TestCase):
         self.assertEqual(test2[1], 0.00109)
         with self.assertRaises(ValueError):
             precise_inst_ht([va1, va2], 0.4, 0.8)
+
+    def test_joins(self):
+        test1 = joins(500, 500, 460.529, 493.218)
+        self.assertAlmostEqual(test1[0], 40.049, 3)
+        self.assertAlmostEqual(test1[1], 260.2505, 4)
+        test2 = joins(500, 500, 458.129, 515.419)
+        self.assertAlmostEqual(test2[0], 44.620, 3)
+        self.assertAlmostEqual(test2[1], 290.2162, 4)
+        test3 = joins(562.677, 548.598, 580.905, 569.481)
+        self.assertAlmostEqual(test3[0], 27.719, 3)
+        self.assertAlmostEqual(test3[1], 41.1165, 4)
+        test4 = joins(582.510, 488.332, 585.996, 463.264)
+        self.assertAlmostEqual(test4[0], 25.309, 3)
+        self.assertAlmostEqual(test4[1], 172.0831, 4)
+
+    def test_radiations(self):
+        test1 = radiations(500, 500, DMSAngle(290, 13).dec(), 44.620, DMSAngle(2, 18, 35).dec(), 1.002515)
+        self.assertAlmostEqual(test1[0], 458.681, 3)
+        self.assertAlmostEqual(test1[1], 517.137, 3)
+        test2 = radiations(500, 500, DMSAngle(290, 13).dec(), 44.620)
+        self.assertAlmostEqual(test2[0], 458.129, 3)
+        self.assertAlmostEqual(test2[1], 515.419, 3)
+        test3 = radiations(564.747, 546.148, DMSAngle(41, 7).dec(), 27.720, DMSAngle(2, 18, 35).dec(), 1.002515)
+        self.assertAlmostEqual(test3[0], 583.850, 3)
+        self.assertAlmostEqual(test3[1], 566.331, 3)
 
 
 if __name__ == '__main__':

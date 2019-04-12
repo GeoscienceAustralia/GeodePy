@@ -115,7 +115,7 @@ def gsi2stn(path, utmzone, cfg_path=None):
         ptlist[num] = ptlist[num].strip()
         ptlist[num] = ptlist[num].split(',')
         for place, item in enumerate(ptlist[num]):
-            if item == '0':
+            if item == '':
                 ptlist[num][place] = '0'
     # Read Config file contents
     if cfg_path is not None:

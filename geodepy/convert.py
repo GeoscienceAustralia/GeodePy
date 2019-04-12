@@ -5,7 +5,7 @@ Geoscience Australia - Python Geodesy Package
 Conversions Module
 """
 
-from math import modf
+from math import modf, sin, cos, atan2, radians, degrees, sqrt
 
 
 def dec2hp(dec):
@@ -169,6 +169,22 @@ def hp2ddm(hp):
     degree, minute = divmod(degmin, 100)
     minute = minute + (second / 6)
     return DDMAngle(degree, minute) if hp >= 0 else DDMAngle(-degree, minute)
+
+
+def polar2rect(r, theta):
+    x = r * sin(radians(theta))
+    y = r * cos(radians(theta))
+    return x, y
+
+
+def rect2polar(x, y):
+    r = sqrt(x ** 2 + y ** 2)
+    theta = atan2(x, y)
+    if theta < 0:
+        theta = degrees(theta) + 360
+    else:
+        theta = degrees(theta)
+    return r, theta
 
 
 # ----------------
