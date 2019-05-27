@@ -238,7 +238,7 @@ def readgsi(filepath):
         gsi_listbystation = []
         # Create lists of gsi data with station records as first element
         for j in range(0, len(stn_index)):
-            gsi_listbystation.append(gsidata[(stn_index[j - 1] - 1):(stn_index[j] - 1)])
+            gsi_listbystation.append(gsidata[(stn_index[j - 1] - 1):(stn_index[j])])
         del gsi_listbystation[0]
     return gsi_listbystation
 
@@ -320,11 +320,12 @@ def gsi2class(gsi_list):
                 to_stn = parse_ptid(line)
                 hz = parse_hz(line)
                 face, vert = parse_vert(line)
+                rounds = 0.5
                 slope = parse_slope(line)
                 tgtht = parse_tgtht(line)
                 instht = parse_instht(line)
                 obs = Observation(from_stn, to_stn, instht, tgtht,
-                                  face, hz, vert, slope)
+                                  face, rounds, hz, vert, slope)
                 obs_list.append(obs)
         if '84..' in record[0]:
             pt_id = parse_ptid(record[0])

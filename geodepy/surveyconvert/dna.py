@@ -53,7 +53,7 @@ def dnaout_dirset(obslist, same_stdev=True, stdev_angular=1, stdev_pointing=0.00
             stdev_pt = str(stdev_angular)
         else:
             pointing_err_pt = dd2sec(degrees(atan(stdev_pointing / obslist[0].sd_obs)))
-            stdev_pt = str(sqrt((pointing_err_pt ** 2) + (stdev_angular ** 2)))
+            stdev_pt = str((sqrt((pointing_err_pt ** 2) + (stdev_angular ** 2)))/sqrt(obslist[0].rounds))
         # create first line using obslist[0]
         line1 = ('D '
                  + obslist[0].from_id.ljust(20)
@@ -72,7 +72,7 @@ def dnaout_dirset(obslist, same_stdev=True, stdev_angular=1, stdev_pointing=0.00
                 stdev_pt = str(stdev_angular)
             else:
                 pointing_err_pt = dd2sec(degrees(atan(stdev_pointing / obslist[num].sd_obs)))
-                stdev_pt = str(sqrt((pointing_err_pt ** 2) + (stdev_angular ** 2)))
+                stdev_pt = str((sqrt((pointing_err_pt ** 2) + (stdev_angular ** 2)))/sqrt(obslist[num].rounds))
             line = ('D '
                     + ''.ljust(40)
                     + obslist[num].to_id.ljust(20)
@@ -89,6 +89,7 @@ def dnaout_dirset(obslist, same_stdev=True, stdev_angular=1, stdev_pointing=0.00
 def dnaout_sd(obslist, stdev_distconst=0.001, stdev_distppm=1):
     dnaobs = []
     for observation in obslist:
+        stdev = (stdev_distconst + ((stdev_distppm/1000000) * observation.sd_obs))/sqrt(observation.rounds)
         # Exclude slope distances of 0m
         if observation.sd_obs == 0:
             pass
@@ -99,7 +100,7 @@ def dnaout_sd(obslist, stdev_distconst=0.001, stdev_distppm=1):
                     + ''.ljust(19)
                     + ('{:.4f}'.format(observation.sd_obs)).rjust(9)
                     + ''.ljust(21)
-                    + ('{:.4f}'.format(stdev_distconst + ((stdev_distppm/1000000) * observation.sd_obs))).ljust(8)
+                    + ('{:.4f}'.format(stdev)).ljust(8)
                     + ('{:.4f}'.format(observation.inst_height).ljust(7))
                     + ('{:.4f}'.format(observation.target_height)))
             dnaobs.append(line)
@@ -130,7 +131,7 @@ def dnaout_va(obslist, same_stdev=True, stdev=1, stdev_pointing=0.001):
                 stdev_pt = str(stdev)
             else:
                 pointing_err_pt = dd2sec(degrees(atan(stdev_pointing / observation.sd_obs)))
-                stdev_pt = str(sqrt((pointing_err_pt ** 2) + (stdev ** 2)))
+                stdev_pt = str((sqrt((pointing_err_pt ** 2) + (stdev ** 2)))/sqrt(observation.rounds))
             # Format Line
             line = ('V '
                     + observation.from_id.ljust(20)

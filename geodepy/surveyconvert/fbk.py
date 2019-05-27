@@ -375,13 +375,14 @@ def fbk2class(fbk_list):
                 else:
                     ValueError('Invalid Vertical Angle in ' + record)
                 to_id = record[2]  # Read To ID
+                rounds = 0.5
                 hz_obs = parse_angle(record[3])  # 3 is Hz Ob (HP)
                 sd_obs = float(record[4])
                 va_obs = parse_angle(record[5])  # 5 is Vert Ob (HP)
                 target_height = float(record[7])
                 obs = Observation(from_id, to_id,
                                   inst_height, target_height,
-                                  face, hz_obs, va_obs, sd_obs)
+                                  face, rounds, hz_obs, va_obs, sd_obs)
                 obs_list.append(obs)
             # else:
             #     raise ValueError('Unexpected format found')

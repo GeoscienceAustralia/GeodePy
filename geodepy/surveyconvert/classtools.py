@@ -55,13 +55,14 @@ class InstSetup(object):
 
 class Observation(object):
     def __init__(self, from_id, to_id, inst_height=0.0, target_height=0.0,
-                 face='FL', hz_obs=DMSAngle(0, 0, 0), va_obs=DMSAngle(0, 0, 0),
+                 face='FL', rounds=0.5, hz_obs=DMSAngle(0, 0, 0), va_obs=DMSAngle(0, 0, 0),
                  sd_obs=0.0, hz_dist=0.0, vert_dist=0.0):
         self.from_id = from_id
         self.to_id = to_id
         self.inst_height = inst_height
         self.target_height = target_height
         self.face = face
+        self.rounds = rounds
         self.hz_obs = hz_obs
         self.va_obs = va_obs
         self.sd_obs = sd_obs
@@ -74,6 +75,7 @@ class Observation(object):
                 + '; inst_height ' + repr(self.inst_height)
                 + '; target_height ' + repr(self.target_height)
                 + '; face ' + repr(self.face)
+                + '; rounds ' + repr(self.rounds)
                 + '; hz_obs ' + repr(self.hz_obs)
                 + '; va_obs ' + repr(self.va_obs)
                 + '; sd_obs ' + repr(self.sd_obs)
@@ -103,6 +105,7 @@ class Observation(object):
                            self.inst_height,
                            self.target_height,
                            newface,
+                           self.rounds,
                            hz_switch,
                            va_switch,
                            self.sd_obs,
@@ -173,6 +176,7 @@ def meanfaces(ob1, ob2):
                            ob1.inst_height,
                            ob1.target_height,
                            ob1.face,
+                           ob1.rounds + ob2.rounds,
                            meaned_hz,
                            meaned_va,
                            meaned_sd)
@@ -189,7 +193,7 @@ def reducesetup(obslist, strict=False, zerodist=False):
     If False, these are ignored
     :return: a reduced list of Observations
     """
-
+    # TODO Add meanmulti to this function somehow
     # Remove obs with sd_obs == 0
     if not zerodist:
         for ob in obslist:
