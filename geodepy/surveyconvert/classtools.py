@@ -266,7 +266,7 @@ def reducesetup(obslist, strict=False, zerodist=False, meanmulti=False):
                 mean_hz + 360
             mean_va = mean(repeat_va)
             mean_sd = mean(repeat_sd)
-            # Comp number of rounds completed
+            # Compute number of rounds of observations completed
             sum_rounds = 0
             for ob in matchedobs:
                 sum_rounds += ob.rounds
