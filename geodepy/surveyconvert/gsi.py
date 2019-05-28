@@ -39,7 +39,7 @@ def gsi2msr(path, cfg_path=None):
         stdev_params = None
     # Reduce observations in setups
     for setup in gsi_project:
-        reduced_obs = reducesetup(setup.observation, strict=False, zerodist=True)
+        reduced_obs = reducesetup(setup.observation, strict=False, zerodist=True, meanmulti=True)
         setup.observation = reduced_obs
     # Perform First Velocity Correction
     if first_vel_obs is not None:

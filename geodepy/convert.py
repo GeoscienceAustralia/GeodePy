@@ -34,8 +34,14 @@ class DMSAngle(object):
     def __add__(self, other):
         return dec2dms(self.dec() + other.dec())
 
+    def __radd__(self, other):
+        return dec2dms(other.dec() + self.dec())
+
     def __sub__(self, other):
         return dec2dms(self.dec() - other.dec())
+
+    def __rsub__(self, other):
+        return dec2dms(other.dec() - self.dec())
 
     def __mul__(self, other):
         try:
