@@ -9,7 +9,7 @@ import os
 import numpy as np
 from geodepy.convert import DMSAngle
 from geodepy.survey import first_vel_params
-from geodepy.surveyconvert.config import readconfig, renameobs, removeobs, first_vel_cfg
+from geodepy.surveyconvert.config import readconfig, renameobs, removeobs, first_vel_cfg, stdev_cfg
 from geodepy.surveyconvert.classtools import Coordinate, InstSetup, Observation, reducesetup, first_vel_observations
 from geodepy.surveyconvert.dna import dnaout_dirset, dnaout_va, dnaout_sd
 
@@ -35,6 +35,8 @@ def fbk2msr(path, cfg_path, strict=False, zerodist=False, same_stdev=False):
     fbk_project = removeobs(cfg, fbk_project)
     # Get First Velocity Correction Observations
     first_vel_obs = first_vel_cfg(cfg)
+    # Get Standard Deviation Parameters
+    stdev_params = stdev_cfg(cfg)
     # Reduce observations in setups
     for setup in fbk_project:
         reduced_obs = reducesetup(setup.observation, strict, zerodist)
@@ -52,10 +54,12 @@ def fbk2msr(path, cfg_path, strict=False, zerodist=False, same_stdev=False):
             setup.observation = corrected_obs
     # Produce Measurement format data from setups
     msr_raw = []
+    if stdev_params is None:
+        stdev_params = (1, 0.001, 0.001, 1)  # Default standard deviation parameters
     for setup in fbk_project:
-        dna_dirset = dnaout_dirset(setup.observation, same_stdev)
-        dna_va = dnaout_va(setup.observation, same_stdev)
-        dna_sd = dnaout_sd(setup.observation)
+        dna_dirset = dnaout_dirset(setup.observation, same_stdev, stdev_params[0], stdev_params[1])
+        dna_va = dnaout_va(setup.observation, same_stdev, stdev_params[0], stdev_params[1])
+        dna_sd = dnaout_sd(setup.observation, stdev_params[2], stdev_params[3])
         msr_raw.append(dna_dirset + dna_va + dna_sd)
     # Build msr header
     dircount = 0
@@ -371,13 +375,14 @@ def fbk2class(fbk_list):
                 else:
                     ValueError('Invalid Vertical Angle in ' + record)
                 to_id = record[2]  # Read To ID
+                rounds = 0.5
                 hz_obs = parse_angle(record[3])  # 3 is Hz Ob (HP)
                 sd_obs = float(record[4])
                 va_obs = parse_angle(record[5])  # 5 is Vert Ob (HP)
                 target_height = float(record[7])
                 obs = Observation(from_id, to_id,
                                   inst_height, target_height,
-                                  face, hz_obs, va_obs, sd_obs)
+                                  face, rounds, hz_obs, va_obs, sd_obs)
                 obs_list.append(obs)
             # else:
             #     raise ValueError('Unexpected format found')

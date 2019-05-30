@@ -5,7 +5,7 @@ Geoscience Australia - Python Geodesy Package
 Conversions Module
 """
 
-from math import modf
+from math import modf, sin, cos, atan2, radians, degrees, sqrt
 
 
 def dec2hp(dec):
@@ -34,20 +34,26 @@ class DMSAngle(object):
     def __add__(self, other):
         return dec2dms(self.dec() + other.dec())
 
+    def __radd__(self, other):
+        return dec2dms(other.dec() + self.dec())
+
     def __sub__(self, other):
         return dec2dms(self.dec() - other.dec())
+
+    def __rsub__(self, other):
+        return dec2dms(other.dec() - self.dec())
 
     def __mul__(self, other):
         try:
             return dec2dms(self.dec() * other)
-        except ValueError:
-            raise ValueError('Multiply only defined between DMSAngle Object and Int or Float')
+        except TypeError:
+            raise TypeError('Multiply only defined between DMSAngle Object and Int or Float')
 
     def __rmul__(self, other):
         try:
             return dec2dms(other * self.dec())
-        except ValueError:
-            raise ValueError('Multiply only defined between DMSAngle Object and Int or Float')
+        except TypeError:
+            raise TypeError('Multiply only defined between DMSAngle Object and Int or Float')
 
     def __truediv__(self, other):
         return dec2dms(self.dec() / other)
@@ -103,14 +109,14 @@ class DDMAngle(object):
     def __mul__(self, other):
         try:
             return dec2ddm(self.dec() * other)
-        except ValueError:
-            raise ValueError('Multiply only defined between DMSAngle Object and Int or Float')
+        except TypeError:
+            raise TypeError('Multiply only defined between DMSAngle Object and Int or Float')
 
     def __rmul__(self, other):
         try:
             return dec2ddm(other * self.dec())
-        except ValueError:
-            raise ValueError('Multiply only defined between DMSAngle Object and Int or Float')
+        except TypeError:
+            raise TypeError('Multiply only defined between DMSAngle Object and Int or Float')
 
     def __truediv__(self, other):
         return dec2ddm(self.dec() / other)
@@ -126,6 +132,12 @@ class DDMAngle(object):
 
     def __ne__(self, other):
         return self.dec() != other.dec()
+
+    def __lt__(self, other):
+        return self.dec() < other.dec()
+
+    def __gt__(self, other):
+        return self.dec() > other.dec()
 
     def dec(self):
         if self.degree >= 0:
@@ -169,6 +181,22 @@ def hp2ddm(hp):
     degree, minute = divmod(degmin, 100)
     minute = minute + (second / 6)
     return DDMAngle(degree, minute) if hp >= 0 else DDMAngle(-degree, minute)
+
+
+def polar2rect(r, theta):
+    x = r * sin(radians(theta))
+    y = r * cos(radians(theta))
+    return x, y
+
+
+def rect2polar(x, y):
+    r = sqrt(x ** 2 + y ** 2)
+    theta = atan2(x, y)
+    if theta < 0:
+        theta = degrees(theta) + 360
+    else:
+        theta = degrees(theta)
+    return r, theta
 
 
 # ----------------

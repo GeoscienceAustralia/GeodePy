@@ -19,6 +19,11 @@ class TestGeodesy(unittest.TestCase):
         self.assertEqual(round(dec2hp(azimuth1to2), 6), 306.520537)
         self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
 
+        test2 = vincinv(lat1, long1, lat1, long1)
+        self.assertEqual(test2[0], 0)
+        self.assertEqual(test2[0], 0)
+        self.assertEqual(test2[2], 0)
+
     def test_vincdir(self):
         # Flinders Peak
         lat1 = hp2dec(-37.57037203)

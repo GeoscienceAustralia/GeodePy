@@ -7,7 +7,8 @@ Survey Data Converter - Class Tools Module
 
 import itertools
 import operator
-from geodepy.convert import DMSAngle
+from statistics import mean
+from geodepy.convert import DMSAngle, dec2dms
 from geodepy.survey import first_vel_corrn
 
 
@@ -55,13 +56,14 @@ class InstSetup(object):
 
 class Observation(object):
     def __init__(self, from_id, to_id, inst_height=0.0, target_height=0.0,
-                 face='FL', hz_obs=DMSAngle(0, 0, 0), va_obs=DMSAngle(0, 0, 0),
+                 face='FL', rounds=0.5, hz_obs=DMSAngle(0, 0, 0), va_obs=DMSAngle(0, 0, 0),
                  sd_obs=0.0, hz_dist=0.0, vert_dist=0.0):
         self.from_id = from_id
         self.to_id = to_id
         self.inst_height = inst_height
         self.target_height = target_height
         self.face = face
+        self.rounds = rounds
         self.hz_obs = hz_obs
         self.va_obs = va_obs
         self.sd_obs = sd_obs
@@ -74,6 +76,7 @@ class Observation(object):
                 + '; inst_height ' + repr(self.inst_height)
                 + '; target_height ' + repr(self.target_height)
                 + '; face ' + repr(self.face)
+                + '; rounds ' + repr(self.rounds)
                 + '; hz_obs ' + repr(self.hz_obs)
                 + '; va_obs ' + repr(self.va_obs)
                 + '; sd_obs ' + repr(self.sd_obs)
@@ -103,11 +106,13 @@ class Observation(object):
                            self.inst_height,
                            self.target_height,
                            newface,
+                           self.rounds,
                            hz_switch,
                            va_switch,
                            self.sd_obs,
                            self.hz_obs,
                            self.vert_dist)
+
 
 def meanfaces(ob1, ob2):
     """
@@ -172,12 +177,13 @@ def meanfaces(ob1, ob2):
                            ob1.inst_height,
                            ob1.target_height,
                            ob1.face,
+                           ob1.rounds + ob2.rounds,
                            meaned_hz,
                            meaned_va,
                            meaned_sd)
 
 
-def reducesetup(obslist, strict=False, zerodist=False):
+def reducesetup(obslist, strict=False, zerodist=False, meanmulti=False):
     """
     Takes a list of Observations from one setup and
     means together FL, FR pairs of Observations.
@@ -186,9 +192,10 @@ def reducesetup(obslist, strict=False, zerodist=False):
     single-face Obs are included and converted to Face Left
     :param zerodist: If True, Obs with Slope Distance of Zero are included.
     If False, these are ignored
+    :param meanmulti: If True, multiple rounds of observations are reduced
+    to a single FL-sense Observation
     :return: a reduced list of Observations
     """
-
     # Remove obs with sd_obs == 0
     if not zerodist:
         for ob in obslist:
@@ -230,6 +237,50 @@ def reducesetup(obslist, strict=False, zerodist=False):
                 for pair in pairedlist:
                     meanob = meanfaces(pair[0], pair[1])
                     meanedobs.append(meanob)
+    # Mean multiple repeated measurements into a single FL observation
+    if meanmulti:
+        multiob = []
+        to_ids = set([i.to_id for i in meanedobs])
+        for id in to_ids:
+            matchedobs = []
+            for ob in meanedobs:
+                if ob.to_id == id:
+                    matchedobs.append(ob)
+            ob1 = matchedobs[0]
+            repeat_hz = [ob.hz_obs.dec() for ob in matchedobs]
+            repeat_hz = sorted(repeat_hz)
+            repeat_va = [ob.va_obs.dec() for ob in matchedobs]
+            repeat_sd = [ob.sd_obs for ob in matchedobs]
+            # Finds where Horizontal Obseravtions are either side of 360, converts those on 360 side to negative
+            hz_diff = [j - i for i, j in zip(repeat_hz[:-1], repeat_hz[1:])]
+            bigjump = 1e100
+            for num, i in enumerate(hz_diff):
+                if i > 180:
+                    bigjump = num
+            for num, ob in enumerate(repeat_hz):
+                if num > bigjump:
+                    repeat_hz[num] = repeat_hz[num] - 360
+            # Mean Repeated Observations
+            mean_hz = mean(repeat_hz)
+            if mean_hz < 0:
+                mean_hz + 360
+            mean_va = mean(repeat_va)
+            mean_sd = mean(repeat_sd)
+            # Compute number of rounds of observations completed
+            sum_rounds = 0
+            for ob in matchedobs:
+                sum_rounds += ob.rounds
+            # Output Meaned Observation
+            multiob.append(Observation(ob1.from_id,
+                                       id,
+                                       ob1.inst_height,
+                                       ob1.target_height,
+                                       ob1.face,
+                                       sum_rounds,
+                                       dec2dms(mean_hz),
+                                       dec2dms(mean_va),
+                                       mean_sd))
+        meanedobs = multiob
     # Order list of meaned obs
     sorted_meanedobs = sorted(meanedobs, key=operator.attrgetter('hz_obs'))
     return sorted_meanedobs

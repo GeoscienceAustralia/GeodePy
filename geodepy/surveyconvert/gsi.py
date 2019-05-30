@@ -10,7 +10,7 @@ import os
 from datetime import datetime
 from geodepy.convert import DMSAngle
 from geodepy.survey import first_vel_params
-from geodepy.surveyconvert.config import readconfig, renameobs, removeobs, first_vel_cfg
+from geodepy.surveyconvert.config import readconfig, renameobs, removeobs, first_vel_cfg, stdev_cfg
 from geodepy.surveyconvert.classtools import Coordinate, InstSetup, Observation, reducesetup, first_vel_observations
 from geodepy.surveyconvert.dna import dnaout_dirset, dnaout_va, dnaout_sd
 
@@ -32,11 +32,14 @@ def gsi2msr(path, cfg_path=None):
         gsi_project = removeobs(cfg, gsi_project)
         # Get First Velocity Correction Observations
         first_vel_obs = first_vel_cfg(cfg)
+        # Get Standard Deviation Parameters
+        stdev_params = stdev_cfg(cfg)
     else:
         first_vel_obs = None
+        stdev_params = None
     # Reduce observations in setups
     for setup in gsi_project:
-        reduced_obs = reducesetup(setup.observation, strict=False, zerodist=False)
+        reduced_obs = reducesetup(setup.observation, strict=False, zerodist=True, meanmulti=True)
         setup.observation = reduced_obs
     # Perform First Velocity Correction
     if first_vel_obs is not None:
@@ -51,10 +54,12 @@ def gsi2msr(path, cfg_path=None):
             setup.observation = corrected_obs
     # Produce Measurement format data from setups
     msr_raw = []
+    if stdev_params is None:
+        stdev_params = (1, 0.001, 0.001, 1)  # Default standard deviation parameters
     for setup in gsi_project:
-        dna_dirset = dnaout_dirset(setup.observation, same_stdev=False)
-        dna_va = dnaout_va(setup.observation, same_stdev=False)
-        dna_sd = dnaout_sd(setup.observation)
+        dna_dirset = dnaout_dirset(setup.observation, False, stdev_params[0], stdev_params[1])
+        dna_va = dnaout_va(setup.observation, False, stdev_params[0], stdev_params[1])
+        dna_sd = dnaout_sd(setup.observation, stdev_params[2], stdev_params[3])
         msr_raw.append(dna_dirset + dna_va + dna_sd)
     # Build msr header
     dircount = 0
@@ -81,13 +86,128 @@ def gsi2msr(path, cfg_path=None):
     msr = [line for sublist in msr_raw for line in sublist]
     msr = [header] + msr
     # Output MSR File
-    fn, ext = os.path.splitext(path)
-    msr_fn = fn + '.msr'
+    if cfg_path is not None:
+        fn, ext = os.path.splitext(cfg_path)
+        msr_fn = fn + '.msr'
+    else:
+        fn, ext = os.path.splitext(path)
+        msr_fn = fn + '.msr'
     with open(msr_fn, 'w+') as msr_file:
         for line in msr:
             msr_file.write(line + '\n')
     # output will be dna msr file
     return msr
+
+
+def gsi2stn(path, utmzone, cfg_path=None):
+    """
+    Converts coordinate list file (.txt) associated with .fbk file into DNA v3 stn file
+    :param path: .txt co-ordinate list associated with .fbk file
+    :param utmzone: UTM Coordinate Zone as string i.e. 'S56' for Southern Hemisphere Zone 56
+    :param cfg_path: .gpy DNA conversion config file
+    :return: DNA v3 .stn file (same directory as source .fbk file)
+    """
+    # Read Data from file
+    with open(path) as raw:
+        ptlist = raw.readlines()
+    # Split comma separated values, replace blanks with zeroes
+    for num, line in enumerate(ptlist):
+        ptlist[num] = ptlist[num].strip()
+        ptlist[num] = ptlist[num].split(',')
+        for place, item in enumerate(ptlist[num]):
+            if item == '':
+                ptlist[num][place] = '0'
+    # Read Config file contents
+    if cfg_path is not None:
+        cfg_list = readconfig(cfg_path)
+        constrain_list = []
+        rename_list = []
+        remove_list = []
+        for group in cfg_list:
+            group_header = group[0].lower()
+            if group_header.startswith('constrain'):
+                constrain_list = group[1:]
+            elif group_header.startswith('rename'):
+                rename_list = group[1:]
+            elif group_header.startswith('remove'):
+                remove_list = group[1:]
+
+            # Perform Block Shift of Coordinates as Specified in Config
+            elif group_header.startswith('blockshift'):
+                shift_list = group[1:]
+                delta_east = shift_list[0]
+                delta_north = shift_list[1]
+                delta_up = shift_list[2]
+                for pt in ptlist:
+                    pt[1] = str('{:.4f}'.format(float(pt[1]) + float(delta_east)))
+                    pt[2] = str('{:.4f}'.format(float(pt[2]) + float(delta_north)))
+                    pt[3] = str('{:.4f}'.format(float(pt[3]) + float(delta_up)))
+
+        # Rename Points as per Config file
+        for num, i in enumerate(rename_list):
+            rename_list[num] = i.split(',')
+        for pt_rename in rename_list:
+            for num, pt in enumerate(ptlist):
+                if pt[0] == pt_rename[0]:
+                    ptlist[num][0] = pt_rename[1]
+
+        # Remove Points as per Config file
+        for pt_rem in remove_list:
+            for num, pt in enumerate(ptlist):
+                if pt[0] == pt_rem:
+                    del ptlist[num]
+
+        # Set Points in Config Constrains list to 'CCC'
+        for num, pt in enumerate(ptlist):
+            ptlist[num] = ['FFF'] + pt
+        for pt_constrain in constrain_list:
+            for num, pt in enumerate(ptlist):
+                if pt[1] == pt_constrain:
+                    ptlist[num][0] = 'CCC'
+
+    # Remove Duplicate Station Points
+    cleanlist = []
+    deduplist = []
+    dedupnum = []
+    for num, pt in enumerate(ptlist):
+        if pt[1] not in deduplist:
+            deduplist.append(pt[1])
+            dedupnum.append(num)
+    for num in dedupnum:
+        cleanlist.append(ptlist[num])
+
+    # Write header line
+    stn = []
+    now = datetime(2020, 1, 1)
+    header = ('!#=DNA 3.01 STN    '
+              + str(now.day).rjust(2, '0') + '.'
+              + str(now.month).rjust(2, '0') + '.'
+              + str(now.year)
+              + 'GDA94'.rjust(14)
+              + (str(len(cleanlist))).rjust(25))
+    stn.append(header)
+
+    # Write line strings in stn format
+    for pt in cleanlist:
+        line = (pt[1].ljust(20)  # Pt ID
+                + pt[0]  # Constraint
+                + ' UTM '  # Projection
+                + pt[2].rjust(13)  # Easting
+                + pt[3].rjust(18)  # Northing
+                + pt[4].rjust(16)  # Elevation
+                + utmzone.rjust(15))  # Hemisphere/Zone input
+        stn.append(line)
+    # Write line strings to file
+    if cfg_path is not None:
+        fn, ext = os.path.splitext(cfg_path)
+        stn_fn = fn + '.stn'
+    else:
+        fn, ext = os.path.splitext(path)
+        stn_fn = fn + '.stn'
+    with open(stn_fn, 'w+') as stn_file:
+        for line in stn:
+            stn_file.write(line + '\n')
+    return stn
 
 
 def readgsi(filepath):
@@ -118,7 +238,7 @@ def readgsi(filepath):
         gsi_listbystation = []
         # Create lists of gsi data with station records as first element
         for j in range(0, len(stn_index)):
-            gsi_listbystation.append(gsidata[(stn_index[j - 1] - 1):(stn_index[j] - 1)])
+            gsi_listbystation.append(gsidata[(stn_index[j - 1] - 1):(stn_index[j])])
         del gsi_listbystation[0]
     return gsi_listbystation
 
@@ -200,11 +320,12 @@ def gsi2class(gsi_list):
                 to_stn = parse_ptid(line)
                 hz = parse_hz(line)
                 face, vert = parse_vert(line)
+                rounds = 0.5
                 slope = parse_slope(line)
                 tgtht = parse_tgtht(line)
                 instht = parse_instht(line)
                 obs = Observation(from_stn, to_stn, instht, tgtht,
-                                  face, hz, vert, slope)
+                                  face, rounds, hz, vert, slope)
                 obs_list.append(obs)
         if '84..' in record[0]:
             pt_id = parse_ptid(record[0])
