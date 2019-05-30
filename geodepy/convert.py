@@ -2,7 +2,7 @@
 
 """
 Geoscience Australia - Python Geodesy Package
-Conversions Module
+Converrt Module
 """
 
 from math import modf, sin, cos, atan2, radians, degrees, sqrt
