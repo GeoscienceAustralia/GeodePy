@@ -22,6 +22,16 @@ def hp2dec(hp):
     return dec if hp >= 0 else -dec
 
 
+class DMSAngle_s(object):
+    # def __init__(self, dmsstring='0,0,0'):
+    #     self.dms_s = dmsstring
+    #     dms_s = self.dms_s.split(',')
+    #
+    # def __repr__(self):
+    #     return '{DMSAngle_s: ' + dms_s[0]
+    pass
+
+
 class DMSAngle(object):
     def __init__(self, degree=0, minute=0, second=0):
         self.degree = int(degree)
@@ -197,6 +207,20 @@ def rect2polar(x, y):
     else:
         theta = degrees(theta)
     return r, theta
+
+
+def retainsign_dms2dec(degree, minute, second):
+    minute = int(minute)
+    if degree == 0.0:
+        degstr = str(degree)
+        if degstr[0] == '-':
+            return -(int(degree) + (minute / 60) + (second / 3600))
+        elif degstr[0] == '0':
+            return int(degree) + (minute / 60) + (second / 3600)
+    elif degree <= -1:
+        return -(abs(int(degree)) + (minute / 60) + (second / 3600))
+    else:
+        return int(degree) + (minute / 60) + (second / 3600)
 
 
 # ----------------
