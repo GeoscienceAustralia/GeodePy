@@ -161,12 +161,12 @@ def meanfaces(ob1, ob2):
         if abs(ob1.hz_obs.dec() - ob2.hz_obs.dec()) < 180:
             meaned_hz = (ob1.hz_obs + ob2.hz_obs) / 2
         elif ob1.hz_obs < ob2.hz_obs:
-            ob2_shift = DMSAngle(360) - ob2.hz_obs
+            ob2_shift = -(DMSAngle(360) - ob2.hz_obs)
             meaned_hz = (ob1.hz_obs + ob2_shift) / 2
             if meaned_hz < DMSAngle(0):
                 meaned_hz = meaned_hz + DMSAngle(360)
         elif ob2.hz_obs < ob1.hz_obs:
-            ob1_shift = DMSAngle(360) - ob1.hz_obs
+            ob1_shift = -(DMSAngle(360) - ob1.hz_obs)
             meaned_hz = (ob1_shift + ob2.hz_obs) / 2
             if meaned_hz < DMSAngle(0):
                 meaned_hz = meaned_hz + DMSAngle(360)
@@ -263,7 +263,7 @@ def reducesetup(obslist, strict=False, zerodist=False, meanmulti=False):
             # Mean Repeated Observations
             mean_hz = mean(repeat_hz)
             if mean_hz < 0:
-                mean_hz + 360
+                mean_hz += 360
             mean_va = mean(repeat_va)
             mean_sd = mean(repeat_sd)
             # Compute number of rounds of observations completed

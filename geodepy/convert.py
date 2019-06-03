@@ -86,7 +86,7 @@ class DMSAngle(object):
 
     def __neg__(self):
         if self.sign == 1:
-            return DMSAngle(-self.degree, self.minute, self.second)
+            return DMSAngle(-self.degree, -self.minute, -self.second)
         else:  # sign == -1
             return DMSAngle(self.degree, self.minute, self.second)
 
