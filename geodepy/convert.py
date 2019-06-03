@@ -22,24 +22,34 @@ def hp2dec(hp):
     return dec if hp >= 0 else -dec
 
 
-class DMSAngle_s(object):
-    # def __init__(self, dmsstring='0,0,0'):
-    #     self.dms_s = dmsstring
-    #     dms_s = self.dms_s.split(',')
-    #
-    # def __repr__(self):
-    #     return '{DMSAngle_s: ' + dms_s[0]
-    pass
-
-
 class DMSAngle(object):
-    def __init__(self, degree=0, minute=0, second=0):
-        self.degree = int(degree)
+    def __init__(self, degree=0, minute=0, second=0.0):
+        # Set sign of object based on sign of any variable
+        if degree == 0:
+            if str(degree)[0] == '-':
+                self.sign = -1
+            elif minute < 0:
+                self.sign = -1
+            elif second < 0:
+                self.sign = -1
+            else:
+                self.sign = 1
+        elif degree > 0:
+            self.sign = 1
+        else:  # degree < 0
+            self.sign = -1
+        self.degree = abs(int(degree))
         self.minute = abs(int(minute))
         self.second = abs(second)
 
     def __repr__(self):
-        return '{DMSAngle: ' + str(self.degree) + 'd ' + str(self.minute) + 'm ' + str(self.second) + 's}'
+        if self.sign == -1:
+            signsymbol = '-'
+        elif self.sign == 1:
+            signsymbol = '+'
+        else:
+            signsymbol = 'error'
+        return '{DMSAngle: ' + signsymbol + str(self.degree) + 'd ' + str(self.minute) + 'm ' + str(self.second) + 's}'
 
     def __add__(self, other):
         return dec2dms(self.dec() + other.dec())
@@ -66,13 +76,19 @@ class DMSAngle(object):
             raise TypeError('Multiply only defined between DMSAngle Object and Int or Float')
 
     def __truediv__(self, other):
-        return dec2dms(self.dec() / other)
+        try:
+            return dec2dms(self.dec() / other)
+        except TypeError:
+            raise TypeError('Division only defined between DMSAngle Object and Int or Float')
 
     def __abs__(self):
-        return DMSAngle(abs(self.degree), self.minute, self.second)
+        return DMSAngle(self.degree, self.minute, self.second)
 
     def __neg__(self):
-        return DMSAngle(-self.degree, self.minute, self.second)
+        if self.sign == 1:
+            return DMSAngle(-self.degree, self.minute, self.second)
+        else:  # sign == -1
+            return DMSAngle(self.degree, self.minute, self.second)
 
     def __eq__(self, other):
         return self.dec() == other.dec()
@@ -87,28 +103,43 @@ class DMSAngle(object):
         return self.dec() > other.dec()
 
     def dec(self):
-        if self.degree >= 0:
-            return self.degree + (self.minute / 60) + (self.second / 3600)
-        else:
-            return -(abs(self.degree) + (self.minute / 60) + (self.second / 3600))
+        return self.sign * (self.degree + (self.minute / 60) + (self.second / 3600))
 
     def hp(self):
-        if self.degree >= 0:
-            return self.degree + (self.minute / 100) + (self.second / 10000)
-        else:
-            return -(abs(self.degree) + (self.minute / 100) + (self.second / 10000))
+        return self.sign * (self.degree + (self.minute / 100) + (self.second / 10000))
 
     def ddm(self):
-        return DDMAngle(self.degree, self.minute + (self.second/60))
+        if self.sign == 1:
+            return DDMAngle(self.degree, self.minute + (self.second/60))
+        else:  # sign == -1
+            return -DDMAngle(self.degree, self.minute + (self.second/60))
 
 
 class DDMAngle(object):
-    def __init__(self, degree, minute):
-        self.degree = int(degree)
+    def __init__(self, degree=0, minute=0.0):
+        # Set sign of object based on sign of any variable
+        if degree == 0:
+            if str(degree)[0] == '-':
+                self.sign = -1
+            elif minute < 0:
+                self.sign = -1
+            else:
+                self.sign = 1
+        elif degree > 0:
+            self.sign = 1
+        else:  # degree < 0
+            self.sign = -1
+        self.degree = abs(int(degree))
         self.minute = abs(minute)
 
     def __repr__(self):
-        return '{DDMAngle: ' + str(self.degree) + 'd ' + str(self.minute) + 'm}'
+        if self.sign == -1:
+            signsymbol = '-'
+        elif self.sign == 1:
+            signsymbol = '+'
+        else:
+            signsymbol = 'error'
+        return '{DDMAngle: ' + signsymbol + str(self.degree) + 'd ' + str(self.minute) + 'm}'
 
     def __add__(self, other):
         return dec2ddm(self.dec() + other.dec())
@@ -129,13 +160,19 @@ class DDMAngle(object):
             raise TypeError('Multiply only defined between DMSAngle Object and Int or Float')
 
     def __truediv__(self, other):
-        return dec2ddm(self.dec() / other)
+        try:
+            return dec2ddm(self.dec() / other)
+        except TypeError:
+            raise TypeError('Division only defined between DMSAngle Object and Int or Float')
 
     def __abs__(self):
-        return DDMAngle(abs(self.degree), self.minute)
+        return DDMAngle(self.degree, self.minute)
 
     def __neg__(self):
-        return DDMAngle(-self.degree, self.minute)
+        if self.sign == 1:
+            return DDMAngle(-self.degree, self.minute)
+        else:  # sign == -1
+            return DDMAngle(self.degree, self.minute)
 
     def __eq__(self, other):
         return self.dec() == other.dec()
@@ -150,21 +187,15 @@ class DDMAngle(object):
         return self.dec() > other.dec()
 
     def dec(self):
-        if self.degree >= 0:
-            return self.degree + (self.minute / 60)
-        else:
-            return -(abs(self.degree) + (self.minute / 60))
+        return self.sign * (self.degree + (self.minute / 60))
 
     def hp(self):
         minute_int, second = divmod(self.minute, 1)
-        if self.degree >= 0:
-            return self.degree + (minute_int / 100) + (second * 0.006)
-        else:
-            return -(abs(self.degree) + (minute_int / 100) + (second * 0.006))
+        return self.sign * (self.degree + (minute_int / 100) + (second * 0.006))
 
     def dms(self):
         minute_int, second = divmod(self.minute, 1)
-        return DMSAngle(self.degree, minute_int, second * 60)
+        return self.sign * DMSAngle(self.degree, minute_int, second * 60)
 
 
 def dec2dms(dec):
@@ -207,20 +238,6 @@ def rect2polar(x, y):
     else:
         theta = degrees(theta)
     return r, theta
-
-
-def retainsign_dms2dec(degree, minute, second):
-    minute = int(minute)
-    if degree == 0.0:
-        degstr = str(degree)
-        if degstr[0] == '-':
-            return -(int(degree) + (minute / 60) + (second / 3600))
-        elif degstr[0] == '0':
-            return int(degree) + (minute / 60) + (second / 3600)
-    elif degree <= -1:
-        return -(abs(int(degree)) + (minute / 60) + (second / 3600))
-    else:
-        return int(degree) + (minute / 60) + (second / 3600)
 
 
 # ----------------
