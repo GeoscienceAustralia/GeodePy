@@ -3,17 +3,27 @@ from geodepy.convert import dec2hp, hp2dec, DMSAngle, DDMAngle, dec2dms, dec2ddm
 
 dec_ex = 123.74875
 dec_ex2 = 12.575
+dec_ex3 = -12.575
+dec_ex4 = 0.0525
+dec_ex5 = 0.005
+
 hp_ex = 123.44555
 hp_ex2 = 12.3430
 hp_ex3 = -12.3430
+hp_ex4 = 0.0309
+hp_ex5 = 0.0018
 
 dms_ex = DMSAngle(123, 44, 55.5)
 dms_ex2 = DMSAngle(12, 34, 30)
 dms_ex3 = DMSAngle(-12, -34, -30)
+dms_ex4 = DMSAngle(0, 3, 9)
+dms_ex5 = DMSAngle(0, 0, 18)
 
 ddm_ex = DDMAngle(123, 44.925)
 ddm_ex2 = DDMAngle(12, 34.5)
 ddm_ex3 = DDMAngle(-12, -34.5)
+ddm_ex4 = DDMAngle(0, 3.15)
+ddm_ex5 = DDMAngle(0, 0.3)
 
 
 class TestConvert(unittest.TestCase):
@@ -32,6 +42,27 @@ class TestConvert(unittest.TestCase):
         self.assertEqual(hp_ex, dms_ex.hp())
         self.assertEqual(hp_ex3, dms_ex3.hp())
         self.assertEqual(ddm_ex, dms_ex.ddm())
+
+        # Test DMSAngle Sign Conventions
+        self.assertEqual(-dec_ex, DMSAngle(-dms_ex.degree, dms_ex.minute, dms_ex.second).dec())
+        self.assertEqual(dec_ex, DMSAngle(dms_ex.degree, -dms_ex.minute, -dms_ex.second).dec())
+        self.assertAlmostEqual(-dec_ex4, DMSAngle(0, -dms_ex4.minute, dms_ex4.second).dec(), 9)
+        self.assertAlmostEqual(dec_ex4, DMSAngle(0, dms_ex4.minute, dms_ex4.second).dec(), 9)
+        self.assertEqual(-dec_ex5, DMSAngle(0, 0, -dms_ex5.second).dec())
+        self.assertEqual(dec_ex5, DMSAngle(0, 0, dms_ex5.second).dec())
+        self.assertEqual(dms_ex.sign, 1)
+        self.assertEqual(-dms_ex.sign, -1)
+        self.assertEqual(dms_ex4.sign, 1)
+        self.assertEqual(-dms_ex4.sign, -1)
+        self.assertEqual(dms_ex5.sign, 1)
+        self.assertEqual(-dms_ex5.sign, -1)
+        self.assertEqual(DMSAngle(-1, 2, 3).sign, -1)
+        self.assertEqual(DMSAngle(1, -2, 3).sign, 1)
+        self.assertEqual(DMSAngle(1, 2, -3).sign, 1)
+        self.assertEqual(DMSAngle(0, -1, 2).sign, -1)
+        self.assertEqual(DMSAngle(0, 0, -3).sign, -1)
+        self.assertEqual(DMSAngle(-0, 1, 2).sign, 1)
+        self.assertEqual(DMSAngle(-0.0, 1, 2).sign, -1)
 
         # Test DMSAngle Overloads
         self.assertEqual(dec_ex + dec_ex2, (dms_ex + dms_ex2).dec())
@@ -55,6 +86,8 @@ class TestConvert(unittest.TestCase):
             dms_ex * 'a'
         with self.assertRaises(TypeError):
             'a' * dms_ex
+        with self.assertRaises(TypeError):
+            dms_ex / 'a'
 
     def test_DDMAngle(self):
         # Test DDMAngle Methods
@@ -62,6 +95,24 @@ class TestConvert(unittest.TestCase):
         self.assertEqual(hp_ex, ddm_ex.hp())
         self.assertEqual(dms_ex, ddm_ex.dms())
         self.assertEqual(hp_ex3, ddm_ex3.hp())
+
+        # Test DMSAngle Sign Conventions
+        self.assertEqual(-dec_ex, DDMAngle(-dms_ex.degree, ddm_ex.minute).dec())
+        self.assertEqual(dec_ex, DDMAngle(dms_ex.degree, -ddm_ex.minute).dec())
+        self.assertAlmostEqual(-dec_ex4, DDMAngle(0, -ddm_ex4.minute).dec(), 9)
+        self.assertAlmostEqual(dec_ex4, DDMAngle(0, ddm_ex4.minute).dec(), 9)
+        self.assertEqual(ddm_ex.sign, 1)
+        self.assertEqual(-ddm_ex.sign, -1)
+        self.assertEqual(ddm_ex4.sign, 1)
+        self.assertEqual(-ddm_ex4.sign, -1)
+        self.assertEqual(ddm_ex5.sign, 1)
+        self.assertEqual(-ddm_ex5.sign, -1)
+        self.assertEqual(DDMAngle(-1, 2).sign, -1)
+        self.assertEqual(DDMAngle(1, -2).sign, 1)
+        self.assertEqual(DDMAngle(1, 2).sign, 1)
+        self.assertEqual(DDMAngle(0, -1).sign, -1)
+        self.assertEqual(DDMAngle(-0, 1).sign, 1)
+        self.assertEqual(DDMAngle(-0.0, 1).sign, -1)
 
         # Test DDMAngle Overloads
         self.assertEqual(dec_ex + dec_ex2, (ddm_ex + ddm_ex2).dec())
@@ -85,6 +136,8 @@ class TestConvert(unittest.TestCase):
             ddm_ex * 'a'
         with self.assertRaises(TypeError):
             'a' * ddm_ex
+        with self.assertRaises(TypeError):
+            ddm_ex / 'a'
 
     def test_dec2dms(self):
         self.assertEqual(dms_ex, dec2dms(dec_ex))
@@ -99,7 +152,8 @@ class TestConvert(unittest.TestCase):
         self.assertEqual(dms_ex.minute, hp2dms(hp_ex).minute)
         self.assertAlmostEqual(dms_ex.second, hp2dms(hp_ex).second, 10)
 
-        self.assertEqual(-dms_ex.degree, hp2dms(-hp_ex).degree)
+        self.assertEqual(-dms_ex.sign, hp2dms(-hp_ex).sign)
+        self.assertEqual(dms_ex.degree, hp2dms(-hp_ex).degree)
         self.assertEqual(dms_ex.minute, hp2dms(-hp_ex).minute)
         self.assertAlmostEqual(dms_ex.second, hp2dms(-hp_ex).second, 10)
 
