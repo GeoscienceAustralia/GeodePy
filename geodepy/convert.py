@@ -170,7 +170,7 @@ class DDMAngle(object):
 
     def __neg__(self):
         if self.sign == 1:
-            return DDMAngle(-self.degree, self.minute)
+            return DDMAngle(-self.degree, -self.minute)
         else:  # sign == -1
             return DDMAngle(self.degree, self.minute)
 
