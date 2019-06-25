@@ -2,11 +2,51 @@ import unittest
 import os.path
 import numpy as np
 import numpy.lib.recfunctions as rfn
-from geodepy.convert import hp2dec, dec2hp
-from geodepy.geodesy import vincinv, vincdir, vincinv_utm, vincdir_utm
+from geodepy.convert import hp2dec, dec2hp, rect2polar, polar2rect
+from geodepy.geodesy import vincinv, vincdir, vincinv_utm, vincdir_utm, enu2xyz, xyz2enu
+from geodepy.transform import grid2geo, llh2xyz
 
 
 class TestGeodesy(unittest.TestCase):
+    def test_enu2xyz(self):
+        MOBS_MGA2020 = (55, 321820.085, 5811181.510, 40.570)
+        MOBS_MGA1994 = (55, 321819.594, 5811180.038, 40.659)
+
+        # Convert UTM Projection Coordinates to Geographic Coordinates
+        MOBS_GDA2020 = grid2geo(MOBS_MGA2020[0], MOBS_MGA2020[1], MOBS_MGA2020[2])
+        MOBS_GDA1994 = grid2geo(MOBS_MGA1994[0], MOBS_MGA1994[1], MOBS_MGA1994[2])
+
+        # Convert Geographic Coordinates to Cartesian XYZ Coordinates
+        MOBS_GDA2020_XYZ = llh2xyz(MOBS_GDA2020[0], MOBS_GDA2020[1], MOBS_MGA2020[3])
+        MOBS_GDA1994_XYZ = llh2xyz(MOBS_GDA1994[0], MOBS_GDA1994[1], MOBS_MGA1994[3])
+
+        # Generate Vector Between UTM Projection Coordinates
+        mga_vector = [MOBS_MGA2020[1] - MOBS_MGA1994[1],
+                      MOBS_MGA2020[2] - MOBS_MGA1994[2],
+                      MOBS_MGA2020[3] - MOBS_MGA1994[3]]
+
+        # Generate Vector Between Cartesian XYZ Coordinates
+        xyz_vector = (MOBS_GDA2020_XYZ[0] - MOBS_GDA1994_XYZ[0],
+                      MOBS_GDA2020_XYZ[1] - MOBS_GDA1994_XYZ[1],
+                      MOBS_GDA2020_XYZ[2] - MOBS_GDA1994_XYZ[2])
+
+        # Rotate UTM Projection Vector by Grid Convergence
+        grid_dist, grid_brg = rect2polar(mga_vector[0], mga_vector[1])
+        local_east, local_north = polar2rect(grid_dist, grid_brg - MOBS_GDA2020[3])
+        local_vector = (local_east, local_north, mga_vector[2])
+
+        # Calculate XYZ Vector using Local Vector Components
+        x, y, z = enu2xyz(MOBS_GDA2020[0], MOBS_GDA2020[1], *local_vector)
+        self.assertAlmostEqual(x, xyz_vector[0], 4)
+        self.assertAlmostEqual(y, xyz_vector[1], 4)
+        self.assertAlmostEqual(z, xyz_vector[2], 4)
+
+        # Calculate Local Vector using XYZ Vector Components
+        e, n, u = xyz2enu(MOBS_GDA2020[0], MOBS_GDA2020[1], *xyz_vector)
+        self.assertAlmostEqual(e, local_vector[0], 4)
+        self.assertAlmostEqual(n, local_vector[1], 4)
+        self.assertAlmostEqual(u, local_vector[2], 4)
+
     def test_vincinv(self):
         # Flinders Peak
         lat1 = hp2dec(-37.57037203)
