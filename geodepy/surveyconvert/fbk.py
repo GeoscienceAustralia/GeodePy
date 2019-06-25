@@ -377,12 +377,18 @@ def fbk2class(fbk_list):
                 to_id = record[2]  # Read To ID
                 rounds = 0.5
                 hz_obs = parse_angle(record[3])  # 3 is Hz Ob (HP)
+                hz_stdev = DMSAngle(0)
                 sd_obs = float(record[4])
+                sd_stdev = 0.0
                 va_obs = parse_angle(record[5])  # 5 is Vert Ob (HP)
+                va_stdev = DMSAngle(0)
                 target_height = float(record[7])
                 obs = Observation(from_id, to_id,
                                   inst_height, target_height,
-                                  face, rounds, hz_obs, va_obs, sd_obs)
+                                  face, rounds,
+                                  hz_obs, hz_stdev,
+                                  va_obs, va_stdev,
+                                  sd_obs, sd_stdev)
                 obs_list.append(obs)
             # else:
             #     raise ValueError('Unexpected format found')

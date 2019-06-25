@@ -7,8 +7,8 @@ Survey Data Converter - Class Tools Module
 
 import itertools
 import operator
-from statistics import mean
-from geodepy.convert import DMSAngle, dec2dms
+from statistics import mean, stdev
+from geodepy.convert import DMSAngle, dec2dms, dd2sec
 from geodepy.survey import first_vel_corrn
 
 
@@ -56,8 +56,11 @@ class InstSetup(object):
 
 class Observation(object):
     def __init__(self, from_id, to_id, inst_height=0.0, target_height=0.0,
-                 face='FL', rounds=0.5, hz_obs=DMSAngle(0, 0, 0), va_obs=DMSAngle(0, 0, 0),
-                 sd_obs=0.0, hz_dist=0.0, vert_dist=0.0):
+                 face='FL', rounds=0.5,
+                 hz_obs=DMSAngle(0, 0, 0), hz_stdev=DMSAngle(0, 0, 0),
+                 va_obs=DMSAngle(0, 0, 0), va_stdev=DMSAngle(0, 0, 0),
+                 sd_obs=0.0, sd_stdev=0.0,
+                 hz_dist=0.0, vert_dist=0.0):
         self.from_id = from_id
         self.to_id = to_id
         self.inst_height = inst_height
@@ -65,8 +68,11 @@ class Observation(object):
         self.face = face
         self.rounds = rounds
         self.hz_obs = hz_obs
+        self.hz_stdev = hz_stdev
         self.va_obs = va_obs
+        self.va_stdev = va_stdev
         self.sd_obs = sd_obs
+        self.sd_stdev = sd_stdev
         self.hz_dist = hz_dist
         self.vert_dist = vert_dist
 
@@ -108,9 +114,12 @@ class Observation(object):
                            newface,
                            self.rounds,
                            hz_switch,
+                           self.hz_stdev,
                            va_switch,
+                           self.va_stdev,
                            self.sd_obs,
-                           self.hz_obs,
+                           self.sd_stdev,
+                           self.hz_dist,
                            self.vert_dist)
 
 
@@ -122,18 +131,18 @@ def meanfaces(ob1, ob2):
     :param ob2: Observation Object (or None)
     :return: Meaned Observation Object of ob1 and ob2 (Face Left Sense)
     """
-    if type(ob1) != Observation and type(ob1) != type(None):
+    if isinstance(ob1, Observation) and isinstance(ob1, type(None)):
         raise TypeError('Invalid Input Type (ob1)')
-    elif type(ob2) != Observation and type(ob2) != type(None):
+    elif isinstance(ob2, Observation) and isinstance(ob2, type(None)):
         raise TypeError('Invalid Input Type (ob2)')
-    elif type(ob1) == type(None) and type(ob2) == type(None):
+    elif isinstance(ob1, type(None)) and isinstance(ob2, type(None)):
         raise TypeError('Ob1 and Ob2 cannot both be None')
-    elif type(ob1) == type(None) and type(ob2) == Observation:
+    elif isinstance(ob1, type(None)) and isinstance(ob2, Observation):
         if ob2.face == 'FL':
             return ob2
         else:
             return ob2.changeface()
-    elif type(ob1) == Observation and type(ob2) == type(None):
+    elif isinstance(ob1, Observation) and isinstance(ob2, type(None)):
         if ob1.face == 'FL':
             return ob1
         else:
@@ -143,7 +152,13 @@ def meanfaces(ob1, ob2):
             or ob1.inst_height != ob2.inst_height
             or ob1.target_height != ob2.target_height):
         raise ValueError('Inputs must be Observation Objects. '
-                         'From, To, Instrument and Target Height must be the same to mean two observations')
+                         'From, To, Instrument and Target Height must be the same to mean two observations\n' +
+                         'Observation 1\n' +
+                         'from: ' + ob1.from_id + ' to: ' + ob1.to_id + ' inst_ht: ' + str(ob1.inst_height)
+                         + ' tgt_ht: ' + str(ob1.target_height) + '\n' +
+                         'Observation 2\n' +
+                         'from: ' + ob2.from_id + ' to: ' + ob2.to_id + ' inst_ht: ' + str(ob2.inst_height)
+                         + ' tgt_ht: ' + str(ob2.target_height) + '\n')
     else:
         # Check Face Inputs, convert all to Face Left Sense
         if ob1.face == 'FL' and ob2.face == 'FR':
@@ -179,8 +194,11 @@ def meanfaces(ob1, ob2):
                            ob1.face,
                            ob1.rounds + ob2.rounds,
                            meaned_hz,
+                           ob1.hz_stdev,
                            meaned_va,
-                           meaned_sd)
+                           ob1.va_stdev,
+                           meaned_sd,
+                           ob1.sd_stdev)
 
 
 def reducesetup(obslist, strict=False, zerodist=False, meanmulti=False):
@@ -266,6 +284,19 @@ def reducesetup(obslist, strict=False, zerodist=False, meanmulti=False):
                 mean_hz += 360
             mean_va = mean(repeat_va)
             mean_sd = mean(repeat_sd)
+            # Compute Standard Deviations for Observations
+            if len(repeat_hz) > 2:
+                hz_stdev = stdev(repeat_hz)
+            else:
+                hz_stdev = 0.0
+            if len(repeat_va) > 2:
+                va_stdev = stdev(repeat_va)
+            else:
+                va_stdev = 0.0
+            if len(repeat_sd) > 2:
+                sd_stdev = stdev(repeat_sd)
+            else:
+                sd_stdev = 0.0
             # Compute number of rounds of observations completed
             sum_rounds = 0
             for ob in matchedobs:
@@ -278,8 +309,11 @@ def reducesetup(obslist, strict=False, zerodist=False, meanmulti=False):
                                        ob1.face,
                                        sum_rounds,
                                        dec2dms(mean_hz),
+                                       dd2sec(hz_stdev),
                                        dec2dms(mean_va),
-                                       mean_sd))
+                                       dd2sec(va_stdev),
+                                       mean_sd,
+                                       sd_stdev))
         meanedobs = multiob
     # Order list of meaned obs
     sorted_meanedobs = sorted(meanedobs, key=operator.attrgetter('hz_obs'))
