@@ -240,26 +240,17 @@ def geo2grid(lat, long, zone=0, ellipsoid=grs80):
     :param ellipsoid: Ellipsoid Object
     :return: hemisphere, zone, east (m), north (m), Point Scale Factor, Grid Convergence (Decimal Degrees)
     """
-    # Input Exception Handling - UTM Extents and Values
-    try:
-        zone = int(zone)
-        if zone < 0 or zone > 60:
-            raise ValueError
-    except ValueError:
-        print('ValueError: Invalid Zone - Zones from 1 to 60')
-        return
-    try:
-        if lat < -80 or lat > 84:
-            raise ValueError
-    except ValueError:
-        print('ValueError: Invalid Latitude - Latitudes from -80 to +84')
-        return
-    try:
-        if long < -180 or long > 180:
-            raise ValueError
-    except ValueError:
-        print('ValueError: Invalid Longitude - Longitudes from -180 to +180')
-        return
+
+    # Input Validation - UTM Extents and Values
+    zone = int(zone)
+    if zone < 0 or zone > 60:
+        raise ValueError('Invalid Zone - Zones from 1 to 60')
+
+    if lat < -80 or lat > 84:
+        raise ValueError('Invalid Latitude - Latitudes from -80 to +84')
+
+    if long < -180 or long > 180:
+        raise ValueError('Invalid Longitude - Longitudes from -180 to +180')
 
     A = rect_radius(ellipsoid)
     a = alpha_coeff(ellipsoid)
@@ -322,33 +313,20 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
     :param ellipsoid: Ellipsoid Object
     :return: Latitude and Longitude (Decimal Degrees), Point Scale Factor, Grid Convergence (Decimal Degrees)
     """
-    # Input Exception Handling - UTM Extents and Values
-    try:
-        zone = int(zone)
-        if zone < 0 or zone > 60:
-            raise ValueError
-    except ValueError:
-        print('ValueError: Invalid Zone - Zones from 1 to 60')
-        return
-    try:
-        if east < -2830000 or east > 3830000:
-            raise ValueError
-    except ValueError:
-        print('ValueError: Invalid Easting - Must be within 3330km of Central Meridian')
-        return
-    try:
-        if north < 0 or north > 10000000:
-            raise ValueError
-    except ValueError:
-        print('ValueError: Invalid Northing - Must be between 0 and 10,000,000m')
-        return
-    try:
-        h = hemisphere.lower()
-        if h != 'north' and h != 'south':
-            raise ValueError
-    except ValueError:
-        print('ValueError: Invalid Hemisphere - String, either North or South')
-        return
+    # Input Validation - UTM Extents and Values
+    zone = int(zone)
+    if zone < 0 or zone > 60:
+        raise ValueError('Invalid Zone - Zones from 1 to 60')
+
+    if east < -2830000 or east > 3830000:
+        raise ValueError('Invalid Easting - Must be within 3330km of Central Meridian')
+
+    if north < 0 or north > 10000000:
+        raise ValueError('Invalid Northing - Must be between 0 and 10,000,000m')
+
+    h = hemisphere.lower()
+    if h != 'north' and h != 'south':
+        raise ValueError('Invalid Hemisphere - String, either North or South')
 
     A = rect_radius(ellipsoid)
     b = beta_coeff(ellipsoid)
