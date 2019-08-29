@@ -87,7 +87,7 @@ def gsi2msr(path, cfg_path=None):
     msr = [header] + msr
     # Output MSR File
     if cfg_path is not None:
-        fn, ext = os.path.splitext(cfg_path)
+        fn, ext = os.path.splitext(path)
         msr_fn = fn + '.msr'
     else:
         fn, ext = os.path.splitext(path)
@@ -164,6 +164,10 @@ def gsi2stn(path, utmzone, cfg_path=None):
             for num, pt in enumerate(ptlist):
                 if pt[1] == pt_constrain:
                     ptlist[num][0] = 'CCC'
+
+    #Set all stations to FFF if no config file
+    else:
+        pass
 
     # Remove Duplicate Station Points
     cleanlist = []
@@ -319,13 +323,19 @@ def gsi2class(gsi_list):
             if '31..' in line:
                 to_stn = parse_ptid(line)
                 hz = parse_hz(line)
+                hz_stdev = DMSAngle(0)
                 face, vert = parse_vert(line)
+                va_stdev = DMSAngle(0)
                 rounds = 0.5
                 slope = parse_slope(line)
+                sd_stdev = 0.0
                 tgtht = parse_tgtht(line)
                 instht = parse_instht(line)
                 obs = Observation(from_stn, to_stn, instht, tgtht,
-                                  face, rounds, hz, vert, slope)
+                                  face, rounds,
+                                  hz, hz_stdev,
+                                  vert, va_stdev,
+                                  slope, sd_stdev)
                 obs_list.append(obs)
         if '84..' in record[0]:
             pt_id = parse_ptid(record[0])

@@ -7,6 +7,7 @@ Survey Data Converter - DynAdjust DNA v3 Output Tools
 
 from math import atan, degrees, sqrt
 from geodepy.convert import dd2sec
+from geodepy.statistics import k_val95
 
 
 def dnaout_dirset(obslist, same_stdev=True, stdev_angular=1, stdev_pointing=0.001):
@@ -52,6 +53,7 @@ def dnaout_dirset(obslist, same_stdev=True, stdev_angular=1, stdev_pointing=0.00
         if obslist[0].sd_obs == 0:
             stdev_pt = str(stdev_angular)
         else:
+            # TODO create GUM Std Dev Model for Dirset
             pointing_err_pt = dd2sec(degrees(atan(stdev_pointing / obslist[0].sd_obs)))
             stdev_pt = str((sqrt((pointing_err_pt ** 2) + (stdev_angular ** 2)))/sqrt(obslist[0].rounds))
         # create first line using obslist[0]
@@ -89,11 +91,37 @@ def dnaout_dirset(obslist, same_stdev=True, stdev_angular=1, stdev_pointing=0.00
 def dnaout_sd(obslist, stdev_distconst=0.001, stdev_distppm=1):
     dnaobs = []
     for observation in obslist:
-        stdev = (stdev_distconst + ((stdev_distppm/1000000) * observation.sd_obs))/sqrt(observation.rounds)
+        # GUM Uncertainty Estimation Model
+        # Characterised Components (Uncertainty, k Value, Population (no of measurements - 1)
+        type_a_esdm = observation.sd_stdev / sqrt(observation.rounds)
+        if observation.rounds > 2:
+            type_a_uncertainty = (type_a_esdm, 1, observation.rounds - 1)
+        else:
+            type_a_uncertainty = (type_a_esdm, 1, 1)
+        inst_centring = (0.001, 2, 30)
+        tgt_centring = (0.001, 2, 30)
+        inst_uncertainty_const = (stdev_distconst, 2, 100)
+        inst_uncertainty_ppm = (stdev_distppm, 2, 100)
+        # Standard Error 1 sigma
+        sterr_typea = type_a_uncertainty[0] / type_a_uncertainty[1]
+        sterr_inst_centring = inst_centring[0] / inst_centring[1]
+        sterr_tgt_centring = tgt_centring[0] / tgt_centring[1]
+        sterr_inst_const = inst_uncertainty_const[0] / inst_uncertainty_const[1]
+        sterr_inst_ppm = observation.sd_obs * ((inst_uncertainty_ppm[0] / inst_uncertainty_ppm[1]) / 1000000)
+        combined_stdev1sigma = sqrt(sterr_typea ** 2 + sterr_inst_centring ** 2 + sterr_tgt_centring ** 2 +
+                           sterr_inst_const ** 2 + sterr_inst_ppm ** 2)
+        # Effective Degrees of Freedom (Welch-Satterthwaite) and
+        vi_eff = (combined_stdev1sigma ** 4) / ((sterr_typea ** 4) / type_a_uncertainty[2] +
+                                                (sterr_inst_centring ** 4) / inst_centring[2] +
+                                                (sterr_tgt_centring ** 4) / tgt_centring[2] +
+                                                (sterr_inst_const ** 4) / inst_uncertainty_const[2] +
+                                                (sterr_inst_ppm ** 4) / inst_uncertainty_ppm[2])
+        stdev = combined_stdev1sigma * k_val95(int(vi_eff))
         # Exclude slope distances of 0m
         if observation.sd_obs == 0:
             pass
         else:
+            # Write line output in DNA v3 Format
             line = ('S '
                     + observation.from_id.ljust(20)
                     + observation.to_id.ljust(20)
@@ -130,6 +158,7 @@ def dnaout_va(obslist, same_stdev=True, stdev=1, stdev_pointing=0.001):
             if observation.sd_obs == 0:
                 stdev_pt = str(stdev)
             else:
+                # TODO create GUM Std Dev Model for VA
                 pointing_err_pt = dd2sec(degrees(atan(stdev_pointing / observation.sd_obs)))
                 stdev_pt = str((sqrt((pointing_err_pt ** 2) + (stdev ** 2)))/sqrt(observation.rounds))
             # Format Line
