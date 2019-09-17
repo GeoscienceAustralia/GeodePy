@@ -14,7 +14,7 @@ import csv
 import datetime
 from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2
 import numpy as np
-from geodepy.constants import grs80, utm, Transformation, atrf_gda2020
+from geodepy.constants import grs80, utm, Transformation, atrf_gda2020, gda94to20
 from geodepy.convert import dec2hp, hp2dec
 
 
@@ -504,6 +504,60 @@ def conform14(x, y, z, to_epoch, trans):
     # Perform Transformation
     xtrans, ytrans, ztrans = conform7(x, y, z, timetrans)
     return xtrans, ytrans, ztrans
+
+
+def mga94to20(zone, east, north, ell_ht=False):
+    """
+    Performs conformal transformation of Map Grid of Australia 1994 to Map Grid of Australia 2020 Coordinates
+    using the GDA2020 Tech Manual v1.2 7 parameter similarity transformation parameters
+    :param zone: Zone Number - 1 to 60
+    :param east: Easting (m, within 3330km of Central Meridian)
+    :param north: Northing (m, 0 to 10,000,000m)
+    :param ell_ht: Ellipsoid Height (m) (optional)
+    :return: MGA2020 Zone, Easting, Northing and Ellipsoid Height (if none provided, returns 0)
+    """
+    lat, lon, psf, gridconv = grid2geo(zone, east, north)
+    if ell_ht is False:
+        ell_ht = 0
+        x94, y94, z94 = llh2xyz(lat, lon, ell_ht)
+        x20, y20, z20 = conform7(x94, y94, z94, gda94to20)
+        lat, lon, ell_ht = xyz2llh(x20, y20, z20)
+        ell_ht = 0
+        hemisphere, zone20, east20, north20, psf, gridconv = geo2grid(lat, lon)
+        return zone20, east20, north20, round(ell_ht, 4)
+    else:
+        x94, y94, z94 = llh2xyz(lat, lon, ell_ht)
+        x20, y20, z20 = conform7(x94, y94, z94, gda94to20)
+        lat, lon, ell_ht = xyz2llh(x20, y20, z20)
+        hemisphere, zone20, east20, north20, psf, gridconv = geo2grid(lat, lon)
+        return zone20, east20, north20, round(ell_ht, 4)
+
+
+def mga20to94(zone, east, north, ell_ht=False):
+    """
+    Performs conformal transformation of Map Grid of Australia 2020 to Map Grid of Australia 1994 Coordinates
+    using the reverse form of the GDA2020 Tech Manual v1.2 7 parameter similarity transformation parameters
+    :param zone: Zone Number - 1 to 60
+    :param east: Easting (m, within 3330km of Central Meridian)
+    :param north: Northing (m, 0 to 10,000,000m)
+    :param ell_ht: Ellipsoid Height (m) (optional)
+    :return: MGA1994 Zone, Easting, Northing and Ellipsoid Height (if none provided, returns 0)
+    """
+    lat, lon, psf, gridconv = grid2geo(zone, east, north)
+    if ell_ht is False:
+        ell_ht = 0
+        x94, y94, z94 = llh2xyz(lat, lon, ell_ht)
+        x20, y20, z20 = conform7(x94, y94, z94, -gda94to20)
+        lat, lon, ell_ht = xyz2llh(x20, y20, z20)
+        ell_ht = 0
+        hemisphere, zone20, east20, north20, psf, gridconv = geo2grid(lat, lon)
+        return zone20, east20, north20, round(ell_ht, 4)
+    else:
+        x94, y94, z94 = llh2xyz(lat, lon, ell_ht)
+        x20, y20, z20 = conform7(x94, y94, z94, -gda94to20)
+        lat, lon, ell_ht = xyz2llh(x20, y20, z20)
+        hemisphere, zone20, east20, north20, psf, gridconv = geo2grid(lat, lon)
+        return zone20, east20, north20, round(ell_ht, 4)
 
 
 def atrftogda2020(x, y, z, epoch_from):
