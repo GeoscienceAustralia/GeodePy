@@ -1,6 +1,15 @@
 import unittest
 
-from geodepy.transform import geo2grid, grid2geo, llh2xyz, xyz2llh, conform7, conform14, atrftogda2020, gda2020toatrf
+from geodepy.transform import (geo2grid,
+                               grid2geo,
+                               llh2xyz,
+                               xyz2llh,
+                               conform7,
+                               conform14,
+                               atrftogda2020,
+                               gda2020toatrf,
+                               mga94to2020,
+                               mga2020to94)
 from geodepy.convert import dms2dd_v, read_dnacoord
 from geodepy.constants import itrf14togda20, gda94to20
 from datetime import date
@@ -117,6 +126,38 @@ class TestTransforms(unittest.TestCase):
         assert (abs(alic_gda2020_comp[0] - alic_gda2020[0]) < 5e-5)
         assert (abs(alic_gda2020_comp[1] - alic_gda2020[1]) < 5e-5)
         assert (abs(alic_gda2020_comp[2] - alic_gda2020[2]) < 5e-5)
+
+    def test_mga94to2020(self):
+        alic_mga94 = (53, 386352.3979, 7381850.7689, 603.3466)
+        alic_mga20 = (53, 386353.2343, 7381852.2986, 603.2489)
+        # Test with no ellipsoid height supplied
+        alic_mga20_noellht_comp = mga94to2020(alic_mga94[0], alic_mga94[1], alic_mga94[2])
+        assert ((alic_mga20_noellht_comp[0] - alic_mga20[0]) == 0)
+        assert (abs(alic_mga20_noellht_comp[1] - alic_mga20[1]) < 5e-5)
+        assert (abs(alic_mga20_noellht_comp[2] - alic_mga20[2]) < 5e-5)
+        assert (alic_mga20_noellht_comp[3] == 0)
+        # Test with ellipsoid height supplied
+        alic_mga20_ellht_comp = mga94to2020(alic_mga94[0], alic_mga94[1], alic_mga94[2], alic_mga94[3])
+        assert ((alic_mga20_ellht_comp[0] - alic_mga20[0]) == 0)
+        assert (abs(alic_mga20_ellht_comp[1] - alic_mga20[1]) < 5e-5)
+        assert (abs(alic_mga20_ellht_comp[2] - alic_mga20[2]) < 5e-5)
+        assert (abs(alic_mga20_ellht_comp[3] - alic_mga20[3]) < 5e-5)
+
+    def test_mga2020to94(self):
+        alic_mga94 = (53, 386352.3979, 7381850.7689, 603.3466)
+        alic_mga20 = (53, 386353.2343, 7381852.2986, 603.2489)
+        # Test with no ellipsoid height supplied
+        alic_mga94_noellht_comp = mga2020to94(alic_mga20[0], alic_mga20[1], alic_mga20[2])
+        assert ((alic_mga94_noellht_comp[0] - alic_mga94[0]) == 0)
+        assert (abs(alic_mga94_noellht_comp[1] - alic_mga94[1]) < 5e-5)
+        assert (abs(alic_mga94_noellht_comp[2] - alic_mga94[2]) < 5e-5)
+        assert (alic_mga94_noellht_comp[3] == 0)
+        # Test with ellipsoid height supplied
+        alic_mga94_ellht_comp = mga2020to94(alic_mga20[0], alic_mga20[1], alic_mga20[2], alic_mga20[3])
+        assert ((alic_mga94_ellht_comp[0] - alic_mga94[0]) == 0)
+        assert (abs(alic_mga94_ellht_comp[1] - alic_mga94[1]) < 5e-5)
+        assert (abs(alic_mga94_ellht_comp[2] - alic_mga94[2]) < 5e-5)
+        assert (abs(alic_mga94_ellht_comp[3] - alic_mga94[3]) < 5e-5)
 
 
 if __name__ == '__main__':
