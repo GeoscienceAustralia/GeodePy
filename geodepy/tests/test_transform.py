@@ -127,7 +127,7 @@ class TestTransforms(unittest.TestCase):
         assert (abs(alic_gda2020_comp[1] - alic_gda2020[1]) < 5e-5)
         assert (abs(alic_gda2020_comp[2] - alic_gda2020[2]) < 5e-5)
 
-    def test_mga94to20(self):
+    def test_mga94to2020(self):
         alic_mga94 = (53, 386352.3979, 7381850.7689, 603.3466)
         alic_mga20 = (53, 386353.2343, 7381852.2986, 603.2489)
         # Test with no ellipsoid height supplied
@@ -143,7 +143,7 @@ class TestTransforms(unittest.TestCase):
         assert (abs(alic_mga20_ellht_comp[2] - alic_mga20[2]) < 5e-5)
         assert (abs(alic_mga20_ellht_comp[3] - alic_mga20[3]) < 5e-5)
 
-    def test_mga20to94(self):
+    def test_mga2020to94(self):
         alic_mga94 = (53, 386352.3979, 7381850.7689, 603.3466)
         alic_mga20 = (53, 386353.2343, 7381852.2986, 603.2489)
         # Test with no ellipsoid height supplied

@@ -518,19 +518,16 @@ def mga94to2020(zone, east, north, ell_ht=False):
     """
     lat, lon, psf, gridconv = grid2geo(zone, east, north)
     if ell_ht is False:
-        ell_ht = 0
-        x94, y94, z94 = llh2xyz(lat, lon, ell_ht)
-        x20, y20, z20 = conform7(x94, y94, z94, gda94to20)
-        lat, lon, ell_ht = xyz2llh(x20, y20, z20)
-        ell_ht = 0
-        hemisphere, zone20, east20, north20, psf, gridconv = geo2grid(lat, lon)
-        return zone20, east20, north20, round(ell_ht, 4)
+        ell_ht_in = 0
     else:
-        x94, y94, z94 = llh2xyz(lat, lon, ell_ht)
-        x20, y20, z20 = conform7(x94, y94, z94, gda94to20)
-        lat, lon, ell_ht = xyz2llh(x20, y20, z20)
-        hemisphere, zone20, east20, north20, psf, gridconv = geo2grid(lat, lon)
-        return zone20, east20, north20, round(ell_ht, 4)
+        ell_ht_in = ell_ht
+    x94, y94, z94 = llh2xyz(lat, lon, ell_ht_in)
+    x20, y20, z20 = conform7(x94, y94, z94, gda94to20)
+    lat, lon, ell_ht_out = xyz2llh(x20, y20, z20)
+    if ell_ht is False:
+        ell_ht_out = 0
+    hemisphere, zone20, east20, north20, psf, gridconv = geo2grid(lat, lon)
+    return zone20, east20, north20, round(ell_ht_out, 4)
 
 
 def mga2020to94(zone, east, north, ell_ht=False):
@@ -545,19 +542,16 @@ def mga2020to94(zone, east, north, ell_ht=False):
     """
     lat, lon, psf, gridconv = grid2geo(zone, east, north)
     if ell_ht is False:
-        ell_ht = 0
-        x94, y94, z94 = llh2xyz(lat, lon, ell_ht)
-        x20, y20, z20 = conform7(x94, y94, z94, -gda94to20)
-        lat, lon, ell_ht = xyz2llh(x20, y20, z20)
-        ell_ht = 0
-        hemisphere, zone20, east20, north20, psf, gridconv = geo2grid(lat, lon)
-        return zone20, east20, north20, round(ell_ht, 4)
+        ell_ht_in = 0
     else:
-        x94, y94, z94 = llh2xyz(lat, lon, ell_ht)
-        x20, y20, z20 = conform7(x94, y94, z94, -gda94to20)
-        lat, lon, ell_ht = xyz2llh(x20, y20, z20)
-        hemisphere, zone20, east20, north20, psf, gridconv = geo2grid(lat, lon)
-        return zone20, east20, north20, round(ell_ht, 4)
+        ell_ht_in = ell_ht
+    x94, y94, z94 = llh2xyz(lat, lon, ell_ht_in)
+    x20, y20, z20 = conform7(x94, y94, z94, -gda94to20)
+    lat, lon, ell_ht_out = xyz2llh(x20, y20, z20)
+    if ell_ht is False:
+        ell_ht_out = 0
+    hemisphere, zone20, east20, north20, psf, gridconv = geo2grid(lat, lon)
+    return zone20, east20, north20, round(ell_ht_out, 4)
 
 
 def atrftogda2020(x, y, z, epoch_from):
