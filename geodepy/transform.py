@@ -4,15 +4,19 @@
 Geoscience Australia - Python Geodesy Package
 Transform Module
 
-Ref1: http://www.icsm.gov.au/sites/default/files/GDA2020TechnicalManualV1.1.1.pdf
-Ref2: http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
+Ref1
+http://www.icsm.gov.au/sites/default/files/GDA2020TechnicalManualV1.1.1.pdf
+
+Ref2
+http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 """
 
 
-import os
+import os, sys
 import csv
 import datetime
-from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, atan, atan2
+from math import sqrt, log, degrees, radians, sin, cos, tan, sinh, cosh, \
+    atan, atan2
 import numpy as np
 from geodepy.constants import grs80, utm, Transformation, atrf_gda2020
 from geodepy.convert import dec2hp, hp2dec
@@ -24,13 +28,14 @@ proj = utm
 
 def rect_radius(ellipsoid):
     """
-    Computes the Rectifying Radius of an Ellipsoid with specified Inverse Flattening
-    (See Ref 2 Equation 3)
+    Computes the Rectifying Radius of an Ellipsoid with specified Inverse
+    Flattening (See Ref 2 Equation 3)
     :param ellipsoid: Ellipsoid Object
     :return: Ellipsoid Rectifying Radius
     """
-    nval = (1 / float(ellipsoid.inversef)) / (2 - (1 / float(ellipsoid.inversef)))
-    nval2 = nval ** 2
+    nval = (1 / float(ellipsoid.inversef)) /\
+           (2 - (1 / float(ellipsoid.inversef)))
+    nval2 = nval**2
     return (ellipsoid.semimaj / (1 + nval) * ((nval2 *
                                               (nval2 *
                                                (nval2 *
@@ -43,8 +48,8 @@ def rect_radius(ellipsoid):
 
 def alpha_coeff(ellipsoid):
     """
-    Computes the set of Alpha coefficients of an Ellipsoid with specified Inverse Flattening
-    (See Ref 2 Equation 5)
+    Computes the set of Alpha coefficients of an Ellipsoid with specified
+    Inverse Flattening (See Ref 2 Equation 5)
     :param ellipsoid: Ellipsoid Object
     :return: Alpha coefficients a2, a4 ... a16
     """
