@@ -240,6 +240,13 @@ def rect2polar(x, y):
     return r, theta
 
 
+def dd2sec(dd):
+    minutes, seconds = divmod(abs(dd) * 3600, 60)
+    degrees, minutes = divmod(minutes, 60)
+    sec = (degrees * 3600) + (minutes * 60) + seconds
+    return sec if dd >= 0 else -sec
+
+
 # ----------------
 # Legacy Functions
 # dd2dms refactored as dec2hp
@@ -256,13 +263,6 @@ def dms2dd(dms):
     degrees, minutes = divmod(degmin, 100)
     dd = degrees + (minutes / 60) + (seconds / 360)
     return dd if dms >= 0 else -dd
-
-  
-def dd2sec(dd):
-    minutes, seconds = divmod(abs(dd) * 3600, 60)
-    degrees, minutes = divmod(minutes, 60)
-    sec = (degrees * 3600) + (minutes * 60) + seconds
-    return sec if dd >= 0 else -sec
 
 
 def dec2sex(lon, lat):
