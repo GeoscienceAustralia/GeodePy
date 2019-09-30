@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sys
 from math import radians, sin, cos, sqrt, atan2, degrees
 import numpy as np
 
@@ -26,19 +27,24 @@ def vcv_cart2local(vcv_cart, lat, lon):
 
     See Section 4.4.1 of the DynaNet User's Guide v3.3
     """
+    column_vector = False
     if vcv_cart.shape[0] == 3:
         if vcv_cart.shape[1] == 1:
-            vcv_cart = np.array([[vcv_cart[0,0], 0.0, 0.0],
-                                 [0.0, vcv_cart[1,0], 0.0],
-                                 [0.0, 0.0, vcv_cart[2,0]]])
+            column_vector = True
+            vcv_cart = np.array([[vcv_cart[0, 0], 0.0, 0.0],
+                                 [0.0, vcv_cart[1, 0], 0.0],
+                                 [0.0, 0.0, vcv_cart[2, 0]]])
         elif vcv_cart.shape[1] == 3:
             pass
         else:
             sys.exit('Matrix must be either 3x1 or 3x3')
     else:
-         sys.exit('Matrix must be either 3x1 or 3x3')
+        sys.exit('Matrix must be either 3x1 or 3x3')
     rot_matrix = rotation_matrix(lat, lon)
     vcv_local = rot_matrix.transpose() @ vcv_cart @ rot_matrix
+    if column_vector:
+        vcv_local = np.array([[vcv_local[0, 0]], [vcv_local[1, 1]],
+                              [vcv_local[2, 2]]])
     return vcv_local
 
 
@@ -50,8 +56,10 @@ def vcv_local2cart(vcv_local, lat, lon):
 
     See Section 4.4.1 of the DynaNet User's Guide v3.3
     """
+    column_vector = False
     if vcv_local.shape[0] == 3:
         if vcv_local.shape[1] == 1:
+            column_vector = True
             vcv_local = np.array([[vcv_local[0, 0], 0.0, 0.0],
                                  [0.0, vcv_local[1, 0], 0.0],
                                  [0.0, 0.0, vcv_local[2, 0]]])
@@ -63,6 +71,9 @@ def vcv_local2cart(vcv_local, lat, lon):
         sys.exit('Matrix must be either 3x1 or 3x3')
     rot_matrix = rotation_matrix(lat, lon)
     vcv_cart = rot_matrix @ vcv_local @ rot_matrix.transpose()
+    if column_vector:
+        vcv_cart = np.array([[vcv_cart[0, 0]], [vcv_cart[1, 1]],
+                             [vcv_cart[2, 2]]])
     return vcv_cart
 
 
