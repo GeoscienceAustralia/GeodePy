@@ -5,71 +5,51 @@ Geoscience Australia - Python Geodesy Package
 Geodesy Module
 """
 
-import os
+import os, sys
 import csv
-from math import (pi, degrees, radians, sqrt, sin,
-                  cos, tan, asin, acos, atan, atan2)
+from math import degrees, radians, sqrt, sin, cos, tan, asin, acos, atan, atan2
 import numpy as np
 from geodepy.convert import dec2hp, hp2dec
 from geodepy.constants import grs80
 from geodepy.transform import grid2geo, geo2grid
+from geodepy.statistics import rotation_matrix
 
 
-def enu2xyz(lat, long, east, north, up):
-    """
-    function to convert a vector in a local east, north, up reference frame to
-    a vector in a cartesian x, y, z reference frame
+def enu2xyz(lat, lon, east, north, up):
+    """Convert a column vector in the local reference frame to a column vector
+    in the Cartesian reference frame.
     :param lat: latitude in decimal degrees
-    :param long: longitude in decimal degrees
+    :param lon: longitude in decimal degrees
     :param east: in metres
     :param north: in metres
     :param up: in metres
     :return: x, y, z in metres
     """
-    lat = radians(lat)
-    long = radians(long)
-    # Create ENU Vector
-    enu = np.array([[east],
-                    [north],
-                    [up]])
-    # Create Rotation Matrix
-    rotate = np.array([[-sin(long), -sin(lat)*cos(long), cos(lat)*cos(long)],
-                       [cos(long), -sin(lat)*sin(long), cos(lat)*sin(long)],
-                       [0, cos(lat), sin(lat)]])
-    xyz = np.dot(rotate, enu)
-    # Assign to separate variables
-    x = float(xyz[0])
-    y = float(xyz[1])
-    z = float(xyz[2])
+    rot_matrix = rotation_matrix(lat, lon)
+    enu = np.array([[east], [north], [up]])
+    xyz = rot_matrix @ enu
+    x = xyz[0, 0]
+    y = xyz[1, 0]
+    z = xyz[2, 0]
     return x, y, z
 
 
-def xyz2enu(lat, long, x, y, z):
-    """
-    function to convert a vector in a cartesian x, y, z reference frame to a
-    vector in a local east, north, up reference frame
+def xyz2enu(lat, lon, x, y, z):
+    """Convert a column vector in the Cartesian reference frame to a column
+    vector in the local reference frame.
     :param lat: latitude in decimal degrees
-    :param long: longitude in decimal degrees
+    :param lon: longitude in decimal degrees
     :param x: in metres
     :param y: in metres
     :param z: in metres
     :return: east, north, up in metres
     """
-    lat = radians(lat)
-    long = radians(long)
-    # Create XYZ Vector
-    xyz = np.array([[x],
-                    [y],
-                    [z]])
-    # Create Rotation Matrix
-    rotate = np.array([[-sin(long), cos(long), 0],
-                       [-sin(lat)*cos(long), -sin(lat)*sin(long), cos(lat)],
-                       [cos(lat)*cos(long), cos(lat)*sin(long), sin(lat)]])
-    enu = np.dot(rotate, xyz)
-    # Assign to separate variables
-    east = float(enu[0])
-    north = float(enu[1])
-    up = float(enu[2])
+    rot_matrix = rotation_matrix(lat, lon)
+    xyz = np.array([[x], [y], [z]])
+    enu = rot_matrix.transpose() @ xyz
+    east = enu[0, 0]
+    north = enu[1, 0]
+    up = enu[2, 0]
     return east, north, up
 
 
