@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import sys
+sys.path.append('./env/lib/python3.7/site-packages')
 from math import radians, sin, cos, sqrt, atan2, degrees
 import numpy as np
 
