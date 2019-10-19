@@ -14,7 +14,7 @@ NumPy
 
 ### Testing
 
-Run: `python -m unittest discover geodepy/tests/`
+Run: `python -m unittest discover geodepy/tests/ --verbose`
 
 ### Tutorials
 
