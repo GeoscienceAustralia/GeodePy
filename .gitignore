@@ -1,4 +1,3 @@
-.idea
 __pycache__
 
 # Compiled python modules.
@@ -6,6 +5,7 @@ __pycache__
 
 # Setuptools distribution folder.
 /dist/
+env
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
@@ -13,8 +13,8 @@ __pycache__
 # Ignore test-related files
 /coverage.data
 /coverage/
-.coverage
-htmlcov/
+
+# IDEs
 .vscode
-env
+.idea
 
