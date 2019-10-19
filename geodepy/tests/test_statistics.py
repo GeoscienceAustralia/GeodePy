@@ -1,6 +1,3 @@
-import sys
-sys.path.append("../geodepy")
-
 import unittest
 from geodepy import statistics
 from geodepy.statistics import np
