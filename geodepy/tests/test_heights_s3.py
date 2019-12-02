@@ -6,7 +6,7 @@ Created on Fri Nov 08 10:52:07 2019
 """
 import unittest
 import numpy as np
-import heights_s3
+import geodepy.heights_s3
 
 #___________________________________________________________________________#
 ## Some test Cases to run, check againts ga.gov.au/ausgeoid
