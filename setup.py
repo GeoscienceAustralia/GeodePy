@@ -9,4 +9,4 @@ setup(name='geodepy',
       author_email='geodesy@ga.gov.au',
       license='Apache License 2.0',
       packages=['geodepy'],
-      install_requires=['numpy'])
+      install_requires=['numpy', 'scipy', 'gdal'])
