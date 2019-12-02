@@ -24,17 +24,17 @@ DOVPV=-2.4971921
 
 class TestHeights(unittest.TestCase):
     def test_AVWS_H(self):
-        self.assertAlmostEqual(np.asscalar(heights_s3.GPS_to_AVWS(Lat,Long,Height)[0]),AVWS_H,7)
+        self.assertAlmostEqual(np.asscalar(geodepy.heights_s3.GPS_to_AVWS(Lat,Long,Height)[0]),AVWS_H,7)
     def test_AVWS_H_STD(self):
-        self.assertAlmostEqual(np.asscalar(heights_s3.GPS_to_AVWS(Lat,Long,Height)[1]),AVWS_H_STD,7)
+        self.assertAlmostEqual(np.asscalar(geodepy.heights_s3.GPS_to_AVWS(Lat,Long,Height)[1]),AVWS_H_STD,7)
     def test_DOVPV(self):
-        self.assertAlmostEqual(np.asscalar(heights_s3.DOV(Lat,Long)[1]),DOVPV,7)
+        self.assertAlmostEqual(np.asscalar(geodepy.heights_s3.DOV(Lat,Long)[1]),DOVPV,7)
     def test_DOVPM(self):
-        self.assertAlmostEqual(np.asscalar(heights_s3.DOV(Lat,Long)[0]),DOVPM,7)
+        self.assertAlmostEqual(np.asscalar(geodepy.heights_s3.DOV(Lat,Long)[0]),DOVPM,7)
     def test_AHD_H(self):
-        self.assertAlmostEqual(np.asscalar(heights_s3.GPS_to_AHD(Lat,Long,Height)[0]),AHD_H,7)
+        self.assertAlmostEqual(np.asscalar(geodepy.heights_s3.GPS_to_AHD(Lat,Long,Height)[0]),AHD_H,7)
     def test_AHD_H_STD(self):
-        self.assertAlmostEqual(np.asscalar(heights_s3.GPS_to_AHD(Lat,Long,Height)[1]),AHD_H_STD,7)
+        self.assertAlmostEqual(np.asscalar(geodepy.heights_s3.GPS_to_AHD(Lat,Long,Height)[1]),AHD_H_STD,7)
 
 
 if __name__ == '__main__':
