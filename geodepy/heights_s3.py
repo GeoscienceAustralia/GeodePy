@@ -5,8 +5,6 @@
 # AWVS/AHD and Vice Versa 
 # Gridded data used for the varisous reference surfaces are geotiff files
 # These allow direct access remotely using "gdal"
-# File names are hard coded 
-# Some exmaples of how the functions can be used are give towards the end 
 #___________________________________________________________________________#
 # Import dependencies 
 import gdal
