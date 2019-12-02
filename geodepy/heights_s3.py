@@ -12,7 +12,7 @@
 import gdal
 import numpy as np
 from scipy.interpolate import griddata
-import Height_filenames
+import geodepy.Height_filenames
 #___________________________________________________________________________#
 # Interpolation functions
 def interp_file(Lat,Long,file):
