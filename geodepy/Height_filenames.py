@@ -10,3 +10,4 @@ file_AG2020='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AUSGeoi
 file_AG2020_STD='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AUSGeoid2020_RELEASEV20170908_err.tif'
 file_AVWS='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AVWS_20191107.tif'
 file_AVWS_STD='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AVWS_STD_20191107.tif'
+file_GRAV_BA='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/Bouguer_Grav_RELEASE20191107.tif'
