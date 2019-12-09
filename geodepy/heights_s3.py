@@ -56,7 +56,7 @@ def AVWS_to_GPS(Lat,Long,AVWS_H):
     GPS_H=AVWS_H+zeta
     return [GPS_H,zeta_std]
 
-def AHD_to_AVWS(Lat,Long,AHD_H,file_AG2020):
+def AHD_to_AVWS(Lat,Long,AHD_H):
     # Convert to GPS
     GPS_H=AHD_H+interp_file(Lat,Long,Height_filenames.file_AG2020) # AUSGEOID2020 file
     # Convert to AVWS
