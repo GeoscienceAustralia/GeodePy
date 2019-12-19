@@ -37,9 +37,9 @@ def vcv_cart2local(vcv_cart, lat, lon):
         elif vcv_cart.shape[1] == 3:
             pass
         else:
-            sys.exit('Matrix must be either 3x1 or 3x3')
+            raise ValueError('Matrix must be either 3x1 or 3x3')
     else:
-        sys.exit('Matrix must be either 3x1 or 3x3')
+        raise ValueError('Matrix must be either 3x1 or 3x3')
     rot_matrix = rotation_matrix(lat, lon)
     vcv_local = rot_matrix.transpose() @ vcv_cart @ rot_matrix
     if column_vector:
@@ -66,9 +66,9 @@ def vcv_local2cart(vcv_local, lat, lon):
         elif vcv_local.shape[1] == 3:
             pass
         else:
-            sys.exit('Matrix must be either 3x1 or 3x3')
+            raise ValueError('Matrix must be either 3x1 or 3x3')
     else:
-        sys.exit('Matrix must be either 3x1 or 3x3')
+        raise ValueError('Matrix must be either 3x1 or 3x3')
     rot_matrix = rotation_matrix(lat, lon)
     vcv_cart = rot_matrix @ vcv_local @ rot_matrix.transpose()
     if column_vector:
