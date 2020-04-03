@@ -6,9 +6,14 @@ import numpy as np
 
 
 def rotation_matrix(lat, lon):
-    """Returns the 3x3 rotation matrix for a given latitude and longitude
-    (given in decimal degrees)
-    See Section 4.2.3 of the DynaNet User's Guide v3.3
+    """Returns the rotation matrix between the local and Cartesian reference
+    systems at a given latitude and longitude
+
+    See Section 4.2.3 of the DynAdjust User's Guide v1.0
+
+    :param lat: latitude in decimal degrees
+    :param lon: longitude in decimal degrees
+    :return: rot_matrix (3x3)
     """
     (rlat, rlon) = (radians(lat), radians(lon))
     rot_matrix = np.array(
@@ -20,57 +25,81 @@ def rotation_matrix(lat, lon):
 
 
 def vcv_cart2local(vcv_cart, lat, lon):
-    """Transform a 3x3 VCV from the Cartesian to the local reference frame. If
-    only a column vector of variances is supplied (3x1) then the full VCV is
-    padded out with zeros for the transformation. In these cases, only the
-    column vector of variances (3x1) is returned.
+    """Transforms a VCV from the Cartesian to the local reference frame. If
+    only a column vector of variances is supplied then they are assumed to be
+    uncorrelated and only the column vector of variances is returned.
 
-    See Section 4.4.1 of the DynaNet User's Guide v3.3
+    See Section 4.4.1 of the DynAdjust User's Guide v1.0
+
+    :param vcv_cart: a VCV in the Cartesian reference frame (3x1 or 3x3)
+    :param lat: latitude in decimal degrees
+    :param lon: longitude in decimal degrees
+    :return: vcv_local (3x1 or 3x3)
     """
+    column_vector = False
     if vcv_cart.shape[0] == 3:
         if vcv_cart.shape[1] == 1:
-            vcv_cart = np.array([[vcv_cart[0,0], 0.0, 0.0],
-                                 [0.0, vcv_cart[1,0], 0.0],
-                                 [0.0, 0.0, vcv_cart[2,0]]])
+            column_vector = True
+            vcv_cart = np.array([[vcv_cart[0, 0], 0.0, 0.0],
+                                 [0.0, vcv_cart[1, 0], 0.0],
+                                 [0.0, 0.0, vcv_cart[2, 0]]])
         elif vcv_cart.shape[1] == 3:
             pass
         else:
-            sys.exit('Matrix must be either 3x1 or 3x3')
+            raise ValueError('Matrix must be either 3x1 or 3x3')
     else:
-         sys.exit('Matrix must be either 3x1 or 3x3')
+        raise ValueError('Matrix must be either 3x1 or 3x3')
     rot_matrix = rotation_matrix(lat, lon)
     vcv_local = rot_matrix.transpose() @ vcv_cart @ rot_matrix
+    if column_vector:
+        vcv_local = np.array([[vcv_local[0, 0]], [vcv_local[1, 1]],
+                              [vcv_local[2, 2]]])
     return vcv_local
 
 
 def vcv_local2cart(vcv_local, lat, lon):
-    """Transform a 3x3 VCV from the local to the Cartesian reference frame. If
-    only a column vector of variances is supplied (3x1) then the full VCV is
-    padded out with zeros for the transformation. In these cases, only the
-    column vector of variances (3x1) is returned.
+    """Transform a VCV from the local to the Cartesian reference frame. If
+    only a column vector of variances is supplied then they are assumed to be
+    uncorrelated and only the column vector of variances is returned.
 
-    See Section 4.4.1 of the DynaNet User's Guide v3.3
+    See Section 4.4.1 of the DynAdjust User's Guide v1.0
+
+    :param vcv_local: a VCV in the local reference frame (3x1 or 3x3)
+    :param lat: latitude in decimal degrees
+    :param lon: longitude in decimal degrees
+    :return: vcv_cart (3x1 or 3x3)
     """
+    column_vector = False
     if vcv_local.shape[0] == 3:
         if vcv_local.shape[1] == 1:
+            column_vector = True
             vcv_local = np.array([[vcv_local[0, 0], 0.0, 0.0],
                                  [0.0, vcv_local[1, 0], 0.0],
                                  [0.0, 0.0, vcv_local[2, 0]]])
         elif vcv_local.shape[1] == 3:
             pass
         else:
-            sys.exit('Matrix must be either 3x1 or 3x3')
+            raise ValueError('Matrix must be either 3x1 or 3x3')
     else:
-        sys.exit('Matrix must be either 3x1 or 3x3')
+        raise ValueError('Matrix must be either 3x1 or 3x3')
     rot_matrix = rotation_matrix(lat, lon)
     vcv_cart = rot_matrix @ vcv_local @ rot_matrix.transpose()
+    if column_vector:
+        vcv_cart = np.array([[vcv_cart[0, 0]], [vcv_cart[1, 1]],
+                             [vcv_cart[2, 2]]])
     return vcv_cart
 
 
 def error_ellipse(vcv):
     """Calculate the semi-major axis, semi-minor axis, and the orientation of
-    the error ellipse calculated from a 3x3 VCV
+    the error ellipse defined by a VCV
+
     See Section 7.3.3.1 of the DynaNet User's Guide v3.3
+
+    :param vcv: a VCV (3x3)
+    :return: a, semi-major axis
+    :return: b, semi-minor axis
+    :return: orientation, the orientation of the rorr ellipse
     """
     z = sqrt((vcv[0, 0] - vcv[1, 1])**2 + 4 * vcv[0, 1]**2)
     a = sqrt(0.5 * (vcv[0, 0] + vcv[1, 1] + z))
@@ -82,8 +111,12 @@ def error_ellipse(vcv):
 
 
 def circ_hz_pu(a, b):
-    """Calculate the circularised horizontal PU form the semi-major and
-    semi-minor axes
+    """Calculate the circularised horizontal PU from the semi-major and
+    semi-minor axes of an error ellipse
+
+    :param a: semi-major axis
+    :param b: semi-minor axis
+    :return: r the radius of the circularised error
     """
     q0 = 1.960790
     q1 = 0.004071
@@ -105,6 +138,7 @@ def k_val95(dof):
     120, returns k value of 1.96 and for DOF below 1, returns k value
     for DOF = 1. Coverage Factor produced using following scipy stats
     code: stats.t.ppf(1-0.025,dof)
+
     :param dof: Degrees of Freedom (Number of Measurements Minus 1)
     :return: Coverage Factor k
     """
