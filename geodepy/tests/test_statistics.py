@@ -19,27 +19,24 @@ class TestStatistics(unittest.TestCase):
         np.array_equal(expected_result, result)
         self.assertEqual(type(expected_result), type(result))
 
-    def test_vcv_cart2local_and_vcv_local2cart2_3X3(self):
+    def test_vcv_cart2local_3X3(self):
         lat = 19.4792453
         lon = 70.69315634
         v_cart = np.array([
-            [0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0],
+            [1.44, -1.32, 1.32],
+            [-1.32, 1.20, -1.20],
+            [1.32, -1.20, 1.20]
         ])
         expected_result = np.array([
-            [0., 0., 0.],
-            [0., 0., 0.],
-            [0., 0., 0.],
+            [2.23753205, -1.8674709, 0.35405044],
+            [-1.8674709, 1.54898417, -0.2905506],
+            [0.35405044, -0.2905506, 0.05348378]
         ])
 
-        result_cart2local = statistics.vcv_cart2local(v_cart, lat, lon)
-        result_local2cart = statistics.vcv_local2cart(v_cart, lat, lon)
+        result = statistics.vcv_cart2local(v_cart, lat, lon)
 
-        np.testing.assert_array_equal(expected_result, result_cart2local)
-        np.testing.assert_array_equal(expected_result, result_local2cart)
-        self.assertEqual(type(expected_result), type(result_cart2local))
-        self.assertEqual(type(expected_result), type(result_local2cart))
+        np.testing.assert_array_equal(expected_result, result)
+        self.assertEqual(type(expected_result), type(result))
 
     def test_vcv_cart2local_and_vcv_local2cart2_3X2(self):
         lat = 0.0
