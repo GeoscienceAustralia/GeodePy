@@ -4,13 +4,18 @@ from geodepy.statistics import np
 
 lat = 19.4792453
 lon = 70.69315634
+vcv = np.array([
+    [1.44, -1.32, 1.32],
+    [-1.32, 1.20, -1.20],
+    [1.32, -1.20, 1.20]
+])
+var = np.array([
+    [1.44], [1.20], [1.20]
+])
 
 
 class TestStatistics(unittest.TestCase):
     def test_rotation_matrix(self):
-#        lat = 19.4792
-#        lon = 70.6931
-
         expected_result = np.array([
             [-0.94376147, -0.1102527, 0.3117028],
             [0.33062712, -0.31471177, 0.88974278],
@@ -22,148 +27,68 @@ class TestStatistics(unittest.TestCase):
         np.testing.assert_almost_equal(expected_result, result)
         self.assertEqual(type(expected_result), type(result))
 
-    def test_vcv_cart2local_3X3(self):
-        lat = 19.4792453
-        lon = 70.69315634
-        v_cart = np.array([
-            [1.44, -1.32, 1.32],
-            [-1.32, 1.20, -1.20],
-            [1.32, -1.20, 1.20]
-        ])
+    def test_vcv_cart2local_3x3(self):
         expected_result = np.array([
             [2.23753205, -1.8674709, 0.35405044],
             [-1.8674709, 1.54898417, -0.2905506],
             [0.35405044, -0.2905506, 0.05348378]
         ])
 
-        result = statistics.vcv_cart2local(v_cart, lat, lon)
+        result = statistics.vcv_cart2local(vcv, lat, lon)
 
         np.testing.assert_almost_equal(expected_result, result)
         self.assertEqual(type(expected_result), type(result))
 
-    def test_vcv_cart2local_3X1(self):
-        lat = 19.4792453
-        lon = 70.69315634
-        v_cart = np.array([
-            [1.44], [1.20], [1.20]
-        ])
+    def test_vcv_cart2local_3x1(self):
         expected_result = np.array([
             [1.41376457], [1.20291736], [1.22331807]
         ])
 
-        result = statistics.vcv_cart2local(v_cart, lat, lon)
+        result = statistics.vcv_cart2local(var, lat, lon)
 
         np.testing.assert_almost_equal(expected_result, result)
         self.assertEqual(type(expected_result), type(result))
 
     def test_vcv_cart2local_3X2(self):
-        lat = 0.0
-        lon = 0.0
-        v_cart = np.array([
-            [0.0, 0.0],
-            [0.0, 0.0],
-            [0.0, 0.0],
-        ])
+        v_cart = np.zeros((3, 2))
 
         with self.assertRaises(SystemExit):
-            statistics.vcv_cart2local(v_cart, lat, lon)
+            statistics.vcv_cart2local(v_cart, 0.0, 0.0)
 
     def test_vcv_local2cart_3X3(self):
-        lat = 19.4792453
-        lon = 70.69315634
-        v_local = np.array([
-            [1.44, -1.32, 1.32],
-            [-1.32, 1.20, -1.20],
-            [1.32, -1.20, 1.20]
-        ])
         expected_result = np.array([
             [0.44492825, -1.15577063,  0.45052547],
             [-1.15577063,  2.94958039, -1.14655874],
             [0.45052547, -1.14655874, 0.44549136]
         ])
 
-        result = statistics.vcv_local2cart(v_local, lat, lon)
+        result = statistics.vcv_local2cart(vcv, lat, lon)
 
         np.testing.assert_almost_equal(expected_result, result)
         self.assertEqual(type(expected_result), type(result))
 
-    def test_vcv_cart2local_3X1(self):
-        lat = 19.4792453
-        lon = 70.69315634
-        v_cart = np.array([
-            [1.44], [1.20], [1.20]
-        ])
+    def test_vcv_local2cart_3X1(self):
         expected_result = np.array([
             [1.41376457], [1.20291736], [1.22331807]
         ])
 
-        result = statistics.vcv_cart2local(v_cart, lat, lon)
+        result = statistics.vcv_cart2local(var, lat, lon)
 
         np.testing.assert_almost_equal(expected_result, result)
         self.assertEqual(type(expected_result), type(result))
 
-    def test_vcv_cart2local_3X2(self):
-        lat = 0.0
-        lon = 0.0
-        v_cart = np.array([
-            [0.0, 0.0],
-            [0.0, 0.0],
-            [0.0, 0.0],
-        ])
-
-        with self.assertRaises(SystemExit):
-            statistics.vcv_cart2local(v_cart, lat, lon)
+    def test_vcv_local2cart_3X2(self):
+        v_cart = np.zeros((3, 2))
 
         with self.assertRaises(SystemExit):
             statistics.vcv_local2cart(v_cart, lat, lon)
-
-    def test_vcv_cart2local_and_vcv_local2cart2_2X3(self):
-        lat = 0.0
-        lon = 0.0
-        v_cart = np.array([
-            [0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0],
-        ])
-
-        with self.assertRaises(SystemExit):
-            statistics.vcv_cart2local(v_cart, lat, lon)
-
-        with self.assertRaises(SystemExit):
-            statistics.vcv_local2cart(v_cart, lat, lon)
-
-    def test_vcv_cart2local_and_vcv_local2cart2_1X3(self):
-        lat = 0.0
-        lon = 0.0
-        v_cart = np.array([
-            [0.0],
-            [0.0],
-            [0.0],
-        ])
-        expected_result = np.array([
-            [0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0],
-        ])
-
-        result_cart2local = statistics.vcv_cart2local(v_cart, lat, lon)
-        result_local2cart = statistics.vcv_local2cart(v_cart, lat, lon)
-
-        np.testing.assert_array_equal(expected_result, result_cart2local)
-        np.testing.assert_array_equal(expected_result, result_local2cart)
-        self.assertEqual(type(expected_result), type(result_cart2local))
-        self.assertEqual(type(expected_result), type(result_local2cart))
 
     def test_error_ellipse(self):
-        vcv = np.array([
-            [90, 0, 0],
-            [0, 90, 0],
-            [0, 0, 90],
-        ])
         expected_result = (9.486832980505138, 9.486832980505138, 90.0)
 
         result = statistics.error_ellipse(vcv)
 
-        self.assertEqual(expected_result, result)
+        np.testing.assert_almost_equal(expected_result, result)
         self.assertEqual(type(expected_result), type(result))
 
     def test_circ_hz_pu(self):

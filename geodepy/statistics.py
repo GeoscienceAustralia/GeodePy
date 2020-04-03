@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
 from math import radians, sin, cos, sqrt, atan2, degrees
 import numpy as np
 
@@ -99,7 +98,7 @@ def error_ellipse(vcv):
     :param vcv: a VCV (3x3)
     :return: a, semi-major axis
     :return: b, semi-minor axis
-    :return: orientation, the orientation of the rorr ellipse
+    :return: orientation, the orientation of the error ellipse
     """
     z = sqrt((vcv[0, 0] - vcv[1, 1])**2 + 4 * vcv[0, 1]**2)
     a = sqrt(0.5 * (vcv[0, 0] + vcv[1, 1] + z))
