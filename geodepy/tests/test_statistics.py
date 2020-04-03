@@ -34,9 +34,8 @@ class TestStatistics(unittest.TestCase):
         ])
 
         result = statistics.vcv_cart2local(v_cart, lat, lon)
-        print(result)
 
-        self.assertAlmostEqual(expected_result, result, 6)
+        np.testing.assert_almost_equal(expected_result, result)
         self.assertEqual(type(expected_result), type(result))
 
     def test_vcv_cart2local_and_vcv_local2cart2_3X2(self):
