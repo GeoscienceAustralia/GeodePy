@@ -52,7 +52,7 @@ class TestStatistics(unittest.TestCase):
     def test_vcv_cart2local_3X2(self):
         v_cart = np.zeros((3, 2))
 
-        with self.assertRaises(SystemExit):
+        with self.assertRaises(ValueError):
             statistics.vcv_cart2local(v_cart, 0.0, 0.0)
 
     def test_vcv_local2cart_3X3(self):
@@ -80,7 +80,7 @@ class TestStatistics(unittest.TestCase):
     def test_vcv_local2cart_3X2(self):
         v_cart = np.zeros((3, 2))
 
-        with self.assertRaises(SystemExit):
+        with self.assertRaises(ValiueError):
             statistics.vcv_local2cart(v_cart, lat, lon)
 
     def test_error_ellipse(self):
