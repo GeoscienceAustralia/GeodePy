@@ -38,6 +38,25 @@ class TestStatistics(unittest.TestCase):
         np.testing.assert_almost_equal(expected_result, result)
         self.assertEqual(type(expected_result), type(result))
 
+    def test_vcv_local2cart_3X3(self):
+        lat = 19.4792453
+        lon = 70.69315634
+        v_local = np.array([
+            [1.44, -1.32, 1.32],
+            [-1.32, 1.20, -1.20],
+            [1.32, -1.20, 1.20]
+        ])
+        expected_result = np.array([
+            [0.44492825, -1.15577063,  0.45052547],
+            [-1.15577063,  2.94958039, -1.14655874],
+            [0.45052547, -1.14655874, 0.44549136]]
+        ])
+
+        result = statistics.vcv_local2cart(v_local, lat, lon)
+
+        np.testing.assert_almost_equal(expected_result, result)
+        self.assertEqual(type(expected_result), type(result))
+
     def test_vcv_cart2local_and_vcv_local2cart2_3X2(self):
         lat = 0.0
         lon = 0.0
