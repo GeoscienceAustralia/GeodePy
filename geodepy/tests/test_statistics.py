@@ -49,7 +49,7 @@ class TestStatistics(unittest.TestCase):
         expected_result = np.array([
             [0.44492825, -1.15577063,  0.45052547],
             [-1.15577063,  2.94958039, -1.14655874],
-            [0.45052547, -1.14655874, 0.44549136]]
+            [0.45052547, -1.14655874, 0.44549136]
         ])
 
         result = statistics.vcv_local2cart(v_local, lat, lon)
