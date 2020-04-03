@@ -371,3 +371,12 @@ itrf00to89 = iers2trans('ITRF2000', 'ITRF1989', date(1988, 1, 1),
 itrf00to88 = iers2trans('ITRF2000', 'ITRF1988', date(1988, 1, 1),
                         24.7, 11.5, -97.9, 8.95, 0, 0, -0.18,
                         0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
+
+# The locations of files used in the height module
+file_DOV_PV='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/DOV_PV.tif'
+file_DOV_PM='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/DOV_PM.tif'
+file_AG2020='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AUSGeoid2020_RELEASEV20170908.tif'
+file_AG2020_STD='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AUSGeoid2020_RELEASEV20170908_err.tif'
+file_AVWS='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AVWS_20191107.tif'
+file_AVWS_STD='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AVWS_STD_20191107.tif'
+file_GRAV_BA='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/Bouguer_Grav_RELEASE20191107.tif'
