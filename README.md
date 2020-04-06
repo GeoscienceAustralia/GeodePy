@@ -4,21 +4,24 @@
 
 This is a package of tools for manipulating geospatial datasets using Python and tested in Python 3.6.4.
 
+### Tutorials
+
+See [here](https://github.com/GeoscienceAustralia/GeodePy/tree/master/docs/tutorials) for worked examples of common GeodePy functions and routines.
+
 ### Dependencies
 
-This package requires the following non-standard Python modules installed:
+This package requires the following PyPI Packages installed:
 
 ```
 NumPy
+SciPy
 ```
+
+Additionally, the geodepy.height module requires the GDAL library (tested using GDAL 3.0.4). For more information, see [here](https://gdal.org/index.html) for information about GDAL, [here](https://anaconda.org/conda-forge/gdal) for Anaconda support for GDAL and [here](http://www.gisinternals.com/release.php) for GDAL Binaries for Windows.
 
 ### Testing
 
 Run: `python -m unittest discover geodepy/tests/ --verbose`
-
-### Tutorials
-
-See [here](https://github.com/GeoscienceAustralia/GeodePy/tree/master/docs/tutorials) for worked examples of common GeodePy functions and routines.
 
 ## API
 
@@ -37,12 +40,13 @@ For subsequent updating run: `zappa update dev`
 * **Craig Harrison** - *Project Management* - [harry093](https://github.com/harry093)
 * **Josh Batchelor** - *Initial Work, Geodesy and Surveying* - [BatchelorJ](https://github.com/BatchelorJ)
 * **Jonathan Mettes** - *Testing, Integration and Deployment* - [jmettes](https://github.com/jmettes)
+* **Jack McCubbine** - *Height Module*
 
 See also the list of [contributors](https://github.com/GeoscienceAustralia/geodepy/graphs/contributors) who participated in this project.
 
 ### License
 
-Copyright 2018 Geoscience Australia
+Copyright 2018-2020 Geoscience Australia
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
