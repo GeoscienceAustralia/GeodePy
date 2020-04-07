@@ -40,7 +40,7 @@ For subsequent updating run: `zappa update dev`
 * **Craig Harrison** - *Project Management* - [harry093](https://github.com/harry093)
 * **Josh Batchelor** - *Initial Work, Geodesy and Surveying* - [BatchelorJ](https://github.com/BatchelorJ)
 * **Jonathan Mettes** - *Testing, Integration and Deployment* - [jmettes](https://github.com/jmettes)
-* **Jack McCubbine** - *Height Module*
+* **Jack McCubbine** - *Height Module* - [JackMcCubbineGA](https://github.com/JackMcCubbineGA)
 
 See also the list of [contributors](https://github.com/GeoscienceAustralia/geodepy/graphs/contributors) who participated in this project.
 
