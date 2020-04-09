@@ -24,17 +24,21 @@ DOVPV=-2.4971921
 
 class TestHeights(unittest.TestCase):
     def test_AVWS_H(self):
-        self.assertAlmostEqual(np.asscalar(geodepy.height.GPS_to_AVWS(Lat, Long, Height)[0]), AVWS_H, 7)
+        self.assertAlmostEqual(np.asscalar(
+            geodepy.height.GPS_to_AVWS(Lat, Long, Height)[0]), AVWS_H, 7)
     def test_AVWS_H_STD(self):
-        self.assertAlmostEqual(np.asscalar(geodepy.height.GPS_to_AVWS(Lat, Long, Height)[1]), AVWS_H_STD, 7)
+        self.assertAlmostEqual(np.asscalar(
+            geodepy.height.GPS_to_AVWS(Lat, Long, Height)[1]), AVWS_H_STD, 7)
     def test_DOVPV(self):
         self.assertAlmostEqual(np.asscalar(geodepy.height.DOV(Lat, Long)[1]), DOVPV, 7)
     def test_DOVPM(self):
         self.assertAlmostEqual(np.asscalar(geodepy.height.DOV(Lat, Long)[0]), DOVPM, 7)
     def test_AHD_H(self):
-        self.assertAlmostEqual(np.asscalar(geodepy.height.GPS_to_AHD(Lat, Long, Height)[0]), AHD_H, 7)
+        self.assertAlmostEqual(np.asscalar(
+            geodepy.height.GPS_to_AHD(Lat, Long, Height)[0]), AHD_H, 7)
     def test_AHD_H_STD(self):
-        self.assertAlmostEqual(np.asscalar(geodepy.height.GPS_to_AHD(Lat, Long, Height)[1]), AHD_H_STD, 7)
+        self.assertAlmostEqual(np.asscalar(
+            geodepy.height.GPS_to_AHD(Lat, Long, Height)[1]), AHD_H_STD, 7)
 
 #___________________________________________________________________________#
 ## Some test Cases to run, check againts ga.gov.au/ausgeoid
@@ -51,9 +55,11 @@ NC=0.80179403
 
 class TestNC(unittest.TestCase):
     def test_NC(self):
-        self.assertAlmostEqual(np.asscalar(geodepy.height.normal_correction(Lat1,Long1,Height1,Lat2,Long2,Height2)[0]),NC,7)
+        self.assertAlmostEqual(np.asscalar(
+            geodepy.height.normal_correction(Lat1, Long1, Height1, Lat2, Long2, Height2)[0]), NC, 7)
     def test_Grav(self):
-        self.assertAlmostEqual(np.asscalar(geodepy.height.normal_correction(Lat1,Long1,Height1,Lat2,Long2,Height2)[1]),RECOVERED_GRAV,7)
+        self.assertAlmostEqual(np.asscalar(
+            geodepy.height.normal_correction(Lat1, Long1, Height1, Lat2, Long2, Height2)[1]), RECOVERED_GRAV, 7)
 
 if __name__ == '__main__':
     unittest.main()
