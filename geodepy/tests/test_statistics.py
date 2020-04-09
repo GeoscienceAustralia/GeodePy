@@ -29,9 +29,9 @@ class TestStatistics(unittest.TestCase):
 
     def test_vcv_cart2local_3x3(self):
         expected_result = np.array([
-            [2.23753205, -1.8674709, 0.35405044],
-            [-1.8674709, 1.54898417, -0.2905506],
-            [0.35405044, -0.2905506, 0.05348378]
+            [2.23971834, -1.86955194, 0.3599339],
+            [-1.86955194, 1.55096504, -0.29615085],
+            [0.3599339, -0.29615085, 0.06931662]
         ])
 
         result = statistics.vcv_cart2local(vcv, lat, lon)
@@ -44,7 +44,7 @@ class TestStatistics(unittest.TestCase):
             [1.41376457], [1.20291736], [1.22331807]
         ])
 
-        result = vcv_cart2local(var, lat, lon)
+        result = statistics.vcv_cart2local(var, lat, lon)
 
         np.testing.assert_almost_equal(expected_result, result)
         self.assertEqual(type(expected_result), type(result))
@@ -57,9 +57,9 @@ class TestStatistics(unittest.TestCase):
 
     def test_vcv_local2cart_3X3(self):
         expected_result = np.array([
-            [0.44492825, -1.15577063,  0.45052547],
-            [-1.15577063,  2.94958039, -1.14655874],
-            [0.45052547, -1.14655874, 0.44549136]
+            [0.44517136, -1.15507667, 0.44844663],
+            [-1.15507667, 2.95156126, -1.15249271],
+            [0.44844663, -1.15249271, 0.46326737]
         ])
 
         result = statistics.vcv_local2cart(vcv, lat, lon)
@@ -106,7 +106,7 @@ class TestStatistics(unittest.TestCase):
 
         for item in dof:
             with self.assertRaises(TypeError):
-                statistics.k_val95(dof)
+                statistics.k_val95(item)
 
     def test_k_val95_less_1(self):
         dof = -1
