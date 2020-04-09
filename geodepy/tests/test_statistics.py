@@ -1,12 +1,12 @@
 import unittest
 from geodepy import statistics
-from geodepy.statistics import np
+import numpy as np
 
 lat = 19.4792453
 lon = 70.69315634
 vcv = np.array([
     [1.44, -1.32, 1.32],
-    [-1.32, 1.20, -1.20],
+    [-1.32, 1.22, -1.20],
     [1.32, -1.20, 1.20]
 ])
 var = np.array([
@@ -44,7 +44,7 @@ class TestStatistics(unittest.TestCase):
             [1.41376457], [1.20291736], [1.22331807]
         ])
 
-        result = statistics.vcv_cart2local(var, lat, lon)
+        result = vcv_cart2local(var, lat, lon)
 
         np.testing.assert_almost_equal(expected_result, result)
         self.assertEqual(type(expected_result), type(result))
@@ -80,11 +80,12 @@ class TestStatistics(unittest.TestCase):
     def test_vcv_local2cart_3X2(self):
         v_cart = np.zeros((3, 2))
 
-        with self.assertRaises(ValiueError):
+        with self.assertRaises(ValueError):
             statistics.vcv_local2cart(v_cart, lat, lon)
 
     def test_error_ellipse(self):
-        expected_result = (9.486832980505138, 9.486832980505138, 90.0)
+        expected_result = (1.6292867776015223, 0.07365185899111726,
+                           132.61817915463692)
 
         result = statistics.error_ellipse(vcv)
 
@@ -95,10 +96,10 @@ class TestStatistics(unittest.TestCase):
         a = 1
         b = 0
 
-        expeted_result = 1.96079
+        expected_result = 1.96079
 
         result = statistics.circ_hz_pu(a, b)
-        self.assertEqual(expeted_result, result)
+        self.assertEqual(expected_result, result)
 
     def test_k_val95_typeError(self):
         dof = [[], {}, ""]
