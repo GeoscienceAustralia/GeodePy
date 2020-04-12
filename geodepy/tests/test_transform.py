@@ -10,7 +10,7 @@ from geodepy.transform import (geo2grid,
                                gda2020toatrf,
                                mga94to2020,
                                mga2020to94)
-from geodepy.convert import dms2dd_v, read_dnacoord
+from geodepy.convert import dms2dd_v, read_dnacoord, DMSAngle
 from geodepy.constants import itrf14togda20, gda94to20
 from datetime import date
 import numpy as np
@@ -41,7 +41,6 @@ class TestTransforms(unittest.TestCase):
         np.testing.assert_almost_equal(gridded_geo[:, 2:4].astype(float), np.array(test_grid_coords[['east', 'north']].tolist()),
                                        decimal=3)
 
-
     # Tests comparing results from DynAdjust Adjusted Coordinate File including 109 Points Across Australia
     def test_llh2xyz(self):
         abs_path = os.path.abspath(os.path.dirname(__file__))
@@ -68,13 +67,41 @@ class TestTransforms(unittest.TestCase):
     def test_geo2grid(self):
         abs_path = os.path.abspath(os.path.dirname(__file__))
 
+        # Test various coordinates in Australia
         testdata = read_dnacoord(os.path.join(abs_path, 'resources/natadjust_rvs_example.dat'))
         for coord in testdata:
             coord.converthptodd()
             hem, zonecomp, eastcomp, northcomp, psf, grid_conv = geo2grid(coord.lat, coord.long)
-            assert (zonecomp == coord.zone)
-            assert (abs(eastcomp - coord.easting) < 4e-4)
-            assert (abs(northcomp - coord.northing) < 4e-4)
+            self.assertEqual(zonecomp, coord.zone)
+            self.assertLess(abs(eastcomp - coord.easting), 4e-4)
+            self.assertLess((northcomp - coord.northing), 4e-4)
+
+        # Test North and South Hemisphere Output
+        north_ex = (DMSAngle(34, 57, 00.79653).dec(), DMSAngle(117, 48, 36.68783).dec())
+        south_ex = (DMSAngle(-34, 57, 00.79653).dec(), DMSAngle(117, 48, 36.68783).dec())
+        north_grid = geo2grid(north_ex[0], north_ex[1])
+        south_grid = geo2grid(south_ex[0], south_ex[1])
+        self.assertEqual(north_grid[0], 'North')
+        self.assertEqual(south_grid[0], 'South')
+        self.assertEqual(north_grid[1], south_grid[1])  # Zone
+        self.assertEqual(north_grid[2], south_grid[2])  # Easting
+        self.assertEqual(north_grid[3], 10000000 - south_grid[3])  # Northing
+        self.assertEqual(north_grid[4], south_grid[4])  # PSF
+        self.assertEqual(north_grid[5], -south_grid[5])  # Grid Convergence
+
+        # Test Input Validation
+        with self.assertRaises(ValueError):
+            geo2grid(0, 45, -1)
+        with self.assertRaises(ValueError):
+            geo2grid(0, 45, 61)
+        with self.assertRaises(ValueError):
+            geo2grid(-81, 45, 0)
+        with self.assertRaises(ValueError):
+            geo2grid(85, 45, 0)
+        with self.assertRaises(ValueError):
+            geo2grid(0, -181, 0)
+        with self.assertRaises(ValueError):
+            geo2grid(0, 181, 0)
 
     def test_grid2geo(self):
         abs_path = os.path.abspath(os.path.dirname(__file__))
@@ -86,6 +113,25 @@ class TestTransforms(unittest.TestCase):
             assert (abs(latcomp - coord.lat) < 5e-9)
             assert (abs(longcomp - coord.long) < 5e-9)
 
+        # Test North and South Hemisphere Output
+        north_ex = (50, 573976.8747, 3867822.4539, 'North')
+        south_ex = (50, 573976.8747, 6132177.5461, 'South')
+
+        # Test Input Validation
+        with self.assertRaises(ValueError):
+            grid2geo(-1, 0, 500000)
+        with self.assertRaises(ValueError):
+            grid2geo(61, 0, 500000)
+        with self.assertRaises(ValueError):
+            grid2geo(0, -2830001, 500000)
+        with self.assertRaises(ValueError):
+            grid2geo(0, 3830001, 500000)
+        with self.assertRaises(ValueError):
+            grid2geo(0, 0, -1)
+        with self.assertRaises(ValueError):
+            grid2geo(0, 0, 10000001)
+        with self.assertRaises(ValueError):
+            grid2geo(0, 0, 500000, 'fail')
 
     def test_conform7(self):
         # Replication of tests in GDA2020 Tech Manual v1.2 - Sect 3.1.1
@@ -100,7 +146,6 @@ class TestTransforms(unittest.TestCase):
         assert (abs(alic_gda1994_comp[1] - alic_gda1994[1]) < 5e-5)
         assert (abs(alic_gda1994_comp[2] - alic_gda1994[2]) < 5e-5)
 
-
     def test_conform14(self):
         # Replication of tests in GDA2020 Tech Manual v1.2 - Sect 3.3.1
         alic_gda2020 = (-4052052.7373, 4212835.9835, -2545104.5867)
@@ -113,7 +158,6 @@ class TestTransforms(unittest.TestCase):
         assert (abs(alic_gda2020_comp[0] - alic_gda2020[0]) < 5e-5)
         assert (abs(alic_gda2020_comp[1] - alic_gda2020[1]) < 5e-5)
         assert (abs(alic_gda2020_comp[2] - alic_gda2020[2]) < 5e-5)
-
 
     def test_atrftogda2020(self):
         alic_gda2020 = (-4052052.7373, 4212835.9835, -2545104.5867)
