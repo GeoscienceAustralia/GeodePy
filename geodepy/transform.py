@@ -337,10 +337,12 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
     b = beta_coeff(ellipsoid)
     # Transverse Mercator Co-ordinates
     x = (east - float(proj.falseeast)) / float(proj.cmscale)
-    if hemisphere == 'north':
-        y = north / float(proj.cmscale)
+    if hemisphere.lower() == 'north':
+        y = -(north / float(proj.cmscale))
+        hemisign = -1
     else:
         y = (north - float(proj.falsenorth)) / float(proj.cmscale)
+        hemisign = 1
 
     # Transverse Mercator Ratios
     xi = y / A
@@ -391,7 +393,7 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
     # Point Scale Factor and Grid Convergence
     psf, grid_conv = psfandgridconv(xi1, eta1, lat, long, cm, conf_lat)
 
-    return round(lat, 11), round(long, 11), round(psf, 8), grid_conv
+    return hemisign * round(lat, 11), round(long, 11), round(psf, 8), hemisign * grid_conv
 
 
 def xyz2llh(x, y, z, ellipsoid=grs80):

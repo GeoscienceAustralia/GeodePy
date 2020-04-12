@@ -110,12 +110,19 @@ class TestTransforms(unittest.TestCase):
         for coord in testdata:
             coord.converthptodd()
             latcomp, longcomp, psf, grid_conv = grid2geo(coord.zone, coord.easting, coord.northing)
-            assert (abs(latcomp - coord.lat) < 5e-9)
-            assert (abs(longcomp - coord.long) < 5e-9)
+            self.assertLess(abs(latcomp - coord.lat), 5e-9)
+            self.assertLess(abs(longcomp - coord.long), 5e-9)
 
         # Test North and South Hemisphere Output
         north_ex = (50, 573976.8747, 3867822.4539, 'North')
         south_ex = (50, 573976.8747, 6132177.5461, 'South')
+        north_geo = grid2geo(*north_ex)
+        south_geo = grid2geo(*south_ex)
+        self.assertEqual(north_geo[0], -south_geo[0])
+        self.assertEqual(north_geo[1], south_geo[1])
+        self.assertEqual(north_geo[2], south_geo[2])
+        self.assertEqual(north_geo[3], -south_geo[3])
+
 
         # Test Input Validation
         with self.assertRaises(ValueError):
