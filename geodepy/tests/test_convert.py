@@ -1,5 +1,6 @@
 import unittest
-from geodepy.convert import dec2hp, hp2dec, DMSAngle, DDMAngle, dec2dms, dec2ddm, hp2dms, hp2ddm, dd2dms, dms2dd
+from geodepy.convert import dec2hp, hp2dec, DMSAngle, DDMAngle, dec2dms, dec2ddm, hp2dms,\
+                            hp2ddm, dd2dms, dms2dd
 
 dec_ex = 123.74875
 dec_ex2 = 12.575
