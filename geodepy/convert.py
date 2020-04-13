@@ -52,16 +52,28 @@ class DMSAngle(object):
         return '{DMSAngle: ' + signsymbol + str(self.degree) + 'd ' + str(self.minute) + 'm ' + str(self.second) + 's}'
 
     def __add__(self, other):
-        return dec2dms(self.dec() + other.dec())
+        try:
+            return dec2dms(self.dec() + other.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects together')
 
     def __radd__(self, other):
-        return dec2dms(other.dec() + self.dec())
+        try:
+            return dec2dms(other.dec() + self.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects together')
 
     def __sub__(self, other):
-        return dec2dms(self.dec() - other.dec())
+        try:
+            return dec2dms(self.dec() - other.dec())
+        except AttributeError:
+            raise TypeError('Can only subtract DMSAngle and/or DDMAngle objects together')
 
     def __rsub__(self, other):
-        return dec2dms(other.dec() - self.dec())
+        try:
+            return dec2dms(other.dec() - self.dec())
+        except AttributeError:
+            raise TypeError('Can only subtract DMSAngle and/or DDMAngle objects together')
 
     def __mul__(self, other):
         try:
@@ -142,10 +154,28 @@ class DDMAngle(object):
         return '{DDMAngle: ' + signsymbol + str(self.degree) + 'd ' + str(self.minute) + 'm}'
 
     def __add__(self, other):
-        return dec2ddm(self.dec() + other.dec())
+        try:
+            return dec2ddm(self.dec() + other.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects together')
+
+    def __radd__(self, other):
+        try:
+            return dec2ddm(other.dec() + self.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects together')
 
     def __sub__(self, other):
-        return dec2ddm(self.dec() - other.dec())
+        try:
+            return dec2ddm(self.dec() - other.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects together')
+
+    def __rsub__(self, other):
+        try:
+            return dec2ddm(other.dec() - self.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects together')
 
     def __mul__(self, other):
         try:

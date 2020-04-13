@@ -38,7 +38,8 @@ class TestTransforms(unittest.TestCase):
                                        decimal=8)
 
         gridded_geo = np.stack(geo2grid(*x) for x in dms2dd_v(np.array(test_geo_coords[['lat', 'lon']].tolist())))
-        np.testing.assert_almost_equal(gridded_geo[:, 2:4].astype(float), np.array(test_grid_coords[['east', 'north']].tolist()),
+        np.testing.assert_almost_equal(gridded_geo[:, 2:4].astype(float),
+                                       np.array(test_grid_coords[['east', 'north']].tolist()),
                                        decimal=3)
 
     # Tests comparing results from DynAdjust Adjusted Coordinate File including 109 Points Across Australia
@@ -122,7 +123,6 @@ class TestTransforms(unittest.TestCase):
         self.assertEqual(north_geo[1], south_geo[1])
         self.assertEqual(north_geo[2], south_geo[2])
         self.assertEqual(north_geo[3], -south_geo[3])
-
 
         # Test Input Validation
         with self.assertRaises(ValueError):

@@ -43,6 +43,7 @@ class TestConvert(unittest.TestCase):
         self.assertEqual(hp_ex3, dms_ex3.hp())
         self.assertEqual(ddm_ex, dms_ex.ddm())
         self.assertEqual(-ddm_ex, -dms_ex.ddm())
+        self.assertEqual(ddm_ex3, dms_ex3.ddm())
 
         # Test DMSAngle Sign Conventions
         self.assertEqual(-dec_ex, DMSAngle(-dms_ex.degree, dms_ex.minute, dms_ex.second).dec())
@@ -94,6 +95,20 @@ class TestConvert(unittest.TestCase):
             'a' * dms_ex
         with self.assertRaises(TypeError):
             dms_ex / 'a'
+        with self.assertRaises(TypeError):
+            dms_ex + 'a'
+        with self.assertRaises(TypeError):
+            'a' + dms_ex
+        with self.assertRaises(TypeError):
+            dms_ex - 'a'
+        with self.assertRaises(TypeError):
+            'a' - dms_ex
+
+        # Test Class Interoperability
+        self.assertEqual(DMSAngle(1, 2, 3) + DDMAngle(2, 3), DMSAngle(3, 5, 3))
+        self.assertEqual(DMSAngle(3, 2, 0) - DDMAngle(2, 2.5), DMSAngle(0, 59, 30))
+        self.assertEqual(DDMAngle(2, 3) + DMSAngle(1, 2, 3), DDMAngle(3, 5.05))
+        self.assertEqual(DDMAngle(3, 2) - DMSAngle(2, 2, 30), DDMAngle(0, 59.5))
 
     def test_DDMAngle(self):
         # Test DDMAngle Methods
@@ -149,6 +164,14 @@ class TestConvert(unittest.TestCase):
             'a' * ddm_ex
         with self.assertRaises(TypeError):
             ddm_ex / 'a'
+        with self.assertRaises(TypeError):
+            ddm_ex + 'a'
+        with self.assertRaises(TypeError):
+            'a' + ddm_ex
+        with self.assertRaises(TypeError):
+            ddm_ex - 'a'
+        with self.assertRaises(TypeError):
+            'a' - ddm_ex
 
     def test_dec2dms(self):
         self.assertEqual(dms_ex, dec2dms(dec_ex))
