@@ -52,16 +52,28 @@ class DMSAngle(object):
         return '{DMSAngle: ' + signsymbol + str(self.degree) + 'd ' + str(self.minute) + 'm ' + str(self.second) + 's}'
 
     def __add__(self, other):
-        return dec2dms(self.dec() + other.dec())
+        try:
+            return dec2dms(self.dec() + other.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects together')
 
     def __radd__(self, other):
-        return dec2dms(other.dec() + self.dec())
+        try:
+            return dec2dms(other.dec() + self.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects together')
 
     def __sub__(self, other):
-        return dec2dms(self.dec() - other.dec())
+        try:
+            return dec2dms(self.dec() - other.dec())
+        except AttributeError:
+            raise TypeError('Can only subtract DMSAngle and/or DDMAngle objects together')
 
     def __rsub__(self, other):
-        return dec2dms(other.dec() - self.dec())
+        try:
+            return dec2dms(other.dec() - self.dec())
+        except AttributeError:
+            raise TypeError('Can only subtract DMSAngle and/or DDMAngle objects together')
 
     def __mul__(self, other):
         try:
@@ -142,10 +154,28 @@ class DDMAngle(object):
         return '{DDMAngle: ' + signsymbol + str(self.degree) + 'd ' + str(self.minute) + 'm}'
 
     def __add__(self, other):
-        return dec2ddm(self.dec() + other.dec())
+        try:
+            return dec2ddm(self.dec() + other.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects together')
+
+    def __radd__(self, other):
+        try:
+            return dec2ddm(other.dec() + self.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects together')
 
     def __sub__(self, other):
-        return dec2ddm(self.dec() - other.dec())
+        try:
+            return dec2ddm(self.dec() - other.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects together')
+
+    def __rsub__(self, other):
+        try:
+            return dec2ddm(other.dec() - self.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects together')
 
     def __mul__(self, other):
         try:
@@ -263,127 +293,6 @@ def dms2dd(dms):
     degrees, minutes = divmod(degmin, 100)
     dd = degrees + (minutes / 60) + (seconds / 360)
     return dd if dms >= 0 else -dd
-
-
-def dec2sex(lon, lat):
-    """Convert decimal degrees to sexagesimal format
-
-    Longitudes go from -180 to 180
-    Latitudes go from -90 to 90
-    """
-    def fmt_sex(coord):
-        """Function to create a sexagesimal-formatted coordinate as a string
-        """
-        coord = float(coord)
-        if coord < 0:
-            flag = -1
-            coord = abs(coord)
-        else:
-            flag = 1
-        min_sec, deg = modf(coord)
-        deg = int(deg)
-        deg *= flag  # deal with negatives
-        sec, min = modf(min_sec * 60)
-        min = round(min)
-        sec *= 60
-        sex_coord = '{} {:02d} {:05.2f}'.format(deg, min, sec)
-
-        return sex_coord
-
-# Convert the coordinates
-    sex_lon = fmt_sex(lon)
-    sex_lat = fmt_sex(lat)
-
-    return sex_lon, sex_lat
-
-
-def sex2dec(lon, lat):
-    """Convert a sexagesimal coordinate to decimal degrees
-
-    Longitudes go from -180 to 180
-    Latitudes go from -90 to 90
-    """
-    def fmt_dec(coord):
-        """Function to piece together a decimal coordinate
-        """
-        coord = str(coord)
-        if coord[:1] == '-':
-            flag = -1
-            coord = coord[1:]
-        else:
-            flag = 1
-        deg, min, sec = coord.split()
-        dec_coord = int(deg) + float(min) / 60 + float(sec) / 3600
-        dec_coord = float('{:.6f}'.format(dec_coord))
-        dec_coord *= flag  # deal with negatives
-
-        return dec_coord
-
-# Convert the coordinates
-    dec_lon = fmt_dec(lon)
-    dec_lat = fmt_dec(lat)
-
-    return dec_lon, dec_lat
-
-
-def sex2hp(lon, lat):
-    """Convert a sexagesimal coordinate to HP notation
-
-    Longitudes go from -180 to 180
-    Latitudes go from -90 to 90
-    """
-    def fmt_hp(coord):
-        """Function to piece together a coordinate in HP notation
-        """
-        coord = str(coord)
-        if coord[:1] == '-':
-            flag = -1
-            coord = coord[1:]
-        else:
-            flag = 1
-        deg, min, sec = coord.split()
-        sec = sec.replace('.', '')
-        hp_coord = '{}.{:02d}{:04d}'.format(deg, int(min), int(sec))
-        if flag == -1:
-            hp_coord = '-' + hp_coord  # deal with negatives
-
-        return hp_coord
-
-# Convert the coordinates
-    hp_lon = fmt_hp(lon)
-    hp_lat = fmt_hp(lat)
-
-    return hp_lon, hp_lat
-
-
-def hp2sex(lon, lat):
-    """Convert HP notation to a sexagesimal coordinate
-
-    Longitudes go from -180 to 180
-    Latitudes go from -90 to 90
-    """
-    def fmt_sex(coord):
-        """Function to piece together a coordinate in HP notation
-        """
-        coord = str(coord)
-        if coord[:1] == '-':
-            flag = -1
-            coord = coord[1:]
-        else:
-            flag = 1
-        deg, min, sec = coord.split()
-        sec = sec.replace('.', '')
-        hp_coord = '{}.{:02d}{:04d}'.format(deg, int(min), int(sec))
-        if flag == -1:
-            hp_coord = '-' + hp_coord  # deal with negatives
-
-        return hp_coord
-
-# Convert the coordinates
-    hp_lon = fmt_sex(lon)
-    hp_lat = fmt_sex(lat)
-
-    return hp_lon, hp_lat
 
 
 def dd2dms_v(dd):

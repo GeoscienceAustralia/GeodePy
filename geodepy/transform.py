@@ -337,10 +337,12 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
     b = beta_coeff(ellipsoid)
     # Transverse Mercator Co-ordinates
     x = (east - float(proj.falseeast)) / float(proj.cmscale)
-    if hemisphere == 'north':
-        y = north / float(proj.cmscale)
+    if hemisphere.lower() == 'north':
+        y = -(north / float(proj.cmscale))
+        hemisign = -1
     else:
         y = (north - float(proj.falsenorth)) / float(proj.cmscale)
+        hemisign = 1
 
     # Transverse Mercator Ratios
     xi = y / A
@@ -391,7 +393,7 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
     # Point Scale Factor and Grid Convergence
     psf, grid_conv = psfandgridconv(xi1, eta1, lat, long, cm, conf_lat)
 
-    return round(lat, 11), round(long, 11), round(psf, 8), grid_conv
+    return hemisign * round(lat, 11), round(long, 11), round(psf, 8), hemisign * grid_conv
 
 
 def xyz2llh(x, y, z, ellipsoid=grs80):
@@ -584,86 +586,3 @@ def gda2020toatrf(x, y, z, epoch_to):
     :return: Cartesian X, Y, Z Coordinate in terms of ATRF at the specified Epoch
     """
     return conform14(x, y, z, epoch_to, -atrf_gda2020)
-
-
-def grid2geoio():
-    """
-    No Input:
-    Prompts the user for the name of a file in csv format. Data in the file
-    must be in the form Point ID, UTM Zone, Easting (m), Northing (m) with
-    no header line.
-
-    No Output:
-    Uses the function grid2geo to convert each row in the csv file into a
-    latitude and longitude in Degrees, Minutes and Seconds. This data is
-    written to a new file with the name <inputfile>_out.csv
-    """
-    # Enter Filename
-    print('Enter co-ordinate file (\.csv)\:')
-    fn = input()
-    # Open Filename
-    csvfile = open(fn)
-    csvreader = csv.reader(csvfile)
-    # Create Output File
-    fn_part = (os.path.splitext(fn))
-    fn_out = fn_part[0] + '_out' + fn_part[1]
-    outfile = open(fn_out, 'w')
-    # Write Output
-    outfilewriter = csv.writer(outfile)
-    # Optional Header Row
-    # outfilewriter.writerow(['Pt', 'Latitude', 'Longitude', 'Point Scale Factor', 'Grid Convergence'])
-    for row in csvreader:
-        pt_num = row[0]
-        zone = float(row[1])
-        east = float(row[2])
-        north = float(row[3])
-        # Calculate Conversion
-        lat, long, psf, grid_conv = grid2geo(zone, east, north)
-        lat = dec2hp(lat)
-        long = dec2hp(long)
-        grid_conv = dec2hp(grid_conv)
-        output = [pt_num, lat, long, psf, grid_conv]
-        outfilewriter.writerow(output)
-    # Close Files
-    outfile.close()
-    csvfile.close()
-
-
-def geo2gridio():
-    """
-    No Input:
-    Prompts the user for the name of a file in csv format. Data in the file
-    must be in the form Point ID, Latitude, Longitude in Decimal Degrees with
-    no header line.
-
-    No Output:
-    Uses the function geo2grid to convert each row in the csv file into a
-    coordinate with UTM Zone, Easting (m), Northing (m). This data is written
-    to a new file with the name <inputfile>_out.csv
-    """
-    # Enter Filename
-    print('Enter co-ordinate file:')
-    fn = input()
-    # Open Filename
-    csvfile = open(fn)
-    csvreader = csv.reader(csvfile)
-    # Create Output File
-    fn_part = (os.path.splitext(fn))
-    fn_out = fn_part[0] + '_out' + fn_part[1]
-    outfile = open(fn_out, 'w')
-    # Write Output
-    outfilewriter = csv.writer(outfile)
-    # Optional Header Row
-    # outfilewriter.writerow(['Pt', 'Zone', 'Easting', 'Northing', 'Point Scale Factor', 'Grid Convergence'])
-    for row in csvreader:
-        pt_num = row[0]
-        lat = hp2dec(float(row[1]))
-        long = hp2dec(float(row[2]))
-        # Calculate Conversion
-        hemisphere, zone, east, north, psf, grid_conv = geo2grid(lat, long)
-        grid_conv = hp2dec(grid_conv)
-        output = [pt_num] + [hemisphere, zone, east, north, psf, grid_conv]
-        outfilewriter.writerow(output)
-    # Close Files
-    outfile.close()
-    csvfile.close()
