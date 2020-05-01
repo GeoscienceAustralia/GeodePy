@@ -1,16 +1,13 @@
 import unittest
 
-from geodepy.transform import (geo2grid,
-                               grid2geo,
-                               llh2xyz,
-                               xyz2llh,
-                               conform7,
+from geodepy.transform import (conform7,
                                conform14,
                                atrftogda2020,
                                gda2020toatrf,
                                mga94to2020,
                                mga2020to94)
-from geodepy.convert import DMSAngle, hp2dec_v
+from geodepy.convert import DMSAngle, hp2dec_v, geo2grid, grid2geo, xyz2llh, \
+    llh2xyz
 from geodepy.constants import itrf14togda20, gda94to20
 from geodepy.fileio import read_dnacoord
 from datetime import date
