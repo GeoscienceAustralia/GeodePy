@@ -10,7 +10,7 @@ from geodepy.transform import (geo2grid,
                                gda2020toatrf,
                                mga94to2020,
                                mga2020to94)
-from geodepy.convert import DMSAngle
+from geodepy.convert import DMSAngle, hp2dec_v
 from geodepy.constants import itrf14togda20, gda94to20
 from geodepy.fileio import read_dnacoord
 from datetime import date
@@ -35,10 +35,10 @@ class TestTransforms(unittest.TestCase):
                                          names=['site', 'zone', 'east', 'north'])
 
         geoed_grid = np.array(list(grid2geo(*x) for x in test_grid_coords[['zone', 'east', 'north']]))
-        np.testing.assert_almost_equal(geoed_grid[:, :2], dms2dd_v(np.array(test_geo_coords[['lat', 'lon']].tolist())),
+        np.testing.assert_almost_equal(geoed_grid[:, :2], hp2dec_v(np.array(test_geo_coords[['lat', 'lon']].tolist())),
                                        decimal=8)
 
-        gridded_geo = np.stack(geo2grid(*x) for x in dms2dd_v(np.array(test_geo_coords[['lat', 'lon']].tolist())))
+        gridded_geo = np.stack(geo2grid(*x) for x in hp2dec_v(np.array(test_geo_coords[['lat', 'lon']].tolist())))
         np.testing.assert_almost_equal(gridded_geo[:, 2:4].astype(float),
                                        np.array(test_grid_coords[['east', 'north']].tolist()),
                                        decimal=3)

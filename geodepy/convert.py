@@ -296,3 +296,19 @@ def dd2sec(dd):
     degrees, minutes = divmod(minutes, 60)
     sec = (degrees * 3600) + (minutes * 60) + seconds
     return sec if dd >= 0 else -sec
+
+
+def dec2hp_v(dec):
+    minutes, seconds = divmod(abs(dec) * 3600, 60)
+    degrees, minutes = divmod(minutes, 60)
+    hp = degrees + (minutes / 100) + (seconds / 10000)
+    hp[dec <= 0] = -hp[dec <= 0]
+    return hp
+
+
+def hp2dec_v(dms):
+    degmin, seconds = divmod(abs(dms) * 1000, 10)
+    degrees, minutes = divmod(degmin, 100)
+    dec = degrees + (minutes / 60) + (seconds / 360)
+    dec[hp <= 0] = -dec[hp <= 0]
+    return dec
