@@ -8,9 +8,10 @@ import geodepy.convert as cv
 import geodepy.constants as cs
 
 '''
-The inputoutput module acts as the backend for the GUI and manages the calls to the GeodePy functions. The functions
-are rewritten  from the transform module but use pandas to improve efficiency. Functions placed here to not overcrowd
-the transform module.
+The inputoutput module acts as the backend for the GUI and manages the calls
+to the GeodePy functions. The functions are rewritten  from the transform
+module but use pandas to improve efficiency. Functions placed here to not
+overcrowd the transform module.
 '''
 
 
@@ -46,8 +47,8 @@ def grid2geoio(fn, fn_out, easting, northing, utmzone, geotypeout):
     # Convert tuple returned to DafaFrame
     resultdf = pd.DataFrame(list(returned), columns=['Latitude', 'Longitude', 'Point Scale Factor', 'Grid Convergence'])
     if geotypeout == 'DMS':
-        resultdf['Latitude'] = resultdf['Latitude'].apply(cv.dd2dms)
-        resultdf['Longitude'] = resultdf['Longitude'].apply(cv.dd2dms)
+        resultdf['Latitude'] = resultdf['Latitude'].apply(cv.dec2hp)
+        resultdf['Longitude'] = resultdf['Longitude'].apply(cv.dec2hp)
     # Adds the results to the original dataframe from the csv
     csvdf = pd.concat([csvdf, resultdf], axis=1)
     # Writes the dataframe to a csv
@@ -83,8 +84,8 @@ def geo2gridio(fn, fn_out, latitude, longitude, geotypein):
 
     # Converts DMS lat and long to Decimal Degrees if required
     if geotypein == 'DMS':
-        csvdf['LatitudeDD'] = csvdf[latitude].apply(cv.dms2dd)
-        csvdf['LongitudeDD'] = csvdf[longitude].apply(cv.dms2dd)
+        csvdf['LatitudeDD'] = csvdf[latitude].apply(cv.hp2dec)
+        csvdf['LongitudeDD'] = csvdf[longitude].apply(cv.hp2dec)
         latitude = 'LatitudeDD'
         longitude = 'LongitudeDD'
 
@@ -159,8 +160,8 @@ def gdatrans7(fn, fn_out, latitude, longitude, ellht, gdageotypein, direction):
     if gdageotypein == 'DMS':
         csvdf['LatitudeDMS'] = csvdf[latitude]
         csvdf['LongitudeDMS'] = csvdf[longitude]
-        csvdf['Latitude'] = csvdf[latitude].apply(cv.dms2dd)
-        csvdf['Longitude'] = csvdf[longitude].apply(cv.dms2dd)
+        csvdf['Latitude'] = csvdf[latitude].apply(cv.hp2dec)
+        csvdf['Longitude'] = csvdf[longitude].apply(cv.hp2dec)
 
     # Converts Lat, Long & ElipHt XYZ
     returned = csvdf.apply(lambda x: tf.llh2xyz(x[latitude], x[longitude], x[ellht]), axis=1)
