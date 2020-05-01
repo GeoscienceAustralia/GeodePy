@@ -306,7 +306,7 @@ def dec2hp_v(dec):
     return hp
 
 
-def hp2dec_v(dms):
+def hp2dec_v(hp):
     degmin, seconds = divmod(abs(dms) * 1000, 10)
     degrees, minutes = divmod(degmin, 100)
     dec = degrees + (minutes / 60) + (seconds / 360)
