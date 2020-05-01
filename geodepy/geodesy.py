@@ -8,7 +8,7 @@ Geodesy Module
 from math import degrees, radians, sqrt, sin, cos, tan, asin, acos, atan, atan2
 import numpy as np
 from geodepy.constants import grs80
-from geodepy.transform import grid2geo, geo2grid
+from geodepy.convert import geo2grid, grid2geo
 from geodepy.statistics import rotation_matrix
 
 

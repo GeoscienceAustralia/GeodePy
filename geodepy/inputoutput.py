@@ -1,6 +1,7 @@
 
 __all__ = ["grid2geoio", "geo2gridio", "gdatrans7"]
 
+import geodepy.convert
 import pandas as pd
 import tkinter as ttk
 import geodepy.transform as tf
@@ -43,7 +44,7 @@ def grid2geoio(fn, fn_out, easting, northing, utmzone, geotypeout):
     # Opens the CSV as a pandas dataframe
     csvdf = pd.read_csv(fn, low_memory=False)
     # Sends data to tf.grid2geo
-    returned = csvdf.apply(lambda x: tf.grid2geo(x[utmzone], x[easting], x[northing]), axis=1)
+    returned = csvdf.apply(lambda x: geodepy.convert.grid2geo(x[utmzone], x[easting], x[northing]), axis=1)
     # Convert tuple returned to DafaFrame
     resultdf = pd.DataFrame(list(returned), columns=['Latitude', 'Longitude', 'Point Scale Factor', 'Grid Convergence'])
     if geotypeout == 'DMS':
@@ -90,7 +91,7 @@ def geo2gridio(fn, fn_out, latitude, longitude, geotypein):
         longitude = 'LongitudeDD'
 
     # Sends data to tf.geo2grid
-    returned = csvdf.apply(lambda x: tf.geo2grid(x[latitude], x[longitude]), axis=1)
+    returned = csvdf.apply(lambda x: geodepy.convert.geo2grid(x[latitude], x[longitude]), axis=1)
     # Convert tuple returned from tf.gepo2grid into DafaFrame
     resultdf = pd.DataFrame(list(returned), columns=['Hemisphere', 'UTMZone', 'Easting', 'Northing',
                                                      'Point Scale Factor', 'Grid Convergence'])
@@ -164,7 +165,7 @@ def gdatrans7(fn, fn_out, latitude, longitude, ellht, gdageotypein, direction):
         csvdf['Longitude'] = csvdf[longitude].apply(cv.hp2dec)
 
     # Converts Lat, Long & ElipHt XYZ
-    returned = csvdf.apply(lambda x: tf.llh2xyz(x[latitude], x[longitude], x[ellht]), axis=1)
+    returned = csvdf.apply(lambda x: geodepy.convert.llh2xyz(x[latitude], x[longitude], x[ellht]), axis=1)
     # Converts the results from llh2xyz into a dataframe
     xyzresultdf = pd.DataFrame(list(returned), columns=['CartesianX', 'CartesianY', 'CartesianZ'])
 
@@ -180,7 +181,7 @@ def gdatrans7(fn, fn_out, latitude, longitude, ellht, gdageotypein, direction):
     csvdf = pd.concat([csvdf, transresultdf], axis=1)
 
     # Converts the the transformed XYZ coordinates back to Lats, Longs and Ellipsoidal Heights
-    returned = csvdf.apply(lambda x: tf.xyz2llh(x.TransCartesianX, x.TransCartesianY, x.TransCartesianZ), axis=1)
+    returned = csvdf.apply(lambda x: geodepy.convert.xyz2llh(x.TransCartesianX, x.TransCartesianY, x.TransCartesianZ), axis=1)
     # Converts the results from llh2xyz into a dataframe
     llhresultdf = pd.DataFrame(list(returned), columns=[translat, translong, transellht])
 
