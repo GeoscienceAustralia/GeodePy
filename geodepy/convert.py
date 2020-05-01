@@ -307,7 +307,7 @@ def dec2hp_v(dec):
 
 
 def hp2dec_v(hp):
-    degmin, seconds = divmod(abs(dms) * 1000, 10)
+    degmin, seconds = divmod(abs(hp) * 1000, 10)
     degrees, minutes = divmod(degmin, 100)
     dec = degrees + (minutes / 60) + (seconds / 360)
     dec[hp <= 0] = -dec[hp <= 0]
