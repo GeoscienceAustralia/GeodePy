@@ -2,7 +2,7 @@
 
 """
 Geoscience Australia - Python Geodesy Package
-Constants Module
+FileIO Module
 """
 
 from geodepy.convert import hp2dec
