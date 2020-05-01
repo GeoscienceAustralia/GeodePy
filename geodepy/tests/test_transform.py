@@ -12,6 +12,7 @@ from geodepy.transform import (geo2grid,
                                mga2020to94)
 from geodepy.convert import DMSAngle
 from geodepy.constants import itrf14togda20, gda94to20
+from geodepy.fileio import read_dnacoord
 from datetime import date
 import numpy as np
 import os.path

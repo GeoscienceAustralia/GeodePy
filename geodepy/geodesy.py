@@ -5,11 +5,8 @@ Geoscience Australia - Python Geodesy Package
 Geodesy Module
 """
 
-import os, sys
-import csv
 from math import degrees, radians, sqrt, sin, cos, tan, asin, acos, atan, atan2
 import numpy as np
-from geodepy.convert import dec2hp, hp2dec
 from geodepy.constants import grs80
 from geodepy.transform import grid2geo, geo2grid
 from geodepy.statistics import rotation_matrix
