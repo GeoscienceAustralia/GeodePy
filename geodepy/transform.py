@@ -142,7 +142,7 @@ def atrftogda2020(x, y, z, epoch_from):
     return conform14(x, y, z, epoch_from, atrf_gda2020)
 
 
-def gda2020toatrf(x, y, z, epoch_to):
+def gda2020_to_atrf2014(x, y, z, epoch_to):
     """
     Transforms Cartesian (x, y, z) Coordinates in terms of Geocentric Datum of Australia 2020
     (GDA2020 - reference epoch 2020.0) to coordinates in terms of the Australian Terrestrial Reference Frame (ATRF) at
