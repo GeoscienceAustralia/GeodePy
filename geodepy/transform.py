@@ -15,7 +15,7 @@ import datetime
 from math import radians
 import numpy as np
 from geodepy.constants import Transformation, atrf_gda2020,\
-    gda94to20
+    gda94_to_gda2020
 from geodepy.convert import hp2dec, geo2grid, \
     grid2geo, xyz2llh, llh2xyz
 
@@ -97,7 +97,7 @@ def mga94to2020(zone, east, north, ell_ht=False):
     else:
         ell_ht_in = ell_ht
     x94, y94, z94 = llh2xyz(lat, lon, ell_ht_in)
-    x20, y20, z20 = conform7(x94, y94, z94, gda94to20)
+    x20, y20, z20 = conform7(x94, y94, z94, gda94_to_gda2020)
     lat, lon, ell_ht_out = xyz2llh(x20, y20, z20)
     if ell_ht is False:
         ell_ht_out = 0
@@ -121,7 +121,7 @@ def mga2020to94(zone, east, north, ell_ht=False):
     else:
         ell_ht_in = ell_ht
     x94, y94, z94 = llh2xyz(lat, lon, ell_ht_in)
-    x20, y20, z20 = conform7(x94, y94, z94, -gda94to20)
+    x20, y20, z20 = conform7(x94, y94, z94, -gda94_to_gda2020)
     lat, lon, ell_ht_out = xyz2llh(x20, y20, z20)
     if ell_ht is False:
         ell_ht_out = 0

@@ -166,8 +166,8 @@ def iers2trans(itrf_from, itrf_to, ref_epoch, tx, ty, tz, sc, rx, ry, rz, d_tx, 
 
 # GDA1994 to GDA2020 Transformation Parameters from GDA2020 Tech Manual v1.2
 
-gda94to20 = Transformation('GDA1994', 'GDA2020', 0,
-                           0.06155, -0.01087, -0.04019, -0.009994, -0.0394924, -0.0327221, -0.0328979)
+gda94_to_gda2020 = Transformation('GDA1994', 'GDA2020', 0,
+                                  0.06155, -0.01087, -0.04019, -0.009994, -0.0394924, -0.0327221, -0.0328979)
 
 # ITRF2014 to GDA2020 (Australian Plate Motion Model) Transformation Parameters from GDA2020 Tech Manual v1.2. The
 # model was derived using 109 ARGN and AuScope GNSS CORS which were used to define the RVS.

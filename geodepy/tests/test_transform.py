@@ -8,7 +8,7 @@ from geodepy.transform import (conform7,
                                mga2020to94)
 from geodepy.convert import DMSAngle, hp2dec_v, geo2grid, grid2geo, xyz2llh, \
     llh2xyz
-from geodepy.constants import itrf14togda20, gda94to20
+from geodepy.constants import itrf14togda20, gda94_to_gda2020
 from geodepy.fileio import read_dnacoord
 from datetime import date
 import numpy as np
@@ -142,8 +142,8 @@ class TestTransforms(unittest.TestCase):
         # Replication of tests in GDA2020 Tech Manual v1.2 - Sect 3.1.1
         alic_gda1994 = (-4052051.7643, 4212836.2017, -2545106.0245)
         alic_gda2020 = (-4052052.7379, 4212835.9897, -2545104.5898)
-        alic_gda2020_comp = conform7(*alic_gda1994, gda94to20)
-        alic_gda1994_comp = conform7(*alic_gda2020, -gda94to20)
+        alic_gda2020_comp = conform7(*alic_gda1994, gda94_to_gda2020)
+        alic_gda1994_comp = conform7(*alic_gda2020, -gda94_to_gda2020)
         assert (abs(alic_gda2020_comp[0] - alic_gda2020[0]) < 5e-5)
         assert (abs(alic_gda2020_comp[1] - alic_gda2020[1]) < 5e-5)
         assert (abs(alic_gda2020_comp[2] - alic_gda2020[2]) < 5e-5)
