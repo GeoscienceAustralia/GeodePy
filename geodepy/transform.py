@@ -15,7 +15,7 @@ import datetime
 from math import radians
 import numpy as np
 from geodepy.constants import Transformation, atrf_gda2020,\
-    gda94to20
+    gda94_to_gda2020
 from geodepy.convert import hp2dec, geo2grid, \
     grid2geo, xyz2llh, llh2xyz
 
@@ -81,7 +81,7 @@ def conform14(x, y, z, to_epoch, trans):
     return xtrans, ytrans, ztrans
 
 
-def mga94to2020(zone, east, north, ell_ht=False):
+def mga94_to_mga2020(zone, east, north, ell_ht=False):
     """
     Performs conformal transformation of Map Grid of Australia 1994 to Map Grid of Australia 2020 Coordinates
     using the GDA2020 Tech Manual v1.2 7 parameter similarity transformation parameters
@@ -97,7 +97,7 @@ def mga94to2020(zone, east, north, ell_ht=False):
     else:
         ell_ht_in = ell_ht
     x94, y94, z94 = llh2xyz(lat, lon, ell_ht_in)
-    x20, y20, z20 = conform7(x94, y94, z94, gda94to20)
+    x20, y20, z20 = conform7(x94, y94, z94, gda94_to_gda2020)
     lat, lon, ell_ht_out = xyz2llh(x20, y20, z20)
     if ell_ht is False:
         ell_ht_out = 0
@@ -105,7 +105,7 @@ def mga94to2020(zone, east, north, ell_ht=False):
     return zone20, east20, north20, round(ell_ht_out, 4)
 
 
-def mga2020to94(zone, east, north, ell_ht=False):
+def mga2020_to_mga94(zone, east, north, ell_ht=False):
     """
     Performs conformal transformation of Map Grid of Australia 2020 to Map Grid of Australia 1994 Coordinates
     using the reverse form of the GDA2020 Tech Manual v1.2 7 parameter similarity transformation parameters
@@ -121,7 +121,7 @@ def mga2020to94(zone, east, north, ell_ht=False):
     else:
         ell_ht_in = ell_ht
     x94, y94, z94 = llh2xyz(lat, lon, ell_ht_in)
-    x20, y20, z20 = conform7(x94, y94, z94, -gda94to20)
+    x20, y20, z20 = conform7(x94, y94, z94, -gda94_to_gda2020)
     lat, lon, ell_ht_out = xyz2llh(x20, y20, z20)
     if ell_ht is False:
         ell_ht_out = 0
@@ -129,7 +129,7 @@ def mga2020to94(zone, east, north, ell_ht=False):
     return zone20, east20, north20, round(ell_ht_out, 4)
 
 
-def atrftogda2020(x, y, z, epoch_from):
+def atrf2014_to_gda2020(x, y, z, epoch_from):
     """
     Transforms Cartesian (x, y, z) Coordinates in terms of the Australian Terrestrial Reference Frame (ATRF) at
     a specified epoch to coordinates in terms of Geocentric Datum of Australia 2020 (GDA2020 - reference epoch 2020.0)
@@ -142,7 +142,7 @@ def atrftogda2020(x, y, z, epoch_from):
     return conform14(x, y, z, epoch_from, atrf_gda2020)
 
 
-def gda2020toatrf(x, y, z, epoch_to):
+def gda2020_to_atrf2014(x, y, z, epoch_to):
     """
     Transforms Cartesian (x, y, z) Coordinates in terms of Geocentric Datum of Australia 2020
     (GDA2020 - reference epoch 2020.0) to coordinates in terms of the Australian Terrestrial Reference Frame (ATRF) at
