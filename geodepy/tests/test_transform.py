@@ -2,7 +2,7 @@ import unittest
 
 from geodepy.transform import (conform7,
                                conform14,
-                               atrftogda2020,
+                               atrf2014_to_gda2020,
                                gda2020_to_atrf2014,
                                mga94to2020,
                                mga2020to94)
@@ -164,11 +164,11 @@ class TestTransforms(unittest.TestCase):
         assert (abs(alic_gda2020_comp[1] - alic_gda2020[1]) < 5e-5)
         assert (abs(alic_gda2020_comp[2] - alic_gda2020[2]) < 5e-5)
 
-    def test_atrftogda2020(self):
+    def test_atrf2014_to_gda2020(self):
         alic_gda2020 = (-4052052.7373, 4212835.9835, -2545104.5867)
         alic_itrf14at2018 = (-4052052.6588, 4212835.9938, -2545104.6946)
         alic_itrf14at2018_comp = gda2020_to_atrf2014(*alic_gda2020, date(2018, 1, 1))
-        alic_gda2020_comp = atrftogda2020(*alic_itrf14at2018, date(2018, 1, 1))
+        alic_gda2020_comp = atrf2014_to_gda2020(*alic_itrf14at2018, date(2018, 1, 1))
         assert (abs(alic_itrf14at2018_comp[0] - alic_itrf14at2018[0]) < 5e-5)
         assert (abs(alic_itrf14at2018_comp[1] - alic_itrf14at2018[1]) < 5e-5)
         assert (abs(alic_itrf14at2018_comp[2] - alic_itrf14at2018[2]) < 5e-5)

@@ -129,7 +129,7 @@ def mga2020to94(zone, east, north, ell_ht=False):
     return zone20, east20, north20, round(ell_ht_out, 4)
 
 
-def atrftogda2020(x, y, z, epoch_from):
+def atrf2014_to_gda2020(x, y, z, epoch_from):
     """
     Transforms Cartesian (x, y, z) Coordinates in terms of the Australian Terrestrial Reference Frame (ATRF) at
     a specified epoch to coordinates in terms of Geocentric Datum of Australia 2020 (GDA2020 - reference epoch 2020.0)
