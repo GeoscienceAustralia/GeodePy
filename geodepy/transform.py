@@ -105,7 +105,7 @@ def mga94to2020(zone, east, north, ell_ht=False):
     return zone20, east20, north20, round(ell_ht_out, 4)
 
 
-def mga2020to94(zone, east, north, ell_ht=False):
+def mga2020_to_mga94(zone, east, north, ell_ht=False):
     """
     Performs conformal transformation of Map Grid of Australia 2020 to Map Grid of Australia 1994 Coordinates
     using the reverse form of the GDA2020 Tech Manual v1.2 7 parameter similarity transformation parameters
