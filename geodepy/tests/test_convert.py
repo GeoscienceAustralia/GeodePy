@@ -1,6 +1,8 @@
 import unittest
-from geodepy.convert import dec2hp, hp2dec, DMSAngle, DDMAngle, dec2dms,\
-    dec2ddm, hp2dms, hp2ddm
+import datetime
+from geodepy.convert import (dec2hp, hp2dec, DMSAngle, DDMAngle, dec2dms,
+                             dec2ddm, hp2dms, hp2ddm, yyyydoy_to_date,
+                             date_to_yyyydoy)
 
 dec_ex = 123.74875
 dec_ex2 = 12.575
@@ -203,6 +205,54 @@ class TestConvert(unittest.TestCase):
     def test_hp2ddm(self):
         self.assertEqual(ddm_ex, hp2ddm(hp_ex))
         self.assertEqual(-ddm_ex, hp2ddm(-hp_ex))
+
+    def test_date_to_yyyydoy(self):
+        self.assertEqual(date_to_yyyydoy(datetime.date(2020, 1, 4)),
+                         '2020.004')
+        self.assertEqual(date_to_yyyydoy(datetime.date(2020, 10, 12)),
+                         '2020.286')
+        self.assertEqual(date_to_yyyydoy(datetime.date(1998, 4, 7)),
+                         '1998.097')
+        self.assertEqual(date_to_yyyydoy(datetime.date(2000, 11, 22)),
+                         '2000.327')
+        self.assertEqual(date_to_yyyydoy(datetime.date(2008, 2, 29)),
+                         '2008.060')
+        with self.assertRaises(AttributeError):
+            date_to_yyyydoy('a')
+        with self.assertRaises(AttributeError):
+            date_to_yyyydoy('2020123')
+
+    def test_yyyydoy_to_date(self):
+        self.assertEqual(yyyydoy_to_date('2020.004'),
+                         datetime.date(2020, 1, 4))
+        self.assertEqual(yyyydoy_to_date('2020.286'),
+                         datetime.date(2020, 10, 12))
+        self.assertEqual(yyyydoy_to_date('1998.097'),
+                         datetime.date(1998, 4, 7))
+        self.assertEqual(yyyydoy_to_date('2000.327'),
+                         datetime.date(2000, 11, 22))
+        self.assertEqual(yyyydoy_to_date('2008.060'),
+                         datetime.date(2008, 2, 29))
+        self.assertEqual(yyyydoy_to_date('2020004'),
+                         datetime.date(2020, 1, 4))
+        self.assertEqual(yyyydoy_to_date('2020286'),
+                         datetime.date(2020, 10, 12))
+        self.assertEqual(yyyydoy_to_date('1998097'),
+                         datetime.date(1998, 4, 7))
+        self.assertEqual(yyyydoy_to_date('2000327'),
+                         datetime.date(2000, 11, 22))
+        self.assertEqual(yyyydoy_to_date('2008060'),
+                         datetime.date(2008, 2, 29))
+        with self.assertRaises(ValueError):
+            yyyydoy_to_date('a')
+        with self.assertRaises(ValueError):
+            yyyydoy_to_date('20201234')
+        with self.assertRaises(ValueError):
+            yyyydoy_to_date('2020.1234')
+        with self.assertRaises(ValueError):
+            yyyydoy_to_date('202012')
+        with self.assertRaises(ValueError):
+            yyyydoy_to_date('2020.12')
 
 
 if __name__ == '__main__':
