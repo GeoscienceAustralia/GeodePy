@@ -5,13 +5,14 @@ Geoscience Australia - Python Geodesy Package
 Convert Module
 """
 
-from math import sin, cos, atan2, radians, degrees, sqrt, cosh, sinh, tan, \
-    atan, log
-
+from math import (sin, cos, atan2, radians, degrees,
+                  sqrt, cosh, sinh, tan, atan, log)
+import datetime
 from geodepy.constants import utm, grs80
 
 # Universal Transverse Mercator Projection Parameters
 proj = utm
+
 
 class DMSAngle(object):
     def __init__(self, degree=0, minute=0, second=0.0):
@@ -420,8 +421,8 @@ def alpha_coeff(ellipsoid):
 
 def beta_coeff(ellipsoid):
     """
-    Computes the set of Beta coefficients of an Ellipsoid with specified Inverse Flattening
-    (See Ref 2 Equation 23)
+    Computes the set of Beta coefficients of an Ellipsoid with specified
+    Inverse Flattening (See Ref 2 Equation 23)
     :param ellipsoid: Ellipsoid Object
     :return: Alpha coefficients a2, a4 ... a16
     """
@@ -510,7 +511,8 @@ def psfandgridconv(xi1, eta1, lat, long, cm, conf_lat, ellipsoid=grs80):
     psf = (float(proj.cmscale)
            * (A / ellipsoid.semimaj)
            * sqrt(q**2 + p**2)
-           * ((sqrt(1 + (tan(lat)**2)) * sqrt(1 - ellipsoid.ecc1sq * (sin(lat)**2)))
+           * ((sqrt(1 + (tan(lat)**2))
+               * sqrt(1 - ellipsoid.ecc1sq * (sin(lat)**2)))
               / sqrt((tan(conf_lat)**2) + (cos(long_diff)**2))))
 
     # Grid Convergence
@@ -527,16 +529,18 @@ def psfandgridconv(xi1, eta1, lat, long, cm, conf_lat, ellipsoid=grs80):
 
 def geo2grid(lat, long, zone=0, ellipsoid=grs80):
     """
-    Takes a geographic co-ordinate (latitude, longitude) and returns its corresponding
-    Hemisphere, Zone and Projection Easting and Northing, Point Scale Factor and Grid
-    Convergence. Default Projection is Universal Transverse Mercator Projection using
+    Takes a geographic co-ordinate (latitude, longitude) and returns its
+    corresponding Hemisphere, Zone and Projection Easting and Northing, Point
+    Scale Factor and Grid Convergence. Default Projection is Universal
+    Transverse Mercator Projection using
     GRS80 Ellipsoid parameters.
     :param lat: Latitude in Decimal Degrees
     :param long: Longitude in Decimal Degrees
-    :param zone: Optional Zone Number - Only required if calculating grid co-ordinate
-                outside zone boundaries
+    :param zone: Optional Zone Number - Only required if calculating grid
+                                        co-ordinate outside zone boundaries
     :param ellipsoid: Ellipsoid Object
-    :return: hemisphere, zone, east (m), north (m), Point Scale Factor, Grid Convergence (Decimal Degrees)
+    :return: hemisphere, zone, east (m), north (m), Point Scale Factor,
+             Grid Convergence (Decimal Degrees)
     """
 
     # Input Validation - UTM Extents and Values
@@ -596,21 +600,25 @@ def geo2grid(lat, long, zone=0, ellipsoid=grs80):
     # Point Scale Factor and Grid Convergence
     psf, grid_conv = psfandgridconv(xi1, eta1, degrees(lat), long, cm, conf_lat)
 
-    return hemisphere, zone, round(float(east), 4), round(float(north), 4), round(psf, 8), grid_conv
+    return (hemisphere, zone,
+            round(float(east), 4),
+            round(float(north), 4),
+            round(psf, 8), grid_conv)
 
 
 def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
     """
-    Takes a Transverse Mercator grid co-ordinate (Zone, Easting, Northing, Hemisphere)
-    and returns its corresponding Geographic Latitude and Longitude, Point Scale Factor
-    and Grid Convergence. Default Projection is Universal Transverse Mercator Projection
-    using GRS80 Ellipsoid parameters.
+    Takes a Transverse Mercator grid co-ordinate (Zone, Easting, Northing,
+    Hemisphere) and returns its corresponding Geographic Latitude and Longitude,
+    Point Scale Factor and Grid Convergence. Default Projection is Universal
+    Transverse Mercator Projection using GRS80 Ellipsoid parameters.
     :param zone: Zone Number - 1 to 60
     :param east: Easting (m, within 3330km of Central Meridian)
     :param north: Northing (m, 0 to 10,000,000m)
     :param hemisphere: String - 'North' or 'South'(default)
     :param ellipsoid: Ellipsoid Object
-    :return: Latitude and Longitude (Decimal Degrees), Point Scale Factor, Grid Convergence (Decimal Degrees)
+    :return: Latitude and Longitude (Decimal Degrees), Point Scale Factor,
+             Grid Convergence (Decimal Degrees)
     """
     # Input Validation - UTM Extents and Values
     zone = int(zone)
@@ -618,7 +626,8 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
         raise ValueError('Invalid Zone - Zones from 1 to 60')
 
     if east < -2830000 or east > 3830000:
-        raise ValueError('Invalid Easting - Must be within 3330km of Central Meridian')
+        raise ValueError('Invalid Easting - Must be within'
+                         '3330km of Central Meridian')
 
     if north < 0 or north > 10000000:
         raise ValueError('Invalid Northing - Must be between 0 and 10,000,000m')
@@ -662,10 +671,12 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
                            / (1 - ((ecc1 * tn) / (sqrt(1 + tn ** 2)))))))
 
     def ftn(tn, ecc1):
-        return t * sqrt(1 + (sigma(tn, ecc1)) ** 2) - sigma(tn, ecc1) * sqrt(1 + tn ** 2) - t1
+        return (t * sqrt(1 + (sigma(tn, ecc1)) ** 2) -
+                sigma(tn, ecc1) * sqrt(1 + tn ** 2) - t1)
 
     def f1tn(tn, ecc1, ecc1sq):
-        return ((sqrt(1 + (sigma(tn, ecc1)) ** 2) * sqrt(1 + tn ** 2) - sigma(tn, ecc1) * tn)
+        return ((sqrt(1 + (sigma(tn, ecc1)) ** 2) * sqrt(1 + tn ** 2)
+                 - sigma(tn, ecc1) * tn)
                 * (((1 - float(ecc1sq)) * sqrt(1 + t ** 2))
                    / (1 + (1 - float(ecc1sq)) * t ** 2)))
 
@@ -675,7 +686,8 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
     while diff > 1e-15 and itercount < 100:
         itercount += 1
         t_before = t
-        t = t - (ftn(t, ellipsoid.ecc1) / f1tn(t, ellipsoid.ecc1, ellipsoid.ecc1sq))
+        t = t - (ftn(t, ellipsoid.ecc1)
+                 / f1tn(t, ellipsoid.ecc1, ellipsoid.ecc1sq))
         diff = abs(t - t_before)
     lat = degrees(atan(t))
 
@@ -687,7 +699,9 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
     # Point Scale Factor and Grid Convergence
     psf, grid_conv = psfandgridconv(xi1, eta1, lat, long, cm, conf_lat)
 
-    return hemisign * round(lat, 11), round(long, 11), round(psf, 8), hemisign * grid_conv
+    return (hemisign * round(lat, 11),
+            round(long, 11), round(psf, 8),
+            hemisign * grid_conv)
 
 
 def xyz2llh(x, y, z, ellipsoid=grs80):
@@ -720,7 +734,8 @@ def xyz2llh(x, y, z, ellipsoid=grs80):
 def llh2xyz(lat, long, ellht, ellipsoid=grs80):
     # Add input for ellipsoid (default: grs80)
     """
-    Input: Latitude and Longitude in Decimal Degrees, Ellipsoidal Height in metres
+    Input: Latitude and Longitude in Decimal Degrees, Ellipsoidal Height in
+    metres
     Output: Cartesian X, Y, Z Coordinates in metres
     """
     # Convert lat & long to radians
@@ -736,3 +751,41 @@ def llh2xyz(lat, long, ellht, ellipsoid=grs80):
     y = (nu + ellht) * cos(lat) * sin(long)
     z = ((ellipsoid.semimin**2 / ellipsoid.semimaj**2) * nu + ellht) * sin(lat)
     return x, y, z
+
+
+def date_to_yyyydoy(date):
+    """
+    Convert a datetime.date object to a string in the form 'yyyy.doy',
+    where yyyy is the 4 character year number and doy is the 3 character
+    day of year
+    :param date: datetime.date object
+    :return: string with date in the form 'yyyy.doy'
+    """
+    try:
+        return (str(date.timetuple().tm_year) + '.' +
+                str(date.timetuple().tm_yday).zfill(3))
+    except AttributeError:
+        raise AttributeError('Invalid date: date must be datetime.date object')
+
+
+def yyyydoy_to_date(yyyydoy):
+    """
+    Convert a string in the form of either 'yyyydoy' or 'yyyy.doy' to a
+    datetime.date object, where yyyy is the 4 character year number and doy
+    is the 3 character day of year
+    :param yyyydoy: string with date in the form 'yyyy.doy' or 'yyyydoy'
+    :return: datetime.date object
+    """
+    try:
+        if '.' in yyyydoy:
+            if len(yyyydoy) != 8:
+                raise ValueError('Invalid string: must be yyyydoy or yyyy.doy')
+            yyyy, doy = yyyydoy.split('.')
+        else:
+            if len(yyyydoy) != 7:
+                raise ValueError('Invalid string: must be yyyydoy or yyyy.doy')
+            yyyy = yyyydoy[0:4]
+            doy = yyyydoy[4:7]
+        return datetime.date(int(yyyy), 1, 1) + datetime.timedelta(int(doy) - 1)
+    except ValueError:
+        raise ValueError('Invalid string: must be yyyydoy or yyyy.doy')
