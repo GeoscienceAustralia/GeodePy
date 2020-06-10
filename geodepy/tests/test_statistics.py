@@ -92,6 +92,36 @@ class TestStatistics(unittest.TestCase):
         np.testing.assert_almost_equal(expected_result, result)
         self.assertEqual(type(expected_result), type(result))
 
+    def test_relative_error(self):
+        lat1 = -33.371389383333
+        lon1 = 145.673034975000
+        var1 = np.array([
+            [1.7671344090e-04, -8.9986817000e-05, 1.1789951440e-04],
+            [-8.9986817000e-05, 1.0963890720e-04, -7.1820721020e-05],
+            [1.1789951440e-04, -7.1820721020e-05, 1.4015891560e-04]
+        ])
+        var2 = np.array([
+            [1.7105233790e-04, -8.8389059620e-05, 1.1156043490e-04],
+            [-8.8389059620e-05, 1.0754378720e-04, -6.8637225330e-05],
+            [1.1156043490e-04, -6.8637225330e-05, 1.3097055280e-04]
+        ])
+        cov12 = np.array([
+            [1.5518691860e-04, -7.8107376300e-05, 1.0312885480e-04],
+            [-7.8392614650e-05, 9.5884929150e-05, -6.2159214580e-05],
+            [1.0310493330e-04, -6.1905790840e-05, 1.2226743540e-04]
+        ])
+
+        expected_results = (
+            0.003122110653270988,
+            0.0028032035987053208,
+            133.65771030508103,
+            0.008473125158578584
+        )
+
+        results = statistics.relative_error(lat1, lon1, var1, var2, cov12)
+        np.testing.assert_almost_equal(expected_results, results)
+        self.assertEqual(type(expected_results), type(results))
+        
     def test_circ_hz_pu(self):
         a = 1
         b = 0
