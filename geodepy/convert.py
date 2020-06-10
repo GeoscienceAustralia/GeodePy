@@ -5,21 +5,13 @@ Geoscience Australia - Python Geodesy Package
 Convert Module
 """
 
-from math import modf, sin, cos, atan2, radians, degrees, sqrt
+from math import (sin, cos, atan2, radians, degrees,
+                  sqrt, cosh, sinh, tan, atan, log)
+import datetime
+from geodepy.constants import utm, grs80
 
-
-def dec2hp(dec):
-    minute, second = divmod(abs(dec) * 3600, 60)
-    degree, minute = divmod(minute, 60)
-    hp = degree + (minute / 100) + (second / 10000)
-    return hp if dec >= 0 else -hp
-
-
-def hp2dec(hp):
-    degmin, second = divmod(abs(hp) * 1000, 10)
-    degree, minute = divmod(degmin, 100)
-    dec = degree + (minute / 60) + (second / 360)
-    return dec if hp >= 0 else -dec
+# Universal Transverse Mercator Projection Parameters
+proj = utm
 
 
 class DMSAngle(object):
@@ -49,37 +41,57 @@ class DMSAngle(object):
             signsymbol = '+'
         else:
             signsymbol = 'error'
-        return '{DMSAngle: ' + signsymbol + str(self.degree) + 'd ' + str(self.minute) + 'm ' + str(self.second) + 's}'
+        return '{DMSAngle: ' + signsymbol + str(self.degree) + 'd ' +\
+               str(self.minute) + 'm ' + str(self.second) + 's}'
 
     def __add__(self, other):
-        return dec2dms(self.dec() + other.dec())
+        try:
+            return dec2dms(self.dec() + other.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects '
+                            'together')
 
     def __radd__(self, other):
-        return dec2dms(other.dec() + self.dec())
+        try:
+            return dec2dms(other.dec() + self.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects '
+                            'together')
 
     def __sub__(self, other):
-        return dec2dms(self.dec() - other.dec())
+        try:
+            return dec2dms(self.dec() - other.dec())
+        except AttributeError:
+            raise TypeError('Can only subtract DMSAngle and/or DDMAngle '
+                            'objects together')
 
     def __rsub__(self, other):
-        return dec2dms(other.dec() - self.dec())
+        try:
+            return dec2dms(other.dec() - self.dec())
+        except AttributeError:
+            raise TypeError('Can only subtract DMSAngle and/or DDMAngle '
+                            'objects together')
 
     def __mul__(self, other):
         try:
             return dec2dms(self.dec() * other)
         except TypeError:
-            raise TypeError('Multiply only defined between DMSAngle Object and Int or Float')
+            raise TypeError('Multiply only defined between DMSAngle Object '
+                            'and Int or Float')
 
     def __rmul__(self, other):
         try:
             return dec2dms(other * self.dec())
         except TypeError:
-            raise TypeError('Multiply only defined between DMSAngle Object and Int or Float')
+            raise TypeError('Multiply only defined between DMSAngle Object '
+                            'and Int or Float')
 
     def __truediv__(self, other):
         try:
             return dec2dms(self.dec() / other)
         except TypeError:
-            raise TypeError('Division only defined between DMSAngle Object and Int or Float')
+            raise TypeError('Division only defined between DMSAngle Object '
+                            'and Int or Float')
 
     def __abs__(self):
         return DMSAngle(self.degree, self.minute, self.second)
@@ -103,10 +115,12 @@ class DMSAngle(object):
         return self.dec() > other.dec()
 
     def dec(self):
-        return self.sign * (self.degree + (self.minute / 60) + (self.second / 3600))
+        return self.sign * (self.degree + (self.minute / 60) +
+                            (self.second / 3600))
 
     def hp(self):
-        return self.sign * (self.degree + (self.minute / 100) + (self.second / 10000))
+        return self.sign * (self.degree + (self.minute / 100) +
+                            (self.second / 10000))
 
     def ddm(self):
         if self.sign == 1:
@@ -139,31 +153,57 @@ class DDMAngle(object):
             signsymbol = '+'
         else:
             signsymbol = 'error'
-        return '{DDMAngle: ' + signsymbol + str(self.degree) + 'd ' + str(self.minute) + 'm}'
+        return '{DDMAngle: ' + signsymbol + str(self.degree) + 'd ' + \
+               str(self.minute) + 'm}'
 
     def __add__(self, other):
-        return dec2ddm(self.dec() + other.dec())
+        try:
+            return dec2ddm(self.dec() + other.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects '
+                            'together')
+
+    def __radd__(self, other):
+        try:
+            return dec2ddm(other.dec() + self.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects '
+                            'together')
 
     def __sub__(self, other):
-        return dec2ddm(self.dec() - other.dec())
+        try:
+            return dec2ddm(self.dec() - other.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects '
+                            'together')
+
+    def __rsub__(self, other):
+        try:
+            return dec2ddm(other.dec() - self.dec())
+        except AttributeError:
+            raise TypeError('Can only add DMSAngle and/or DDMAngle objects '
+                            'together')
 
     def __mul__(self, other):
         try:
             return dec2ddm(self.dec() * other)
         except TypeError:
-            raise TypeError('Multiply only defined between DMSAngle Object and Int or Float')
+            raise TypeError('Multiply only defined between DMSAngle Object '
+                            'and Int or Float')
 
     def __rmul__(self, other):
         try:
             return dec2ddm(other * self.dec())
         except TypeError:
-            raise TypeError('Multiply only defined between DMSAngle Object and Int or Float')
+            raise TypeError('Multiply only defined between DMSAngle Object '
+                            'and Int or Float')
 
     def __truediv__(self, other):
         try:
             return dec2ddm(self.dec() / other)
         except TypeError:
-            raise TypeError('Division only defined between DMSAngle Object and Int or Float')
+            raise TypeError('Division only defined between DMSAngle Object '
+                            'and Int or Float')
 
     def __abs__(self):
         return DDMAngle(self.degree, self.minute)
@@ -191,17 +231,33 @@ class DDMAngle(object):
 
     def hp(self):
         minute_int, second = divmod(self.minute, 1)
-        return self.sign * (self.degree + (minute_int / 100) + (second * 0.006))
+        return self.sign * (self.degree + (minute_int / 100) +
+                            (second * 0.006))
 
     def dms(self):
         minute_int, second = divmod(self.minute, 1)
         return self.sign * DMSAngle(self.degree, minute_int, second * 60)
 
 
+def dec2hp(dec):
+    minute, second = divmod(abs(dec) * 3600, 60)
+    degree, minute = divmod(minute, 60)
+    hp = degree + (minute / 100) + (second / 10000)
+    return hp if dec >= 0 else -hp
+
+
+def hp2dec(hp):
+    degmin, second = divmod(abs(hp) * 1000, 10)
+    degree, minute = divmod(degmin, 100)
+    dec = degree + (minute / 60) + (second / 360)
+    return dec if hp >= 0 else -dec
+
+
 def dec2dms(dec):
     minute, second = divmod(abs(dec) * 3600, 60)
     degree, minute = divmod(minute, 60)
-    return DMSAngle(degree, minute, second) if dec >= 0 else DMSAngle(-degree, minute, second)
+    return DMSAngle(degree, minute, second) if dec >= 0 \
+        else DMSAngle(-degree, minute, second)
 
 
 def dec2ddm(dec):
@@ -214,7 +270,8 @@ def dec2ddm(dec):
 def hp2dms(hp):
     degmin, second = divmod(abs(hp) * 1000, 10)
     degree, minute = divmod(degmin, 100)
-    return DMSAngle(degree, minute, second * 10) if hp >= 0 else DMSAngle(-degree, minute, second * 10)
+    return DMSAngle(degree, minute, second * 10) if hp >= 0 \
+        else DMSAngle(-degree, minute, second * 10)
 
 
 def hp2ddm(hp):
@@ -247,208 +304,488 @@ def dd2sec(dd):
     return sec if dd >= 0 else -sec
 
 
-# ----------------
-# Legacy Functions
-# dd2dms refactored as dec2hp
-def dd2dms(dd):
-    minutes, seconds = divmod(abs(dd) * 3600, 60)
+def dec2hp_v(dec):
+    minutes, seconds = divmod(abs(dec) * 3600, 60)
     degrees, minutes = divmod(minutes, 60)
-    dms = degrees + (minutes / 100) + (seconds / 10000)
-    return dms if dd >= 0 else -dms
+    hp = degrees + (minutes / 100) + (seconds / 10000)
+    hp[dec <= 0] = -hp[dec <= 0]
+    return hp
 
 
-# dms2dd refactored as hp2dec
-def dms2dd(dms):
-    degmin, seconds = divmod(abs(dms) * 1000, 10)
+def hp2dec_v(hp):
+    degmin, seconds = divmod(abs(hp) * 1000, 10)
     degrees, minutes = divmod(degmin, 100)
-    dd = degrees + (minutes / 60) + (seconds / 360)
-    return dd if dms >= 0 else -dd
+    dec = degrees + (minutes / 60) + (seconds / 360)
+    dec[hp <= 0] = -dec[hp <= 0]
+    return dec
 
 
-def dec2sex(lon, lat):
-    """Convert decimal degrees to sexagesimal format
-
-    Longitudes go from -180 to 180
-    Latitudes go from -90 to 90
+def rect_radius(ellipsoid):
     """
-    def fmt_sex(coord):
-        """Function to create a sexagesimal-formatted coordinate as a string
-        """
-        coord = float(coord)
-        if coord < 0:
-            flag = -1
-            coord = abs(coord)
-        else:
-            flag = 1
-        min_sec, deg = modf(coord)
-        deg = int(deg)
-        deg *= flag  # deal with negatives
-        sec, min = modf(min_sec * 60)
-        min = round(min)
-        sec *= 60
-        sex_coord = '{} {:02d} {:05.2f}'.format(deg, min, sec)
-
-        return sex_coord
-
-# Convert the coordinates
-    sex_lon = fmt_sex(lon)
-    sex_lat = fmt_sex(lat)
-
-    return sex_lon, sex_lat
-
-
-def sex2dec(lon, lat):
-    """Convert a sexagesimal coordinate to decimal degrees
-
-    Longitudes go from -180 to 180
-    Latitudes go from -90 to 90
+    Computes the Rectifying Radius of an Ellipsoid with specified Inverse
+    Flattening (See Ref 2 Equation 3)
+    :param ellipsoid: Ellipsoid Object
+    :return: Ellipsoid Rectifying Radius
     """
-    def fmt_dec(coord):
-        """Function to piece together a decimal coordinate
-        """
-        coord = str(coord)
-        if coord[:1] == '-':
-            flag = -1
-            coord = coord[1:]
-        else:
-            flag = 1
-        deg, min, sec = coord.split()
-        dec_coord = int(deg) + float(min) / 60 + float(sec) / 3600
-        dec_coord = float('{:.6f}'.format(dec_coord))
-        dec_coord *= flag  # deal with negatives
-
-        return dec_coord
-
-# Convert the coordinates
-    dec_lon = fmt_dec(lon)
-    dec_lat = fmt_dec(lat)
-
-    return dec_lon, dec_lat
+    nval = (1 / float(ellipsoid.inversef)) /\
+           (2 - (1 / float(ellipsoid.inversef)))
+    nval2 = nval**2
+    return (ellipsoid.semimaj / (1 + nval) * ((nval2 *
+                                              (nval2 *
+                                               (nval2 *
+                                                (25 * nval2 + 64)
+                                                + 256)
+                                               + 4096)
+                                              + 16384)
+                                              / 16384.))
 
 
-def sex2hp(lon, lat):
-    """Convert a sexagesimal coordinate to HP notation
-
-    Longitudes go from -180 to 180
-    Latitudes go from -90 to 90
+def alpha_coeff(ellipsoid):
     """
-    def fmt_hp(coord):
-        """Function to piece together a coordinate in HP notation
-        """
-        coord = str(coord)
-        if coord[:1] == '-':
-            flag = -1
-            coord = coord[1:]
-        else:
-            flag = 1
-        deg, min, sec = coord.split()
-        sec = sec.replace('.', '')
-        hp_coord = '{}.{:02d}{:04d}'.format(deg, int(min), int(sec))
-        if flag == -1:
-            hp_coord = '-' + hp_coord  # deal with negatives
-
-        return hp_coord
-
-# Convert the coordinates
-    hp_lon = fmt_hp(lon)
-    hp_lat = fmt_hp(lat)
-
-    return hp_lon, hp_lat
-
-
-def hp2sex(lon, lat):
-    """Convert HP notation to a sexagesimal coordinate
-
-    Longitudes go from -180 to 180
-    Latitudes go from -90 to 90
+    Computes the set of Alpha coefficients of an Ellipsoid with specified
+    Inverse Flattening (See Ref 2 Equation 5)
+    :param ellipsoid: Ellipsoid Object
+    :return: Alpha coefficients a2, a4 ... a16
     """
-    def fmt_sex(coord):
-        """Function to piece together a coordinate in HP notation
-        """
-        coord = str(coord)
-        if coord[:1] == '-':
-            flag = -1
-            coord = coord[1:]
+    nval = ellipsoid.n
+    a2 = ((nval *
+           (nval *
+            (nval *
+             (nval *
+              (nval *
+               (nval *
+                ((37884525 - 75900428 * nval)
+                 * nval + 42422016)
+                - 89611200)
+               + 46287360)
+              + 63504000)
+             - 135475200)
+            + 101606400))
+          / 203212800.)
+
+    a4 = ((nval ** 2 *
+           (nval *
+            (nval *
+             (nval *
+              (nval *
+               (nval *
+                (148003883 * nval + 83274912)
+                - 178508970)
+               + 77690880)
+              + 67374720)
+             - 104509440)
+            + 47174400))
+          / 174182400.)
+
+    a6 = ((nval ** 3 *
+           (nval *
+            (nval *
+             (nval *
+              (nval *
+               (318729724 * nval - 738126169)
+               + 294981280)
+              + 178924680)
+             - 234938880)
+            + 81164160))
+          / 319334400.)
+
+    a8 = ((nval ** 4 *
+           (nval *
+            (nval *
+             ((14967552000 - 40176129013 * nval) * nval + 6971354016)
+             - 8165836800)
+            + 2355138720))
+          / 7664025600.)
+
+    a10 = ((nval ** 5 *
+            (nval *
+             (nval *
+              (10421654396 * nval + 3997835751)
+              - 4266773472)
+             + 1072709352))
+           / 2490808320.)
+
+    a12 = ((nval ** 6 *
+            (nval *
+             (175214326799 * nval - 171950693600)
+             + 38652967262))
+           / 58118860800.)
+
+    a14 = ((nval ** 7 *
+            (13700311101 - 67039739596 * nval))
+           / 12454041600.)
+
+    a16 = (1424729850961 * nval ** 8) / 743921418240.
+    return a2, a4, a6, a8, a10, a12, a14, a16
+
+
+def beta_coeff(ellipsoid):
+    """
+    Computes the set of Beta coefficients of an Ellipsoid with specified
+    Inverse Flattening (See Ref 2 Equation 23)
+    :param ellipsoid: Ellipsoid Object
+    :return: Alpha coefficients a2, a4 ... a16
+    """
+    nval = ellipsoid.n
+    b2 = ((nval *
+           (nval *
+            (nval *
+             (nval *
+              (nval *
+               (nval *
+                ((37845269 - 31777436 * nval) - 43097152)
+                + 42865200)
+               + 752640)
+              - 104428800)
+             + 180633600)
+            - 135475200))
+          / 270950400.)
+
+    b4 = ((nval ** 2 *
+           (nval *
+            (nval *
+             (nval *
+              (nval *
+               ((-24749483 * nval - 14930208) * nval + 100683990)
+               - 152616960)
+              + 105719040)
+             - 23224320)
+            - 7257600))
+          / 348364800.)
+
+    b6 = ((nval ** 3 *
+           (nval *
+            (nval *
+             (nval *
+              (nval *
+               (232468668 * nval - 101880889)
+               - 39205760)
+              + 29795040)
+             + 28131840)
+            - 22619520))
+          / 638668800.)
+
+    b8 = ((nval ** 4 *
+           (nval *
+            (nval *
+             ((-324154477 * nval - 1433121792) * nval + 876745056)
+             + 167270400)
+            - 208945440))
+          / 7664025600.)
+
+    b10 = ((nval ** 5 *
+            (nval *
+             (nval *
+              (312227409 - 457888660 * nval)
+              + 67920528)
+             - 70779852))
+           / 2490808320.)
+
+    b12 = ((nval ** 6 *
+            (nval *
+             (19841813847 * nval + 3665348512)
+             - 3758062126))
+           / 116237721600.)
+
+    b14 = ((nval ** 7 *
+            (1989295244 * nval - 1979471673))
+           / 49816166400.)
+
+    b16 = ((-191773887257 * nval ** 8) / 3719607091200.)
+    return b2, b4, b6, b8, b10, b12, b14, b16
+
+
+def psfandgridconv(xi1, eta1, lat, long, cm, conf_lat, ellipsoid=grs80):
+    A = rect_radius(ellipsoid)
+    a = alpha_coeff(ellipsoid)
+    lat = radians(lat)
+    long_diff = radians(long - cm)
+
+    # Point Scale Factor
+    p = 1
+    q = 0
+    for r in range(1, 9):
+        p += 2*r * a[r-1] * cos(2*r * xi1) * cosh(2*r * eta1)
+        q += 2*r * a[r-1] * sin(2*r * xi1) * sinh(2*r * eta1)
+    q = -q
+    psf = (float(proj.cmscale)
+           * (A / ellipsoid.semimaj)
+           * sqrt(q**2 + p**2)
+           * ((sqrt(1 + (tan(lat)**2))
+               * sqrt(1 - ellipsoid.ecc1sq * (sin(lat)**2)))
+              / sqrt((tan(conf_lat)**2) + (cos(long_diff)**2))))
+
+    # Grid Convergence
+    grid_conv = degrees(atan(abs(q / p))
+                        + atan(abs(tan(conf_lat) * tan(long_diff))
+                               / sqrt(1 + tan(conf_lat)**2)))
+    if cm > long and lat < 0:
+        grid_conv = -grid_conv
+    elif cm < long and lat > 0:
+        grid_conv = -grid_conv
+
+    return psf, grid_conv
+
+
+def geo2grid(lat, long, zone=0, ellipsoid=grs80):
+    """
+    Takes a geographic co-ordinate (latitude, longitude) and returns its
+    corresponding Hemisphere, Zone and Projection Easting and Northing, Point
+    Scale Factor and Grid Convergence. Default Projection is Universal
+    Transverse Mercator Projection using
+    GRS80 Ellipsoid parameters.
+    :param lat: Latitude in Decimal Degrees
+    :param long: Longitude in Decimal Degrees
+    :param zone: Optional Zone Number - Only required if calculating grid
+                                        co-ordinate outside zone boundaries
+    :param ellipsoid: Ellipsoid Object
+    :return: hemisphere, zone, east (m), north (m), Point Scale Factor,
+             Grid Convergence (Decimal Degrees)
+    """
+
+    # Input Validation - UTM Extents and Values
+    zone = int(zone)
+    if zone < 0 or zone > 60:
+        raise ValueError('Invalid Zone - Zones from 1 to 60')
+
+    if lat < -80 or lat > 84:
+        raise ValueError('Invalid Latitude - Latitudes from -80 to +84')
+
+    if long < -180 or long > 180:
+        raise ValueError('Invalid Longitude - Longitudes from -180 to +180')
+
+    A = rect_radius(ellipsoid)
+    a = alpha_coeff(ellipsoid)
+    lat = radians(lat)
+    # Calculate Zone
+    if zone == 0:
+        zone = int((float(long) - (
+                    proj.initialcm - (1.5 * proj.zonewidth))) / proj.zonewidth)
+    cm = float(zone * proj.zonewidth) + (proj.initialcm - proj.zonewidth)
+
+    # Conformal Latitude
+    sigx = (ellipsoid.ecc1 * tan(lat)) / sqrt(1 + (tan(lat) ** 2))
+    sig = sinh(ellipsoid.ecc1 * (0.5 * log((1 + sigx) / (1 - sigx))))
+    conf_lat = tan(lat) * sqrt(1 + sig ** 2) - sig * sqrt(1 + (tan(lat) ** 2))
+    conf_lat = atan(conf_lat)
+
+    # Longitude Difference
+    long_diff = radians(long - cm)
+    # Gauss-Schreiber Ratios
+    xi1 = atan(tan(conf_lat) / cos(long_diff))
+    eta1x = sin(long_diff) / (sqrt(tan(conf_lat) ** 2 + cos(long_diff) ** 2))
+    eta1 = log(eta1x + sqrt(1 + eta1x ** 2))
+
+    # Transverse Mercator Ratios
+    eta = eta1
+    xi = xi1
+    for r in range(1, 9):
+        eta += a[r-1] * cos(2*r * xi1) * sinh(2*r * eta1)
+        xi += a[r-1] * sin(2*r * xi1) * cosh(2*r * eta1)
+
+    # Transverse Mercator Co-ordinates
+    x = A * eta
+    y = A * xi
+
+    # Hemisphere-dependent UTM Projection Co-ordinates
+    east = proj.cmscale * x + proj.falseeast
+    if y < 0:
+        hemisphere = 'South'
+        north = proj.cmscale * y + proj.falsenorth
+    else:
+        hemisphere = 'North'
+        falsenorth = 0
+        north = proj.cmscale * y + falsenorth
+
+    # Point Scale Factor and Grid Convergence
+    psf, grid_conv = psfandgridconv(xi1, eta1, degrees(lat), long, cm, conf_lat)
+
+    return (hemisphere, zone,
+            round(float(east), 4),
+            round(float(north), 4),
+            round(psf, 8), grid_conv)
+
+
+def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
+    """
+    Takes a Transverse Mercator grid co-ordinate (Zone, Easting, Northing,
+    Hemisphere) and returns its corresponding Geographic Latitude and Longitude,
+    Point Scale Factor and Grid Convergence. Default Projection is Universal
+    Transverse Mercator Projection using GRS80 Ellipsoid parameters.
+    :param zone: Zone Number - 1 to 60
+    :param east: Easting (m, within 3330km of Central Meridian)
+    :param north: Northing (m, 0 to 10,000,000m)
+    :param hemisphere: String - 'North' or 'South'(default)
+    :param ellipsoid: Ellipsoid Object
+    :return: Latitude and Longitude (Decimal Degrees), Point Scale Factor,
+             Grid Convergence (Decimal Degrees)
+    """
+    # Input Validation - UTM Extents and Values
+    zone = int(zone)
+    if zone < 0 or zone > 60:
+        raise ValueError('Invalid Zone - Zones from 1 to 60')
+
+    if east < -2830000 or east > 3830000:
+        raise ValueError('Invalid Easting - Must be within'
+                         '3330km of Central Meridian')
+
+    if north < 0 or north > 10000000:
+        raise ValueError('Invalid Northing - Must be between 0 and 10,000,000m')
+
+    h = hemisphere.lower()
+    if h != 'north' and h != 'south':
+        raise ValueError('Invalid Hemisphere - String, either North or South')
+
+    A = rect_radius(ellipsoid)
+    b = beta_coeff(ellipsoid)
+    # Transverse Mercator Co-ordinates
+    x = (east - float(proj.falseeast)) / float(proj.cmscale)
+    if hemisphere.lower() == 'north':
+        y = -(north / float(proj.cmscale))
+        hemisign = -1
+    else:
+        y = (north - float(proj.falsenorth)) / float(proj.cmscale)
+        hemisign = 1
+
+    # Transverse Mercator Ratios
+    xi = y / A
+    eta = x / A
+
+    # Gauss-Schreiber Ratios
+    eta1 = eta
+    xi1 = xi
+    for r in range(1, 9):
+        eta1 += b[r-1] * cos(2*r * xi) * sinh(2*r * eta)
+        xi1 += b[r-1] * sin(2*r * xi) * cosh(2*r * eta)
+
+    # Conformal Latitude
+    conf_lat = (sin(xi1)) / (sqrt((sinh(eta1)) ** 2 + (cos(xi1)) ** 2))
+    t1 = conf_lat
+    conf_lat = atan(conf_lat)
+
+    # Finding t using Newtons Method
+    def sigma(tn, ecc1):
+        return (sinh(ecc1
+                     * 0.5
+                     * log((1 + ((ecc1 * tn) / (sqrt(1 + tn ** 2))))
+                           / (1 - ((ecc1 * tn) / (sqrt(1 + tn ** 2)))))))
+
+    def ftn(tn, ecc1):
+        return (t * sqrt(1 + (sigma(tn, ecc1)) ** 2) -
+                sigma(tn, ecc1) * sqrt(1 + tn ** 2) - t1)
+
+    def f1tn(tn, ecc1, ecc1sq):
+        return ((sqrt(1 + (sigma(tn, ecc1)) ** 2) * sqrt(1 + tn ** 2)
+                 - sigma(tn, ecc1) * tn)
+                * (((1 - float(ecc1sq)) * sqrt(1 + t ** 2))
+                   / (1 + (1 - float(ecc1sq)) * t ** 2)))
+
+    diff = 1
+    t = t1
+    itercount = 0
+    while diff > 1e-15 and itercount < 100:
+        itercount += 1
+        t_before = t
+        t = t - (ftn(t, ellipsoid.ecc1)
+                 / f1tn(t, ellipsoid.ecc1, ellipsoid.ecc1sq))
+        diff = abs(t - t_before)
+    lat = degrees(atan(t))
+
+    # Compute Longitude
+    cm = float((zone * proj.zonewidth) + proj.initialcm - proj.zonewidth)
+    long_diff = degrees(atan(sinh(eta1) / cos(xi1)))
+    long = cm + long_diff
+
+    # Point Scale Factor and Grid Convergence
+    psf, grid_conv = psfandgridconv(xi1, eta1, lat, long, cm, conf_lat)
+
+    return (hemisign * round(lat, 11),
+            round(long, 11), round(psf, 8),
+            hemisign * grid_conv)
+
+
+def xyz2llh(x, y, z, ellipsoid=grs80):
+    # Add input for ellipsoid (default: grs80)
+    """
+    Input: Cartesian XYZ coordinate in metres
+
+    Output: Latitude and Longitude in Decimal
+    Degrees and Ellipsoidal Height in Metres
+    """
+    # Calculate Longitude
+    long = atan2(y, x)
+    # Calculate Latitude
+    p = sqrt(x**2 + y**2)
+    latinit = atan((z*(1+ellipsoid.ecc2sq))/p)
+    lat = latinit
+    itercheck = 1
+    while abs(itercheck) > 1e-10:
+        nu = ellipsoid.semimaj/(sqrt(1 - ellipsoid.ecc1sq * (sin(lat))**2))
+        itercheck = lat - atan((z + nu * ellipsoid.ecc1sq * sin(lat))/p)
+        lat = atan((z + nu * ellipsoid.ecc1sq * sin(lat))/p)
+    nu = ellipsoid.semimaj/(sqrt(1 - ellipsoid.ecc1sq * (sin(lat))**2))
+    ellht = p/(cos(lat)) - nu
+    # Convert Latitude and Longitude to Degrees
+    lat = degrees(lat)
+    long = degrees(long)
+    return lat, long, ellht
+
+
+def llh2xyz(lat, long, ellht, ellipsoid=grs80):
+    # Add input for ellipsoid (default: grs80)
+    """
+    Input: Latitude and Longitude in Decimal Degrees, Ellipsoidal Height in
+    metres
+    Output: Cartesian X, Y, Z Coordinates in metres
+    """
+    # Convert lat & long to radians
+    lat = radians(lat)
+    long = radians(long)
+    # Calculate Ellipsoid Radius of Curvature in the Prime Vertical - nu
+    if lat == 0:
+        nu = grs80.semimaj
+    else:
+        nu = ellipsoid.semimaj/(sqrt(1 - ellipsoid.ecc1sq * (sin(lat)**2)))
+    # Calculate x, y, z
+    x = (nu + ellht) * cos(lat) * cos(long)
+    y = (nu + ellht) * cos(lat) * sin(long)
+    z = ((ellipsoid.semimin**2 / ellipsoid.semimaj**2) * nu + ellht) * sin(lat)
+    return x, y, z
+
+
+def date_to_yyyydoy(date):
+    """
+    Convert a datetime.date object to a string in the form 'yyyy.doy',
+    where yyyy is the 4 character year number and doy is the 3 character
+    day of year
+    :param date: datetime.date object
+    :return: string with date in the form 'yyyy.doy'
+    """
+    try:
+        return (str(date.timetuple().tm_year) + '.' +
+                str(date.timetuple().tm_yday).zfill(3))
+    except AttributeError:
+        raise AttributeError('Invalid date: date must be datetime.date object')
+
+
+def yyyydoy_to_date(yyyydoy):
+    """
+    Convert a string in the form of either 'yyyydoy' or 'yyyy.doy' to a
+    datetime.date object, where yyyy is the 4 character year number and doy
+    is the 3 character day of year
+    :param yyyydoy: string with date in the form 'yyyy.doy' or 'yyyydoy'
+    :return: datetime.date object
+    """
+    try:
+        if '.' in yyyydoy:
+            if len(yyyydoy) != 8:
+                raise ValueError('Invalid string: must be yyyydoy or yyyy.doy')
+            yyyy, doy = yyyydoy.split('.')
         else:
-            flag = 1
-        deg, min, sec = coord.split()
-        sec = sec.replace('.', '')
-        hp_coord = '{}.{:02d}{:04d}'.format(deg, int(min), int(sec))
-        if flag == -1:
-            hp_coord = '-' + hp_coord  # deal with negatives
-
-        return hp_coord
-
-# Convert the coordinates
-    hp_lon = fmt_sex(lon)
-    hp_lat = fmt_sex(lat)
-
-    return hp_lon, hp_lat
-
-
-def dd2dms_v(dd):
-    minutes, seconds = divmod(abs(dd) * 3600, 60)
-    degrees, minutes = divmod(minutes, 60)
-    dms = degrees + (minutes / 100) + (seconds / 10000)
-    dms[dd <= 0] = -dms[dd <= 0]
-    return dms
-
-
-def dms2dd_v(dms):
-    degmin, seconds = divmod(abs(dms) * 1000, 10)
-    degrees, minutes = divmod(degmin, 100)
-    dd = degrees + (minutes / 60) + (seconds / 360)
-    dd[dms <= 0] = -dd[dms <= 0]
-    return dd
-
-
-class DNACoord(object):
-    def __init__(self, pointid, const, easting, northing, zone, lat,
-                 long, ortho_ht, ell_ht, x, y, z, x_sd, y_sd, z_sd, desc):
-        self.pointid = pointid
-        self.const = const
-        self.easting = easting
-        self.northing = northing
-        self.zone = zone
-        self.lat = lat
-        self.long = long
-        self.ortho_ht = ortho_ht
-        self.ell_ht = ell_ht
-        self.x = x
-        self.y = y
-        self.z = z
-        self.x_sd = x_sd
-        self.y_sd = y_sd
-        self.z_sd = z_sd
-        self.desc = desc
-
-    def converthptodd(self):
-        self.lat = hp2dec(self.lat)
-        self.long = hp2dec(self.long)
-
-
-def read_dnacoord(fn):
-    coord_list = []
-    with open(fn, 'r') as file:
-        dnadata = file.readlines()
-        for line in dnadata:
-            pointid = line[0:20]
-            const = line[21:25]
-            easting = float(line[28:40])
-            northing = float(line[41:58])
-            zone = int(line[60:63])
-            lat = float(line[63:78])
-            long = float(line[78:92])
-            ortho_ht = float(line[93:103])
-            ell_ht = float(line[103:114])
-            x = float(line[115:129])
-            y = float(line[130:144])
-            z = float(line[145:159])
-            x_sd = float(line[160:171])
-            y_sd = float(line[172:181])
-            z_sd = float(line[182:191])
-            desc = line[192:-1]
-            record = DNACoord(pointid.strip(), const.strip(), easting, northing, zone, lat,
-                              long, ortho_ht, ell_ht, x, y, z, x_sd, y_sd, z_sd, desc.strip())
-            coord_list.append(record)
-    return coord_list
+            if len(yyyydoy) != 7:
+                raise ValueError('Invalid string: must be yyyydoy or yyyy.doy')
+            yyyy = yyyydoy[0:4]
+            doy = yyyydoy[4:7]
+        return datetime.date(int(yyyy), 1, 1) + datetime.timedelta(int(doy) - 1)
+    except ValueError:
+        raise ValueError('Invalid string: must be yyyydoy or yyyy.doy')

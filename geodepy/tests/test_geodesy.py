@@ -2,9 +2,9 @@ import unittest
 import os.path
 import numpy as np
 import numpy.lib.recfunctions as rfn
-from geodepy.convert import hp2dec, dec2hp, rect2polar, polar2rect
+from geodepy.convert import hp2dec, dec2hp, rect2polar, polar2rect, grid2geo, \
+    llh2xyz
 from geodepy.geodesy import vincinv, vincdir, vincinv_utm, vincdir_utm, enu2xyz, xyz2enu
-from geodepy.transform import grid2geo, llh2xyz
 
 
 class TestGeodesy(unittest.TestCase):

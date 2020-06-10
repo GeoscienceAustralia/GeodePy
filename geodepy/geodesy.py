@@ -5,71 +5,48 @@ Geoscience Australia - Python Geodesy Package
 Geodesy Module
 """
 
-import os
-import csv
-from math import (pi, degrees, radians, sqrt, sin,
-                  cos, tan, asin, acos, atan, atan2)
+from math import degrees, radians, sqrt, sin, cos, tan, asin, acos, atan, atan2
 import numpy as np
-from geodepy.convert import dec2hp, hp2dec
 from geodepy.constants import grs80
-from geodepy.transform import grid2geo, geo2grid
+from geodepy.convert import geo2grid, grid2geo
+from geodepy.statistics import rotation_matrix
 
 
-def enu2xyz(lat, long, east, north, up):
-    """
-    function to convert a vector in a local east, north, up reference frame to
-    a vector in a cartesian x, y, z reference frame
+def enu2xyz(lat, lon, east, north, up):
+    """Convert a column vector in the local reference frame to a column vector
+    in the Cartesian reference frame.
     :param lat: latitude in decimal degrees
-    :param long: longitude in decimal degrees
+    :param lon: longitude in decimal degrees
     :param east: in metres
     :param north: in metres
     :param up: in metres
     :return: x, y, z in metres
     """
-    lat = radians(lat)
-    long = radians(long)
-    # Create ENU Vector
-    enu = np.array([[east],
-                    [north],
-                    [up]])
-    # Create Rotation Matrix
-    rotate = np.array([[-sin(long), -sin(lat)*cos(long), cos(lat)*cos(long)],
-                       [cos(long), -sin(lat)*sin(long), cos(lat)*sin(long)],
-                       [0, cos(lat), sin(lat)]])
-    xyz = np.dot(rotate, enu)
-    # Assign to separate variables
-    x = float(xyz[0])
-    y = float(xyz[1])
-    z = float(xyz[2])
+    rot_matrix = rotation_matrix(lat, lon)
+    enu = np.array([[east], [north], [up]])
+    xyz = rot_matrix @ enu
+    x = xyz[0, 0]
+    y = xyz[1, 0]
+    z = xyz[2, 0]
     return x, y, z
 
 
-def xyz2enu(lat, long, x, y, z):
-    """
-    function to convert a vector in a cartesian x, y, z reference frame to a
-    vector in a local east, north, up reference frame
+def xyz2enu(lat, lon, x, y, z):
+    """Convert a column vector in the Cartesian reference frame to a column
+    vector in the local reference frame.
     :param lat: latitude in decimal degrees
-    :param long: longitude in decimal degrees
+    :param lon: longitude in decimal degrees
     :param x: in metres
     :param y: in metres
     :param z: in metres
     :return: east, north, up in metres
     """
-    lat = radians(lat)
-    long = radians(long)
-    # Create XYZ Vector
-    xyz = np.array([[x],
-                    [y],
-                    [z]])
-    # Create Rotation Matrix
-    rotate = np.array([[-sin(long), cos(long), 0],
-                       [-sin(lat)*cos(long), -sin(lat)*sin(long), cos(lat)],
-                       [cos(lat)*cos(long), cos(lat)*sin(long), sin(lat)]])
-    enu = np.dot(rotate, xyz)
-    # Assign to separate variables
-    east = float(enu[0])
-    north = float(enu[1])
-    up = float(enu[2])
+    rot_matrix = rotation_matrix(lat, lon)
+    xyz = np.array([[x], [y], [z]])
+    enu = rot_matrix.transpose() @ xyz
+    east = enu[0, 0]
+    north = enu[1, 0]
+    up = enu[2, 0]
     return east, north, up
 
 
@@ -302,75 +279,3 @@ def vincinv_utm(zone1, east1, north1, zone2, east2, north2, hemisphere1='south',
     pt2 = grid2geo(zone2, east2, north2, hemisphere2, ellipsoid)
     # Use vincinv
     return vincinv(pt1[0], pt1[1], pt2[0], pt2[1], ellipsoid)
-
-
-def vincdirio():
-    """
-    No Input:
-    Prompts the user for the name of a file in csv format. Data in the file
-    must be in the form Latitude, Longitude of Point 1 in Degrees Minutes
-    Seconds, Geodetic Azimuth from Point 1 to 2 in Degrees Minutes Seconds and
-    Distance in metres with no header line.
-
-    No Output:
-    Uses the function vincdir to calculate for each row in the csv file the
-    geographic coordinate (lat, long) of Point 2 and the Azimuth from Point 2
-    to Point 1, all in Degrees Minutes Seconds. This data is written to a new
-    file with the name <inputfile>_out.csv
-    """
-    # Enter Filename
-    fn = input('Enter co-ordinate file:\n')
-    # Open Filename
-    csvfile = open(fn)
-    csvreader = csv.reader(csvfile)
-    # Create Output File
-    fn_part = (os.path.splitext(fn))
-    fn_out = fn_part[0] + '_out' + fn_part[1]
-    outfile = open(fn_out, 'w')
-    # Write Output
-    outfilewriter = csv.writer(outfile)
-    # outfilewriter.writerow(['Latitude2', 'Longitude2', 'azimuth2to1'])
-    for row in csvreader:
-        lat1 = hp2dec(float(row[0]))
-        long1 = hp2dec(float(row[1]))
-        azimuth1to2 = hp2dec(float(row[2]))
-        ell_dist = float(row[3])
-        lat2, long2, azimuth2to1 = vincdir(lat1, long1, azimuth1to2, ell_dist)
-        lat2 = dec2hp(lat2)
-        long2 = dec2hp(long2)
-        azimuth2to1 = dec2hp(azimuth2to1)
-        output = [lat2, long2, azimuth2to1]
-        outfilewriter.writerow(output)
-    # Close Files
-    outfile.close()
-    csvfile.close()
-
-
-def vincinvio():
-    # Enter Filename
-    print('Enter co-ordinate file:')
-    fn = input()
-    # Open Filename
-    csvfile = open(fn)
-    csvreader = csv.reader(csvfile)
-    # Create Output File
-    fn_part = (os.path.splitext(fn))
-    fn_out = fn_part[0] + '_out' + fn_part[1]
-    outfile = open(fn_out, 'w')
-    # Write Output
-    outfilewriter = csv.writer(outfile)
-    outfilewriter.writerow(['Ell_Dist', 'Azimuth1to2', 'Azimuth2to1'])
-    for row in csvreader:
-        lat1 = hp2dec(float(row[0]))
-        long1 = hp2dec(float(row[1]))
-        lat2 = hp2dec(float(row[2]))
-        long2 = hp2dec(float(row[3]))
-        ell_dist, azimuth1to2, azimuth2to1 = vincinv(lat1, long1, lat2, long2)
-        azimuth1to2 = dec2hp(azimuth1to2)
-        azimuth2to1 = dec2hp(azimuth2to1)
-        output = (ell_dist, azimuth1to2, azimuth2to1)
-        outfilewriter.writerow(output)
-    # Close Files
-    outfile.close()
-    csvfile.close()
-
