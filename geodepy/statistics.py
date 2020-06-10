@@ -109,6 +109,54 @@ def error_ellipse(vcv):
     return a, b, orientation
 
 
+def relative_error(lat, lon, var1, var2, cov12):
+    """
+    Function to compute relative error between two 3D stations:
+        - 2D relative error ellipse [semi-major axis, semi-minor axis, bearing]
+        - 1D relative 'up' error
+
+    :param lat: latitude at Stn1 in decimal degrees
+    :param lon: longitude at Stn1 in decimal degrees
+    :param var1: 3x3 Cartesian XYZ variance matrix of Stn1
+    :param var2: 3x3 Cartesian XYZ variance matrix of Stn2
+    :param cov12: 3x3 Cartesian XYZ covariance block between Stn1 and Stn2
+    :return: Relative error ellipse components [smaj, smin, brg] and relative 'up' error
+    """
+
+    # rotate matrices from cartesian to local
+    var1_enu = vcv_cart2local(var1, lat, lon)
+    var2_enu = vcv_cart2local(var2, lat, lon)
+    cov12_enu = vcv_cart2local(cov12, lat, lon)
+
+    # form relative variance matrix
+    rel_var = np.zeros((3, 3))
+
+    # diagonal terms
+    rel_var[0, 0] = var1_enu[0, 0] + var2_enu[0, 0] - 2 * cov12_enu[0, 0]
+    rel_var[1, 1] = var1_enu[1, 1] + var2_enu[1, 1] - 2 * cov12_enu[1, 1] 
+    rel_var[2, 2] = var1_enu[2, 2] + var2_enu[2, 2] - 2 * cov12_enu[2, 2]
+
+    # east-north covariance
+    rel_var[0, 1] = var1_enu[0, 1] + var2_enu[0, 1] - cov12_enu[0, 1] - cov12_enu[1, 0]
+    rel_var[1, 0] = rel_var[0, 1]
+
+    # east-up covariance
+    rel_var[0, 2] = var1_enu[0, 2] + var2_enu[0, 2] - cov12_enu[0, 2] - cov12_enu[2, 0]
+    rel_var[2, 0] = rel_var[0, 2]
+
+    # north-up covariance
+    rel_var[1, 2] = var1_enu[1, 2] + var2_enu[1, 2] - cov12_enu[1, 2] - cov12_enu[2, 1]
+    rel_var[2, 1] = rel_var[1, 2]
+
+    # relative error ellipse [smaj, smin, brg]
+    ree = error_ellipse(rel_var)
+
+    # relative up error
+    rue = rel_var[2, 2] ** 0.5
+
+    return ree[0], ree[1], ree[2], rue
+
+
 def circ_hz_pu(a, b):
     """Calculate the circularised horizontal PU from the semi-major and
     semi-minor axes of an error ellipse
