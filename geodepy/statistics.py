@@ -114,6 +114,9 @@ def relative_error(lat, lon, var1, var2, cov12):
     Function to compute relative error between two 3D stations:
         - 2D relative error ellipse [semi-major axis, semi-minor axis, bearing]
         - 1D relative 'up' error
+        
+    Adapted from Harvey B.R. (1998) Practical least squares and statistics for surveyors,
+    Monograph 13, Section 4.4, p.135
 
     :param lat: latitude at Stn1 in decimal degrees
     :param lon: longitude at Stn1 in decimal degrees
