@@ -8,7 +8,7 @@ Geodesy Module
 from math import degrees, radians, sqrt, sin, cos, tan, asin, acos, atan, atan2
 import numpy as np
 from geodepy.constants import grs80
-from geodepy.convert import geo2grid, grid2geo
+from geodepy.convert import geo2grid, grid2geo, angular_typecheck
 from geodepy.statistics import rotation_matrix
 
 
@@ -22,7 +22,7 @@ def enu2xyz(lat, lon, east, north, up):
     :param up: in metres
     :return: x, y, z in metres
     """
-    rot_matrix = rotation_matrix(lat, lon)
+    rot_matrix = rotation_matrix(angular_typecheck(lat), angular_typecheck(lon))
     enu = np.array([[east], [north], [up]])
     xyz = rot_matrix @ enu
     x = xyz[0, 0]
@@ -41,7 +41,7 @@ def xyz2enu(lat, lon, x, y, z):
     :param z: in metres
     :return: east, north, up in metres
     """
-    rot_matrix = rotation_matrix(lat, lon)
+    rot_matrix = rotation_matrix(angular_typecheck(lat), angular_typecheck(lon))
     xyz = np.array([[x], [y], [z]])
     enu = rot_matrix.transpose() @ xyz
     east = enu[0, 0]
@@ -53,10 +53,13 @@ def xyz2enu(lat, lon, x, y, z):
 def vincdir(lat1, lon1, azimuth1to2, ell_dist, ellipsoid=grs80):
     """
     Vincenty's Direct Formula
-    :param lat1: Latitude of Point 1 (Decimal Degrees)
-    :param lon1: Longitude of Point 1 (Decimal Degrees)
-    :param azimuth1to2: Azimuth from Point 1 to 2 (Decimal Degrees)
-    :param ell_dist: Ellipsoidal Distance between Points 1 and 2 (m)
+    :param lat1: Latitude of Point 1 (decimal degrees)
+    :type lat1: float (decimal degrees), DMSAngle or DDMAngle
+    :param lon1: Longitude of Point 1 (decimal degrees)
+    :type lon1: float (decimal degrees), DMSAngle or DDMAngle
+    :param azimuth1to2: Azimuth from Point 1 to 2 (decimal degrees)
+    :type azimuth1to2: float (decimal degrees), DMSAngle or DDMAngle
+    :param ell_dist: Ellipsoidal Distance between Points 1 and 2 (metres)
     :param ellipsoid: Ellipsoid Object
     :return: lat2: Latitude of Point 2 (Decimal Degrees),
              lon2: Longitude of Point 2 (Decimal Degrees),
@@ -65,7 +68,10 @@ def vincdir(lat1, lon1, azimuth1to2, ell_dist, ellipsoid=grs80):
     Code review: 14-08-2018 Craig Harrison
     """
 
-    azimuth1to2 = radians(azimuth1to2)
+    # Convert Angles to Decimal Degrees (if required)
+    lat1 = angular_typecheck(lat1)
+    lon1 = angular_typecheck(lon1)
+    azimuth1to2 = radians(angular_typecheck(azimuth1to2))
 
     # Equation numbering is from the GDA2020 Tech Manual v1.0
 
@@ -151,10 +157,14 @@ def vincdir(lat1, lon1, azimuth1to2, ell_dist, ellipsoid=grs80):
 def vincinv(lat1, lon1, lat2, lon2, ellipsoid=grs80):
     """
     Vincenty's Inverse Formula
-    :param lat1: Latitude of Point 1 (Decimal Degrees)
-    :param lon1: Longitude of Point 1 (Decimal Degrees)
-    :param lat2: Latitude of Point 2 (Decimal Degrees)
-    :param lon2: Longitude of Point 2 (Decimal Degrees)
+    :param lat1: Latitude of Point 1 (decimal degrees)
+    :type lat1: float (decimal degrees), DMSAngle or DDMAngle
+    :param lon1: Longitude of Point 1 (decimal degrees)
+    :type lon1: float (decimal degrees), DMSAngle or DDMAngle
+    :param lat2: Latitude of Point 2 (decimal degrees)
+    :type lat2: float (decimal degrees), DMSAngle or DDMAngle
+    :param lon2: Longitude of Point 2 (decimal degrees)
+    :type lon2: float (decimal degrees), DMSAngle or DDMAngle
     :param ellipsoid: Ellipsoid Object
     :return: ell_dist: Ellipsoidal Distance between Points 1 and 2 (m),
              azimuth1to2: Azimuth from Point 1 to 2 (Decimal Degrees),
@@ -162,6 +172,12 @@ def vincinv(lat1, lon1, lat2, lon2, ellipsoid=grs80):
 
     Code review: 14-08-2018 Craig Harrison
     """
+
+    # Convert Angles to Decimal Degrees (if required)
+    lat1 = angular_typecheck(lat1)
+    lon1 = angular_typecheck(lon1)
+    lat2 = angular_typecheck(lat2)
+    lon2 = angular_typecheck(lon2)
 
     # Exit if the two input points are the same
     if lat1 == lat2 and lon1 == lon2:
@@ -263,17 +279,53 @@ def vincinv(lat1, lon1, lat2, lon2, ellipsoid=grs80):
     return round(ell_dist, 3), round(azimuth1to2, 9), round(azimuth2to1, 9)
 
 
-def vincdir_utm(zone1, east1, north1, azimuth1to2, ell_dist, hemisphere1='south', ellipsoid=grs80):
+def vincdir_utm(zone1, east1, north1, azimuth1to2, ell_dist,
+                hemisphere1='south', ellipsoid=grs80):
+    """
+    Perform Vincentys Direct Computation using UTM Grid coordinates
+    :param zone1: Point 1 Zone Number - 1 to 60
+    :param east1: Point 1 Easting (m, within 3330km of Central Meridian)
+    :param north1: Point 1 Northing (m, 0 to 10,000,000m)
+    :param azimuth1to2: Azimuth from Point 1 to 2 (decimal degrees)
+    :type azimuth1to2: float (decimal degrees), DMSAngle or DDMAngle
+    :param ell_dist: Ellipsoidal Distance between Points 1 and 2 (metres)
+    :param hemisphere1: Point 1 Hemisphere: String - 'North' or 'South'(default)
+    :param ellipsoid: Ellipsoid Object (default: GRS80)
+    :return: Hemisphere, zone, easting and northing of Point 2, Azimuth from
+    Point 2 to 1 (decimal degrees)
+    :rtype: tuple
+    """
+
+    # Convert angle to decimal degrees (if required)
+    azimuth1to2 = angular_typecheck(azimuth1to2)
+
     # Convert utm to geographic
     pt1 = grid2geo(zone1, east1, north1, hemisphere1)
     # Use vincdir
-    lat2, lon2, azimuth2to1 = vincdir(pt1[0], pt1[1], azimuth1to2, ell_dist, ellipsoid)
+    lat2, lon2, azimuth2to1 = vincdir(pt1[0], pt1[1], azimuth1to2, ell_dist,
+                                      ellipsoid)
     # Convert geographic to utm
     hemisphere2, zone2, east2, north2, psf2, gc2 = geo2grid(lat2, lon2)
     return hemisphere2, zone2, east2, north2, azimuth2to1
 
 
-def vincinv_utm(zone1, east1, north1, zone2, east2, north2, hemisphere1='south', hemisphere2='south', ellipsoid=grs80):
+def vincinv_utm(zone1, east1, north1, zone2, east2, north2,
+                hemisphere1='south', hemisphere2='south', ellipsoid=grs80):
+    """
+    Perform Vincentys Inverse Computation using UTM Grid Coordinates
+    :param zone1: Point 1 Zone Number - 1 to 60
+    :param east1: Point 1 Easting (m, within 3330km of Central Meridian)
+    :param north1: Point 1 Northing (m, 0 to 10,000,000m)
+    :param zone2: Point 2 Zone Number - 1 to 60
+    :param east2: Point 2 Easting (m, within 3330km of Central Meridian)
+    :param north2: Point 2 Northing (m, 0 to 10,000,000m)
+    :param hemisphere1: Point 1 Hemisphere: String - 'North' or 'South'(default)
+    :param hemisphere2: Point 2 Hemisphere: String - 'North' or 'South'(default)
+    :param ellipsoid: Ellipsoid Object (default: GRS80)
+    :return: ell_dist: Ellipsoidal Distance between Points 1 and 2 (m),
+             azimuth1to2: Azimuth from Point 1 to 2 (decimal degrees),
+             azimuth2to1: Azimuth from Point 2 to 1 (decimal degrees)
+    """
     # Convert utm to geographic
     pt1 = grid2geo(zone1, east1, north1, hemisphere1, ellipsoid)
     pt2 = grid2geo(zone2, east2, north2, hemisphere2, ellipsoid)
