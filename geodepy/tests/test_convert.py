@@ -291,8 +291,32 @@ class TestConvert(unittest.TestCase):
                                        np.array(test_grid_coords[['east', 'north']].tolist()),
                                        decimal=3)
 
-    # Tests comparing results from DynAdjust Adjusted Coordinate File including 109 Points Across Australia
     def test_llh2xyz(self):
+
+        # Test of single point
+        x, y, z = llh2xyz(hp2dec(-37.482667598), hp2dec(144.581644114), 39.6514)
+        self.assertAlmostEqual(x, -4131654.2815, 3)
+        self.assertAlmostEqual(y, 2896107.9738, 3)
+        self.assertAlmostEqual(z, -3888601.3067, 3)
+
+        # Test DMSAngle input
+        x, y, z = llh2xyz(DMSAngle(-37, 48, 26.67598),
+                          DMSAngle(144, 58, 16.44114),
+                          39.6514)
+        self.assertAlmostEqual(x, -4131654.2815, 3)
+        self.assertAlmostEqual(y, 2896107.9738, 3)
+        self.assertAlmostEqual(z, -3888601.3067, 3)
+
+        # Test DDMAngle input
+        x, y, z = llh2xyz(DDMAngle(-37, 48.4445996),
+                          DDMAngle(144, 58.274019),
+                          39.6514)
+        self.assertAlmostEqual(x, -4131654.2815, 3)
+        self.assertAlmostEqual(y, 2896107.9738, 3)
+        self.assertAlmostEqual(z, -3888601.3067, 3)
+
+        # Tests comparing results from DynAdjust Adjusted Coordinate File
+        # including 109 Points Across Australia
         abs_path = os.path.abspath(os.path.dirname(__file__))
 
         testdata = read_dnacoord(os.path.join(abs_path, 'resources/natadjust_rvs_example.dat'))
@@ -315,6 +339,38 @@ class TestConvert(unittest.TestCase):
             assert (abs(ell_htcomp - coord.ell_ht) < 1e-4)
 
     def test_geo2grid(self):
+        # Single Point Test
+        hem, zone, east, north, psf, grid_conv = geo2grid(hp2dec(-37.482667598),
+                                                          hp2dec(144.581644114))
+        self.assertEqual(hem, 'South')
+        self.assertEqual(zone, 55)
+        self.assertAlmostEqual(east, 321405.5592, 3)
+        self.assertAlmostEqual(north, 5813614.1613, 3)
+        self.assertAlmostEqual(psf, 0.99999287, 8)
+        self.assertAlmostEqual(grid_conv, -1.2439811331, 9)
+
+        # Test DMSAngle Input
+        (hem, zone, east,
+         north, psf, grid_conv) = geo2grid(DMSAngle(-37, 48, 26.67598),
+                                           DMSAngle(144, 58, 16.44114))
+        self.assertEqual(hem, 'South')
+        self.assertEqual(zone, 55)
+        self.assertAlmostEqual(east, 321405.5592, 3)
+        self.assertAlmostEqual(north, 5813614.1613, 3)
+        self.assertAlmostEqual(psf, 0.99999287, 8)
+        self.assertAlmostEqual(grid_conv, -1.2439811331, 9)
+
+        # Test DDMAngle Input
+        (hem, zone, east,
+         north, psf, grid_conv) = geo2grid(DDMAngle(-37, 48.4445997),
+                                           DDMAngle(144, 58.274019))
+        self.assertEqual(hem, 'South')
+        self.assertEqual(zone, 55)
+        self.assertAlmostEqual(east, 321405.5592, 3)
+        self.assertAlmostEqual(north, 5813614.1613, 3)
+        self.assertAlmostEqual(psf, 0.99999287, 8)
+        self.assertAlmostEqual(grid_conv, -1.2439811331, 9)
+
         abs_path = os.path.abspath(os.path.dirname(__file__))
 
         # Test various coordinates in Australia

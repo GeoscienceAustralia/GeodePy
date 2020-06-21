@@ -6,18 +6,12 @@ from geodepy.transform import (conform7,
                                gda2020_to_atrf2014,
                                mga94_to_mga2020,
                                mga2020_to_mga94)
-from geodepy.convert import DMSAngle, hp2dec_v, geo2grid, grid2geo, xyz2llh, \
-    llh2xyz
 from geodepy.constants import itrf14togda20, gda94_to_gda2020
-from geodepy.fileio import read_dnacoord
 from datetime import date
-import numpy as np
-import os.path
 
 
 class TestTransforms(unittest.TestCase):
     # Tests equality between values produced using grid2geo and geo2grid
-    # TODO: Change Source Data input to natadjust_rvs_example.dat
 
     def test_conform7(self):
         # Replication of tests in GDA2020 Tech Manual v1.2 - Sect 3.1.1
