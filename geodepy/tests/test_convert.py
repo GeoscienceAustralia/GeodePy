@@ -1,8 +1,8 @@
 import unittest
 import datetime
 from geodepy.convert import (dec2hp, hp2dec, DMSAngle, DDMAngle, dec2dms,
-                             dec2ddm, hp2dms, hp2ddm, yyyydoy_to_date,
-                             date_to_yyyydoy)
+                             dec2ddm, hp2dms, hp2ddm, dd2sec,
+                             yyyydoy_to_date, date_to_yyyydoy)
 
 dec_ex = 123.74875
 dec_ex2 = 12.575
@@ -205,6 +205,17 @@ class TestConvert(unittest.TestCase):
     def test_hp2ddm(self):
         self.assertEqual(ddm_ex, hp2ddm(hp_ex))
         self.assertEqual(-ddm_ex, hp2ddm(-hp_ex))
+
+    def test_dd2sec(self):
+        self.assertEqual(dd2sec(1), 3600)
+        self.assertEqual(dd2sec(-1), -3600)
+        self.assertEqual(dd2sec(hp2dec(0.0001)), 1)
+        self.assertEqual(dd2sec(hp2dec(-0.0001)), -1)
+        self.assertEqual(dd2sec(hp2dec(0.00001)), 0.1)
+        self.assertEqual(dd2sec(dec_ex4), 189)
+        self.assertEqual(dd2sec(-dec_ex4), -189)
+        self.assertEqual(dd2sec(dec_ex2), 45270)
+        self.assertEqual(dd2sec(-dec_ex2), -45270)
 
     def test_date_to_yyyydoy(self):
         self.assertEqual(date_to_yyyydoy(datetime.date(2020, 1, 4)),

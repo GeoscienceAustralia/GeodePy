@@ -256,8 +256,8 @@ def hp2dec(hp):
 def dec2dms(dec):
     minute, second = divmod(abs(dec) * 3600, 60)
     degree, minute = divmod(minute, 60)
-    return DMSAngle(degree, minute, second) if dec >= 0 \
-        else DMSAngle(-degree, minute, second)
+    return (DMSAngle(degree, minute, second) if dec >= 0
+            else DMSAngle(-degree, minute, second))
 
 
 def dec2ddm(dec):
@@ -270,8 +270,8 @@ def dec2ddm(dec):
 def hp2dms(hp):
     degmin, second = divmod(abs(hp) * 1000, 10)
     degree, minute = divmod(degmin, 100)
-    return DMSAngle(degree, minute, second * 10) if hp >= 0 \
-        else DMSAngle(-degree, minute, second * 10)
+    return (DMSAngle(degree, minute, second * 10) if hp >= 0
+            else DMSAngle(-degree, minute, second * 10))
 
 
 def hp2ddm(hp):
@@ -298,24 +298,24 @@ def rect2polar(x, y):
 
 
 def dd2sec(dd):
-    minutes, seconds = divmod(abs(dd) * 3600, 60)
-    degrees, minutes = divmod(minutes, 60)
-    sec = (degrees * 3600) + (minutes * 60) + seconds
+    minute, second = divmod(abs(dd) * 3600, 60)
+    degree, minute = divmod(minute, 60)
+    sec = (degree * 3600) + (minute * 60) + second
     return sec if dd >= 0 else -sec
 
 
 def dec2hp_v(dec):
-    minutes, seconds = divmod(abs(dec) * 3600, 60)
-    degrees, minutes = divmod(minutes, 60)
-    hp = degrees + (minutes / 100) + (seconds / 10000)
+    minute, second = divmod(abs(dec) * 3600, 60)
+    degree, minute = divmod(minute, 60)
+    hp = degree + (minute / 100) + (second / 10000)
     hp[dec <= 0] = -hp[dec <= 0]
     return hp
 
 
 def hp2dec_v(hp):
-    degmin, seconds = divmod(abs(hp) * 1000, 10)
-    degrees, minutes = divmod(degmin, 100)
-    dec = degrees + (minutes / 60) + (seconds / 360)
+    degmin, second = divmod(abs(hp) * 1000, 10)
+    degree, minute = divmod(degmin, 100)
+    dec = degrees + (minute / 60) + (second / 360)
     dec[hp <= 0] = -dec[hp <= 0]
     return dec
 
