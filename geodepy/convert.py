@@ -315,9 +315,17 @@ def dec2hp_v(dec):
 def hp2dec_v(hp):
     degmin, second = divmod(abs(hp) * 1000, 10)
     degree, minute = divmod(degmin, 100)
-    dec = degrees + (minute / 60) + (second / 360)
+    dec = degree + (minute / 60) + (second / 360)
     dec[hp <= 0] = -dec[hp <= 0]
     return dec
+
+
+def angular_typecheck(angle):
+    # Converts DMSAngle and DDMAngle Objects to Decimal Degrees
+    if type(angle) is DMSAngle or type(angle) is DDMAngle:
+        return angle.dec()
+    else:
+        return angle
 
 
 def rect_radius(ellipsoid):
@@ -495,11 +503,13 @@ def beta_coeff(ellipsoid):
     return b2, b4, b6, b8, b10, b12, b14, b16
 
 
-def psfandgridconv(xi1, eta1, lat, long, cm, conf_lat, ellipsoid=grs80):
+def psfandgridconv(xi1, eta1, lat, lon, cm, conf_lat, ellipsoid=grs80):
+    lat = angular_typecheck(lat)
+    lon = angular_typecheck(lon)
     A = rect_radius(ellipsoid)
     a = alpha_coeff(ellipsoid)
     lat = radians(lat)
-    long_diff = radians(long - cm)
+    long_diff = radians(lon - cm)
 
     # Point Scale Factor
     p = 1
@@ -519,15 +529,15 @@ def psfandgridconv(xi1, eta1, lat, long, cm, conf_lat, ellipsoid=grs80):
     grid_conv = degrees(atan(abs(q / p))
                         + atan(abs(tan(conf_lat) * tan(long_diff))
                                / sqrt(1 + tan(conf_lat)**2)))
-    if cm > long and lat < 0:
+    if cm > lon and lat < 0:
         grid_conv = -grid_conv
-    elif cm < long and lat > 0:
+    elif cm < lon and lat > 0:
         grid_conv = -grid_conv
 
     return psf, grid_conv
 
 
-def geo2grid(lat, long, zone=0, ellipsoid=grs80):
+def geo2grid(lat, lon, zone=0, ellipsoid=grs80):
     """
     Takes a geographic co-ordinate (latitude, longitude) and returns its
     corresponding Hemisphere, Zone and Projection Easting and Northing, Point
@@ -535,7 +545,7 @@ def geo2grid(lat, long, zone=0, ellipsoid=grs80):
     Transverse Mercator Projection using
     GRS80 Ellipsoid parameters.
     :param lat: Latitude in Decimal Degrees
-    :param long: Longitude in Decimal Degrees
+    :param lon: Longitude in Decimal Degrees
     :param zone: Optional Zone Number - Only required if calculating grid
                                         co-ordinate outside zone boundaries
     :param ellipsoid: Ellipsoid Object
@@ -543,6 +553,9 @@ def geo2grid(lat, long, zone=0, ellipsoid=grs80):
              Grid Convergence (Decimal Degrees)
     """
 
+    # Convert DMSAngle and DDMAngle to Decimal Angle
+    lat = angular_typecheck(lat)
+    lon = angular_typecheck(lon)
     # Input Validation - UTM Extents and Values
     zone = int(zone)
     if zone < 0 or zone > 60:
@@ -551,7 +564,7 @@ def geo2grid(lat, long, zone=0, ellipsoid=grs80):
     if lat < -80 or lat > 84:
         raise ValueError('Invalid Latitude - Latitudes from -80 to +84')
 
-    if long < -180 or long > 180:
+    if lon < -180 or lon > 180:
         raise ValueError('Invalid Longitude - Longitudes from -180 to +180')
 
     A = rect_radius(ellipsoid)
@@ -559,7 +572,7 @@ def geo2grid(lat, long, zone=0, ellipsoid=grs80):
     lat = radians(lat)
     # Calculate Zone
     if zone == 0:
-        zone = int((float(long) - (
+        zone = int((float(lon) - (
                     proj.initialcm - (1.5 * proj.zonewidth))) / proj.zonewidth)
     cm = float(zone * proj.zonewidth) + (proj.initialcm - proj.zonewidth)
 
@@ -570,7 +583,7 @@ def geo2grid(lat, long, zone=0, ellipsoid=grs80):
     conf_lat = atan(conf_lat)
 
     # Longitude Difference
-    long_diff = radians(long - cm)
+    long_diff = radians(lon - cm)
     # Gauss-Schreiber Ratios
     xi1 = atan(tan(conf_lat) / cos(long_diff))
     eta1x = sin(long_diff) / (sqrt(tan(conf_lat) ** 2 + cos(long_diff) ** 2))
@@ -598,7 +611,7 @@ def geo2grid(lat, long, zone=0, ellipsoid=grs80):
         north = proj.cmscale * y + falsenorth
 
     # Point Scale Factor and Grid Convergence
-    psf, grid_conv = psfandgridconv(xi1, eta1, degrees(lat), long, cm, conf_lat)
+    psf, grid_conv = psfandgridconv(xi1, eta1, degrees(lat), lon, cm, conf_lat)
 
     return (hemisphere, zone,
             round(float(east), 4),
@@ -731,24 +744,23 @@ def xyz2llh(x, y, z, ellipsoid=grs80):
     return lat, long, ellht
 
 
-def llh2xyz(lat, long, ellht, ellipsoid=grs80):
-    # Add input for ellipsoid (default: grs80)
+def llh2xyz(lat, lon, ellht, ellipsoid=grs80):
     """
     Input: Latitude and Longitude in Decimal Degrees, Ellipsoidal Height in
     metres
     Output: Cartesian X, Y, Z Coordinates in metres
     """
     # Convert lat & long to radians
-    lat = radians(lat)
-    long = radians(long)
+    lat = radians(angular_typecheck(lat))
+    lon = radians(angular_typecheck(lon))
     # Calculate Ellipsoid Radius of Curvature in the Prime Vertical - nu
     if lat == 0:
         nu = grs80.semimaj
     else:
         nu = ellipsoid.semimaj/(sqrt(1 - ellipsoid.ecc1sq * (sin(lat)**2)))
     # Calculate x, y, z
-    x = (nu + ellht) * cos(lat) * cos(long)
-    y = (nu + ellht) * cos(lat) * sin(long)
+    x = (nu + ellht) * cos(lat) * cos(lon)
+    y = (nu + ellht) * cos(lat) * sin(lon)
     z = ((ellipsoid.semimin**2 / ellipsoid.semimaj**2) * nu + ellht) * sin(lat)
     return x, y, z
 
