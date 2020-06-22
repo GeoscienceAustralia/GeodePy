@@ -15,7 +15,15 @@ proj = utm
 
 
 class DMSAngle(object):
+    """
+    Class for working with angles in Degrees, Minutes and Seconds format
+    """
     def __init__(self, degree=0, minute=0, second=0.0):
+        """
+        :param degree: Angle: whole degrees component (floats truncated)
+        :param minute: Angle: whole minutes component (floats truncated)
+        :param second: Angle: seconds component (floats preserved)
+        """
         # Set sign of object based on sign of any variable
         if degree == 0:
             if str(degree)[0] == '-':
@@ -115,14 +123,29 @@ class DMSAngle(object):
         return self.dec() > other.dec()
 
     def dec(self):
+        """
+        Convert to Decimal Degrees
+        :return: Decimal Degrees
+        :rtype: float
+        """
         return self.sign * (self.degree + (self.minute / 60) +
                             (self.second / 3600))
 
     def hp(self):
+        """
+        Convert to HP Notation
+        :return: HP Notation (DDD.MMSSSS)
+        :rtype: float
+        """
         return self.sign * (self.degree + (self.minute / 100) +
                             (self.second / 10000))
 
     def ddm(self):
+        """
+        Convert to Degrees, Decimal Minutes Object
+        :return: Degrees, Decimal Minutes Object
+        :rtype: DDMAngle
+        """
         if self.sign == 1:
             return DDMAngle(self.degree, self.minute + (self.second/60))
         else:  # sign == -1
@@ -130,7 +153,14 @@ class DMSAngle(object):
 
 
 class DDMAngle(object):
+    """
+    Class for working with angles in Degrees, Decimal Minutes format
+    """
     def __init__(self, degree=0, minute=0.0):
+        """
+        :param degree: Angle: whole degrees component (floats truncated)
+        :param minute: Angle:minutes component (floats preserved)
+        """
         # Set sign of object based on sign of any variable
         if degree == 0:
             if str(degree)[0] == '-':
@@ -227,19 +257,41 @@ class DDMAngle(object):
         return self.dec() > other.dec()
 
     def dec(self):
+        """
+        Convert to Decimal Degrees
+        :return: Decimal Degrees
+        :rtype: float
+        """
         return self.sign * (self.degree + (self.minute / 60))
 
     def hp(self):
+        """
+        Convert to HP Notation
+        :return: HP Notation (DDD.MMSSSS)
+        :rtype: float
+        """
         minute_int, second = divmod(self.minute, 1)
         return self.sign * (self.degree + (minute_int / 100) +
                             (second * 0.006))
 
     def dms(self):
+        """
+        Convert to Degrees, Minutes, Seconds Object
+        :return: Degrees, Minutes, Seconds Object
+        :rtype: DMSAngle
+        """
         minute_int, second = divmod(self.minute, 1)
         return self.sign * DMSAngle(self.degree, minute_int, second * 60)
 
 
 def dec2hp(dec):
+    """
+    Converts Decimal Degrees to HP Notation
+    :param dec: Decimal Degrees
+    :type dec: float
+    :return: HP Notation (DDD.MMSSSS)
+    :rtype: float
+    """
     minute, second = divmod(abs(dec) * 3600, 60)
     degree, minute = divmod(minute, 60)
     hp = degree + (minute / 100) + (second / 10000)
@@ -247,6 +299,13 @@ def dec2hp(dec):
 
 
 def hp2dec(hp):
+    """
+    Converts HP Notation to Decimal Degrees
+    :param hp: HP Notation (DDD.MMSSSS)
+    :type hp: float
+    :return: Decimal Degrees
+    :rtype: float
+    """
     degmin, second = divmod(abs(hp) * 1000, 10)
     degree, minute = divmod(degmin, 100)
     dec = degree + (minute / 60) + (second / 360)
@@ -254,13 +313,27 @@ def hp2dec(hp):
 
 
 def dec2dms(dec):
+    """
+    Converts Decimal Degrees to Degrees, Minutes, Seconds Object
+    :param dec: Decimal Degrees
+    :type dec: float
+    :return: Degrees, Minutes, Seconds Object
+    :rtype: DMSAngle
+    """
     minute, second = divmod(abs(dec) * 3600, 60)
     degree, minute = divmod(minute, 60)
-    return DMSAngle(degree, minute, second) if dec >= 0 \
-        else DMSAngle(-degree, minute, second)
+    return (DMSAngle(degree, minute, second) if dec >= 0
+            else DMSAngle(-degree, minute, second))
 
 
 def dec2ddm(dec):
+    """
+    Converts Decimal Degrees to Degrees, Decimal Minutes Object
+    :param dec: Decimal Degrees
+    :type dec: float
+    :return: Degrees, Decimal Minutes Object
+    :rtype: DDMAngle
+    """
     minute, second = divmod(abs(dec) * 3600, 60)
     degree, minute = divmod(minute, 60)
     minute = minute + (second / 60)
@@ -268,13 +341,27 @@ def dec2ddm(dec):
 
 
 def hp2dms(hp):
+    """
+    Converts HP Notation to Degrees, Minutes, Seconds Object
+    :param hp: HP Notation (DDD.MMSSSS)
+    :type hp: float
+    :return: Degrees, Minutes, Seconds Object
+    :rtype: DMSAngle
+    """
     degmin, second = divmod(abs(hp) * 1000, 10)
     degree, minute = divmod(degmin, 100)
-    return DMSAngle(degree, minute, second * 10) if hp >= 0 \
-        else DMSAngle(-degree, minute, second * 10)
+    return (DMSAngle(degree, minute, second * 10) if hp >= 0
+            else DMSAngle(-degree, minute, second * 10))
 
 
 def hp2ddm(hp):
+    """
+    Converts HP Notation to Degrees, Decimal Minutes Object
+    :param hp: HP Notation (DDD.MMSSSS)
+    :type hp: float
+    :return: Degrees, Decimal Minutes Object
+    :rtype: DDMAngle
+    """
     degmin, second = divmod(abs(hp) * 1000, 10)
     degree, minute = divmod(degmin, 100)
     minute = minute + (second / 6)
@@ -282,12 +369,32 @@ def hp2ddm(hp):
 
 
 def polar2rect(r, theta):
+    """
+    Converts point in polar coordinates to corresponding rectangular coordinates
+    Theta is degrees and is measured clockwise from the positive y axis
+    (i.e. north)
+    :param r: Radius
+    :param theta: Angle (decimal degrees)
+    :type theta: Float (decimal degrees), DMSAngle or DDMAngle
+    :return: Rectangular Coordinates X, Y
+    """
+    theta = angular_typecheck(theta)
     x = r * sin(radians(theta))
     y = r * cos(radians(theta))
     return x, y
 
 
 def rect2polar(x, y):
+    """
+    Converts point in rectangular coordinates to corresponding polar coordinates
+    Angular component of polar coordinates (theta) is in decimal degrees and
+    is measured clockwise from the positive y axis (i.e. north)
+    :param x: Rectangular Coordinate X
+    :param y: Rectangular Coordinate Y
+    :return r: Radius
+    :return theta: Angle (decimal degrees)
+    :rtype theta: float (decimal degrees)
+    """
     r = sqrt(x ** 2 + y ** 2)
     theta = atan2(x, y)
     if theta < 0:
@@ -298,26 +405,39 @@ def rect2polar(x, y):
 
 
 def dd2sec(dd):
-    minutes, seconds = divmod(abs(dd) * 3600, 60)
-    degrees, minutes = divmod(minutes, 60)
-    sec = (degrees * 3600) + (minutes * 60) + seconds
+    """
+    Converts angle in decimal degrees to angle in seconds
+    :param dd: Decimal Degrees
+    :return: Seconds
+    """
+    minute, second = divmod(abs(dd) * 3600, 60)
+    degree, minute = divmod(minute, 60)
+    sec = (degree * 3600) + (minute * 60) + second
     return sec if dd >= 0 else -sec
 
 
 def dec2hp_v(dec):
-    minutes, seconds = divmod(abs(dec) * 3600, 60)
-    degrees, minutes = divmod(minutes, 60)
-    hp = degrees + (minutes / 100) + (seconds / 10000)
+    minute, second = divmod(abs(dec) * 3600, 60)
+    degree, minute = divmod(minute, 60)
+    hp = degree + (minute / 100) + (second / 10000)
     hp[dec <= 0] = -hp[dec <= 0]
     return hp
 
 
 def hp2dec_v(hp):
-    degmin, seconds = divmod(abs(hp) * 1000, 10)
-    degrees, minutes = divmod(degmin, 100)
-    dec = degrees + (minutes / 60) + (seconds / 360)
+    degmin, second = divmod(abs(hp) * 1000, 10)
+    degree, minute = divmod(degmin, 100)
+    dec = degree + (minute / 60) + (second / 360)
     dec[hp <= 0] = -dec[hp <= 0]
     return dec
+
+
+def angular_typecheck(angle):
+    # Converts DMSAngle and DDMAngle Objects to Decimal Degrees
+    if type(angle) is DMSAngle or type(angle) is DDMAngle:
+        return angle.dec()
+    else:
+        return angle
 
 
 def rect_radius(ellipsoid):
@@ -325,6 +445,7 @@ def rect_radius(ellipsoid):
     Computes the Rectifying Radius of an Ellipsoid with specified Inverse
     Flattening (See Ref 2 Equation 3)
     :param ellipsoid: Ellipsoid Object
+    :type ellipsoid: Ellipsoid
     :return: Ellipsoid Rectifying Radius
     """
     nval = (1 / float(ellipsoid.inversef)) /\
@@ -345,7 +466,9 @@ def alpha_coeff(ellipsoid):
     Computes the set of Alpha coefficients of an Ellipsoid with specified
     Inverse Flattening (See Ref 2 Equation 5)
     :param ellipsoid: Ellipsoid Object
+    :type ellipsoid: Ellipsoid
     :return: Alpha coefficients a2, a4 ... a16
+    :rtype: tuple
     """
     nval = ellipsoid.n
     a2 = ((nval *
@@ -424,7 +547,9 @@ def beta_coeff(ellipsoid):
     Computes the set of Beta coefficients of an Ellipsoid with specified
     Inverse Flattening (See Ref 2 Equation 23)
     :param ellipsoid: Ellipsoid Object
+    :type ellipsoid: Ellipsoid
     :return: Alpha coefficients a2, a4 ... a16
+    :rtype: tuple
     """
     nval = ellipsoid.n
     b2 = ((nval *
@@ -495,11 +620,28 @@ def beta_coeff(ellipsoid):
     return b2, b4, b6, b8, b10, b12, b14, b16
 
 
-def psfandgridconv(xi1, eta1, lat, long, cm, conf_lat, ellipsoid=grs80):
+def psfandgridconv(xi1, eta1, lat, lon, cm, conf_lat, ellipsoid=grs80):
+    """
+    Calculates Point Scale Factor and Grid Convergence. Used in convert.geo2grid
+    and convert.grid2geo
+    :param xi1: Transverse Mercator Ratio Xi
+    :param eta1: Transverse Mercator Ratio Eta
+    :param lat: Latitude
+    :type lat: Decimal Degrees, DMSAngle or DDMAngle
+    :param lon: Longitude
+    :type lon: Decimal Degrees, DMSAngle or DDMAngle
+    :param cm: Central Meridian
+    :param conf_lat: Conformal Latitude
+    :param ellipsoid: Ellipsoid Object (default: GRS80)
+    :return: Point Scale Factor, Grid Convergence (Decimal Degrees)
+    :rtype: tuple
+    """
+    lat = angular_typecheck(lat)
+    lon = angular_typecheck(lon)
     A = rect_radius(ellipsoid)
     a = alpha_coeff(ellipsoid)
     lat = radians(lat)
-    long_diff = radians(long - cm)
+    long_diff = radians(lon - cm)
 
     # Point Scale Factor
     p = 1
@@ -519,30 +661,37 @@ def psfandgridconv(xi1, eta1, lat, long, cm, conf_lat, ellipsoid=grs80):
     grid_conv = degrees(atan(abs(q / p))
                         + atan(abs(tan(conf_lat) * tan(long_diff))
                                / sqrt(1 + tan(conf_lat)**2)))
-    if cm > long and lat < 0:
+    if cm > lon and lat < 0:
         grid_conv = -grid_conv
-    elif cm < long and lat > 0:
+    elif cm < lon and lat > 0:
         grid_conv = -grid_conv
 
     return psf, grid_conv
 
 
-def geo2grid(lat, long, zone=0, ellipsoid=grs80):
+def geo2grid(lat, lon, zone=0, ellipsoid=grs80):
     """
     Takes a geographic co-ordinate (latitude, longitude) and returns its
     corresponding Hemisphere, Zone and Projection Easting and Northing, Point
     Scale Factor and Grid Convergence. Default Projection is Universal
     Transverse Mercator Projection using
     GRS80 Ellipsoid parameters.
-    :param lat: Latitude in Decimal Degrees
-    :param long: Longitude in Decimal Degrees
+    :param lat: Latitude
+    :type lat: Float (Decimal Degrees), DMSAngle or DDMAngle
+    :param lon: Longitude
+    :type lon: Float (Decimal Degrees, DMSAngle or DDMAngle
     :param zone: Optional Zone Number - Only required if calculating grid
                                         co-ordinate outside zone boundaries
     :param ellipsoid: Ellipsoid Object
+    :type ellipsoid: Ellipsoid
     :return: hemisphere, zone, east (m), north (m), Point Scale Factor,
              Grid Convergence (Decimal Degrees)
+    :rtype: tuple
     """
 
+    # Convert DMSAngle and DDMAngle to Decimal Angle
+    lat = angular_typecheck(lat)
+    lon = angular_typecheck(lon)
     # Input Validation - UTM Extents and Values
     zone = int(zone)
     if zone < 0 or zone > 60:
@@ -551,7 +700,7 @@ def geo2grid(lat, long, zone=0, ellipsoid=grs80):
     if lat < -80 or lat > 84:
         raise ValueError('Invalid Latitude - Latitudes from -80 to +84')
 
-    if long < -180 or long > 180:
+    if lon < -180 or lon > 180:
         raise ValueError('Invalid Longitude - Longitudes from -180 to +180')
 
     A = rect_radius(ellipsoid)
@@ -559,7 +708,7 @@ def geo2grid(lat, long, zone=0, ellipsoid=grs80):
     lat = radians(lat)
     # Calculate Zone
     if zone == 0:
-        zone = int((float(long) - (
+        zone = int((float(lon) - (
                     proj.initialcm - (1.5 * proj.zonewidth))) / proj.zonewidth)
     cm = float(zone * proj.zonewidth) + (proj.initialcm - proj.zonewidth)
 
@@ -570,7 +719,7 @@ def geo2grid(lat, long, zone=0, ellipsoid=grs80):
     conf_lat = atan(conf_lat)
 
     # Longitude Difference
-    long_diff = radians(long - cm)
+    long_diff = radians(lon - cm)
     # Gauss-Schreiber Ratios
     xi1 = atan(tan(conf_lat) / cos(long_diff))
     eta1x = sin(long_diff) / (sqrt(tan(conf_lat) ** 2 + cos(long_diff) ** 2))
@@ -598,7 +747,7 @@ def geo2grid(lat, long, zone=0, ellipsoid=grs80):
         north = proj.cmscale * y + falsenorth
 
     # Point Scale Factor and Grid Convergence
-    psf, grid_conv = psfandgridconv(xi1, eta1, degrees(lat), long, cm, conf_lat)
+    psf, grid_conv = psfandgridconv(xi1, eta1, degrees(lat), lon, cm, conf_lat)
 
     return (hemisphere, zone,
             round(float(east), 4),
@@ -617,8 +766,10 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
     :param north: Northing (m, 0 to 10,000,000m)
     :param hemisphere: String - 'North' or 'South'(default)
     :param ellipsoid: Ellipsoid Object
+    :type ellipsoid: Ellipsoid
     :return: Latitude and Longitude (Decimal Degrees), Point Scale Factor,
              Grid Convergence (Decimal Degrees)
+    :rtype: tuple
     """
     # Input Validation - UTM Extents and Values
     zone = int(zone)
@@ -705,12 +856,17 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
 
 
 def xyz2llh(x, y, z, ellipsoid=grs80):
-    # Add input for ellipsoid (default: grs80)
     """
-    Input: Cartesian XYZ coordinate in metres
-
-    Output: Latitude and Longitude in Decimal
-    Degrees and Ellipsoidal Height in Metres
+    Converts Cartesian X, Y, Z coordinate to Geographic Latitude, Longitude and
+    Ellipsoid Height. Default Ellipsoid parameters used are GRS80.
+    :param x: Cartesian X Coordinate (metres)
+    :param y: Cartesian Y Coordinate (metres)
+    :param z: Cartesian Z Coordinate (metres)
+    :param ellipsoid: Ellipsoid Object
+    :type ellipsoid: Ellipsoid
+    :return: Geographic Latitude (Decimal Degrees), Longitude (Decimal Degrees)
+    and Ellipsoid Height (metres)
+    :rtype: tuple
     """
     # Calculate Longitude
     long = atan2(y, x)
@@ -731,24 +887,31 @@ def xyz2llh(x, y, z, ellipsoid=grs80):
     return lat, long, ellht
 
 
-def llh2xyz(lat, long, ellht, ellipsoid=grs80):
-    # Add input for ellipsoid (default: grs80)
+def llh2xyz(lat, lon, ellht=0, ellipsoid=grs80):
     """
-    Input: Latitude and Longitude in Decimal Degrees, Ellipsoidal Height in
-    metres
-    Output: Cartesian X, Y, Z Coordinates in metres
+    Converts Geographic Latitude, Longitude and Ellipsoid Height to Cartesian
+    X, Y and Z Coordinates. Default Ellipsoid parameters used are GRS80.
+    :param lat: Geographic Latitude
+    :type lat: Float (Decimal Degrees), DMSAngle or DDMAngle
+    :param lon: Geographic Longitude
+    :type lon: Float (Decimal Degrees), DMSAngle or DDMAngle
+    :param ellht: Ellipsoid Height (metres, default is 0m)
+    :param ellipsoid: Ellipsoid Object
+    :type ellipsoid: Ellipsoid
+    :return: Cartesian X, Y, Z Coordinate in metres
+    :rtype: tuple
     """
     # Convert lat & long to radians
-    lat = radians(lat)
-    long = radians(long)
+    lat = radians(angular_typecheck(lat))
+    lon = radians(angular_typecheck(lon))
     # Calculate Ellipsoid Radius of Curvature in the Prime Vertical - nu
     if lat == 0:
         nu = grs80.semimaj
     else:
         nu = ellipsoid.semimaj/(sqrt(1 - ellipsoid.ecc1sq * (sin(lat)**2)))
     # Calculate x, y, z
-    x = (nu + ellht) * cos(lat) * cos(long)
-    y = (nu + ellht) * cos(lat) * sin(long)
+    x = (nu + ellht) * cos(lat) * cos(lon)
+    y = (nu + ellht) * cos(lat) * sin(lon)
     z = ((ellipsoid.semimin**2 / ellipsoid.semimaj**2) * nu + ellht) * sin(lat)
     return x, y, z
 
@@ -759,7 +922,9 @@ def date_to_yyyydoy(date):
     where yyyy is the 4 character year number and doy is the 3 character
     day of year
     :param date: datetime.date object
+    :type date: datetime.date
     :return: string with date in the form 'yyyy.doy'
+    :rtype: str
     """
     try:
         return (str(date.timetuple().tm_year) + '.' +
@@ -775,6 +940,7 @@ def yyyydoy_to_date(yyyydoy):
     is the 3 character day of year
     :param yyyydoy: string with date in the form 'yyyy.doy' or 'yyyydoy'
     :return: datetime.date object
+    :rtype: datetime.date
     """
     try:
         if '.' in yyyydoy:

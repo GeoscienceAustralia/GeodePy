@@ -1,6 +1,7 @@
 import unittest
-from geodepy.survey import first_vel_params, first_vel_corrn, precise_inst_ht, va_conv, radiations, joins
 from geodepy.convert import DMSAngle
+from geodepy.survey import (first_vel_params, first_vel_corrn,
+                            precise_inst_ht, va_conv, radiations, joins)
 
 
 class TestSurveyConvert(unittest.TestCase):
@@ -11,7 +12,8 @@ class TestSurveyConvert(unittest.TestCase):
         edm_wavelength = 0.850
         param_c = 281.781
         param_d = 79.393
-        params_new = first_vel_params(edm_wavelength, temperature, pressure, relative_humidity)
+        params_new = first_vel_params(edm_wavelength, temperature,
+                                      pressure, relative_humidity)
         self.assertEqual(round(params_new[0], 3), param_c)
         self.assertEqual(round(params_new[1], 3), param_d)
 
@@ -21,7 +23,8 @@ class TestSurveyConvert(unittest.TestCase):
         obs_temperature = 6.8
         obs_pressure = 960.8
         obs_relative_humidity = 58.6
-        correction = first_vel_corrn(raw_obs_distance, params, obs_temperature, obs_pressure, obs_relative_humidity)
+        correction = first_vel_corrn(raw_obs_distance, params, obs_temperature,
+                                     obs_pressure, obs_relative_humidity)
         corrected_obs_distance = raw_obs_distance + correction
         self.assertEqual(round(corrected_obs_distance, 4), 1117.8618)
 
@@ -79,13 +82,17 @@ class TestSurveyConvert(unittest.TestCase):
         self.assertAlmostEqual(test4[1], 172.0831, 4)
 
     def test_radiations(self):
-        test1 = radiations(500, 500, DMSAngle(290, 13).dec(), 44.620, DMSAngle(2, 18, 35).dec(), 1.002515)
+        test1 = radiations(500, 500,
+                           DMSAngle(290, 13).dec(), 44.620,
+                           DMSAngle(2, 18, 35).dec(), 1.002515)
         self.assertAlmostEqual(test1[0], 458.681, 3)
         self.assertAlmostEqual(test1[1], 517.137, 3)
         test2 = radiations(500, 500, DMSAngle(290, 13).dec(), 44.620)
         self.assertAlmostEqual(test2[0], 458.129, 3)
         self.assertAlmostEqual(test2[1], 515.419, 3)
-        test3 = radiations(564.747, 546.148, DMSAngle(41, 7).dec(), 27.720, DMSAngle(2, 18, 35).dec(), 1.002515)
+        test3 = radiations(564.747, 546.148,
+                           DMSAngle(41, 7).dec(), 27.720,
+                           DMSAngle(2, 18, 35).dec(), 1.002515)
         self.assertAlmostEqual(test3[0], 583.850, 3)
         self.assertAlmostEqual(test3[1], 566.331, 3)
 
