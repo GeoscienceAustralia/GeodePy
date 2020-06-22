@@ -169,7 +169,6 @@ def vincinv(lat1, lon1, lat2, lon2, ellipsoid=grs80):
     :return: ell_dist: Ellipsoidal Distance between Points 1 and 2 (m),
              azimuth1to2: Azimuth from Point 1 to 2 (Decimal Degrees),
              azimuth2to1: Azimuth from Point 2 to 1 (Decimal Degrees)
-
     Code review: 14-08-2018 Craig Harrison
     """
 
@@ -199,7 +198,7 @@ def vincinv(lat1, lon1, lat2, lon2, ellipsoid=grs80):
     # (< 1e-12) or after 1000 iterations have been completed
     alpha = 0
     sigma = 0
-    two_sigma_m = 0
+    cos_two_sigma_m = 0
     for i in range(1000):
 
         # Eq. 74
@@ -216,16 +215,17 @@ def vincinv(lat1, lon1, lat2, lon2, ellipsoid=grs80):
         alpha = asin((cos(u1)*cos(u2)*sin(lon)) / sin_sigma)
 
         # Eq. 78
-        two_sigma_m = acos(cos(sigma) - 2*sin(u1)*sin(u2) / cos(alpha)**2)
+        cos_two_sigma_m = cos(sigma) - (2*sin(u1)*sin(u2) / cos(alpha)**2)
 
         # Eq. 79
         c = (ellipsoid.f / 16) * cos(alpha)**2 * (4 + ellipsoid.f
                                                   * (4 - 3*cos(alpha)**2))
 
         # Eq. 80
-        new_lon = omega + (1 - c) * ellipsoid.f * sin(alpha) \
-            * (sigma + c*sin(sigma) * (cos(two_sigma_m) + c*cos(sigma)
-               * (-1 + 2*cos(two_sigma_m)**2)))
+        new_lon = omega + (1 - c) * ellipsoid.f * sin(alpha) * (sigma + c*sin(sigma)
+                                                                * (cos_two_sigma_m + c * cos(sigma)
+                                                                   * (-1 + 2*(cos_two_sigma_m**2))))
+
         delta_lon = new_lon - lon
         lon = new_lon
 
@@ -246,11 +246,12 @@ def vincinv(lat1, lon1, lat2, lon2, ellipsoid=grs80):
         * (256 + u_squared * (-128 + u_squared * (74 - 47 * u_squared)))
 
     # Eq. 84
-    delta_sigma = b*sin(sigma) * (cos(two_sigma_m) + (b / 4)
-                                  * (cos(sigma) * (-1 + 2*cos(two_sigma_m)**2)
-                                  - (b / 6)*cos(two_sigma_m)
+    delta_sigma = b*sin(sigma) * (cos_two_sigma_m + (b / 4)
+                                  * (cos(sigma) * (-1 + 2*cos_two_sigma_m**2)
+                                  - (b / 6)*cos_two_sigma_m
                                   * (-3 + 4*sin(sigma)**2)
-                                  * (-3 + 4*cos(two_sigma_m)**2)))
+                                  * (-3 + 4*cos_two_sigma_m**2)))
+
     # Calculate the ellipsoidal distance
     # Eq. 85
     ell_dist = ellipsoid.semimin*a * (sigma - delta_sigma)
