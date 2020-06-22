@@ -61,5 +61,18 @@ class TestNC(unittest.TestCase):
         self.assertAlmostEqual(np.asscalar(
             geodepy.height.normal_correction(Lat1, Long1, Height1, Lat2, Long2, Height2)[1]), RECOVERED_GRAV, 7)
 
+
+class TestNoc(unittest.TestCase):
+    def test_noc(self):
+        # sample data
+        PLH1 = [-30.89632356, 141.08948867, 75.279]
+        PLH2 = [-30.86585867, 141.07870767, 71.449]
+        expected_result = 0.000182
+
+        result = geodepy.height.normal_orthometric_correction(PLH1[0], PLH1[1], PLH1[2], PLH2[0], PLH2[1], PLH2[2])
+
+        self.assertAlmostEqual(expected_result, result, places=6)
+
+
 if __name__ == '__main__':
     unittest.main()
