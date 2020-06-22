@@ -24,6 +24,7 @@ class Ellipsoid(object):
         self.ecc1 = sqrt(self.ecc1sq)
         self.n = float(self.f / (2 - self.f))
         self.n2 = self.n ** 2
+        self.meanradius = (2 * self.semimaj + self.semimin)/3
 
 
 # Geodetic Reference System 1980 (http://www.epsg-registry.org/export.htm?gml=urn:ogc:def:ellipsoid:EPSG::7019)
@@ -380,3 +381,6 @@ file_AG2020_STD='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AUS
 file_AVWS='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AVWS_20191107.tif'
 file_AVWS_STD='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AVWS_STD_20191107.tif'
 file_GRAV_BA='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/Bouguer_Grav_RELEASE20191107.tif'
+
+# GRS80 normal gravity flattening (Moritz, 2000 Section 4)
+grs80_ngf = 0.005302440112
