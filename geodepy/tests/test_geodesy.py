@@ -75,9 +75,7 @@ class TestGeodesy(unittest.TestCase):
         self.assertEqual(round(dec2hp(azimuth2to1), 6), 269.591520)
 
         test2 = vincinv(lat1, lon1, lat1, lon1)
-        self.assertEqual(test2[0], 0)
-        self.assertEqual(test2[1], 0)
-        self.assertEqual(test2[2], 0)
+        self.assertEqual(test2, (0, 0, 0))
 
         # Test DMSAngle Input
         ell_dist, azimuth1to2, azimuth2to1 = vincinv(lat1_DMS, lon1_DMS,
@@ -87,9 +85,7 @@ class TestGeodesy(unittest.TestCase):
         self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
 
         test2 = vincinv(lat1_DMS, lon1_DMS, lat1_DMS, lon1_DMS)
-        self.assertEqual(test2[0], 0)
-        self.assertEqual(test2[0], 0)
-        self.assertEqual(test2[2], 0)
+        self.assertEqual(test2, (0, 0, 0))
 
         # Test DDMAngle Input
         (ell_dist,
@@ -102,9 +98,7 @@ class TestGeodesy(unittest.TestCase):
 
         test2 = vincinv(lat1_DMS.ddm(), lon1_DMS.ddm(),
                         lat1_DMS.ddm(), lon1_DMS.ddm())
-        self.assertEqual(test2[0], 0)
-        self.assertEqual(test2[0], 0)
-        self.assertEqual(test2[2], 0)
+        self.assertEqual(test2, (0, 0, 0))
 
     def test_vincdir(self):
         # Flinders Peak
