@@ -66,9 +66,17 @@ class TestGeodesy(unittest.TestCase):
         self.assertEqual(round(dec2hp(azimuth1to2), 6), 306.520537)
         self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
 
+        # additional test case:
+        pl1 = (-29.85, 140.71666666666667)
+        pl2 = (-29.85, 140.76666666666667)
+        ell_dist, azimuth1to2, azimuth2to1 = vincinv(pl1[0], pl1[1], pl2[0], pl2[1])
+        self.assertEqual(round(ell_dist, 3), 4831.553)
+        self.assertEqual(round(dec2hp(azimuth1to2), 6), 90.004480)
+        self.assertEqual(round(dec2hp(azimuth2to1), 6), 269.591520)
+
         test2 = vincinv(lat1, lon1, lat1, lon1)
         self.assertEqual(test2[0], 0)
-        self.assertEqual(test2[0], 0)
+        self.assertEqual(test2[1], 0)
         self.assertEqual(test2[2], 0)
 
         # Test DMSAngle Input
