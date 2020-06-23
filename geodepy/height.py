@@ -8,9 +8,11 @@
 #___________________________________________________________________________#
 # Import dependencies 
 import geodepy.constants as cons
+import geodepy.geodesy as gg
 import gdal
 import numpy as np
 from scipy.interpolate import griddata
+import math as m
 #___________________________________________________________________________#
 # Interpolation functions
 def interp_file(Lat,Long,file):
@@ -165,3 +167,32 @@ def normal_correction(Lat_A,Long_A,H_A,Lat_B,Long_B,H_B):
    # print g
     NC=(dn*(g-Gamma_0)/Gamma_0)+H_A*(normal_g_A-Gamma_0)/Gamma_0-H_B*(normal_g_B-Gamma_0)/Gamma_0
     return NC,g
+
+
+def normal_orthometric_correction(lat1, lon1, H1, lat2, lon2, H2):
+    """
+    Computes the normal-orthometric correction based on Heck (2003).
+    See Standard for New Zealand Vertical Datum 2016, Section 3.3
+
+    :param lat1: Latitude at Stn1
+    :param lon1: Longitude at Stn1
+    :param H1: Physical Height at Stn1
+    :param lat2: Latitude at Stn2
+    :param lon2: longitude at Stn2
+    :param H2: Physical Height at Stn2
+    :return: normal-orthometric correction
+    """
+
+    f_ng = cons.grs80_ngf
+    m_rad = cons.grs80.meanradius
+
+    mid_height = (H1 + H2) / 2
+    mid_lat = m.radians((lat1 + lat2) / 2)
+
+    vinc_inv = gg.vincinv(lat1, lon1, lat2, lon2)
+    dist = vinc_inv[0]
+    az = vinc_inv[1]
+
+    noc = - f_ng / m_rad * mid_height * m.sin(2.0 * mid_lat) * m.cos(m.radians(az)) * dist
+
+    return noc
