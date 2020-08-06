@@ -14,6 +14,28 @@ from geodepy.constants import utm, grs80
 proj = utm
 
 
+class DECAngle(float):
+    """
+    Class for working with angles in Decimal Degrees
+    Note: GeodePy also supports working with angles in Decimal Degrees as floats
+    """
+
+    def __init__(self, dec_angle=0.0):
+        """
+        :param dec_angle: float Decimal Degrees angle
+        """
+        super().__init__()
+        self.dec_angle = float(dec_angle)
+
+    def __repr__(self):
+        if self.dec_angle >= 0:
+            return '{DECAngle: +' + str(self.dec_angle) + '}'
+        else:  # negative
+            return '{DECAngle: ' + str(self.dec_angle) + '}'
+
+    # TODO: Everything Else
+
+
 class DMSAngle(object):
     """
     Class for working with angles in Degrees, Minutes and Seconds format
