@@ -18,12 +18,19 @@ class DMSAngle(object):
     """
     Class for working with angles in Degrees, Minutes and Seconds format
     """
-    def __init__(self, degree=0, minute=0, second=0.0):
+    def __init__(self, degree, minute=0, second=0.0):
         """
         :param degree: Angle: whole degrees component (floats truncated)
+                       Alt: formatted string '±DDD MM SS.SSS'
         :param minute: Angle: whole minutes component (floats truncated)
         :param second: Angle: seconds component (floats preserved)
         """
+        # Convert formatted string 'DDD MM SS.SSS' to DMSAngle
+        if type(degree) == str:
+            str_pts = degree.split(' ')
+            degree = int(str_pts[0])
+            minute = int(str_pts[1])
+            second = float(str_pts[2])
         # Set sign of object based on sign of any variable
         if degree == 0:
             if str(degree)[0] == '-':
@@ -56,29 +63,29 @@ class DMSAngle(object):
         try:
             return dec2dms(self.dec() + other.dec())
         except AttributeError:
-            raise TypeError('Can only add DMSAngle and/or DDMAngle objects '
+            raise TypeError('Can only add Angle objects with .dec() method '
                             'together')
 
     def __radd__(self, other):
         try:
             return dec2dms(other.dec() + self.dec())
         except AttributeError:
-            raise TypeError('Can only add DMSAngle and/or DDMAngle objects '
+            raise TypeError('Can only add Angle objects with .dec() method '
                             'together')
 
     def __sub__(self, other):
         try:
             return dec2dms(self.dec() - other.dec())
         except AttributeError:
-            raise TypeError('Can only subtract DMSAngle and/or DDMAngle '
-                            'objects together')
+            raise TypeError('Can only subtract Angle objects with .dec() method'
+                            ' together')
 
     def __rsub__(self, other):
         try:
             return dec2dms(other.dec() - self.dec())
         except AttributeError:
-            raise TypeError('Can only subtract DMSAngle and/or DDMAngle '
-                            'objects together')
+            raise TypeError('Can only subtract Angle objects with .dec() method'
+                            ' together')
 
     def __mul__(self, other):
         try:
@@ -122,23 +129,52 @@ class DMSAngle(object):
     def __gt__(self, other):
         return self.dec() > other.dec()
 
+    def __str__(self):
+        return (str(self.sign * self.degree) + ' ' + str(self.minute) + ' '
+                + str(self.second))
+
+    def rad(self):
+        """
+        Convert to Radians
+        :return: Radians
+        :rtype: float
+        """
+        return radians(self.dec())
+
     def dec(self):
         """
-        Convert to Decimal Degrees
+        Convert to Decimal Degrees (float)
         :return: Decimal Degrees
         :rtype: float
         """
         return self.sign * (self.degree + (self.minute / 60) +
                             (self.second / 3600))
 
+    def deca(self):
+        """
+        Convert to Decimal Degrees (class)
+        :return: Decimal Degrees
+        :rtype: DECAngle
+        """
+        # return DECAngle(self.dec())
+        pass
+
     def hp(self):
         """
-        Convert to HP Notation
+        Convert to HP Notation (float)
         :return: HP Notation (DDD.MMSSSS)
         :rtype: float
         """
         return self.sign * (self.degree + (self.minute / 100) +
                             (self.second / 10000))
+
+    def hpa(self):
+        """
+        Convert to HP Notation (class)
+        :return: HP Notation (DDD.MMSSSS)
+        :rtype: HPAngle
+        """
+        return HPAngle(self.hp())
 
     def ddm(self):
         """
@@ -156,11 +192,16 @@ class DDMAngle(object):
     """
     Class for working with angles in Degrees, Decimal Minutes format
     """
-    def __init__(self, degree=0, minute=0.0):
+    def __init__(self, degree, minute=0.0):
         """
         :param degree: Angle: whole degrees component (floats truncated)
         :param minute: Angle:minutes component (floats preserved)
         """
+        # Convert formatted string 'DDD MM.MMMM' to DDMAngle
+        if type(degree) == str:
+            str_pts = degree.split(' ')
+            degree = int(str_pts[0])
+            minute = int(str_pts[1])
         # Set sign of object based on sign of any variable
         if degree == 0:
             if str(degree)[0] == '-':
@@ -190,29 +231,29 @@ class DDMAngle(object):
         try:
             return dec2ddm(self.dec() + other.dec())
         except AttributeError:
-            raise TypeError('Can only add DMSAngle and/or DDMAngle objects '
+            raise TypeError('Can only add Angle objects with .dec() method '
                             'together')
 
     def __radd__(self, other):
         try:
             return dec2ddm(other.dec() + self.dec())
         except AttributeError:
-            raise TypeError('Can only add DMSAngle and/or DDMAngle objects '
+            raise TypeError('Can only add Angle objects with .dec() method '
                             'together')
 
     def __sub__(self, other):
         try:
             return dec2ddm(self.dec() - other.dec())
         except AttributeError:
-            raise TypeError('Can only add DMSAngle and/or DDMAngle objects '
-                            'together')
+            raise TypeError('Can only subtract Angle objects with .dec() method'
+                            ' together')
 
     def __rsub__(self, other):
         try:
             return dec2ddm(other.dec() - self.dec())
         except AttributeError:
-            raise TypeError('Can only add DMSAngle and/or DDMAngle objects '
-                            'together')
+            raise TypeError('Can only subtract Angle objects with .dec() method'
+                            ' together')
 
     def __mul__(self, other):
         try:
@@ -256,23 +297,51 @@ class DDMAngle(object):
     def __gt__(self, other):
         return self.dec() > other.dec()
 
+    def __str__(self):
+        return str(self.sign * self.degree) + ' ' + str(self.minute)
+
+    def rad(self):
+        """
+        Convert to Radians
+        :return: Radians
+        :rtype: float
+        """
+        return radians(self.dec())
+
     def dec(self):
         """
-        Convert to Decimal Degrees
+        Convert to Decimal Degrees (float)
         :return: Decimal Degrees
         :rtype: float
         """
         return self.sign * (self.degree + (self.minute / 60))
 
+    def deca(self):
+        """
+        Convert to Decimal Degrees (class)
+        :return: Decimal Degrees
+        :rtype: DECAngle
+        """
+        # return DECAngle(self.dec())
+        pass
+
     def hp(self):
         """
-        Convert to HP Notation
+        Convert to HP Notation (float)
         :return: HP Notation (DDD.MMSSSS)
         :rtype: float
         """
         minute_int, second = divmod(self.minute, 1)
         return self.sign * (self.degree + (minute_int / 100) +
                             (second * 0.006))
+
+    def hpa(self):
+        """
+        Convert to HP Notation (class)
+        :return: HP Notation (DDD.MMSSSS)
+        :rtype: HPAngle
+        """
+        return HPAngle(self.hp())
 
     def dms(self):
         """
@@ -281,12 +350,154 @@ class DDMAngle(object):
         :rtype: DMSAngle
         """
         minute_int, second = divmod(self.minute, 1)
-        return self.sign * DMSAngle(self.degree, minute_int, second * 60)
+        return self.sign * DMSAngle(self.degree, int(minute_int), second * 60)
+
+
+class HPAngle(object):
+    """
+    Class for working with angles in Hewlett-Packard (HP) format
+    """
+    def __init__(self, hp_angle=0.0):
+        """
+        :param hp_angle: float HP angle
+        """
+        self.hp_angle = float(hp_angle)
+
+    def __repr__(self):
+        if self.hp_angle >= 0:
+            return '{HPAngle: +' + str(self.hp_angle) + '}'
+        else:  # negative
+            return '{HPAngle: ' + str(self.hp_angle) + '}'
+
+    def __add__(self, other):
+        try:
+            return HPAngle(dec2hp(self.dec() + other.dec()))
+        except AttributeError:
+            raise TypeError('Can only add Angle objects with .dec() method '
+                            'together')
+
+    def __radd__(self, other):
+        try:
+            return HPAngle(dec2hp(other.dec() + self.dec()))
+        except AttributeError:
+            raise TypeError('Can only add Angle objects with .dec() method '
+                            'together')
+
+    def __sub__(self, other):
+        try:
+            return HPAngle(dec2hp(self.dec() - other.dec()))
+        except AttributeError:
+            raise TypeError('Can only subtract Angle objects with .dec() method'
+                            ' together')
+
+    def __rsub__(self, other):
+        try:
+            return HPAngle(dec2hp(other.dec() - self.dec()))
+        except AttributeError:
+            raise TypeError('Can only subtract Angle objects with .dec() method'
+                            ' together')
+
+    def __mul__(self, other):
+        try:
+            return HPAngle(dec2hp(self.dec() * other))
+        except TypeError:
+            raise TypeError('Multiply only defined between Angle objects and '
+                            'Int or Float')
+
+    def __rmul__(self, other):
+        try:
+            return HPAngle(dec2hp(other * self.dec()))
+        except TypeError:
+            raise TypeError('Multiply only defined between Angle objects and '
+                            'Int or Float')
+
+    def __truediv__(self, other):
+        try:
+            return HPAngle(dec2hp(self.dec() / other))
+        except TypeError:
+            raise TypeError('Division only defined between HPAngle objects '
+                            'and Int or Float')
+
+    def __abs__(self):
+        return HPAngle(abs(self.hp_angle))
+
+    def __neg__(self):
+        return HPAngle(self.hp_angle.__neg__())
+
+    def __eq__(self, other):
+        return self.dec() == other.dec()
+
+    def __ne__(self, other):
+        return self.dec() != other.dec()
+
+    def __lt__(self, other):
+        return self.dec() < other.dec()
+
+    def __gt__(self, other):
+        return self.dec() > other.dec()
+
+    def __int__(self):
+        return int(self.hp_angle)
+
+    def __float__(self):
+        return float(self.hp_angle)
+
+    def __str__(self):
+        return str(self.hp_angle)
+
+    def rad(self):
+        """
+        Convert to Radians
+        :return: Radians
+        :rtype: float
+        """
+        return radians(hp2dec(self.hp_angle))
+
+    def dec(self):
+        """
+        Convert to Decimal Degrees (float)
+        :return: Decimal Degrees
+        :rtype: float
+        """
+        return hp2dec(self.hp_angle)
+
+    def deca(self):
+        """
+        Convert to Decimal Degrees (class)
+        :return: Decimal Degrees
+        :rtype: DECAngle
+        """
+        # return DECAngle(self.dec())
+        pass
+
+    def hp(self):
+        """
+        Convert to HP Notation (float)
+        :return: HP Notation (DDD.MMSSSS)
+        :rtype: float
+        """
+        return float(self.hp_angle)
+
+    def dms(self):
+        """
+        Convert to Degrees, Minutes, Seconds Object
+        :return: Degrees, Minutes, Seconds Object
+        :rtype: DMSAngle
+        """
+        return hp2dms(self.hp_angle)
+
+    def ddm(self):
+        """
+        Convert to Degrees, Decimal Minutes Object
+        :return: Degrees, Decimal Minutes Object
+        :rtype: DDMAngle
+        """
+        return hp2ddm(self.hp_angle)
 
 
 def dec2hp(dec):
     """
-    Converts Decimal Degrees to HP Notation
+    Converts Decimal Degrees to HP Notation (float)
     :param dec: Decimal Degrees
     :type dec: float
     :return: HP Notation (DDD.MMSSSS)
