@@ -139,7 +139,7 @@ def read_sinex_matrix(file):
     """
 
     # Read in the codes (station names) and solutions, and check for velocities
-    data = read_sinex_estimate('GDA2020_RVS.SNX')
+    data = read_sinex_estimate(file)
     code = []
     soln = []
     velocities = False
