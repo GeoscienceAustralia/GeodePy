@@ -31,13 +31,16 @@ class Ellipsoid(object):
 # www.epsg-registry.org/export.htm?gml=urn:ogc:def:ellipsoid:EPSG::7019
 grs80 = Ellipsoid(6378137, 298.257222101)
 
+
 # World Geodetic System 1984
 # www.epsg-registry.org/export.htm?gml=urn:ogc:def:ellipsoid:EPSG::7030
 wgs84 = Ellipsoid(6378137, 298.257223563)
 
+
 # Australian National Spheroid
 # www.epsg-registry.org/export.htm?gml=urn:ogc:def:ellipsoid:EPSG::7003
 ans = Ellipsoid(6378160, 298.25)
+
 
 # International (Hayford) 1924
 # www.epsg-registry.org/export.htm?gml=urn:ogc:def:ellipsoid:EPSG::7022
@@ -105,7 +108,7 @@ class Transformation(object):
         """
         Reverses the direction of the transformation object, i.e.,
         the ITRF2014 to ITRF2000 transformation becomes the ITRF2000 to
-        ITRF2014 transformation
+        ITRF2014 transformation.
 
         :return: reversed direction transformation object
         """
@@ -156,7 +159,7 @@ def iers2trans(itrf_from, itrf_to, ref_epoch, tx, ty, tz, sc, rx, ry, rz,
     """
     Used to convert IERS transformation parameters into GeodePy Transformation
     class parameters.
-    Note: All rotation and delta rotation terms have the sign change applied
+    Note: All rotation and delta rotation terms have the sign change applied.
     :param itrf_from: ITRF realization transforming from
     :param itrf_to: ITRF realization transforming to
     :param ref_epoch: Reference epoch (YYYY.DOY)
@@ -192,31 +195,25 @@ gda94_to_gda2020 = Transformation('GDA94', 'GDA2020', 0,
                                   -0.0394924, -0.0327221, -0.0328979)
 
 
-"""
-ITRF2014 to GDA2020 transformation parameters [GDA2020 Tech Manual v1.2]. This
-transformation is also called the Australian Plate Motion Model and it was
-derived using the 109 ARGN and AuScope GNSS CORS that were used to define the
-National Measurement (Recognized-Value Standard of Measurement of Position)
-Determination 2017. See
-https://www.legislation.gov.au/Details/F2017L01352
-"""
+# ITRF2014 to GDA2020 transformation parameters [GDA2020 Tech Manual v1.2].
+# This transformation is also called the Australian Plate Motion Model and it
+# was derived using the 109 ARGN and AuScope GNSS CORS that were used to define
+# the National Measurement (Recognized-Value Standard of Measurement of
+# Position)Determination 2017.
+# https://www.legislation.gov.au/Details/F2017L01352
 itrf14togda20 = Transformation('ITRF2014', 'GDA2020', date(2020, 1, 1),
                                0, 0, 0, 0, 0, 0, 0,
                                0, 0, 0, 0, 0.00150379, 0.00118346, 0.00120716)
 
-"""
-ATRF2014 to GDA2020 transformation parameters. Note this transformation is
-identical to the above Australian Plate Motion Model
-"""
+# ATRF2014 to GDA2020 transformation parameters. Note this transformation is
+# identical to the above Australian Plate Motion Model
 atrf_gda2020 = Transformation('ATRF2014', 'GDA2020', date(2020, 1, 1),
                               0, 0, 0, 0, 0, 0, 0,
                               0, 0, 0, 0, 0.00150379, 0.00118346, 0.00120716)
 
-"""
-GDA94 to ITRF transformation parameters [Dawson and Woods (2010)]
-AGD66 and AGD84 to GDA94 transformation parameters [GDA94 Tech Manual v2.4]
-See http://www.icsm.gov.au/datum/gda2020-and-gda94-technical-manuals
-"""
+# GDA94 to ITRF transformation parameters [Dawson and Woods (2010)]
+# AGD66 and AGD84 to GDA94 transformation parameters [GDA94 Tech Manual v2.4]
+# http://www.icsm.gov.au/datum/gda2020-and-gda94-technical-manuals
 itrf08togda94 = Transformation('ITRF2008', 'GDA94', date(1994, 1, 1),
                                -0.08468, -0.01942, 0.03201,
                                0.00971,
@@ -288,9 +285,8 @@ agd66togda94_nt = Transformation('AGD66', 'GDA94', 0,
                                  0.008, -0.557, -0.178)
 
 
-"""ITRF2014 parameters
-See http://itrf.ign.fr/doc_ITRF/Transfo-ITRF2014_ITRFs.txt
-"""
+# ITRF2014 parameters
+# http://itrf.ign.fr/doc_ITRF/Transfo-ITRF2014_ITRFs.txt
 itrf14to08 = iers2trans('ITRF2014', 'ITRF2008', date(2010, 1, 1),
                         1.6, 1.9, 2.4, -0.02, 0, 0, 0,
                         0.0, 0.0, -0.1, 0.03, 0, 0, 0)
@@ -338,10 +334,9 @@ itrf14to89 = iers2trans('ITRF2014', 'ITRF89', date(2010, 1, 1),
 itrf14to88 = iers2trans('ITRF2014', 'ITRF88', date(2010, 1, 1),
                         25.4, -0.5, -154.8, 11.29, 0.1, 0, 0.26,
                         0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
-"""
-ITRF2008 parameters
-See http://itrf.ign.fr/doc_ITRF/Transfo-ITRF2008_ITRFs.txt
-"""
+
+# ITRF2008 parameters
+# http://itrf.ign.fr/doc_ITRF/Transfo-ITRF2008_ITRFs.txt
 itrf08to05 = iers2trans('ITRF2008', 'ITRF2005', date(2000, 1, 1),
                         -2.0, -0.9, -4.7, 0.94, 0, 0, 0,
                         0.3, 0.0, 0.0, 0.0, 0, 0, 0)
@@ -386,22 +381,18 @@ itrf08to88 = iers2trans('ITRF2008', 'ITRF88', date(2000, 1, 1),
                         22.8, 2.6, -125.2, 10.41, 0.10, 0, 0.06,
                         0.1, -0.5, -3.2, 0.09, 0, 0, 0.02)
 
-"""
-ITRF2005 parameters
-See http://itrf.ensg.ign.fr/ITRF_solutions/2005/tp_05-00.php
-"""
+# ITRF2005 parameters
+# http://itrf.ensg.ign.fr/ITRF_solutions/2005/tp_05-00.php
 itrf05to00 = iers2trans('ITRF2005', 'ITRF2000', date(2000, 1, 1),
                         0.1, -0.8, -5.8, 0.40, 0, 0, 0,
                         -0.2, 0.1, -1.8, 0.08, 0, 0, 0)
 
-"""
-ITRF2000 parameters
-See ftp://itrf.ensg.ign.fr/pub/itrf/ITRF.TP
-NOTE: This ref lists translations in centimetres. All other ITRF
-transformations are shown in millimetres.
-NOTE: All translations and rates of translation shown below have been converted
-to millimetres.
-"""
+# ITRF2000 parameters
+# ftp://itrf.ensg.ign.fr/pub/itrf/ITRF.TP
+# NOTE: This ref lists translations in centimetres. All other ITRF
+# transformations are shown in millimetres.
+# NOTE: All translations and rates of translation shown below have been
+# converted to millimetres.
 itrf00to97 = iers2trans('ITRF2000', 'ITRF97', date(1997, 1, 1),
                         6.7, 6.1, -18.5, 1.55, 0, 0, 0,
                         0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
@@ -439,13 +430,14 @@ itrf00to88 = iers2trans('ITRF2000', 'ITRF88', date(1988, 1, 1),
                         0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
 
 # The locations of files used in the height module
-file_DOV_PV='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/DOV_PV.tif'
-file_DOV_PM='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/DOV_PM.tif'
-file_AG2020='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AUSGeoid2020_RELEASEV20170908.tif'
-file_AG2020_STD='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AUSGeoid2020_RELEASEV20170908_err.tif'
-file_AVWS='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AVWS_20191107.tif'
-file_AVWS_STD='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AVWS_STD_20191107.tif'
-file_GRAV_BA='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/Bouguer_Grav_RELEASE20191107.tif'
+aws_server = '/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/'
+file_DOV_PV = aws_server + 'DOV_PV.tif'
+file_DOV_PM = aws_server + 'DOV_PM.tif'
+file_AG2020 = aws_server + 'AUSGeoid2020_RELEASEV20170908.tif'
+file_AG2020_STD = aws_server + 'AUSGeoid2020_RELEASEV20170908_err.tif'
+file_AVWS = aws_server + 'AVWS_20191107.tif'
+file_AVWS_STD = aws_server + 'AVWS_STD_20191107.tif'
+file_GRAV_BA = aws_server + 'Bouguer_Grav_RELEASE20191107.tif'
 
 # GRS80 normal gravity flattening [Moritz, 2000 Section 4]
 grs80_ngf = 0.005302440112
