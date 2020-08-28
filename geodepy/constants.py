@@ -430,14 +430,14 @@ itrf00to88 = iers2trans('ITRF2000', 'ITRF88', date(1988, 1, 1),
                         0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
 
 # The locations of files used in the height module
-aws_server = '/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/'
-file_DOV_PV = aws_server + 'DOV_PV.tif'
-file_DOV_PM = aws_server + 'DOV_PM.tif'
-file_AG2020 = aws_server + 'AUSGeoid2020_RELEASEV20170908.tif'
-file_AG2020_STD = aws_server + 'AUSGeoid2020_RELEASEV20170908_err.tif'
-file_AVWS = aws_server + 'AVWS_20191107.tif'
-file_AVWS_STD = aws_server + 'AVWS_STD_20191107.tif'
-file_GRAV_BA = aws_server + 'Bouguer_Grav_RELEASE20191107.tif'
+aws_server = '/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/'
+file_DOV_PV = aws_server + 'AVWS/DOV_PV.tif'
+file_DOV_PM = aws_server + 'AVWS/DOV_PM.tif'
+file_AG2020 = aws_server + 'AVWS/AUSGeoid2020_RELEASEV20170908.tif'
+file_AG2020_STD = aws_server + 'AVWS/AUSGeoid2020_RELEASEV20170908_err.tif'
+file_AVWS = aws_server + 'AGQG/AVWS_20191107.tif'
+file_AVWS_STD = aws_server + 'AGQG/AGQG_uncertainty_20191107.tif'
+file_GRAV_BA = aws_server + 'AVWS/Bouguer_Grav_RELEASE20191107.tif'
 
 # GRS80 normal gravity flattening [Moritz, 2000 Section 4]
 grs80_ngf = 0.005302440112
