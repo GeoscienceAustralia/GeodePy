@@ -435,7 +435,7 @@ file_DOV_PV = aws_server + 'AVWS/DOV_PV.tif'
 file_DOV_PM = aws_server + 'AVWS/DOV_PM.tif'
 file_AG2020 = aws_server + 'AVWS/AUSGeoid2020_RELEASEV20170908.tif'
 file_AG2020_STD = aws_server + 'AVWS/AUSGeoid2020_RELEASEV20170908_err.tif'
-file_AVWS = aws_server + 'AGQG/AVWS_20191107.tif'
+file_AVWS = aws_server + 'AGQG/AGQG_20191107.tif'
 file_AVWS_STD = aws_server + 'AGQG/AGQG_uncertainty_20191107.tif'
 file_GRAV_BA = aws_server + 'AVWS/Bouguer_Grav_RELEASE20191107.tif'
 
