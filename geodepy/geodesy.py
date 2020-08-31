@@ -7,7 +7,7 @@ Geodesy Module
 
 from math import degrees, radians, sqrt, sin, cos, tan, asin, acos, atan, atan2
 import numpy as np
-from geodepy.constants import grs80
+from geodepy.constants import grs80, utm
 from geodepy.convert import geo2grid, grid2geo, angular_typecheck
 from geodepy.statistics import rotation_matrix
 
@@ -332,3 +332,60 @@ def vincinv_utm(zone1, east1, north1, zone2, east2, north2,
     pt2 = grid2geo(zone2, east2, north2, hemisphere2, ellipsoid)
     # Use vincinv
     return vincinv(pt1[0], pt1[1], pt2[0], pt2[1], ellipsoid)
+
+
+def lsf(zone1, east1, north1, zone2, east2, north2,
+        hemisphere='south', ellipsoid=grs80, projection=utm):
+    """
+    Computes Line Scale Factor for a pair of Transverse Mercator Coordinates
+    Ref: Deakin 2010, Traverse Computations on the Ellipsoid and on the
+    Universal Transverse Mercator Projection, pp 35
+    http://www.mygeodesy.id.au/documents/Trav_Comp_V2.1.pdf
+    :param zone1: Station 1 Zone Number - 1 to 60
+    :param east1: Station 1 Easting (m, within 3330km of Central Meridian)
+    :param north1: Station 1 Northing (m, 0 to 10,000,000m)
+    :param zone2: Station 2 Zone Number - 1 to 60
+    :param east2: Station 2 Easting (m, within 3330km of Central Meridian)
+    :param north2: Station 2 Northing (m, 0 to 10,000,000m)
+    :param hemisphere: String - 'North' or 'South'(default)
+    :param ellipsoid: Ellipsoid Object (default GRS80)
+    :param projection: Projection Object (default Universal Transverse Mercator)
+    :return: Line Scale Factor
+    """
+    eastofcm1 = east1 - projection.falseeast
+    lat1 = grid2geo(zone1, east1, north1, hemisphere, ellipsoid)[0]
+    eastofcm2 = east2 - projection.falseeast
+    lat2 = grid2geo(zone2, east2, north2, hemisphere, ellipsoid)[0]
+    lat_mean = (lat1 + lat2) / 2
+    r_sq_m = (rho(lat_mean, ellipsoid) *
+              nu(lat_mean, ellipsoid) *
+              projection.cmscale ** 2)
+    k1 = ((eastofcm1 ** 2 + eastofcm1 * eastofcm2 + eastofcm2 ** 2) /
+          (6 * r_sq_m))
+    k2 = ((eastofcm1 ** 2 + eastofcm1 * eastofcm2 + eastofcm2 ** 2) /
+          (36 * r_sq_m))
+    return projection.cmscale * (1 + k1 * (1 + k2))
+
+
+def rho(lat, ellipsoid=grs80):
+    """
+    Return the radius of curvature of the ellipsoid in the meridian plane
+    (rho) at a given latitude
+    :param lat: latitude in decimal degrees
+    :param ellipsoid: Ellipsoid Object
+    :return: rho at specified latitude
+    """
+    return ((ellipsoid.semimaj * (1 - ellipsoid.ecc1sq)) /
+            (1 - ellipsoid.ecc1sq * (sin(radians(lat)) ** 2)) ** 1.5)
+
+
+def nu(lat, ellipsoid=grs80):
+    """
+    Return the radius of curvature of the ellipsoid in the prime vertical plane
+    (nu) at a given latitude
+    :param lat: latitude in decimal degrees
+    :param ellipsoid: Ellipsoid Object
+    :return: nu at specified latitude
+    """
+    return (ellipsoid.semimaj /
+            sqrt(1 - ellipsoid.ecc1sq * (sin(radians(lat)) ** 2)))
