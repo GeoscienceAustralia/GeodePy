@@ -133,59 +133,65 @@ class TestGeodesy(unittest.TestCase):
         self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
 
     def test_vincinv_utm(self):
-        # Flinders Peak (UTM)
+        # Flinders Peak (UTM 55)
         zone1 = 55
         east1 = 273741.2966
         north1 = 5796489.7769
-        # Buninyong (UTM)
-        zone2 = 54
-        east2 = 758173.7973
-        north2 = 5828674.3402
-        ell_dist, azimuth1to2, azimuth2to1 = vincinv_utm(zone1, east1, north1, zone2, east2, north2)
-        self.assertEqual(round(ell_dist, 3), 54972.271)
-        self.assertEqual(round(dec2hp(azimuth1to2), 6), 306.520537)
-        self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
+        # Buninyong (UTM 55)
+        zone2 = 55
+        east2 = 228854.0513
+        north2 = 5828259.0384
+        # Buninyong (UTM 54)
+        zone3 = 54
+        east3 = 758173.7973
+        north3 = 5828674.3402
+
+        # Test Coordinates in Zone 55 only
+        grid_dist, grid1to2, grid2to1, lsf = vincinv_utm(zone1, east1, north1,
+                                                         zone2, east2, north2)
+        self.assertAlmostEqual(lsf, 1.00036397, 8)
+        self.assertAlmostEqual(grid_dist, 54992.279, 3)
+        self.assertAlmostEqual(dec2hp(grid1to2), 305.17017259, 7)
+        self.assertAlmostEqual(dec2hp(grid2to1), 125.17418518, 7)
+
+        # Test Coordinates in Different Zones (55 and 54)
+        # (Point 2 Grid Bearing Different (Zone 54 Grid Bearing))
+        grid_dist, grid1to2, grid2to1, lsf = vincinv_utm(zone1, east1, north1,
+                                                         zone3, east3, north3)
+        self.assertAlmostEqual(lsf, 1.00036397, 8)
+        self.assertAlmostEqual(grid_dist, 54992.279, 3)
+        self.assertAlmostEqual(dec2hp(grid1to2), 305.17017259, 7)
+        self.assertAlmostEqual(dec2hp(grid2to1), 128.57444307, 7)
 
     def test_vincdir_utm(self):
-        # Flinders Peak (UTM)
+        # Flinders Peak (UTM 55)
         zone1 = 55
         east1 = 273741.2966
         north1 = 5796489.7769
-        # To Buninyong
-        azimuth1to2 = hp2dec(306.520537)
-        azimuth1to2_DMS = DMSAngle(306, 52, 5.37)
-
-        ell_dist = 54972.271
+        # Grid Dimensions to Point 2 (Buninyong)
+        grid_dist = 54992.279
+        grid1to2 = hp2dec(305.17017259)
+        grid1to2_DMS = DMSAngle(305, 17, 1.7259)
 
         # Test Decimal Degrees Input
-        (hemisphere2, zone2, east2,
-         north2, azimuth2to1) = vincdir_utm(zone1, east1, north1,
-                                            azimuth1to2, ell_dist)
-        self.assertEqual(hemisphere2, 'South')
-        self.assertEqual(zone2, 54)
-        self.assertEqual(round(east2, 4), 758173.7968)
-        self.assertEqual(round(north2, 4), 5828674.3395)
-        self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
+        (zone2, east2, north2,
+         grid2to1, lsf) = vincdir_utm(zone1, east1, north1,
+                                      grid1to2, grid_dist)
+        self.assertEqual(zone2, zone1)
+        self.assertAlmostEqual(east2, 228854.0513, 3)
+        self.assertAlmostEqual(north2, 5828259.0384, 3)
+        self.assertAlmostEqual(dec2hp(grid2to1), 125.17418518, 7)
+        self.assertAlmostEqual(lsf, 1.00036397, 8)
 
         # Test DMSAngle Input
-        (hemisphere2, zone2, east2,
-         north2, azimuth2to1) = vincdir_utm(zone1, east1, north1,
-                                            azimuth1to2_DMS, ell_dist)
-        self.assertEqual(hemisphere2, 'South')
-        self.assertEqual(zone2, 54)
-        self.assertEqual(round(east2, 4), 758173.7968)
-        self.assertEqual(round(north2, 4), 5828674.3395)
-        self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
-
-        # Test DDMAngle Input
-        (hemisphere2, zone2, east2,
-         north2, azimuth2to1) = vincdir_utm(zone1, east1, north1,
-                                            azimuth1to2_DMS.ddm(), ell_dist)
-        self.assertEqual(hemisphere2, 'South')
-        self.assertEqual(zone2, 54)
-        self.assertEqual(round(east2, 4), 758173.7968)
-        self.assertEqual(round(north2, 4), 5828674.3395)
-        self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
+        (zone2, east2, north2,
+         grid2to1, lsf) = vincdir_utm(zone1, east1, north1,
+                                      grid1to2_DMS, grid_dist)
+        self.assertEqual(zone2, zone1)
+        self.assertAlmostEqual(east2, 228854.0513, 3)
+        self.assertAlmostEqual(north2, 5828259.0384, 3)
+        self.assertAlmostEqual(dec2hp(grid2to1), 125.17418518, 7)
+        self.assertAlmostEqual(lsf, 1.00036397, 8)
 
     def test_equality_vincentys(self):
         # Test multiple point-to-point vincinv calculations
