@@ -10,7 +10,8 @@ from math import (sin, cos, atan2, radians, degrees,
 import datetime
 from geodepy.constants import utm, grs80
 from geodepy.angles import (DECAngle, DMSAngle, DDMAngle, HPAngle,
-                            hp2dec, hp2dms, hp2ddm, dec2hp, dec2dms, dec2ddm)
+                            hp2dec, hp2dms, hp2ddm, dec2hp, dec2dms, dec2ddm,
+                            dd2sec, dec2hp_v, hp2dec_v, angular_typecheck)
 
 # Universal Transverse Mercator Projection Parameters
 proj = utm
@@ -50,42 +51,6 @@ def rect2polar(x, y):
     else:
         theta = degrees(theta)
     return r, theta
-
-
-def dd2sec(dd):
-    """
-    Converts angle in decimal degrees to angle in seconds
-    :param dd: Decimal Degrees
-    :return: Seconds
-    """
-    minute, second = divmod(abs(dd) * 3600, 60)
-    degree, minute = divmod(minute, 60)
-    sec = (degree * 3600) + (minute * 60) + second
-    return sec if dd >= 0 else -sec
-
-
-def dec2hp_v(dec):
-    minute, second = divmod(abs(dec) * 3600, 60)
-    degree, minute = divmod(minute, 60)
-    hp = degree + (minute / 100) + (second / 10000)
-    hp[dec <= 0] = -hp[dec <= 0]
-    return hp
-
-
-def hp2dec_v(hp):
-    degmin, second = divmod(abs(hp) * 1000, 10)
-    degree, minute = divmod(degmin, 100)
-    dec = degree + (minute / 60) + (second / 360)
-    dec[hp <= 0] = -dec[hp <= 0]
-    return dec
-
-
-def angular_typecheck(angle):
-    # Converts DMSAngle and DDMAngle Objects to Decimal Degrees
-    if type(angle) is DMSAngle or type(angle) is DDMAngle:
-        return angle.dec()
-    else:
-        return angle
 
 
 def rect_radius(ellipsoid):

@@ -97,6 +97,9 @@ class DECAngle(float):
     def __str__(self):
         return str(self.dec_angle)
 
+    def __round__(self, n=None):
+        return DECAngle(round(self.dec_angle, n))
+
     def rad(self):
         """
         Convert to radians
@@ -265,6 +268,11 @@ class DMSAngle(object):
         return (str(self.sign * self.degree) + ' ' + str(self.minute) + ' '
                 + str(self.second))
 
+    def __round__(self, n=None):
+        return DMSAngle(self.sign * self.degree,
+                        self.minute,
+                        round(self.second, n))
+
     def rad(self):
         """
         Convert to Radians
@@ -431,6 +439,10 @@ class DDMAngle(object):
     def __str__(self):
         return str(self.sign * self.degree) + ' ' + str(self.minute)
 
+    def __round__(self, n=None):
+        return DDMAngle(self.sign * self.degree,
+                        round(self.minute, n))
+
     def rad(self):
         """
         Convert to Radians
@@ -493,6 +505,15 @@ class HPAngle(object):
         :param hp_angle: float HP angle
         """
         self.hp_angle = float(hp_angle)
+        hp_dec_str = f'{self.hp_angle:.17f}'.split('.')[1]
+        if int(hp_dec_str[0]) > 5:
+            raise ValueError(f'Invalid HP Notation: 1st decimal place greater '
+                             f'than 5: {self.hp_angle}')
+        if len(hp_dec_str) > 2:
+            if int(hp_dec_str[2]) > 5:
+                raise ValueError(
+                    f'Invalid HP Notation: 3st decimal place greater '
+                    f'than 5: {self.hp_angle}')
 
     def __repr__(self):
         if self.hp_angle >= 0:
@@ -576,6 +597,9 @@ class HPAngle(object):
     def __str__(self):
         return str(self.hp_angle)
 
+    def __round__(self, n=None):
+        return HPAngle(round(self.hp_angle, n))
+
     def rad(self):
         """
         Convert to Radians
@@ -636,6 +660,7 @@ def dec2hp(dec):
     minute, second = divmod(abs(dec) * 3600, 60)
     degree, minute = divmod(minute, 60)
     hp = degree + (minute / 100) + (second / 10000)
+    hp = round(hp, 16)
     return hp if dec >= 0 else -hp
 
 
@@ -661,9 +686,20 @@ def hp2dec(hp):
     :return: Decimal Degrees
     :rtype: float
     """
+    # Check if 1st and 3rd decimal place greater than 5 (invalid HP Notation)
+    hp = float(hp)
+    hp_dec_str = f'{hp:.17f}'.split('.')[1]
+    if int(hp_dec_str[0]) > 5:
+        raise ValueError(f'Invalid HP Notation: 1st decimal place greater '
+                         f'than 5: {hp}')
+    if len(hp_dec_str) > 2:
+        if int(hp_dec_str[2]) > 5:
+            raise ValueError(f'Invalid HP Notation: 3st decimal place greater '
+                             f'than 5: {hp}')
     degmin, second = divmod(abs(hp) * 1000, 10)
     degree, minute = divmod(degmin, 100)
     dec = degree + (minute / 60) + (second / 360)
+    dec = round(dec, 16)
     return dec if hp >= 0 else -dec
 
 
@@ -754,3 +790,39 @@ def hp2ddm(hp):
     degree, minute = divmod(degmin, 100)
     minute = minute + (second / 6)
     return DDMAngle(degree, minute) if hp >= 0 else DDMAngle(-degree, minute)
+
+
+def dd2sec(dd):
+    """
+    Converts angle in decimal degrees to angle in seconds
+    :param dd: Decimal Degrees
+    :return: Seconds
+    """
+    minute, second = divmod(abs(dd) * 3600, 60)
+    degree, minute = divmod(minute, 60)
+    sec = (degree * 3600) + (minute * 60) + second
+    return sec if dd >= 0 else -sec
+
+
+def dec2hp_v(dec):
+    minute, second = divmod(abs(dec) * 3600, 60)
+    degree, minute = divmod(minute, 60)
+    hp = degree + (minute / 100) + (second / 10000)
+    hp[dec <= 0] = -hp[dec <= 0]
+    return hp
+
+
+def hp2dec_v(hp):
+    degmin, second = divmod(abs(hp) * 1000, 10)
+    degree, minute = divmod(degmin, 100)
+    dec = degree + (minute / 60) + (second / 360)
+    dec[hp <= 0] = -dec[hp <= 0]
+    return dec
+
+
+def angular_typecheck(angle):
+    # Converts DMSAngle and DDMAngle Objects to Decimal Degrees
+    if type(angle) is DMSAngle or type(angle) is DDMAngle:
+        return angle.dec()
+    else:
+        return angle
