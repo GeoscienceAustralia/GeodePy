@@ -7,9 +7,10 @@ Geodesy Module
 
 from math import degrees, radians, sqrt, sin, cos, tan, asin, acos, atan, atan2
 import numpy as np
-from geodepy.constants import grs80
+from geodepy.constants import grs80, utm
 from geodepy.convert import geo2grid, grid2geo, angular_typecheck
 from geodepy.statistics import rotation_matrix
+from geodepy.survey import radiations
 
 
 def enu2xyz(lat, lon, east, north, up):
@@ -280,55 +281,170 @@ def vincinv(lat1, lon1, lat2, lon2, ellipsoid=grs80):
     return round(ell_dist, 3), round(azimuth1to2, 9), round(azimuth2to1, 9)
 
 
-def vincdir_utm(zone1, east1, north1, azimuth1to2, ell_dist,
-                hemisphere1='south', ellipsoid=grs80):
+def vincdir_utm(zone1, east1, north1, grid1to2, grid_dist,
+                hemisphere='south', ellipsoid=grs80):
     """
-    Perform Vincentys Direct Computation using UTM Grid coordinates
+    Perform Vincenty's Direct Computation using UTM Grid Coordinates, a
+    grid bearing and grid distance.
+    Note: Point 2 UTM Coordinates use the Zone specified for Point 1, even if
+    Point 2 would typically be computed in a different zone. This keeps the grid
+    bearings and line scale factor all relative to the same UTM Zone.
     :param zone1: Point 1 Zone Number - 1 to 60
     :param east1: Point 1 Easting (m, within 3330km of Central Meridian)
     :param north1: Point 1 Northing (m, 0 to 10,000,000m)
-    :param azimuth1to2: Azimuth from Point 1 to 2 (decimal degrees)
-    :type azimuth1to2: float (decimal degrees), DMSAngle or DDMAngle
-    :param ell_dist: Ellipsoidal Distance between Points 1 and 2 (metres)
-    :param hemisphere1: Point 1 Hemisphere: String - 'North' or 'South'(default)
+    :param grid1to2: Grid Bearing from Point 1 to 2 (decimal degrees),
+    :param grid_dist: UTM Grid Distance between Points 1 and 2 (m)
+    :param hemisphere: String - 'North' or 'South'(default)
     :param ellipsoid: Ellipsoid Object (default: GRS80)
-    :return: Hemisphere, zone, easting and northing of Point 2, Azimuth from
-    Point 2 to 1 (decimal degrees)
-    :rtype: tuple
+    :return: zone2: Point 2 Zone Number - 1 to 60
+             east2: Point 2 Easting (m, within 3330km of Central Meridian)
+             north2: Point 2 Northing (m, 0 to 10,000,000m)
+             grid2to1: Grid Bearing from Point 2 to 1 (decimal degrees)
+             lsf: Line Scale Factor (for Point 1 Zone)
     """
-
     # Convert angle to decimal degrees (if required)
-    azimuth1to2 = angular_typecheck(azimuth1to2)
+    grid1to2 = angular_typecheck(grid1to2)
 
-    # Convert utm to geographic
-    pt1 = grid2geo(zone1, east1, north1, hemisphere1)
-    # Use vincdir
-    lat2, lon2, azimuth2to1 = vincdir(pt1[0], pt1[1], azimuth1to2, ell_dist,
-                                      ellipsoid)
-    # Convert geographic to utm
-    hemisphere2, zone2, east2, north2, psf2, gc2 = geo2grid(lat2, lon2)
-    return hemisphere2, zone2, east2, north2, azimuth2to1
+    # Convert UTM Coords to Geographic
+    lat1, lon1, psf1, gridconv1 = grid2geo(zone1, east1, north1,
+                                           hemisphere, ellipsoid)
+
+    # Convert Grid Bearing to Geodetic Azimuth
+    az1to2 = grid1to2 - gridconv1
+
+    # Estimate Line Scale Factor (LSF)
+    zone2, east2, north2 = (zone1, *radiations(east1, north1,
+                                               grid1to2, grid_dist))
+    lsf = line_sf(zone1, east1, north1, zone2, east2, north2)
+
+    # Iteratively estimate Pt 2 Coordinates, refining LSF each time
+    lsf_diff = 1
+    max_iter = 10
+    while lsf_diff > 1e-9:
+        lsf_previous = lsf
+        lat2, lon2, az2to1 = vincdir(lat1, lon1, az1to2,
+                                     grid_dist / lsf, ellipsoid)
+        (hemisphere2, zone2, east2,
+         north2, psf2, gridconv2) = geo2grid(lat2, lon2,
+                                             zone1, ellipsoid)
+        lsf = line_sf(zone1, east1, north1,
+                      zone2, east2, north2,
+                      hemisphere, ellipsoid)
+        lsf_diff = abs(lsf_previous - lsf)
+
+    # Compute Grid Bearing for Station 2
+    lat2, lon2, psf2, gridconv2 = grid2geo(zone2, east2, north2,
+                                           hemisphere, ellipsoid)
+    grid2to1 = az2to1 + gridconv2
+
+    return zone2, east2, north2, grid2to1, lsf
 
 
 def vincinv_utm(zone1, east1, north1, zone2, east2, north2,
-                hemisphere1='south', hemisphere2='south', ellipsoid=grs80):
+                hemisphere='south', ellipsoid=grs80):
     """
     Perform Vincentys Inverse Computation using UTM Grid Coordinates
+    Note: Where coordinates from different zones are used, UTM Grid Distance
+    is relative to Point 1's Zone. Grid Bearings of Points 1 and 2 are
+    relative to each of their respective Zones.
     :param zone1: Point 1 Zone Number - 1 to 60
     :param east1: Point 1 Easting (m, within 3330km of Central Meridian)
     :param north1: Point 1 Northing (m, 0 to 10,000,000m)
     :param zone2: Point 2 Zone Number - 1 to 60
     :param east2: Point 2 Easting (m, within 3330km of Central Meridian)
     :param north2: Point 2 Northing (m, 0 to 10,000,000m)
-    :param hemisphere1: Point 1 Hemisphere: String - 'North' or 'South'(default)
-    :param hemisphere2: Point 2 Hemisphere: String - 'North' or 'South'(default)
+    :param hemisphere: String - 'North' or 'South'(default)
     :param ellipsoid: Ellipsoid Object (default: GRS80)
-    :return: ell_dist: Ellipsoidal Distance between Points 1 and 2 (m),
-             azimuth1to2: Azimuth from Point 1 to 2 (decimal degrees),
-             azimuth2to1: Azimuth from Point 2 to 1 (decimal degrees)
+    :return: grid_dist: UTM Grid Distance between Points 1 and 2 (m),
+             grid1to2: Grid Bearing from Point 1 to 2 (decimal degrees),
+             grid2to1: Grid Bearing from Point 2 to 1 (decimal degrees)
+             lsf: Line Scale Factor (for Point 1 Zone)
     """
     # Convert utm to geographic
-    pt1 = grid2geo(zone1, east1, north1, hemisphere1, ellipsoid)
-    pt2 = grid2geo(zone2, east2, north2, hemisphere2, ellipsoid)
-    # Use vincinv
-    return vincinv(pt1[0], pt1[1], pt2[0], pt2[1], ellipsoid)
+    pt1 = grid2geo(zone1, east1, north1, hemisphere, ellipsoid)
+    pt2 = grid2geo(zone2, east2, north2, hemisphere, ellipsoid)
+    ell_dist, az1to2, az2to1 = vincinv(pt1[0], pt1[1],
+                                       pt2[0], pt2[1], ellipsoid)
+
+    # Compute Grid Distance using Line Scale Factor
+    lsf = line_sf(zone1, east1, north1,
+                  zone2, east2, north2, hemisphere, ellipsoid)
+    grid_dist = ell_dist * lsf
+
+    # Compute Grid Bearings using Grid Convergence
+    grid1to2 = az1to2 + pt1[3]
+    grid2to1 = az2to1 + pt2[3]
+
+    return grid_dist, grid1to2, grid2to1, lsf
+
+
+def line_sf(zone1, east1, north1, zone2, east2, north2,
+            hemisphere='south', ellipsoid=grs80, projection=utm):
+    """
+    Computes Line Scale Factor for a pair of Transverse Mercator Coordinates
+    Ref: Deakin 2010, Traverse Computations on the Ellipsoid and on the
+    Universal Transverse Mercator Projection, pp 35
+    http://www.mygeodesy.id.au/documents/Trav_Comp_V2.1.pdf
+    :param zone1: Station 1 Zone Number - 1 to 60
+    :param east1: Station 1 Easting (m, within 3330km of Central Meridian)
+    :param north1: Station 1 Northing (m, 0 to 10,000,000m)
+    :param zone2: Station 2 Zone Number - 1 to 60
+    :param east2: Station 2 Easting (m, within 3330km of Central Meridian)
+    :param north2: Station 2 Northing (m, 0 to 10,000,000m)
+    :param hemisphere: String - 'North' or 'South'(default)
+    :param ellipsoid: Ellipsoid Object (default GRS80)
+    :param projection: Projection Object (default Universal Transverse Mercator)
+    :return: Line Scale Factor (relative to Zone 1 if different zones
+    are entered)
+    """
+    # Re-project cross-zone coordinate to same UTM zone
+    if zone1 != zone2:
+        # Re-project Station 2 Coordinates to same zone as Station 1
+        stn2_geo = grid2geo(zone2, east2, north2, hemisphere, ellipsoid)
+        stn2_zone1 = geo2grid(stn2_geo[0], stn2_geo[1], zone1, ellipsoid)
+        zone2 = stn2_zone1[1]
+        east2 = stn2_zone1[2]
+        north2 = stn2_zone1[3]
+
+    # Comute easting distances from Central Meridian
+    eastofcm1 = east1 - projection.falseeast
+    eastofcm2 = east2 - projection.falseeast
+
+    # Compute Mean Latitude
+    lat1 = grid2geo(zone1, east1, north1, hemisphere, ellipsoid)[0]
+    lat2 = grid2geo(zone2, east2, north2, hemisphere, ellipsoid)[0]
+    lat_mean = (lat1 + lat2) / 2
+
+    # Compute Line Scale Factor (Deakin 2010 Eq. 13)
+    r_sq_m = (rho(lat_mean, ellipsoid) *
+              nu(lat_mean, ellipsoid) *
+              projection.cmscale ** 2)
+    k1 = ((eastofcm1 ** 2 + eastofcm1 * eastofcm2 + eastofcm2 ** 2) /
+          (6 * r_sq_m))
+    k2 = ((eastofcm1 ** 2 + eastofcm1 * eastofcm2 + eastofcm2 ** 2) /
+          (36 * r_sq_m))
+    return projection.cmscale * (1 + k1 * (1 + k2))
+
+
+def rho(lat, ellipsoid=grs80):
+    """
+    Return the radius of curvature of the ellipsoid in the meridian plane
+    (rho) at a given latitude
+    :param lat: latitude in decimal degrees
+    :param ellipsoid: Ellipsoid Object
+    :return: rho at specified latitude
+    """
+    return ((ellipsoid.semimaj * (1 - ellipsoid.ecc1sq)) /
+            (1 - ellipsoid.ecc1sq * (sin(radians(lat)) ** 2)) ** 1.5)
+
+
+def nu(lat, ellipsoid=grs80):
+    """
+    Return the radius of curvature of the ellipsoid in the prime vertical plane
+    (nu) at a given latitude
+    :param lat: latitude in decimal degrees
+    :param ellipsoid: Ellipsoid Object
+    :return: nu at specified latitude
+    """
+    return (ellipsoid.semimaj /
+            sqrt(1 - ellipsoid.ecc1sq * (sin(radians(lat)) ** 2)))
