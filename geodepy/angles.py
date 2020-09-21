@@ -270,8 +270,8 @@ class DMSAngle(object):
 
     def __round__(self, n=None):
         return DMSAngle(self.sign * self.degree,
-                        self.minute,
-                        round(self.second, n))
+                        self.sign * self.minute,
+                        round(self.sign * self.second, n))
 
     def rad(self):
         """
@@ -441,7 +441,7 @@ class DDMAngle(object):
 
     def __round__(self, n=None):
         return DDMAngle(self.sign * self.degree,
-                        round(self.minute, n))
+                        round(self.sign * self.minute, n))
 
     def rad(self):
         """
