@@ -132,6 +132,14 @@ class DECAngle(float):
         """
         return HPAngle(self.hp())
 
+    def gon(self):
+        """
+        Convert to Gradians (float)
+        :return: Gradians
+        :rtype: float
+        """
+        return dec2gon(self.dec_angle)
+
     def dms(self):
         """
         Convert to Degrees, Minutes, Seconds Object
@@ -315,6 +323,14 @@ class DMSAngle(object):
         """
         return HPAngle(self.hp())
 
+    def gon(self):
+        """
+        Convert to Gradians (float)
+        :return: Gradians
+        :rtype: float
+        """
+        return dec2gon(self.dec())
+
     def ddm(self):
         """
         Convert to Degrees, Decimal Minutes Object
@@ -485,6 +501,14 @@ class DDMAngle(object):
         """
         return HPAngle(self.hp())
 
+    def gon(self):
+        """
+        Convert to Gradians (float)
+        :return: Gradians
+        :rtype: float
+        """
+        return dec2gon(self.dec())
+
     def dms(self):
         """
         Convert to Degrees, Minutes, Seconds Object
@@ -632,6 +656,14 @@ class HPAngle(object):
         """
         return float(self.hp_angle)
 
+    def gon(self):
+        """
+        Convert to Gradians (float)
+        :return: Gradians
+        :rtype: float
+        """
+        return hp2gon(self.hp_angle)
+
     def dms(self):
         """
         Convert to Degrees, Minutes, Seconds Object
@@ -672,10 +704,7 @@ def dec2hpa(dec):
     :return: HP Angle Object (DDD.MMSSSS)
     :rtype: HPAngle
     """
-    minute, second = divmod(abs(dec) * 3600, 60)
-    degree, minute = divmod(minute, 60)
-    hp = degree + (minute / 100) + (second / 10000)
-    return hp if dec >= 0 else -hp
+    return HPAngle(dec2hp(dec))
 
 
 def hp2dec(hp):
@@ -712,6 +741,45 @@ def hp2deca(hp):
     :rtype: DECAngle
     """
     return DECAngle(hp2dec(hp))
+
+
+def hp2gon(hp):
+    """
+    Converts HP Notation to Gradians
+    :param hp: HP Notation (DDD.MMSSSS)
+    :type hp: float
+    :return: Gradians
+    :rtype: float
+    """
+    return dec2gon(hp2dec(hp))
+
+
+def hp2dms(hp):
+    """
+    Converts HP Notation to Degrees, Minutes, Seconds Object
+    :param hp: HP Notation (DDD.MMSSSS)
+    :type hp: float
+    :return: Degrees, Minutes, Seconds Object
+    :rtype: DMSAngle
+    """
+    degmin, second = divmod(abs(hp) * 1000, 10)
+    degree, minute = divmod(degmin, 100)
+    return (DMSAngle(degree, minute, second * 10) if hp >= 0
+            else DMSAngle(-degree, minute, second * 10))
+
+
+def hp2ddm(hp):
+    """
+    Converts HP Notation to Degrees, Decimal Minutes Object
+    :param hp: HP Notation (DDD.MMSSSS)
+    :type hp: float
+    :return: Degrees, Decimal Minutes Object
+    :rtype: DDMAngle
+    """
+    degmin, second = divmod(abs(hp) * 1000, 10)
+    degree, minute = divmod(degmin, 100)
+    minute = minute + (second / 6)
+    return DDMAngle(degree, minute) if hp >= 0 else DDMAngle(-degree, minute)
 
 
 def dec2gon(dec):
@@ -762,34 +830,6 @@ def hp2rad(hp):
     :rtype: float
     """
     return radians(hp2dec(hp))
-
-
-def hp2dms(hp):
-    """
-    Converts HP Notation to Degrees, Minutes, Seconds Object
-    :param hp: HP Notation (DDD.MMSSSS)
-    :type hp: float
-    :return: Degrees, Minutes, Seconds Object
-    :rtype: DMSAngle
-    """
-    degmin, second = divmod(abs(hp) * 1000, 10)
-    degree, minute = divmod(degmin, 100)
-    return (DMSAngle(degree, minute, second * 10) if hp >= 0
-            else DMSAngle(-degree, minute, second * 10))
-
-
-def hp2ddm(hp):
-    """
-    Converts HP Notation to Degrees, Decimal Minutes Object
-    :param hp: HP Notation (DDD.MMSSSS)
-    :type hp: float
-    :return: Degrees, Decimal Minutes Object
-    :rtype: DDMAngle
-    """
-    degmin, second = divmod(abs(hp) * 1000, 10)
-    degree, minute = divmod(degmin, 100)
-    minute = minute + (second / 6)
-    return DDMAngle(degree, minute) if hp >= 0 else DDMAngle(-degree, minute)
 
 
 def dd2sec(dd):

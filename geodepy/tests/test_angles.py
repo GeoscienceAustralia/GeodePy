@@ -3,56 +3,61 @@ from math import radians
 
 from geodepy.angles import (dec2hp, hp2dec,
                             DMSAngle, DDMAngle, HPAngle, DECAngle,
-                            dec2dms, dec2ddm, hp2dms, hp2ddm, hp2rad, dd2sec)
+                            dec2dms, dec2ddm, dec2hpa, dec2gon,
+                            hp2dms, hp2ddm, hp2rad, hp2deca, hp2gon,
+                            dd2sec)
 
 rad_exs = [radians(123.74875), radians(12.575), radians(-12.575),
            radians(0.0525), radians(0.005)]
 
-dec_exs = [123.74875, 12.575, -12.575, 0.0525, 0.005]
 dec_ex = 123.74875
 dec_ex2 = 12.575
 dec_ex3 = -12.575
 dec_ex4 = 0.0525
 dec_ex5 = 0.005
+dec_exs = [dec_ex, dec_ex2, dec_ex3, dec_ex4, dec_ex5]
 
-hp_exs = [123.44555, 12.3430, -12.3430, 0.0309, 0.0018]
-hp_ex = 123.44555
-hp_ex2 = 12.3430
-hp_ex3 = -12.3430
-hp_ex4 = 0.0309
-hp_ex5 = 0.0018
-
-deca_exs = [DECAngle(123.74875), DECAngle(12.575), DECAngle(-12.575),
-            DECAngle(0.0525), DECAngle(0.005)]
 deca_ex = DECAngle(123.74875)
 deca_ex2 = DECAngle(12.575)
 deca_ex3 = DECAngle(-12.575)
 deca_ex4 = DECAngle(0.0525)
 deca_ex5 = DECAngle(0.005)
+deca_exs = [deca_ex, deca_ex2, deca_ex3, deca_ex4, deca_ex5]
 
-dms_exs = [DMSAngle(123, 44, 55.5), DMSAngle(12, 34, 30),
-           DMSAngle(-12, -34, -30), DMSAngle(0, 3, 9), DMSAngle(0, 0, 18)]
-dms_ex = DMSAngle(123, 44, 55.5)
-dms_ex2 = DMSAngle(12, 34, 30)
-dms_ex3 = DMSAngle(-12, -34, -30)
-dms_ex4 = DMSAngle(0, 3, 9)
-dms_ex5 = DMSAngle(0, 0, 18)
+hp_ex = 123.44555
+hp_ex2 = 12.3430
+hp_ex3 = -12.3430
+hp_ex4 = 0.0309
+hp_ex5 = 0.0018
+hp_exs = [hp_ex, hp_ex2, hp_ex3, hp_ex4, hp_ex5]
 
-ddm_exs = [DDMAngle(123, 44.925), DDMAngle(12, 34.5), DDMAngle(-12, -34.5),
-           DDMAngle(0, 3.15), DDMAngle(0, 0.3)]
-ddm_ex = DDMAngle(123, 44.925)
-ddm_ex2 = DDMAngle(12, 34.5)
-ddm_ex3 = DDMAngle(-12, -34.5)
-ddm_ex4 = DDMAngle(0, 3.15)
-ddm_ex5 = DDMAngle(0, 0.3)
-
-hpa_exs = [HPAngle(123.44555), HPAngle(12.3430), HPAngle(-12.3430),
-           HPAngle(0.0309), HPAngle(0.0018)]
 hpa_ex = HPAngle(123.44555)
 hpa_ex2 = HPAngle(12.3430)
 hpa_ex3 = HPAngle(-12.3430)
 hpa_ex4 = HPAngle(0.0309)
 hpa_ex5 = HPAngle(0.0018)
+hpa_exs = [hpa_ex, hpa_ex2, hpa_ex3, hpa_ex4, hpa_ex5]
+
+dms_ex = DMSAngle(123, 44, 55.5)
+dms_ex2 = DMSAngle(12, 34, 30)
+dms_ex3 = DMSAngle(-12, -34, -30)
+dms_ex4 = DMSAngle(0, 3, 9)
+dms_ex5 = DMSAngle(0, 0, 18)
+dms_exs = [dms_ex, dms_ex2, dms_ex3, dms_ex4, dms_ex5]
+
+ddm_ex = DDMAngle(123, 44.925)
+ddm_ex2 = DDMAngle(12, 34.5)
+ddm_ex3 = DDMAngle(-12, -34.5)
+ddm_ex4 = DDMAngle(0, 3.15)
+ddm_ex5 = DDMAngle(0, 0.3)
+ddm_exs = [ddm_ex, ddm_ex2, ddm_ex3, ddm_ex4, ddm_ex5]
+
+gon_ex = 137.4986111111111
+gon_ex2 = 13.97222222222222
+gon_ex3 = -13.97222222222222
+gon_ex4 = 0.05833333333333333
+gon_ex5 = 0.00555555555555555
+gon_exs = [gon_ex, gon_ex2, gon_ex3, gon_ex4, gon_ex5]
 
 
 class TestConvert(unittest.TestCase):
@@ -95,6 +100,8 @@ class TestConvert(unittest.TestCase):
             self.assertEqual(round(-ex.hpa(), 13), -hpa_exs[num])
             self.assertEqual(ex.hp(), hp_exs[num])
             self.assertEqual(-ex.hp(), -hp_exs[num])
+            self.assertAlmostEqual(ex.gon(), gon_exs[num], 13)
+            self.assertAlmostEqual(-ex.gon(), -gon_exs[num], 13)
             self.assertEqual(round(ex.dms(), 10), dms_exs[num])
             self.assertEqual(round(-ex.dms(), 10), -dms_exs[num])
             self.assertEqual(round(ex.ddm(), 12), ddm_exs[num])
@@ -151,6 +158,8 @@ class TestConvert(unittest.TestCase):
             self.assertAlmostEqual(-ex.hp(), -hp_exs[num], 16)
             self.assertEqual(ex.hpa(), hpa_exs[num])
             self.assertEqual(-ex.hpa(), -hpa_exs[num])
+            self.assertAlmostEqual(ex.gon(), gon_exs[num], 13)
+            self.assertAlmostEqual(-ex.gon(), -gon_exs[num], 13)
             self.assertEqual(ex.ddm(), ddm_exs[num])
             self.assertEqual(-ex.ddm(), -ddm_exs[num])
 
@@ -230,6 +239,8 @@ class TestConvert(unittest.TestCase):
             self.assertAlmostEqual(-ex.hp(), -hp_exs[num], 16)
             self.assertEqual(ex.hpa(), hpa_exs[num])
             self.assertEqual(-ex.hpa(), -hpa_exs[num])
+            self.assertAlmostEqual(ex.gon(), gon_exs[num], 13)
+            self.assertAlmostEqual(-ex.gon(), -gon_exs[num], 13)
             self.assertEqual(ex.dms(), dms_exs[num])
             self.assertEqual(-ex.dms(), -dms_exs[num])
 
@@ -301,6 +312,7 @@ class TestConvert(unittest.TestCase):
             self.assertEqual(round(-ex.deca(), 13), -deca_exs[num])
             self.assertAlmostEqual(ex.hp(), hp_exs[num], 16)
             self.assertAlmostEqual(-ex.hp(), -hp_exs[num], 16)
+            self.assertAlmostEqual(ex.gon(), gon_exs[num], 13)
             self.assertEqual(round(ex.dms(), 10), dms_exs[num])
             self.assertEqual(round(-ex.dms(), 10), -dms_exs[num])
             self.assertEqual(round(ex.ddm(), 12), ddm_exs[num])
@@ -360,6 +372,16 @@ class TestConvert(unittest.TestCase):
         self.assertEqual(ddm_ex, dec2ddm(dec_ex))
         self.assertEqual(-ddm_ex, dec2ddm(-dec_ex))
 
+    def test_dec2hpa(self):
+        for num, ex in enumerate(dec_exs):
+            self.assertEqual(dec2hpa(ex), hpa_exs[num])
+            self.assertEqual(dec2hpa(-ex), -hpa_exs[num])
+
+    def test_dec2gon(self):
+        for num, ex in enumerate(dec_exs):
+            self.assertAlmostEqual(dec2gon(ex), gon_exs[num], 13)
+            self.assertAlmostEqual(dec2gon(-ex), -gon_exs[num], 13)
+
     def test_hp2dms(self):
         self.assertEqual(dms_ex.degree, hp2dms(hp_ex).degree)
         self.assertEqual(dms_ex.minute, hp2dms(hp_ex).minute)
@@ -369,6 +391,16 @@ class TestConvert(unittest.TestCase):
         self.assertEqual(dms_ex.degree, hp2dms(-hp_ex).degree)
         self.assertEqual(dms_ex.minute, hp2dms(-hp_ex).minute)
         self.assertAlmostEqual(dms_ex.second, hp2dms(-hp_ex).second, 10)
+
+    def test_hp2deca(self):
+        for num, ex in enumerate(hp_exs):
+            self.assertEqual(round(hp2deca(ex), 13), deca_exs[num])
+            self.assertEqual(round(hp2deca(-ex), 13), -deca_exs[num])
+
+    def test_hp2gon(self):
+        for num, ex in enumerate(hp_exs):
+            self.assertAlmostEqual(hp2gon(ex), gon_exs[num], 13)
+            self.assertAlmostEqual(hp2gon(-ex), -gon_exs[num], 13)
 
     def test_hp2rad(self):
         for num, ex in enumerate(hp_exs):
