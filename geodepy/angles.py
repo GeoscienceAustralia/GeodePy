@@ -140,6 +140,14 @@ class DECAngle(float):
         """
         return dec2gon(self.dec_angle)
 
+    def gona(self):
+        """
+        Convert to Gradians (class)
+        :return: Gradians
+        :rtype: GONAngle
+        """
+        return GONAngle(dec2gon(self.dec_angle))
+
     def dms(self):
         """
         Convert to Degrees, Minutes, Seconds Object
@@ -331,6 +339,14 @@ class DMSAngle(object):
         """
         return dec2gon(self.dec())
 
+    def gona(self):
+        """
+        Convert to Gradians (class)
+        :return: Gradians
+        :rtype: GONAngle
+        """
+        return GONAngle(self.gon())
+
     def ddm(self):
         """
         Convert to Degrees, Decimal Minutes Object
@@ -509,6 +525,14 @@ class DDMAngle(object):
         """
         return dec2gon(self.dec())
 
+    def gona(self):
+        """
+        Convert to Gradians (class)
+        :return: Gradians
+        :rtype: GONAngle
+        """
+        return GONAngle(self.gon())
+
     def dms(self):
         """
         Convert to Degrees, Minutes, Seconds Object
@@ -664,6 +688,14 @@ class HPAngle(object):
         """
         return hp2gon(self.hp_angle)
 
+    def gona(self):
+        """
+        Convert to Gradians (class)
+        :return: Gradians
+        :rtype: GONAngle
+        """
+        return GONAngle(self.gon())
+
     def dms(self):
         """
         Convert to Degrees, Minutes, Seconds Object
@@ -679,6 +711,168 @@ class HPAngle(object):
         :rtype: DDMAngle
         """
         return hp2ddm(self.hp_angle)
+
+
+class GONAngle(object):
+    """
+    Class for working with angles in Gradians (90 degrees == 100 Gradians)
+    Note: GeodePy also supports working with angles in Gradians as floats
+    """
+    def __init__(self, gon_angle=0.0):
+        """
+        :param gon_angle: float Gradian angle
+        """
+        super().__init__()
+        self.gon_angle = float(gon_angle)
+
+    def __repr__(self):
+        if self.gon_angle >= 0:
+            return '{GONAngle: +' + str(self.gon_angle) + '}'
+        else:  # negative
+            return '{GONAngle: ' + str(self.gon_angle) + '}'
+
+    def __add__(self, other):
+        try:
+            return GONAngle(dec2gon(self.dec() + other.dec()))
+        except AttributeError:
+            raise TypeError('Can only add Angle objects with .dec() method '
+                            'together')
+
+    def __radd__(self, other):
+        try:
+            return GONAngle(dec2gon(other.dec() + self.dec()))
+        except AttributeError:
+            raise TypeError('Can only add Angle objects with .dec() method '
+                            'together')
+
+    def __sub__(self, other):
+        try:
+            return GONAngle(dec2gon(self.dec() - other.dec()))
+        except AttributeError:
+            raise TypeError('Can only subtract Angle objects with .dec() method'
+                            ' together')
+
+    def __rsub__(self, other):
+        try:
+            return GONAngle(dec2gon(other.dec() - self.dec()))
+        except AttributeError:
+            raise TypeError('Can only subtract Angle objects with .dec() method'
+                            ' together')
+
+    def __mul__(self, other):
+        try:
+            return GONAngle(dec2gon(self.dec() * other))
+        except TypeError:
+            raise TypeError('Multiply only defined between Angle objects and '
+                            'Int or Float')
+
+    def __rmul__(self, other):
+        try:
+            return GONAngle(dec2gon(other * self.dec()))
+        except TypeError:
+            raise TypeError('Multiply only defined between Angle objects and '
+                            'Int or Float')
+
+    def __truediv__(self, other):
+        try:
+            return GONAngle(dec2gon(self.dec() / other))
+        except TypeError:
+            raise TypeError('Division only defined between HPAngle objects '
+                            'and Int or Float')
+
+    def __abs__(self):
+        return GONAngle(abs(self.gon_angle))
+
+    def __neg__(self):
+        return GONAngle(self.gon_angle.__neg__())
+
+    def __eq__(self, other):
+        return self.dec() == other.dec()
+
+    def __ne__(self, other):
+        return self.dec() != other.dec()
+
+    def __lt__(self, other):
+        return self.dec() < other.dec()
+
+    def __gt__(self, other):
+        return self.dec() > other.dec()
+
+    def __int__(self):
+        return int(self.gon_angle)
+
+    def __float__(self):
+        return float(self.gon_angle)
+
+    def __str__(self):
+        return str(self.gon_angle)
+
+    def __round__(self, n=None):
+        return GONAngle(round(self.gon_angle, n))
+
+    def rad(self):
+        """
+        Convert to Radians
+        :return: Radians
+        :rtype: float
+        """
+        return radians(gon2dec(self.gon_angle))
+
+    def dec(self):
+        """
+        Convert to Decimal Degrees (float)
+        :return: Decimal Degrees
+        :rtype: float
+        """
+        return gon2dec(self.gon_angle)
+
+    def deca(self):
+        """
+        Convert to Decimal Degrees (class)
+        :return: Decimal Degrees
+        :rtype: DECAngle
+        """
+        return DECAngle(self.dec())
+
+    def hp(self):
+        """
+        Convert to HP Notation (float)
+        :return: HP Notation (DDD.MMSSSS)
+        :rtype: float
+        """
+        return gon2hp(self.gon_angle)
+
+    def hpa(self):
+        """
+        Convert to HP Notation (class)
+        :return: HP Notation (DDD.MMSSSS)
+        :rtype: HPAngle
+        """
+        return HPAngle(gon2hp(self.gon_angle))
+
+    def gon(self):
+        """
+        Convert to Gradians (float)
+        :return: Gradians
+        :rtype: float
+        """
+        return float(self.gon_angle)
+
+    def dms(self):
+        """
+        Convert to Degrees, Minutes, Seconds Object
+        :return: Degrees, Minutes, Seconds Object
+        :rtype: DMSAngle
+        """
+        return gon2dms(self.gon_angle)
+
+    def ddm(self):
+        """
+        Convert to Degrees, Decimal Minutes Object
+        :return: Degrees, Decimal Minutes Object
+        :rtype: DDMAngle
+        """
+        return gon2ddm(self.gon_angle)
 
 
 def dec2hp(dec):
