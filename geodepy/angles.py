@@ -732,6 +732,17 @@ def hp2dec(hp):
     return dec if hp >= 0 else -dec
 
 
+def hp2rad(hp):
+    """
+    Converts HP Notation to radians
+    :param hp: HP Notation (DDD.MMSSSS)
+    :type hp: float
+    :return: radians
+    :rtype: float
+    """
+    return radians(hp2dec(hp))
+
+
 def hp2deca(hp):
     """
     Converts HP Notation to DECAngle Object
@@ -821,15 +832,81 @@ def dec2ddm(dec):
     return DDMAngle(degree, minute) if dec >= 0 else DDMAngle(-degree, minute)
 
 
-def hp2rad(hp):
+def gon2dec(gon):
     """
-    Converts HP Notation to radians
-    :param hp: HP Notation (DDD.MMSSSS)
-    :type hp: float
-    :return: radians
+    Converts Gradians to Decimal Degrees
+    :param gon: Gradians
+    :type gon: float
+    :return: Decimal Degrees
     :rtype: float
     """
-    return radians(hp2dec(hp))
+    return 9/10 * gon
+
+
+def gon2deca(gon):
+    """
+    Converts Gradians to DECAngle Object
+    :param gon: Gradians
+    :type gon: float
+    :return: Decimal Degrees Object
+    :rtype: DECAngle
+    """
+    return DECAngle(gon2dec(gon))
+
+
+def gon2rad(gon):
+    """
+    Converts Gradians to radians
+    :param gon: Gradians
+    :type gon: float
+    :return: Radians
+    :rtype: float
+    """
+    return radians(gon2dec(gon))
+
+
+def gon2hp(gon):
+    """
+    Converts Gradians to HP Notation (float)
+    :param gon: Gradians
+    :type gon: float
+    :return: HP Notation (DDD.MMSSSS)
+    :rtype: float
+    """
+    return dec2hp(gon2dec(gon))
+
+
+def gon2hpa(gon):
+    """
+    Converts Gradians to HP Angle Object
+    :param gon: Gradians
+    :type gon: float
+    :return: HP Angle Object (DDD.MMSSSS)
+    :rtype: HPAngle
+    """
+    return HPAngle(gon2hp(gon))
+
+
+def gon2dms(gon):
+    """
+    Converts Gradians to Degrees, Minutes, Seconds Object
+    :param gon: Gradians
+    :type gon: float
+    :return: Degrees, Minutes, Seconds Object
+    :rtype: DMSAngle
+    """
+    return dec2dms(gon2dec(gon))
+
+
+def gon2ddm(gon):
+    """
+    Converts Gradians to Degrees, Decimal Minutes Object
+    :param gon: Gradians
+    :type gon: float
+    :return: Degrees, Decimal Minutes Object
+    :rtype: DDMAngle
+    """
+    return dec2ddm(gon2dec(gon))
 
 
 def dd2sec(dd):

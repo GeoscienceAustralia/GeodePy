@@ -5,6 +5,8 @@ from geodepy.angles import (dec2hp, hp2dec,
                             DMSAngle, DDMAngle, HPAngle, DECAngle,
                             dec2dms, dec2ddm, dec2hpa, dec2gon,
                             hp2dms, hp2ddm, hp2rad, hp2deca, hp2gon,
+                            gon2dec, gon2deca, gon2rad, gon2hp, gon2hpa,
+                            gon2dms, gon2ddm,
                             dd2sec)
 
 rad_exs = [radians(123.74875), radians(12.575), radians(-12.575),
@@ -410,6 +412,41 @@ class TestConvert(unittest.TestCase):
     def test_hp2ddm(self):
         self.assertEqual(ddm_ex, hp2ddm(hp_ex))
         self.assertEqual(-ddm_ex, hp2ddm(-hp_ex))
+
+    def test_gon2dec(self):
+        for num, ex in enumerate(gon_exs):
+            self.assertAlmostEqual(gon2dec(ex), dec_exs[num], 14)
+            self.assertAlmostEqual(gon2dec(-ex), -dec_exs[num], 14)
+
+    def test_gon2deca(self):
+        for num, ex in enumerate(gon_exs):
+            self.assertEqual(round(gon2deca(ex), 14), deca_exs[num])
+            self.assertEqual(round(gon2deca(-ex), 14), -deca_exs[num])
+
+    def test_gon2rad(self):
+        for num, ex in enumerate(gon_exs):
+            self.assertAlmostEqual(gon2rad(ex), rad_exs[num], 15)
+            self.assertAlmostEqual(gon2rad(-ex), -rad_exs[num], 15)
+
+    def test_gon2hp(self):
+        for num, ex in enumerate(gon_exs):
+            self.assertEqual(gon2hp(ex), hp_exs[num])
+            self.assertEqual(gon2hp(-ex), -hp_exs[num])
+
+    def test_gon2hpa(self):
+        for num, ex in enumerate(gon_exs):
+            self.assertEqual(gon2hpa(ex), hpa_exs[num])
+            self.assertEqual(gon2hpa(-ex), -hpa_exs[num])
+
+    def test_gon2dms(self):
+        for num, ex in enumerate(gon_exs):
+            self.assertEqual(round(gon2dms(ex), 10), dms_exs[num])
+            self.assertEqual(round(gon2dms(-ex), 10), -dms_exs[num])
+
+    def test_gon2ddm(self):
+        for num, ex in enumerate(gon_exs):
+            self.assertEqual(round(gon2ddm(ex), 12), ddm_exs[num])
+            self.assertEqual(round(gon2ddm(-ex), 12), -ddm_exs[num])
 
     def test_dd2sec(self):
         self.assertEqual(dd2sec(1), 3600)
