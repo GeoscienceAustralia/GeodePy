@@ -94,6 +94,12 @@ class DECAngle(float):
     def __gt__(self, other):
         return self.dec() > other.dec()
 
+    def __int__(self):
+        return int(self.dec_angle)
+
+    def __float__(self):
+        return float(self.dec_angle)
+
     def __str__(self):
         return str(self.dec_angle)
 
@@ -185,28 +191,26 @@ class DMSAngle(object):
         # Set sign of object based on sign of any variable
         if degree == 0:
             if str(degree)[0] == '-':
-                self.sign = -1
+                self.positive = False
             elif minute < 0:
-                self.sign = -1
+                self.positive = False
             elif second < 0:
-                self.sign = -1
+                self.positive = False
             else:
-                self.sign = 1
+                self.positive = True
         elif degree > 0:
-            self.sign = 1
+            self.positive = True
         else:  # degree < 0
-            self.sign = -1
+            self.positive = False
         self.degree = abs(int(degree))
         self.minute = abs(int(minute))
         self.second = abs(second)
 
     def __repr__(self):
-        if self.sign == -1:
-            signsymbol = '-'
-        elif self.sign == 1:
+        if self.positive:
             signsymbol = '+'
         else:
-            signsymbol = 'error'
+            signsymbol = '-'
         return '{DMSAngle: ' + signsymbol + str(self.degree) + 'd ' +\
                str(self.minute) + 'm ' + str(self.second) + 's}'
 
@@ -263,9 +267,9 @@ class DMSAngle(object):
         return DMSAngle(self.degree, self.minute, self.second)
 
     def __neg__(self):
-        if self.sign == 1:
+        if self.positive:
             return DMSAngle(-self.degree, -self.minute, -self.second)
-        else:  # sign == -1
+        else:  # positive == False
             return DMSAngle(self.degree, self.minute, self.second)
 
     def __eq__(self, other):
@@ -281,13 +285,18 @@ class DMSAngle(object):
         return self.dec() > other.dec()
 
     def __str__(self):
-        return (str(self.sign * self.degree) + ' ' + str(self.minute) + ' '
-                + str(self.second))
+        if self.positive:
+            return (str(self.degree) + ' ' + str(self.minute) + ' '
+                    + str(self.second))
+        else:
+            return ('-' + str(self.degree) + ' ' + str(self.minute) + ' '
+                    + str(self.second))
 
     def __round__(self, n=None):
-        return DMSAngle(self.sign * self.degree,
-                        self.sign * self.minute,
-                        round(self.sign * self.second, n))
+        if self.positive:
+            return DMSAngle(self.degree, self.minute, round(self.second, n))
+        else:
+            return -DMSAngle(self.degree, self.minute, round(self.second, n))
 
     def rad(self):
         """
@@ -303,8 +312,10 @@ class DMSAngle(object):
         :return: Decimal Degrees
         :rtype: float
         """
-        return self.sign * (self.degree + (self.minute / 60) +
-                            (self.second / 3600))
+        if self.positive:
+            return self.degree + (self.minute / 60) + (self.second / 3600)
+        else:
+            return -(self.degree + (self.minute / 60) + (self.second / 3600))
 
     def deca(self):
         """
@@ -320,8 +331,10 @@ class DMSAngle(object):
         :return: HP Notation (DDD.MMSSSS)
         :rtype: float
         """
-        return self.sign * (self.degree + (self.minute / 100) +
-                            (self.second / 10000))
+        if self.positive:
+            return self.degree + (self.minute / 100) + (self.second / 10000)
+        else:
+            return -(self.degree + (self.minute / 100) + (self.second / 10000))
 
     def hpa(self):
         """
@@ -353,9 +366,9 @@ class DMSAngle(object):
         :return: Degrees, Decimal Minutes Object
         :rtype: DDMAngle
         """
-        if self.sign == 1:
+        if self.positive:
             return DDMAngle(self.degree, self.minute + (self.second/60))
-        else:  # sign == -1
+        else:
             return -DDMAngle(self.degree, self.minute + (self.second/60))
 
 
@@ -372,29 +385,27 @@ class DDMAngle(object):
         if type(degree) == str:
             str_pts = degree.split(' ')
             degree = int(str_pts[0])
-            minute = int(str_pts[1])
+            minute = float(str_pts[1])
         # Set sign of object based on sign of any variable
         if degree == 0:
             if str(degree)[0] == '-':
-                self.sign = -1
+                self.positive = False
             elif minute < 0:
-                self.sign = -1
+                self.positive = False
             else:
-                self.sign = 1
+                self.positive = True
         elif degree > 0:
-            self.sign = 1
+            self.positive = True
         else:  # degree < 0
-            self.sign = -1
+            self.positive = False
         self.degree = abs(int(degree))
         self.minute = abs(minute)
 
     def __repr__(self):
-        if self.sign == -1:
-            signsymbol = '-'
-        elif self.sign == 1:
+        if self.positive:
             signsymbol = '+'
         else:
-            signsymbol = 'error'
+            signsymbol = '-'
         return '{DDMAngle: ' + signsymbol + str(self.degree) + 'd ' + \
                str(self.minute) + 'm}'
 
@@ -451,7 +462,7 @@ class DDMAngle(object):
         return DDMAngle(self.degree, self.minute)
 
     def __neg__(self):
-        if self.sign == 1:
+        if self.positive:
             return DDMAngle(-self.degree, -self.minute)
         else:  # sign == -1
             return DDMAngle(self.degree, self.minute)
@@ -469,11 +480,16 @@ class DDMAngle(object):
         return self.dec() > other.dec()
 
     def __str__(self):
-        return str(self.sign * self.degree) + ' ' + str(self.minute)
+        if self.positive:
+            return str(self.degree) + ' ' + str(self.minute)
+        else:
+            return '-' + str(self.degree) + ' ' + str(self.minute)
 
     def __round__(self, n=None):
-        return DDMAngle(self.sign * self.degree,
-                        round(self.sign * self.minute, n))
+        if self.positive:
+            return DDMAngle(self.degree, round(self.minute, n))
+        else:
+            return DDMAngle(-self.degree, -round(self.minute, n))
 
     def rad(self):
         """
@@ -489,7 +505,10 @@ class DDMAngle(object):
         :return: Decimal Degrees
         :rtype: float
         """
-        return self.sign * (self.degree + (self.minute / 60))
+        if self.positive:
+            return self.degree + (self.minute / 60)
+        else:
+            return -(self.degree + (self.minute / 60))
 
     def deca(self):
         """
@@ -506,8 +525,10 @@ class DDMAngle(object):
         :rtype: float
         """
         minute_int, second = divmod(self.minute, 1)
-        return self.sign * (self.degree + (minute_int / 100) +
-                            (second * 0.006))
+        if self.positive:
+            return self.degree + (minute_int / 100) + (second * 0.006)
+        else:
+            return -(self.degree + (minute_int / 100) + (second * 0.006))
 
     def hpa(self):
         """
@@ -540,7 +561,10 @@ class DDMAngle(object):
         :rtype: DMSAngle
         """
         minute_int, second = divmod(self.minute, 1)
-        return self.sign * DMSAngle(self.degree, int(minute_int), second * 60)
+        if self.positive:
+            return DMSAngle(self.degree, int(minute_int), second * 60)
+        else:
+            return -DMSAngle(self.degree, int(minute_int), second * 60)
 
 
 class HPAngle(object):
@@ -959,6 +983,17 @@ def hp2gon(hp):
     return dec2gon(hp2dec(hp))
 
 
+def hp2gona(hp):
+    """
+    Converts HP Notation to Gradians (class)
+    :param hp: HP Notation (DDD.MMSSSS)
+    :type hp: float
+    :return: Gradians
+    :rtype: GONAngle
+    """
+    return GONAngle(hp2gon(hp))
+
+
 def hp2dms(hp):
     """
     Converts HP Notation to Degrees, Minutes, Seconds Object
@@ -996,6 +1031,17 @@ def dec2gon(dec):
     :rtype: float
     """
     return 10/9 * dec
+
+
+def dec2gona(dec):
+    """
+    Converts Decimal Degrees to Gradians (class)
+    :param dec: Decimal Degrees
+    :type dec: float
+    :return: Gradians
+    :rtype: GONAngle
+    """
+    return GONAngle(dec2gon(dec))
 
 
 def dec2dms(dec):
