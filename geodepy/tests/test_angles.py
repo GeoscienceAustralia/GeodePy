@@ -7,7 +7,7 @@ from geodepy.angles import (dec2hp, hp2dec,
                             hp2dms, hp2ddm, hp2rad, hp2deca, hp2gon, hp2gona,
                             gon2dec, gon2deca, gon2rad, gon2hp, gon2hpa,
                             gon2dms, gon2ddm,
-                            dd2sec)
+                            dd2sec, angular_typecheck)
 
 rad_exs = [radians(123.74875), radians(12.575), radians(-12.575),
            radians(0.0525), radians(0.005)]
@@ -84,34 +84,6 @@ gona_exs = [gona_ex, gona_ex2, gona_ex3, gona_ex4, gona_ex5]
 
 
 class TestConvert(unittest.TestCase):
-    def test_dec2hp(self):
-        for num, ex in enumerate(hp_exs):
-            self.assertAlmostEqual(ex, dec2hp(dec_exs[num]), 13)
-            self.assertAlmostEqual(-ex, dec2hp(-dec_exs[num]), 13)
-
-    def test_hp2dec(self):
-        for num, ex in enumerate(dec_exs):
-            self.assertAlmostEqual(ex, hp2dec(hp_exs[num]), 13)
-            self.assertAlmostEqual(-ex, hp2dec(-hp_exs[num]), 13)
-        self.assertAlmostEqual(hp2dec(hp_exs[0]) + hp2dec(hp_exs[1]),
-                               dec_exs[0] + dec_exs[1], 13)
-        # Test that invalid minutes and seconds components raise errors
-        # (Minutes and/or Seconds can't be greater than 60, therefore
-        #  123.718 - representing 123 degrees, 71 minutes, 80 seconds
-        #  should raise an Error)
-        with self.assertRaises(ValueError):
-            hp2dec(123.7)
-        with self.assertRaises(ValueError):
-            hp2dec(123.318)
-        with self.assertRaises(ValueError):
-            hp2dec(123.718)
-        with self.assertRaises(ValueError):
-            hp2dec(-123.7)
-        with self.assertRaises(ValueError):
-            hp2dec(-123.318)
-        with self.assertRaises(ValueError):
-            hp2dec(-123.718)
-
     def test_DECAngle(self):
         # Test DECAngle Methods
         for num, ex in enumerate(deca_exs):
@@ -174,6 +146,137 @@ class TestConvert(unittest.TestCase):
             deca_ex - 'a'
         with self.assertRaises(TypeError):
             'a' - deca_ex
+
+    def test_HPAngle(self):
+        # Test HPAngle Methods
+        for num, ex in enumerate(hpa_exs):
+            self.assertAlmostEqual(ex.rad(), rad_exs[num], 16)
+            self.assertAlmostEqual(-ex.rad(), -rad_exs[num], 16)
+            self.assertAlmostEqual(ex.dec(), dec_exs[num], 13)
+            self.assertAlmostEqual(-ex.dec(), -dec_exs[num], 13)
+            self.assertEqual(round(ex.deca(), 13), deca_exs[num])
+            self.assertEqual(round(-ex.deca(), 13), -deca_exs[num])
+            self.assertAlmostEqual(ex.hp(), hp_exs[num], 16)
+            self.assertAlmostEqual(-ex.hp(), -hp_exs[num], 16)
+            self.assertAlmostEqual(ex.gon(), gon_exs[num], 13)
+            self.assertAlmostEqual(-ex.gon(), -gon_exs[num], 13)
+            self.assertEqual(round(ex.gona(), 13), round(gona_exs[num], 13))
+            self.assertEqual(round(-ex.gona(), 13), round(-gona_exs[num], 13))
+            self.assertEqual(round(ex.dms(), 10), dms_exs[num])
+            self.assertEqual(round(-ex.dms(), 10), -dms_exs[num])
+            self.assertEqual(round(ex.ddm(), 12), ddm_exs[num])
+            self.assertEqual(round(-ex.ddm(), 12), -ddm_exs[num])
+            self.assertEqual(str(ex), str(hp_exs[num]))
+            self.assertEqual(HPAngle(str(ex)), ex)
+            self.assertEqual(int(ex), int(hp_exs[num]))
+            self.assertEqual(float(ex), hp_exs[num])
+            self.assertEqual(round(ex), HPAngle(round(hp_exs[num])))
+
+        # Test HPAngle Representation
+        self.assertEqual(repr(hpa_ex), '{HPAngle: +123.44555}')
+        self.assertEqual(repr(hpa_ex3), '{HPAngle: -12.343}')
+
+        # Test DMSAngle Overloads
+        self.assertAlmostEqual(dec_ex + dec_ex2, (hpa_ex + hpa_ex2).dec(), 12)
+        self.assertAlmostEqual(dec_ex2 + dec_ex, (hpa_ex2 + hpa_ex).dec(), 12)
+        self.assertAlmostEqual(dec_ex - dec_ex2, (hpa_ex - hpa_ex2).dec(), 12)
+        self.assertAlmostEqual(dec_ex2 - dec_ex, (hpa_ex2 - hpa_ex).dec(), 12)
+        self.assertAlmostEqual(dec_ex * 5, (hpa_ex * 5).dec(), 12)
+        self.assertAlmostEqual(5 * dec_ex, (5 * hpa_ex).dec(), 12)
+        self.assertAlmostEqual(dec_ex / 3, (hpa_ex / 3).dec(), 12)
+        self.assertEqual(abs(-hpa_ex), hpa_ex)
+        self.assertEqual(-hpa_ex2, hpa_ex3)
+        self.assertEqual(hpa_ex2, abs(hpa_ex3))
+        self.assertTrue(hpa_ex == hpa_ex)
+        self.assertFalse(hpa_ex == hpa_ex2)
+        self.assertTrue(hpa_ex != hpa_ex2)
+        self.assertFalse(hpa_ex != hpa_ex)
+        self.assertTrue(hpa_ex > hpa_ex2)
+        self.assertFalse(hpa_ex2 > hpa_ex)
+        self.assertTrue(hpa_ex2 < hpa_ex)
+        self.assertFalse(hpa_ex < hpa_ex2)
+        with self.assertRaises(TypeError):
+            hpa_ex * 'a'
+        with self.assertRaises(TypeError):
+            'a' * hpa_ex
+        with self.assertRaises(TypeError):
+            hpa_ex / 'a'
+        with self.assertRaises(TypeError):
+            hpa_ex + 'a'
+        with self.assertRaises(TypeError):
+            'a' + hpa_ex
+        with self.assertRaises(TypeError):
+            hpa_ex - 'a'
+        with self.assertRaises(TypeError):
+            'a' - hpa_ex
+
+        # Test Validity Checking of HP format input
+        with self.assertRaises(ValueError):
+            HPAngle(123.7)
+        with self.assertRaises(ValueError):
+            HPAngle(123.007)
+
+    def test_GONAngle(self):
+        # Test GONAngle Methods
+        for num, ex in enumerate(gona_exs):
+            self.assertAlmostEqual(ex.rad(), rad_exs[num], 15)
+            self.assertAlmostEqual(-ex.rad(), -rad_exs[num], 15)
+            self.assertAlmostEqual(ex.dec(), dec_exs[num], 13)
+            self.assertAlmostEqual(-ex.dec(), -dec_exs[num], 13)
+            self.assertEqual(round(ex.deca(), 13), deca_exs[num])
+            self.assertEqual(round(-ex.deca(), 13), -deca_exs[num])
+            self.assertAlmostEqual(ex.hp(), hp_exs[num], 16)
+            self.assertAlmostEqual(-ex.hp(), -hp_exs[num], 16)
+            self.assertEqual(ex.hpa(), hpa_exs[num])
+            self.assertEqual(-ex.hpa(), -hpa_exs[num])
+            self.assertAlmostEqual(ex.gon(), gon_exs[num], 13)
+            self.assertEqual(round(ex.dms(), 10), dms_exs[num])
+            self.assertEqual(round(-ex.dms(), 10), -dms_exs[num])
+            self.assertEqual(round(ex.ddm(), 12), ddm_exs[num])
+            self.assertEqual(round(-ex.ddm(), 12), -ddm_exs[num])
+            self.assertEqual(str(ex), str(gon_exs[num]))
+            self.assertEqual(GONAngle(str(ex)), ex)
+            self.assertEqual(int(ex), int(gon_exs[num]))
+            self.assertEqual(float(ex), gon_exs[num])
+            self.assertEqual(round(ex), GONAngle(round(gon_exs[num])))
+
+        # Test GONAngle Representation
+        self.assertEqual(repr(gona_ex), '{GONAngle: +137.4986111111111}')
+        self.assertEqual(repr(gona_ex3), '{GONAngle: -13.97222222222222}')
+
+        # Test DMSAngle Overloads
+        self.assertAlmostEqual(dec_ex + dec_ex2, (gona_ex + gona_ex2).dec(), 12)
+        self.assertAlmostEqual(dec_ex2 + dec_ex, (gona_ex2 + gona_ex).dec(), 12)
+        self.assertAlmostEqual(dec_ex - dec_ex2, (gona_ex - gona_ex2).dec(), 12)
+        self.assertAlmostEqual(dec_ex2 - dec_ex, (gona_ex2 - gona_ex).dec(), 12)
+        self.assertAlmostEqual(dec_ex * 5, (gona_ex * 5).dec(), 12)
+        self.assertAlmostEqual(5 * dec_ex, (5 * gona_ex).dec(), 12)
+        self.assertAlmostEqual(dec_ex / 3, (gona_ex / 3).dec(), 12)
+        self.assertEqual(abs(-gona_ex), gona_ex)
+        self.assertEqual(-gona_ex2, gona_ex3)
+        self.assertEqual(gona_ex2, abs(gona_ex3))
+        self.assertTrue(gona_ex == gona_ex)
+        self.assertFalse(gona_ex == gona_ex2)
+        self.assertTrue(gona_ex != gona_ex2)
+        self.assertFalse(gona_ex != gona_ex)
+        self.assertTrue(gona_ex > gona_ex2)
+        self.assertFalse(gona_ex2 > gona_ex)
+        self.assertTrue(gona_ex2 < gona_ex)
+        self.assertFalse(gona_ex < gona_ex2)
+        with self.assertRaises(TypeError):
+            gona_ex * 'a'
+        with self.assertRaises(TypeError):
+            'a' * gona_ex
+        with self.assertRaises(TypeError):
+            gona_ex / 'a'
+        with self.assertRaises(TypeError):
+            gona_ex + 'a'
+        with self.assertRaises(TypeError):
+            'a' + gona_ex
+        with self.assertRaises(TypeError):
+            gona_ex - 'a'
+        with self.assertRaises(TypeError):
+            'a' - gona_ex
 
     def test_DMSAngle(self):
         # Test DMSAngle Methods
@@ -349,131 +452,6 @@ class TestConvert(unittest.TestCase):
             self.assertEqual(DDMAngle(ex), ddm_exs[num])
             self.assertEqual(ex, str(ddm_exs[num]))
 
-    def test_HPAngle(self):
-        # Test HPAngle Methods
-        for num, ex in enumerate(hpa_exs):
-            self.assertAlmostEqual(ex.rad(), rad_exs[num], 16)
-            self.assertAlmostEqual(-ex.rad(), -rad_exs[num], 16)
-            self.assertAlmostEqual(ex.dec(), dec_exs[num], 13)
-            self.assertAlmostEqual(-ex.dec(), -dec_exs[num], 13)
-            self.assertEqual(round(ex.deca(), 13), deca_exs[num])
-            self.assertEqual(round(-ex.deca(), 13), -deca_exs[num])
-            self.assertAlmostEqual(ex.hp(), hp_exs[num], 16)
-            self.assertAlmostEqual(-ex.hp(), -hp_exs[num], 16)
-            self.assertAlmostEqual(ex.gon(), gon_exs[num], 13)
-            self.assertAlmostEqual(-ex.gon(), -gon_exs[num], 13)
-            self.assertEqual(round(ex.gona(), 13), round(gona_exs[num], 13))
-            self.assertEqual(round(-ex.gona(), 13), round(-gona_exs[num], 13))
-            self.assertEqual(round(ex.dms(), 10), dms_exs[num])
-            self.assertEqual(round(-ex.dms(), 10), -dms_exs[num])
-            self.assertEqual(round(ex.ddm(), 12), ddm_exs[num])
-            self.assertEqual(round(-ex.ddm(), 12), -ddm_exs[num])
-            self.assertEqual(str(ex), str(hp_exs[num]))
-            self.assertEqual(HPAngle(str(ex)), ex)
-            self.assertEqual(int(ex), int(hp_exs[num]))
-            self.assertEqual(float(ex), hp_exs[num])
-            self.assertEqual(round(ex), HPAngle(round(hp_exs[num])))
-
-        # Test HPAngle Representation
-        self.assertEqual(repr(hpa_ex), '{HPAngle: +123.44555}')
-        self.assertEqual(repr(hpa_ex3), '{HPAngle: -12.343}')
-
-        # Test DMSAngle Overloads
-        self.assertAlmostEqual(dec_ex + dec_ex2, (hpa_ex + hpa_ex2).dec(), 12)
-        self.assertAlmostEqual(dec_ex2 + dec_ex, (hpa_ex2 + hpa_ex).dec(), 12)
-        self.assertAlmostEqual(dec_ex - dec_ex2, (hpa_ex - hpa_ex2).dec(), 12)
-        self.assertAlmostEqual(dec_ex2 - dec_ex, (hpa_ex2 - hpa_ex).dec(), 12)
-        self.assertAlmostEqual(dec_ex * 5, (hpa_ex * 5).dec(), 12)
-        self.assertAlmostEqual(5 * dec_ex, (5 * hpa_ex).dec(), 12)
-        self.assertAlmostEqual(dec_ex / 3, (hpa_ex / 3).dec(), 12)
-        self.assertEqual(abs(-hpa_ex), hpa_ex)
-        self.assertEqual(-hpa_ex2, hpa_ex3)
-        self.assertEqual(hpa_ex2, abs(hpa_ex3))
-        self.assertTrue(hpa_ex == hpa_ex)
-        self.assertFalse(hpa_ex == hpa_ex2)
-        self.assertTrue(hpa_ex != hpa_ex2)
-        self.assertFalse(hpa_ex != hpa_ex)
-        self.assertTrue(hpa_ex > hpa_ex2)
-        self.assertFalse(hpa_ex2 > hpa_ex)
-        self.assertTrue(hpa_ex2 < hpa_ex)
-        self.assertFalse(hpa_ex < hpa_ex2)
-        with self.assertRaises(TypeError):
-            hpa_ex * 'a'
-        with self.assertRaises(TypeError):
-            'a' * hpa_ex
-        with self.assertRaises(TypeError):
-            hpa_ex / 'a'
-        with self.assertRaises(TypeError):
-            hpa_ex + 'a'
-        with self.assertRaises(TypeError):
-            'a' + hpa_ex
-        with self.assertRaises(TypeError):
-            hpa_ex - 'a'
-        with self.assertRaises(TypeError):
-            'a' - hpa_ex
-
-    def test_GONAngle(self):
-        # Test GONAngle Methods
-        for num, ex in enumerate(gona_exs):
-            self.assertAlmostEqual(ex.rad(), rad_exs[num], 15)
-            self.assertAlmostEqual(-ex.rad(), -rad_exs[num], 15)
-            self.assertAlmostEqual(ex.dec(), dec_exs[num], 13)
-            self.assertAlmostEqual(-ex.dec(), -dec_exs[num], 13)
-            self.assertEqual(round(ex.deca(), 13), deca_exs[num])
-            self.assertEqual(round(-ex.deca(), 13), -deca_exs[num])
-            self.assertAlmostEqual(ex.hp(), hp_exs[num], 16)
-            self.assertAlmostEqual(-ex.hp(), -hp_exs[num], 16)
-            self.assertEqual(ex.hpa(), hpa_exs[num])
-            self.assertEqual(-ex.hpa(), -hpa_exs[num])
-            self.assertAlmostEqual(ex.gon(), gon_exs[num], 13)
-            self.assertEqual(round(ex.dms(), 10), dms_exs[num])
-            self.assertEqual(round(-ex.dms(), 10), -dms_exs[num])
-            self.assertEqual(round(ex.ddm(), 12), ddm_exs[num])
-            self.assertEqual(round(-ex.ddm(), 12), -ddm_exs[num])
-            self.assertEqual(str(ex), str(gon_exs[num]))
-            self.assertEqual(GONAngle(str(ex)), ex)
-            self.assertEqual(int(ex), int(gon_exs[num]))
-            self.assertEqual(float(ex), gon_exs[num])
-            self.assertEqual(round(ex), GONAngle(round(gon_exs[num])))
-
-        # Test GONAngle Representation
-        self.assertEqual(repr(gona_ex), '{GONAngle: +137.4986111111111}')
-        self.assertEqual(repr(gona_ex3), '{GONAngle: -13.97222222222222}')
-
-        # Test DMSAngle Overloads
-        self.assertAlmostEqual(dec_ex + dec_ex2, (gona_ex + gona_ex2).dec(), 12)
-        self.assertAlmostEqual(dec_ex2 + dec_ex, (gona_ex2 + gona_ex).dec(), 12)
-        self.assertAlmostEqual(dec_ex - dec_ex2, (gona_ex - gona_ex2).dec(), 12)
-        self.assertAlmostEqual(dec_ex2 - dec_ex, (gona_ex2 - gona_ex).dec(), 12)
-        self.assertAlmostEqual(dec_ex * 5, (gona_ex * 5).dec(), 12)
-        self.assertAlmostEqual(5 * dec_ex, (5 * gona_ex).dec(), 12)
-        self.assertAlmostEqual(dec_ex / 3, (gona_ex / 3).dec(), 12)
-        self.assertEqual(abs(-gona_ex), gona_ex)
-        self.assertEqual(-gona_ex2, gona_ex3)
-        self.assertEqual(gona_ex2, abs(gona_ex3))
-        self.assertTrue(gona_ex == gona_ex)
-        self.assertFalse(gona_ex == gona_ex2)
-        self.assertTrue(gona_ex != gona_ex2)
-        self.assertFalse(gona_ex != gona_ex)
-        self.assertTrue(gona_ex > gona_ex2)
-        self.assertFalse(gona_ex2 > gona_ex)
-        self.assertTrue(gona_ex2 < gona_ex)
-        self.assertFalse(gona_ex < gona_ex2)
-        with self.assertRaises(TypeError):
-            gona_ex * 'a'
-        with self.assertRaises(TypeError):
-            'a' * gona_ex
-        with self.assertRaises(TypeError):
-            gona_ex / 'a'
-        with self.assertRaises(TypeError):
-            gona_ex + 'a'
-        with self.assertRaises(TypeError):
-            'a' + gona_ex
-        with self.assertRaises(TypeError):
-            gona_ex - 'a'
-        with self.assertRaises(TypeError):
-            'a' - gona_ex
-
     def test_angles_interoperability(self):
         self.assertEqual(DMSAngle(1, 2, 3) + DDMAngle(2, 3), DMSAngle(3, 5, 3))
         self.assertEqual(DMSAngle(3, 2, 0) - DDMAngle(2, 2.5),
@@ -482,13 +460,10 @@ class TestConvert(unittest.TestCase):
         self.assertEqual(DDMAngle(3, 2) - DMSAngle(2, 2, 30),
                          DDMAngle(0, 59.5))
 
-    def test_dec2dms(self):
-        self.assertEqual(dms_ex, dec2dms(dec_ex))
-        self.assertEqual(-dms_ex, dec2dms(-dec_ex))
-
-    def test_dec2ddm(self):
-        self.assertEqual(ddm_ex, dec2ddm(dec_ex))
-        self.assertEqual(-ddm_ex, dec2ddm(-dec_ex))
+    def test_dec2hp(self):
+        for num, ex in enumerate(hp_exs):
+            self.assertAlmostEqual(ex, dec2hp(dec_exs[num]), 13)
+            self.assertAlmostEqual(-ex, dec2hp(-dec_exs[num]), 13)
 
     def test_dec2hpa(self):
         for num, ex in enumerate(dec_exs):
@@ -505,15 +480,36 @@ class TestConvert(unittest.TestCase):
             self.assertEqual(round(dec2gona(ex), 13), round(gona_exs[num], 13))
             self.assertEqual(round(dec2gona(-ex), 13), round(-gona_exs[num], 13))
 
-    def test_hp2dms(self):
-        self.assertEqual(dms_ex.degree, hp2dms(hp_ex).degree)
-        self.assertEqual(dms_ex.minute, hp2dms(hp_ex).minute)
-        self.assertAlmostEqual(dms_ex.second, hp2dms(hp_ex).second, 10)
+    def test_dec2dms(self):
+        self.assertEqual(dms_ex, dec2dms(dec_ex))
+        self.assertEqual(-dms_ex, dec2dms(-dec_ex))
 
-        self.assertEqual(-dms_ex, round(hp2dms(-hp_ex), 10))
-        self.assertEqual(dms_ex.degree, hp2dms(-hp_ex).degree)
-        self.assertEqual(dms_ex.minute, hp2dms(-hp_ex).minute)
-        self.assertAlmostEqual(dms_ex.second, hp2dms(-hp_ex).second, 10)
+    def test_dec2ddm(self):
+        self.assertEqual(ddm_ex, dec2ddm(dec_ex))
+        self.assertEqual(-ddm_ex, dec2ddm(-dec_ex))
+
+    def test_hp2dec(self):
+        for num, ex in enumerate(dec_exs):
+            self.assertAlmostEqual(ex, hp2dec(hp_exs[num]), 13)
+            self.assertAlmostEqual(-ex, hp2dec(-hp_exs[num]), 13)
+        self.assertAlmostEqual(hp2dec(hp_exs[0]) + hp2dec(hp_exs[1]),
+                               dec_exs[0] + dec_exs[1], 13)
+        # Test that invalid minutes and seconds components raise errors
+        # (Minutes and/or Seconds can't be greater than 60, therefore
+        #  123.718 - representing 123 degrees, 71 minutes, 80 seconds
+        #  should raise an Error)
+        with self.assertRaises(ValueError):
+            hp2dec(123.7)
+        with self.assertRaises(ValueError):
+            hp2dec(123.318)
+        with self.assertRaises(ValueError):
+            hp2dec(123.718)
+        with self.assertRaises(ValueError):
+            hp2dec(-123.7)
+        with self.assertRaises(ValueError):
+            hp2dec(-123.318)
+        with self.assertRaises(ValueError):
+            hp2dec(-123.718)
 
     def test_hp2deca(self):
         for num, ex in enumerate(hp_exs):
@@ -535,6 +531,16 @@ class TestConvert(unittest.TestCase):
             self.assertEqual(hp2rad(ex), rad_exs[num])
             self.assertEqual(hp2rad(-ex), -rad_exs[num])
 
+    def test_hp2dms(self):
+        self.assertEqual(dms_ex.degree, hp2dms(hp_ex).degree)
+        self.assertEqual(dms_ex.minute, hp2dms(hp_ex).minute)
+        self.assertAlmostEqual(dms_ex.second, hp2dms(hp_ex).second, 10)
+
+        self.assertEqual(-dms_ex, round(hp2dms(-hp_ex), 10))
+        self.assertEqual(dms_ex.degree, hp2dms(-hp_ex).degree)
+        self.assertEqual(dms_ex.minute, hp2dms(-hp_ex).minute)
+        self.assertAlmostEqual(dms_ex.second, hp2dms(-hp_ex).second, 10)
+
     def test_hp2ddm(self):
         self.assertEqual(ddm_ex, hp2ddm(hp_ex))
         self.assertEqual(-ddm_ex, hp2ddm(-hp_ex))
@@ -549,11 +555,6 @@ class TestConvert(unittest.TestCase):
             self.assertEqual(round(gon2deca(ex), 14), deca_exs[num])
             self.assertEqual(round(gon2deca(-ex), 14), -deca_exs[num])
 
-    def test_gon2rad(self):
-        for num, ex in enumerate(gon_exs):
-            self.assertAlmostEqual(gon2rad(ex), rad_exs[num], 15)
-            self.assertAlmostEqual(gon2rad(-ex), -rad_exs[num], 15)
-
     def test_gon2hp(self):
         for num, ex in enumerate(gon_exs):
             self.assertEqual(gon2hp(ex), hp_exs[num])
@@ -563,6 +564,11 @@ class TestConvert(unittest.TestCase):
         for num, ex in enumerate(gon_exs):
             self.assertEqual(gon2hpa(ex), hpa_exs[num])
             self.assertEqual(gon2hpa(-ex), -hpa_exs[num])
+
+    def test_gon2rad(self):
+        for num, ex in enumerate(gon_exs):
+            self.assertAlmostEqual(gon2rad(ex), rad_exs[num], 15)
+            self.assertAlmostEqual(gon2rad(-ex), -rad_exs[num], 15)
 
     def test_gon2dms(self):
         for num, ex in enumerate(gon_exs):
@@ -584,6 +590,16 @@ class TestConvert(unittest.TestCase):
         self.assertEqual(dd2sec(-dec_ex4), -189)
         self.assertEqual(dd2sec(dec_ex2), 45270)
         self.assertEqual(dd2sec(-dec_ex2), -45270)
+
+    def test_angular_typecheck(self):
+        class_exs = [deca_exs, hpa_exs, gona_exs, dms_exs, ddm_exs]
+        for class_ex in class_exs:
+            for num, ex in enumerate(class_ex):
+                self.assertAlmostEqual(angular_typecheck(ex), dec_exs[num], 13)
+                self.assertAlmostEqual(angular_typecheck(-ex), -dec_exs[num], 13)
+        for ex in dec_exs:
+            self.assertEqual(angular_typecheck(ex), ex)
+            self.assertEqual(angular_typecheck(-ex), -ex)
 
 
 if __name__ == '__main__':
