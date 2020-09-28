@@ -1,12 +1,13 @@
 import unittest
 from math import radians
 
-from geodepy.angles import (dec2hp, hp2dec,
-                            DMSAngle, DDMAngle, HPAngle, DECAngle, GONAngle,
-                            dec2dms, dec2ddm, dec2hpa, dec2gon, dec2gona,
-                            hp2dms, hp2ddm, hp2rad, hp2deca, hp2gon, hp2gona,
-                            gon2dec, gon2deca, gon2rad, gon2hp, gon2hpa,
-                            gon2dms, gon2ddm,
+from geodepy.angles import (DECAngle, HPAngle, GONAngle, DMSAngle, DDMAngle,
+                            dec2hp, dec2hpa, dec2gon, dec2gona,
+                            dec2dms, dec2ddm,
+                            hp2dec, hp2deca, hp2gon, hp2gona,
+                            hp2dms, hp2ddm, hp2rad,
+                            gon2dec, gon2deca, gon2hp, gon2hpa,
+                            gon2dms, gon2ddm, gon2rad,
                             dd2sec, angular_typecheck)
 
 rad_exs = [radians(123.74875), radians(12.575), radians(-12.575),
@@ -477,8 +478,10 @@ class TestConvert(unittest.TestCase):
 
     def test_dec2gona(self):
         for num, ex in enumerate(dec_exs):
-            self.assertEqual(round(dec2gona(ex), 13), round(gona_exs[num], 13))
-            self.assertEqual(round(dec2gona(-ex), 13), round(-gona_exs[num], 13))
+            self.assertEqual(round(dec2gona(ex), 13),
+                             round(gona_exs[num], 13))
+            self.assertEqual(round(dec2gona(-ex), 13),
+                             round(-gona_exs[num], 13))
 
     def test_dec2dms(self):
         self.assertEqual(dms_ex, dec2dms(dec_ex))
@@ -595,8 +598,10 @@ class TestConvert(unittest.TestCase):
         class_exs = [deca_exs, hpa_exs, gona_exs, dms_exs, ddm_exs]
         for class_ex in class_exs:
             for num, ex in enumerate(class_ex):
-                self.assertAlmostEqual(angular_typecheck(ex), dec_exs[num], 13)
-                self.assertAlmostEqual(angular_typecheck(-ex), -dec_exs[num], 13)
+                self.assertAlmostEqual(angular_typecheck(ex),
+                                       dec_exs[num], 13)
+                self.assertAlmostEqual(angular_typecheck(-ex),
+                                       -dec_exs[num], 13)
         for ex in dec_exs:
             self.assertEqual(angular_typecheck(ex), ex)
             self.assertEqual(angular_typecheck(-ex), -ex)
