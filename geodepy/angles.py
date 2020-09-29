@@ -1217,4 +1217,4 @@ def angular_typecheck(angle):
     if type(angle) in supported_types:
         return angle.dec()
     else:
-        return angle
+        return float(angle)

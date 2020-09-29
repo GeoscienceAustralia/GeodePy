@@ -50,6 +50,14 @@ intl24 = Ellipsoid(6378388, 297)
 # Projections
 class Projection(object):
     def __init__(self, falseeast, falsenorth, cmscale, zonewidth, initialcm):
+        """
+        Transverse Mercator Projection Parameters
+        :param falseeast: Easting (m) assigned to Central Meridian
+        :param falsenorth: Northing (m) assigned to Equator
+        :param cmscale: Central Meridian Scale Factor (unitless, 1 is no scale)
+        :param zonewidth: Width (decimal degrees) of each TM Zone
+        :param initialcm: Longitude (decimal degrees) of TM Zone 1
+        """
         self.falseeast = falseeast
         self.falsenorth = falsenorth
         self.cmscale = cmscale

@@ -13,7 +13,7 @@ from geodepy.angles import (DECAngle, HPAngle, GONAngle, DMSAngle, DDMAngle,
                             dec2hp, dec2hpa, dec2gon, dec2gona,
                             dec2dms, dec2ddm,
                             hp2dec, hp2deca, hp2gon, hp2gona,
-                            hp2dms, hp2ddm, hp2rad,
+                            hp2dms, hp2ddm, hp2rad, hp2dec_v,
                             gon2dec, gon2deca, gon2hp, gon2hpa,
                             gon2dms, gon2ddm, gon2rad,
                             dd2sec, angular_typecheck)
