@@ -438,6 +438,8 @@ file_AG2020_STD = aws_server + 'AUSGeoid/AUSGeoid2020_RELEASEV20170908_err.tif'
 file_AVWS = aws_server + 'AGQG/AGQG_20191107.tif'
 file_AVWS_STD = aws_server + 'AGQG/AGQG_uncertainty_20191107.tif'
 file_GRAV_BA = aws_server + 'AGQG/Bouguer_Grav_RELEASE20191107.tif'
+file_AG98=aws_server+'AUSGeoid/AUSGeoid98.tif'
+file_AG09=aws_server+'AUSGeoid/AUSGeoid09_V1.01.tif'
 
 # GRS80 normal gravity flattening [Moritz, 2000 Section 4]
 grs80_ngf = 0.005302440112
