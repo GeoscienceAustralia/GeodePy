@@ -91,6 +91,27 @@ def DOV(Lat,Long):
     DOV_PV=interp_file(Lat, Long, cons.file_DOV_PV) # AUSGEOID2020 file
     return [DOV_PM,DOV_PV]
 
+def GPS_to_AUSGeoid98(Lat,Long,GPS_H):
+    N=interp_file(Lat,Long,cons.file_AG98) # AUSGEOID98 file
+    AHD_H=GPS_H-N
+    return [AHD_H]
+
+def AUSGeoid98_to_GPS(Lat,Long,AHD_H):
+    N=interp_file(Lat,Long,cons.file_AG98) # AUSGEOID98 file
+    GPS_H=AHD_H+N
+    return [GPS_H]
+
+def GPS_to_AUSGeoid09(Lat,Long,GPS_H):
+    N=interp_file(Lat,Long,cons.file_AG09) # AUSGEOID09 file
+    AHD_H=GPS_H-N
+    return [AHD_H]
+
+def AUSGeoid09_to_GPS(Lat,Long,AHD_H):
+    N=interp_file(Lat,Long,cons.file_AG09) # AUSGEOID09 file
+    GPS_H=AHD_H+N
+    return [GPS_H]
+
+
 def mean_normal_grav(Lat,h):
     # GRS 80 constants
     a=6378137
