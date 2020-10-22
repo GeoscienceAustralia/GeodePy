@@ -440,6 +440,11 @@ file_AVWS_STD = aws_server + 'AGQG/AGQG_uncertainty_20191107.tif'
 file_GRAV_BA = aws_server + 'AGQG/Bouguer_Grav_RELEASE20191107.tif'
 file_AG98=aws_server+'AUSGeoid/AUSGeoid98.tif'
 file_AG09=aws_server+'AUSGeoid/AUSGeoid09_V1.01.tif'
+file_AG98_DOV_PV='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AUSGeoid98_DOV_PV.tif'
+file_AG98_DOV_PM='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AUSGeoid98_DOV_PM.tif'
+file_AG09_DOV_PV='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AUSGeoid09_DOV_PV_V1.01.tif'
+file_AG09_DOV_PM='/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/AVWS/AUSGeoid09_DOV_PM_V1.01.tif'
+
 
 # GRS80 normal gravity flattening [Moritz, 2000 Section 4]
 grs80_ngf = 0.005302440112
