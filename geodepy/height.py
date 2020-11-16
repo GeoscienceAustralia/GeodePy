@@ -113,16 +113,16 @@ def AUSGeoid09_to_GPS(Lat,Long,AHD_H):
 
 def DOV_09(Lat,Long):   
     # Interp PM
-    DOV_PM=interp_file(Lat,Long,Height_filenames.file_AG09_DOV_PM) # AGQG09 DOV file
+    DOV_PM=interp_file(Lat,Long,cons.file_AG09_DOV_PM) # AGQG09 DOV file
     # Interp PV
-    DOV_PV=interp_file(Lat,Long,Height_filenames.file_AG09_DOV_PV) # AGQG09 DOV file
+    DOV_PV=interp_file(Lat,Long,cons.file_AG09_DOV_PV) # AGQG09 DOV file
     return [DOV_PM,DOV_PV]
 
 def DOV_98(Lat,Long):   
     # Interp PM  
-    DOV_PM=interp_file(Lat,Long,Height_filenames.file_AG98_DOV_PM) # AGQG98 DOV file
+    DOV_PM=interp_file(Lat,Long,cons.file_AG98_DOV_PM) # AGQG98 DOV file
     # Interp PV
-    DOV_PV=interp_file(Lat,Long,Height_filenames.file_AG98_DOV_PV) # AGQG98 DOV file
+    DOV_PV=interp_file(Lat,Long,cons.file_AG98_DOV_PV) # AGQG98 DOV file
     return [DOV_PM,DOV_PV]
 
 def mean_normal_grav(Lat,h):
