@@ -1,11 +1,12 @@
 import unittest
-from geodepy.angles import DMSAngle
-from geodepy.constants import utm
+from geodepy.angles import DMSAngle, DECAngle
+from geodepy.constants import utm, grs80
 from geodepy.coord import CoordCart, CoordGeo, CoordTM
 
 cart_ex1 = CoordCart(-4052052.7379, 4212835.9897, -2545104.5898, -14.269)
 
-geo_ex1 = CoordGeo(DMSAngle(-23, 40, 12.39650), DMSAngle(133, 53, 7.87779),
+geo_ex1 = CoordGeo(DMSAngle(-23, 40, 12.39650).deca(),
+                   DMSAngle(133, 53, 7.87779).deca(),
                    603.2489, 588.9799)
 
 tm_ex1 = CoordTM(53, 386353.2343, 7381852.2986, 603.2489, 588.9799,
@@ -18,9 +19,9 @@ class TestCoord(unittest.TestCase):
                                          'Y: 4212835.9897 Z: -2545104.5898 '
                                          'NVal: -14.269')
         # Test converting from CoordCart to CoordGeo
-        cart2geo = cart_ex1.geo()
-        self.assertAlmostEqual(cart2geo.lat, geo_ex1.lat, 8)
-        self.assertAlmostEqual(cart2geo.lon, geo_ex1.lon, 8)
+        cart2geo = cart_ex1.geo(ellipsoid=grs80, notation=DECAngle)
+        self.assertEqual(round(cart2geo.lat, 8), round(geo_ex1.lat, 8))
+        self.assertEqual(round(cart2geo.lon, 8), round(geo_ex1.lon, 8))
         self.assertAlmostEqual(cart2geo.ell_ht, geo_ex1.ell_ht, 3)
         self.assertAlmostEqual(cart2geo.orth_ht, geo_ex1.orth_ht, 3)
 
