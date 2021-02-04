@@ -65,7 +65,7 @@ class Transformation(object):
     def __init__(self, from_datum, to_datum, ref_epoch,
                  tx, ty, tz, sc, rx, ry, rz,
                  d_tx=0.0, d_ty=0.0, d_tz=0.0, d_sc=0.0,
-                 d_rx=0.0, d_ry=0.0, d_rz=0.0):
+                 d_rx=0.0, d_ry=0.0, d_rz=0.0, tf_sd=None):
         self.from_datum = from_datum   # Datum transforming from
         self.to_datum = to_datum       # Datum transforming to
         self.ref_epoch = ref_epoch     # Ref. epoch (datetime.date object)
@@ -83,6 +83,7 @@ class Transformation(object):
         self.d_rx = d_rx               # Rot rate of change about X (arcsec/yr)
         self.d_ry = d_ry               # Rot rate of change about Y (arcsec/yr)
         self.d_rz = d_rz               # Rot rate of change about Z (arcsec/yr)
+        self.tf_sd = tf_sd             # TransformationSD object
 
     def __repr__(self):
         return ('Transformation: '
@@ -120,7 +121,9 @@ class Transformation(object):
                               -self.rx, -self.ry, -self.rz,
                               -self.d_tx, -self.d_ty, -self.d_tz,
                               -self.d_sc,
-                              -self.d_rx, -self.d_ry, -self.d_rz)
+                              -self.d_rx, -self.d_ry, -self.d_rz,
+                              tf_sd=self.tf_sd
+                              )
 
     def __add__(self, other):
         """
@@ -133,6 +136,16 @@ class Transformation(object):
         """
         if type(other) == date:
             timediff = (other - self.ref_epoch).days/365.25
+
+            if type(self.tf_sd) == TransformationSD:
+                self.tf_sd.sd_tx = (self.tf_sd.sd_tx**2 + (self.tf_sd.sd_d_tx * timediff)**2) ** 0.5
+                self.tf_sd.sd_ty = (self.tf_sd.sd_ty**2 + (self.tf_sd.sd_d_ty * timediff)**2) ** 0.5
+                self.tf_sd.sd_tz = (self.tf_sd.sd_tz**2 + (self.tf_sd.sd_d_tz * timediff)**2) ** 0.5
+                self.tf_sd.sd_sc = (self.tf_sd.sd_sc**2 + (self.tf_sd.sd_d_sc * timediff)**2) ** 0.5
+                self.tf_sd.sd_rx = (self.tf_sd.sd_rx**2 + (self.tf_sd.sd_d_rx * timediff)**2) ** 0.5
+                self.tf_sd.sd_ry = (self.tf_sd.sd_ry**2 + (self.tf_sd.sd_d_ry * timediff)**2) ** 0.5
+                self.tf_sd.sd_rz = (self.tf_sd.sd_rz**2 + (self.tf_sd.sd_d_rz * timediff)**2) ** 0.5
+
             return Transformation(self.to_datum,
                                   self.from_datum,
                                   other,
@@ -149,9 +162,32 @@ class Transformation(object):
                                   self.d_sc,
                                   self.d_rx,
                                   self.d_ry,
-                                  self.d_rz)
+                                  self.d_rz,
+                                  self.tf_sd
+                                  )
         else:
             ValueError('supports adding datetime.date objects only')
+
+
+class TransformationSD(object):
+    def __init__(self, sd_tx=None, sd_ty=None, sd_tz=None, sd_sc=None,
+                 sd_rx=None, sd_ry=None, sd_rz=None,
+                 sd_d_tx=None, sd_d_ty=None, sd_d_tz=None, sd_d_sc=None,
+                 sd_d_rx=None, sd_d_ry=None, sd_d_rz=None):
+        self.sd_tx = sd_tx             # one-sigma uncertainty of tx (m)
+        self.sd_ty = sd_ty             # one-sigma uncertainty of ty (m)
+        self.sd_tz = sd_tz             # one-sigma uncertainty of tz (m)
+        self.sd_sc = sd_sc             # one-sigma uncertainty of sc (ppm)
+        self.sd_rx = sd_rx             # one-sigma uncertainty of rx (arcsec/yr)
+        self.sd_ry = sd_ry             # one-sigma uncertainty of ry (arcsec/yr)
+        self.sd_rz = sd_rz             # one-sigma uncertainty of rz (arcsec/yr)
+        self.sd_d_tx = sd_d_tx         # one-sigma uncertainty of d_tx (m/yr)
+        self.sd_d_ty = sd_d_ty         # one-sigma uncertainty of d_ty (m/yr)
+        self.sd_d_tz = sd_d_tz         # one-sigma uncertainty of d_tz (m/yr)
+        self.sd_d_sc = sd_d_sc         # one-sigma uncertainty of d_sc (ppm/yr)
+        self.sd_d_rx = sd_d_rx         # one-sigma uncertainty of d_rx (arcsec/yr)
+        self.sd_d_ry = sd_d_ry         # one-sigma uncertainty of d_ry (arcsec/yr)
+        self.sd_d_rz = sd_d_rz         # one-sigma uncertainty of d_rz (arcsec/yr)
 
 
 def iers2trans(itrf_from, itrf_to, ref_epoch, tx, ty, tz, sc, rx, ry, rz,
@@ -190,9 +226,16 @@ def iers2trans(itrf_from, itrf_to, ref_epoch, tx, ty, tz, sc, rx, ry, rz,
 
 
 # GDA94 to GDA2020 transformation parameters [GDA2020 Tech Manual v1.2]
+gda94_to_gda2020_sd = TransformationSD(
+    sd_tx=0.0007, sd_ty=0.0006, sd_tz=0.0007,
+    sd_sc=0.00010,
+    sd_rx=0.000011, sd_ry=0.000010, sd_rz=0.000011,
+)
 gda94_to_gda2020 = Transformation('GDA94', 'GDA2020', 0,
                                   0.06155, -0.01087, -0.04019, -0.009994,
-                                  -0.0394924, -0.0327221, -0.0328979)
+                                  -0.0394924, -0.0327221, -0.0328979,
+                                  tf_sd=gda94_to_gda2020_sd
+                                  )
 
 
 # ITRF2014 to GDA2020 transformation parameters [GDA2020 Tech Manual v1.2].
@@ -201,26 +244,92 @@ gda94_to_gda2020 = Transformation('GDA94', 'GDA2020', 0,
 # the National Measurement (Recognized-Value Standard of Measurement of
 # Position)Determination 2017.
 # https://www.legislation.gov.au/Details/F2017L01352
+itrf14togda20_sd = TransformationSD(
+    sd_tx=0.00, sd_ty=0.00, sd_tz=0.00,
+    sd_sc=0.00,
+    sd_rx=0.00, sd_ry=0.00, sd_rz=0.00,
+    sd_d_tx=0.00, sd_d_ty=0.00, sd_d_tz=0.00,
+    sd_d_sc=0.00,
+    sd_d_rx=0.00000417, sd_d_ry=0.00000401, sd_d_rz=0.00000370
+)
 itrf14togda20 = Transformation('ITRF2014', 'GDA2020', date(2020, 1, 1),
                                0, 0, 0, 0, 0, 0, 0,
-                               0, 0, 0, 0, 0.00150379, 0.00118346, 0.00120716)
+                               0, 0, 0, 0, 0.00150379, 0.00118346, 0.00120716,
+                               tf_sd=itrf14togda20_sd
+                               )
 
 # ATRF2014 to GDA2020 transformation parameters. Note this transformation is
 # identical to the above Australian Plate Motion Model
+atrf_gda20_sd = TransformationSD(
+    sd_tx=0.00, sd_ty=0.00, sd_tz=0.00,
+    sd_sc=0.00,
+    sd_rx=0.00, sd_ry=0.00, sd_rz=0.00,
+    sd_d_tx=0.00, sd_d_ty=0.00, sd_d_tz=0.00,
+    sd_d_sc=0.00,
+    sd_d_rx=0.00000417, sd_d_ry=0.00000401, sd_d_rz=0.00000370
+)
 atrf_gda2020 = Transformation('ATRF2014', 'GDA2020', date(2020, 1, 1),
                               0, 0, 0, 0, 0, 0, 0,
-                              0, 0, 0, 0, 0.00150379, 0.00118346, 0.00120716)
+                              0, 0, 0, 0, 0.00150379, 0.00118346, 0.00120716,
+                              tf_sd=atrf_gda20_sd
+                              )
 
 # GDA94 to ITRF transformation parameters [Dawson and Woods (2010)]
 # AGD66 and AGD84 to GDA94 transformation parameters [GDA94 Tech Manual v2.4]
 # http://www.icsm.gov.au/datum/gda2020-and-gda94-technical-manuals
-itrf08togda94 = Transformation('ITRF2008', 'GDA94', date(1994, 1, 1),
-                               -0.08468, -0.01942, 0.03201,
-                               0.00971,
-                               -0.0004254, 0.0022578, 0.0024015,
-                               0.00142, 0.00134, 0.00090,
-                               0.000109,
-                               0.0015461, 0.001820, 0.0011551)
+itrf08togda94_sd = TransformationSD(
+    sd_tx=0.00091, sd_ty=0.00078, sd_tz=0.00106,
+    sd_sc=0.000126,
+    sd_rx=0.0000221, sd_ry=0.0000236, sd_rz=0.0000194,
+    sd_d_tx=0.00008, sd_d_ty=0.00007, sd_d_tz=0.00011,
+    sd_d_sc=0.000013,
+    sd_d_rx=0.0000028, sd_d_ry=0.0000030, sd_d_rz=0.0000023
+)
+
+itrf05togda94_sd = TransformationSD(
+    sd_tx=0.00256, sd_ty=0.00187, sd_tz=0.00337,
+    sd_sc=0.000227,
+    sd_rx=0.0000883, sd_ry=0.0000972, sd_rz=0.0000600,
+    sd_d_tx=0.00028, sd_d_ty=0.00020, sd_d_tz=0.00036,
+    sd_d_sc=0.000022,
+    sd_d_rx=0.0000096, sd_d_ry=0.0000106, sd_d_rz=0.0000070
+)
+
+itrf00togda94_sd = TransformationSD(
+    sd_tx=0.00874, sd_ty=0.00412, sd_tz=0.01105,
+    sd_sc=0.000423,
+    sd_rx=0.0002852, sd_ry=0.0003602, sd_rz=0.0001567,
+    sd_d_tx=0.00166, sd_d_ty=0.00083, sd_d_tz=0.00209,
+    sd_d_sc=0.000076,
+    sd_d_rx=0.0000537, sd_d_ry=0.0000677, sd_d_rz=0.0000317
+)
+
+itrf97togda94_sd = TransformationSD(
+    sd_tx=0.01107, sd_ty=0.00574, sd_tz=0.01427,
+    sd_sc=0.000425,
+    sd_rx=0.0003757, sd_ry=0.0004642, sd_rz=0.0001955,
+    sd_d_tx=0.00276, sd_d_ty=0.00136, sd_d_tz=0.00371,
+    sd_d_sc=0.000101,
+    sd_d_rx=0.0000967, sd_d_ry=0.0001196, sd_d_rz=0.0000453
+)
+
+itrf96togda94_sd = TransformationSD(
+    sd_tx=0.02033, sd_ty=0.01059, sd_tz=0.02866,
+    sd_sc=0.000653,
+    sd_rx=0.0007627, sd_ry=0.0009049, sd_rz=0.0003225,
+    sd_d_tx=0.00753, sd_d_ty=0.00391, sd_d_tz=0.01074,
+    sd_d_sc=0.000228,
+    sd_d_rx=0.0002850, sd_d_ry=0.0003382, sd_d_rz=0.0001169
+)
+
+itrf08togda94 = Transformation(from_datum='ITRF2008', to_datum='GDA94', ref_epoch=date(1994, 1, 1),
+                               tx=-0.08468, ty=-0.01942, tz=0.03201,
+                               sc=0.00971,
+                               rx=-0.0004254, ry=0.0022578, rz=0.0024015,
+                               d_tx=0.00142, d_ty=0.00134, d_tz=0.00090,
+                               d_sc=0.000109,
+                               d_rx=0.0015461, d_ry=0.0011820, d_rz=0.0011551,
+                               tf_sd=itrf08togda94_sd)
 
 itrf05togda94 = Transformation('ITRF2005', 'GDA94', date(1994, 1, 1),
                                -0.07973, -0.00686, 0.03803,
@@ -228,7 +337,8 @@ itrf05togda94 = Transformation('ITRF2005', 'GDA94', date(1994, 1, 1),
                                -0.0000351, 0.0021211, 0.0021411,
                                0.00225, -0.00062, -0.00056,
                                0.000294,
-                               0.0014707, 0.0011443, 0.0011701)
+                               0.0014707, 0.0011443, 0.0011701,
+                               tf_sd=itrf05togda94_sd)
 
 itrf00togda94 = Transformation('ITRF2000', 'GDA94', date(1994, 1, 1),
                                -0.04591, -0.02985, -0.02037,
@@ -236,7 +346,8 @@ itrf00togda94 = Transformation('ITRF2000', 'GDA94', date(1994, 1, 1),
                                -0.0016705, 0.0004594, 0.0019356,
                                -0.00466, 0.00355, 0.01124,
                                0.000249,
-                               0.0017454, 0.0014868, 0.001224)
+                               0.0017454, 0.0014868, 0.001224,
+                               tf_sd=itrf00togda94_sd)
 
 itrf97togda94 = Transformation('ITRF97', 'GDA94', date(1994, 1, 1),
                                -0.01463, -0.02762, -0.02532,
@@ -244,7 +355,8 @@ itrf97togda94 = Transformation('ITRF97', 'GDA94', date(1994, 1, 1),
                                -0.0017893, -0.0006047, 0.0009962,
                                -0.00860, 0.00036, 0.01125,
                                0.000007,
-                               0.0016394, 0.0015198, 0.0013801)
+                               0.0016394, 0.0015198, 0.0013801,
+                               tf_sd=itrf97togda94_sd)
 
 itrf96togda94 = Transformation('ITRF96', 'GDA94', date(1994, 1, 1),
                                0.02454, -0.03643, -0.06812,
@@ -252,7 +364,8 @@ itrf96togda94 = Transformation('ITRF96', 'GDA94', date(1994, 1, 1),
                                -0.0027359, -0.0020431, 0.0003731,
                                -0.02180, 0.00471, 0.02627,
                                0.000388,
-                               0.0020203, 0.0021735, 0.0016290)
+                               0.0020203, 0.0021735, 0.0016290,
+                               tf_sd=itrf96togda94_sd)
 
 agd84togda94 = Transformation('AGD84', 'GDA94', 0,
                               -117.763, -51.510, 139.061,
