@@ -101,6 +101,18 @@ class CoordCart(object):
             return CoordGeo(lat, lon, ell_ht,
                             ell_ht + self.nval)
 
+    # TODO: Add functionality to utilise different TM projections
+
+    def tm(self, ellipsoid=grs80, projection=utm):
+        """
+        Convert coordinates to Transverse Mercator
+        :param ellipsoid: geodepy.constants.Ellipsoid Object (default: grs80)
+        :param projection: geodepy.constants.Projection Object (default: utm)
+        :return: Transverse Mercator Projection Coordinate
+        :rtype: CoordTM
+        """
+        return self.geo(ellipsoid).tm(ellipsoid, projection)
+
 
 class CoordGeo(object):
     """
@@ -240,6 +252,28 @@ class CoordGeo(object):
             x, y, z = llh2xyz(self.lat, self.lon, 0, ellipsoid)
             return CoordCart(x, y, z)  # No Ellipsoid Height -> No N Value
 
+    # TODO: Add functionality to utilise different TM projections
+
+    def tm(self, ellipsoid=grs80, projection=utm):
+        """
+        Convert coordinates to Universal Transverse Mercator Projection
+        Note: Heights are not used in calculation
+        :param ellipsoid: geodepy.constants.Ellipsoid Object (default: grs80)
+        :param projection: geodepy.constants.Projection Object (default: utm)
+        :return: Transverse Mercator Projection Coordinate
+        :rtype: CoordTM
+        """
+        hemi, zone, east, north, psf, gc = geo2grid(self.lat, self.lon,
+                                                    0, ellipsoid)
+        if hemi == 'North':
+            hemi_north = True
+        else:  # hemi == 'South'
+            hemi_north = False
+
+        return CoordTM(zone, east, north,
+                       self.ell_ht, self.orth_ht,
+                       hemi_north, projection)
+
 
 class CoordTM(object):
     """
@@ -275,8 +309,14 @@ class CoordTM(object):
         self.zone = int(zone)
         self.east = float(east)
         self.north = float(north)
-        self.ell_ht = float(ell_ht)
-        self.orth_ht = float(orth_ht)
+        if ell_ht is None:
+            self.ell_ht = None
+        else:
+            self.ell_ht = float(ell_ht)
+        if orth_ht is None:
+            self.orth_ht = None
+        else:
+            self.orth_ht = float(orth_ht)
         if isinstance(hemi_north, bool):
             self.hemi_north = hemi_north
         else:
@@ -299,6 +339,31 @@ class CoordTM(object):
             return (f'CoordTM: Zone: {self.zone} East: {self.east} '
                     f'North: {self.north} Ell_Ht: {self.ell_ht} '
                     f'Orth_Ht: {self.orth_ht} Hemisphere: South')
+
+    def __eq__(self, other):
+        if isinstance(other, CoordTM):
+            return vars(self) == vars(other)
+        else:
+            raise ValueError(f"Can't compare {self} to {other}. If other object"
+                             f" is coord, convert to CoordTM first.")
+
+    def __round__(self, n=None):
+        if self.ell_ht is None and self.orth_ht is None:
+            return CoordTM(self.zone, round(self.east, n), round(self.north, n),
+                           None, None,
+                           self.hemi_north, self.projection)
+        elif self.ell_ht is None:
+            return CoordTM(self.zone, round(self.east, n), round(self.north, n),
+                           None, round(self.orth_ht, n),
+                           self.hemi_north, self.projection)
+        elif self.orth_ht is None:
+            return CoordTM(self.zone, round(self.east, n), round(self.north, n),
+                           round(self.ell_ht, n), None,
+                           self.hemi_north, self.projection)
+        else:
+            return CoordTM(self.zone, round(self.east, n), round(self.north, n),
+                           round(self.ell_ht, n), round(self.orth_ht, n),
+                           self.hemi_north, self.projection)
 
     def geo(self, ellipsoid=grs80, notation=DECAngle):
         """
@@ -336,3 +401,15 @@ class CoordTM(object):
                              f'class from geodepy.angles module. '
                              f'Supplied: {notation}')
         return CoordGeo(lat, lon, self.ell_ht, self.orth_ht)
+
+    # TODO: Add functionality to utilise different TM projections
+
+    def cart(self, ellipsoid=grs80):
+        """
+        Convert coordinates to Cartesian
+        Note: If no ellipsoid height set, uses 0m. No N Value output
+        :param ellipsoid: geodepy.constants.Ellipsoid Object (default: grs80)
+        :return: Cartesian Coordinate
+        :rtype: CoordCart
+        """
+        return self.geo(ellipsoid).cart(ellipsoid)

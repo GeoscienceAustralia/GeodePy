@@ -20,6 +20,7 @@ from geodepy.angles import (DECAngle, HPAngle, GONAngle, DMSAngle, DDMAngle,
 
 
 # Universal Transverse Mercator Projection Parameters
+# TODO: Add this part into functions: geo2grid, grid2geo, psfandgridconv
 proj = utm
 
 
