@@ -99,7 +99,7 @@ class CoordCart(object):
             return CoordGeo(lat, lon, ell_ht)
         else:
             return CoordGeo(lat, lon, ell_ht,
-                            ell_ht + self.nval)
+                            ell_ht - self.nval)
 
     # TODO: Add functionality to utilise different TM projections
 
@@ -119,16 +119,16 @@ class CoordGeo(object):
     Geographic Coordinate Class
     Used for working with coordinates representing points in an ellipsoidal
     system with ellipsoid heights (m) relative to the surface of the ellipsoid.
-    Orthometric heights (m) are relative to a difference reference surface
+    Orthometric heights (m) are relative to a different reference surface
     (typically a geoid).
     """
     def __init__(self, lat, lon, ell_ht=None, orth_ht=None):
         """
-        :param lat: Geographic Latitude (angle between +180 and -180 degrees,
-        positive values are east of central meridian)
-        :type lat: float (decimal degrees) or any Angle object in geodepy.angles
-        :param lon: Geographic Longitude (angle between +90 and -90 degrees,
+        :param lat: Geographic Latitude (angle between +90 and -90 degrees,
         positive values are north of equator)
+        :type lat: float (decimal degrees) or any Angle object in geodepy.angles
+        :param lon: Geographic Longitude (angle between +180 and -180 degrees,
+        positive values are east of central meridian)
         :type lon: float (decimal degrees) or any Angle object in geodepy.angles
         :param ell_ht: Ellipsoid Height (m, positive is outside ellipsoid)
         :type ell_ht: float
@@ -245,7 +245,7 @@ class CoordGeo(object):
         if self.ell_ht:
             x, y, z = llh2xyz(self.lat, self.lon, self.ell_ht, ellipsoid)
             if self.orth_ht:  # Only N Value if both Ellipsoid and Ortho Heights
-                return CoordCart(x, y, z, self.orth_ht - self.ell_ht)
+                return CoordCart(x, y, z, self.ell_ht - self.orth_ht)
             else:  # No Ortho Height -> No N Value
                 return CoordCart(x, y, z)
         else:  # No Ellipsoid Height - set to 0m for conversion
@@ -283,7 +283,7 @@ class CoordTM(object):
     via a projection (default is Universal Transverse Mercator, see
     geodepy.constants.Projection for more details). Ellipsoid heights (m)
     are relative to the surface of the ellipsoid. Orthometric heights (m) are
-    relative to a difference reference surface (typically a geoid).
+    relative to a different reference surface (typically a geoid).
     """
     def __init__(self, zone, east, north, ell_ht=None, orth_ht=None,
                  hemi_north=False, projection=utm):

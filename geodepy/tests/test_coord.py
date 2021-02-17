@@ -3,7 +3,7 @@ from geodepy.angles import DMSAngle, DECAngle
 from geodepy.constants import utm, grs80
 from geodepy.coord import CoordCart, CoordGeo, CoordTM
 
-cart_ex1 = CoordCart(-4052052.7379, 4212835.9897, -2545104.5898, -14.269)
+cart_ex1 = CoordCart(-4052052.7379, 4212835.9897, -2545104.5898, 14.269)
 cart_ex2 = CoordCart(-4052052.7379, 4212835.9897, -2545104.5898)
 
 geo_ex1 = CoordGeo(DMSAngle(-23, 40, 12.39650).deca(),
@@ -29,7 +29,7 @@ class TestCoord(unittest.TestCase):
         # Test Overloads
         self.assertEqual(repr(cart_ex1), 'CoordCart: X: -4052052.7379 '
                                          'Y: 4212835.9897 Z: -2545104.5898 '
-                                         'NVal: -14.269')
+                                         'NVal: 14.269')
 
         self.assertEqual(cart_ex1, cart_ex1)
         with self.assertRaises(ValueError):
