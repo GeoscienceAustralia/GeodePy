@@ -9,11 +9,18 @@ from math import (sin, cos, atan2, radians, degrees,
                   sqrt, cosh, sinh, tan, atan, log)
 import datetime
 from geodepy.constants import utm, grs80
-from geodepy.angles import (DECAngle, DMSAngle, DDMAngle, HPAngle,
-                            hp2dec, hp2dms, hp2ddm, dec2hp, dec2dms, dec2ddm,
-                            dd2sec, dec2hp_v, hp2dec_v, angular_typecheck)
+from geodepy.angles import (DECAngle, HPAngle, GONAngle, DMSAngle, DDMAngle,
+                            dec2hp, dec2hpa, dec2gon, dec2gona,
+                            dec2dms, dec2ddm,
+                            hp2dec, hp2deca, hp2gon, hp2gona,
+                            hp2dms, hp2ddm, hp2rad, hp2dec_v,
+                            gon2dec, gon2deca, gon2hp, gon2hpa,
+                            gon2dms, gon2ddm, gon2rad,
+                            dd2sec, angular_typecheck)
+
 
 # Universal Transverse Mercator Projection Parameters
+# TODO: Add this part into functions: geo2grid, grid2geo, psfandgridconv
 proj = utm
 
 
