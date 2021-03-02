@@ -6,7 +6,10 @@ GNSS Module
 
 In Development
 """
+
+import sys
 from numpy import zeros
+from geodepy.angles import DMSAngle
 
 
 def read_sinex_estimate(file):
@@ -228,3 +231,53 @@ def read_sinex_matrix(file):
                 matrix.append(info)
 
     return matrix
+
+
+def read_sinex_sites(file):
+
+    """This function reads in the SITE/ID block of a SINEX file. It returns
+    sites, a list of tuples:
+
+    sites = [(site, point, domes, obs, station_description, lon, lat, h)]
+
+    where:
+        * site is the site code
+        * point is the site's point code
+        * domes is the site's dome number
+        * obs is the observation technique
+        * station_description is a free format desciption of the site
+        * lon is the approximate longitude of the site as a DMSAngle object
+        * lat is the approximate latitude of the site as a DMSAngle object
+        * h is the approximate height of the site
+
+    :param file: the input SINEX file
+    :return: sites
+    """
+
+    # Read the SITE/ID block into a list
+    lines = []
+    go = False
+    with open(file) as f:
+        for line in f:
+            if line[:8] == '-SITE/ID':
+                break
+            if go and line[:8] == '*CODE PT':
+                pass
+            elif go:
+                lines.append(line)
+            if line[:8] == '+SITE/ID':
+                go = True
+    sites = []
+    for line in lines:
+        site = line[1:5]
+        point = line[6:8].lstrip()
+        domes = line[9:18]
+        obs = line[19:20]
+        station_description = line[21:43].lstrip()
+        lon = DMSAngle(line[44:55].lstrip())
+        lat = DMSAngle(line[56:67].lstrip())
+        h = float(line[67:73])
+        info = (site, point, domes, obs, station_description, lon, lat, h)
+        sites.append(info)
+
+    return sites
