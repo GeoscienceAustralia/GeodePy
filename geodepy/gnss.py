@@ -281,3 +281,51 @@ def read_sinex_sites(file):
         sites.append(info)
 
     return sites
+
+def read_disconts(file):
+
+    """This function reads in the SOLUTION/DISCONTINUITY block of a
+    SINEX file. It returns disconts , a list of tuples:
+
+    sites = [(site, code1, point, code2, start, end, type)]
+
+    where:
+        * site is the site code
+        * code1 is unknown
+        * point is the site's point code
+        * code2 is unknown
+        * start is the start date for the point code in YY:DOY:SSSSS
+        * end is the end date for the point code in YY:DOY:SSSSS
+        * type is the type of discontinuity; P for position or V for
+            velocity
+
+    I could not find the standard for this block.
+
+    :param file: the input discontinuities file
+    :return: disconts
+    """
+
+    # Read the SOLUTION/DISCONTINUITY block into a list
+    lines = []
+    go = False
+    with open(file) as f:
+        for line in f:
+            if line[:23] == '-SOLUTION/DISCONTINUITY':
+                break
+            elif go:
+                lines.append(line)
+            if line[:23] == '+SOLUTION/DISCONTINUITY':
+                go = True
+    disconts = []
+    for line in lines:
+        site = line[1:5]
+        code1 = line[5:8].lstrip()
+        point = line[8:13].lstrip()
+        code2 = line[14:15]
+        start = line[16:28]
+        end = line[29:41]
+        type = line[42:43]
+        info = (site, code1, point, code2, start, end, type)
+        disconts.append(info)
+
+    return disconts
