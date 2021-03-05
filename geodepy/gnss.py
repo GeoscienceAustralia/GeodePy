@@ -294,12 +294,12 @@ def read_disconts(file):
         * code1 is unknown
         * point is the site's point code
         * code2 is unknown
-        * start is the start date for the point code in YY:DOY:SSSSS
-        * end is the end date for the point code in YY:DOY:SSSSS
+        * start is the start time for the point code in YY:DOY:SECOD
+        * end is the end time for the point code in YY:DOY:SECOD
         * type is the type of discontinuity; P for position or V for
             velocity
 
-    I could not find the standard for this block.
+    I could not find the format description for this block.
 
     :param file: the input discontinuities file
     :return: disconts
@@ -329,3 +329,51 @@ def read_disconts(file):
         disconts.append(info)
 
     return disconts
+
+def read_solution_epochs(file):
+
+    """This function reads in the SOLUTION/EPOCHS block of a SINEX file.
+    It returns epochs, a list of tuples:
+
+    epochs = [(site, point, sol, obs, start, end, mean)]
+
+    where:
+        * site is the site code
+        * point is the site's point code
+        * sol is the solution number at a site/point
+        * obs is the observation technique
+        * start is the start time for the solution in YY:DOY:SECOD
+        * end is the end time for the solution in YY:DOY:SECOD
+        * mean is the mean time for the solution in YY:DOY:SECOD
+
+    :param file: the input SINEX file
+    :return: epochs
+    """
+
+    # Read the SOLUTION/EPOCHS block into a list
+    lines = []
+    go = False
+    with open(file) as f:
+        for line in f:
+            if line[:16] == '-SOLUTION/EPOCHS':
+                break
+            if go and line[:8] == '*CODE PT':
+                pass
+            elif go:
+                lines.append(line)
+            if line[:16] == '+SOLUTION/EPOCHS':
+                go = True
+    epochs = []
+    # Parse each line, create a tuple and add it to the list
+    for line in lines:
+        site = line[1:5]
+        point = line[6:8].lstrip()
+        sol = line[9:13].lstrip()
+        obs = line[14:15]
+        start = line[16:28]
+        end = line[29:41]
+        mean = line[42:55].rstrip()
+        info = (site, point, sol, obs, start, end, mean)
+        epochs.append(info)
+
+    return epochs
