@@ -214,7 +214,7 @@ class HPAngle(object):
         if len(hp_dec_str) > 2:
             if int(hp_dec_str[2]) > 5:
                 raise ValueError(
-                    f'Invalid HP Notation: 3st decimal place greater '
+                    f'Invalid HP Notation: 3rd decimal place greater '
                     f'than 5: {self.hp_angle}')
 
     def __repr__(self):
@@ -1021,7 +1021,7 @@ def hp2dec(hp):
                          f'than 5: {hp}')
     if len(hp_dec_str) > 2:
         if int(hp_dec_str[2]) > 5:
-            raise ValueError(f'Invalid HP Notation: 3st decimal place greater '
+            raise ValueError(f'Invalid HP Notation: 3rd decimal place greater '
                              f'than 5: {hp}')
     degmin, second = divmod(abs(hp) * 1000, 10)
     degree, minute = divmod(degmin, 100)
@@ -1217,4 +1217,4 @@ def angular_typecheck(angle):
     if type(angle) in supported_types:
         return angle.dec()
     else:
-        return angle
+        return float(angle)

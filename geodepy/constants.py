@@ -50,6 +50,14 @@ intl24 = Ellipsoid(6378388, 297)
 # Projections
 class Projection(object):
     def __init__(self, falseeast, falsenorth, cmscale, zonewidth, initialcm):
+        """
+        Transverse Mercator Projection Parameters
+        :param falseeast: Easting (m) assigned to Central Meridian
+        :param falsenorth: Northing (m) assigned to Equator
+        :param cmscale: Central Meridian Scale Factor (unitless, 1 is no scale)
+        :param zonewidth: Width (decimal degrees) of each TM Zone
+        :param initialcm: Longitude (decimal degrees) of TM Zone 1
+        """
         self.falseeast = falseeast
         self.falsenorth = falsenorth
         self.cmscale = cmscale
@@ -501,7 +509,7 @@ itrf05to00 = iers2trans('ITRF2005', 'ITRF2000', date(2000, 1, 1),
                         -0.2, 0.1, -1.8, 0.08, 0, 0, 0)
 
 # ITRF2000 parameters
-# ftp://itrf.ensg.ign.fr/pub/itrf/ITRF.TP
+# ftp://ftp.iers.org/products/reference-systems/terrestrial/itrf/ITRF.TP
 # NOTE: This ref lists translations in centimetres. All other ITRF
 # transformations are shown in millimetres.
 # NOTE: All translations and rates of translation shown below have been
@@ -531,7 +539,7 @@ itrf00to91 = iers2trans('ITRF2000', 'ITRF91', date(1988, 1, 1),
                         0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
 
 itrf00to90 = iers2trans('ITRF2000', 'ITRF90', date(1988, 1, 1),
-                        14.7, 13.5, -13.9, 0.75, 0, 0, -0.18,
+                        24.7, 23.5, -35.9, 2.45, 0, 0, -0.18,
                         0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
 
 itrf00to89 = iers2trans('ITRF2000', 'ITRF89', date(1988, 1, 1),
@@ -539,7 +547,7 @@ itrf00to89 = iers2trans('ITRF2000', 'ITRF89', date(1988, 1, 1),
                         0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
 
 itrf00to88 = iers2trans('ITRF2000', 'ITRF88', date(1988, 1, 1),
-                        24.7, 11.5, -97.9, 8.95, 0, 0, -0.18,
+                        24.7, 11.5, -97.9, 8.95, 0.10, 0, -0.18,
                         0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
 
 # The locations of files used in the height module
