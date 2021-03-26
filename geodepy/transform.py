@@ -19,8 +19,7 @@ from geodepy.constants import Transformation, TransformationSD, atrf_gda2020,\
 from geodepy.statistics import vcv_local2cart, vcv_cart2local
 from geodepy.convert import hp2dec, geo2grid, \
     grid2geo, xyz2llh, llh2xyz
-from geodepy.ntv2reader import NTv2Grid, interpolate_ntv2, read_ntv2_file
-from geodepy.coord import CoordGeo, CoordCart, CoordTM
+from geodepy.ntv2reader import NTv2Grid, interpolate_ntv2
 
 
 def conform7(x, y, z, trans, vcv=None):
