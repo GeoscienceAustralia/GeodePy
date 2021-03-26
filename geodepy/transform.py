@@ -19,6 +19,8 @@ from geodepy.constants import Transformation, TransformationSD, atrf_gda2020,\
 from geodepy.statistics import vcv_local2cart, vcv_cart2local
 from geodepy.convert import hp2dec, geo2grid, \
     grid2geo, xyz2llh, llh2xyz
+from geodepy.ntv2reader import NTv2Grid, interpolate_ntv2, read_ntv2_file
+from geodepy.coord import CoordGeo, CoordCart, CoordTM
 
 
 def conform7(x, y, z, trans, vcv=None):
@@ -232,3 +234,40 @@ def gda2020_to_atrf2014(x, y, z, epoch_to, vcv=None):
     :return: Cartesian X, Y, Z Coordinates and vcv matrix in terms of ATRF at the specified Epoch
     """
     return conform14(x, y, z, epoch_to, -atrf_gda2020, vcv=vcv)
+
+
+def ntv2_2d(ntv2_grid, lat, lon, forward_tf=True, method='bicubic'):
+    """
+    Performs a 2D transformation based on ntv2 grid shifts.
+    :param ntv2_grid: Ntv2Grid object (create with read_ntv2_file() function in geodepy.ntv2reader module)
+    :param lat: latitude in decimal degrees
+    :param lon: longitude in decimal degrees
+    :param forward_tf: True/False:
+                       - True applies the shifts in the direction given in the grid.
+                       - False applies the shifts in the opposite direction of the grid
+    :param method: Interpolation strategy - either 'bicubic' or 'bilinear'
+    :return: Transformed latitude and longitude
+    """
+
+    # validate input data
+    if not isinstance(ntv2_grid, NTv2Grid):
+        raise TypeError('ntv2_grid must be Ntv2Grid object')
+    if method != 'bicubic' and method != 'bilinear':
+        raise ValueError(f'interpolation strategy "{method}" not supported')
+
+    # interrogate grid
+    shifts = interpolate_ntv2(ntv2_grid, lat, lon, method=method)
+
+    # null results are outside of grid extents.
+    if shifts[0] is None:
+        raise ValueError('Coordinate outside of grid extents')
+
+    if forward_tf:
+        tf_lat = lat + shifts[0] / 3600
+        tf_lon = lon - shifts[1] / 3600
+    else:
+        tf_lat = lat - shifts[0] / 3600
+        tf_lon = lon + shifts[1] / 3600
+
+    return tf_lat, tf_lon
+
