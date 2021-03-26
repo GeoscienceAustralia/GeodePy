@@ -269,4 +269,3 @@ def ntv2_2d(ntv2_grid, lat, lon, forward_tf=True, method='bicubic'):
         tf_lon = lon + shifts[1] / 3600
 
     return tf_lat, tf_lon
-
