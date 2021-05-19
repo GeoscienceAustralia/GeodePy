@@ -14,11 +14,11 @@ http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 import datetime
 from math import radians
 import numpy as np
-from geodepy.constants import Transformation, TransformationSD, atrf_gda2020,\
-    gda94_to_gda2020
+from geodepy.constants import (Transformation, TransformationSD,
+                               atrf2014_to_gda2020, gda1994_to_gda2020)
 from geodepy.statistics import vcv_local2cart, vcv_cart2local
-from geodepy.convert import hp2dec, geo2grid, \
-    grid2geo, xyz2llh, llh2xyz
+from geodepy.convert import (hp2dec, geo2grid,
+                             grid2geo, xyz2llh, llh2xyz)
 from geodepy.ntv2reader import NTv2Grid, interpolate_ntv2
 
 
@@ -167,7 +167,7 @@ def mga94_to_mga2020(zone, east, north, ell_ht=False, vcv=None):
     if vcv is not None:
         vcv = vcv_local2cart(vcv, lat, lon)
     x94, y94, z94 = llh2xyz(lat, lon, ell_ht_in)
-    x20, y20, z20, vcv20 = conform7(x94, y94, z94, gda94_to_gda2020, vcv)
+    x20, y20, z20, vcv20 = conform7(x94, y94, z94, gda1994_to_gda2020, vcv)
     lat, lon, ell_ht_out = xyz2llh(x20, y20, z20)
     if vcv20 is not None:
         vcv20 = vcv_cart2local(vcv20, lat, lon)
@@ -196,7 +196,7 @@ def mga2020_to_mga94(zone, east, north, ell_ht=False, vcv=None):
     if vcv is not None:
         vcv = vcv_local2cart(vcv, lat, lon)
     x94, y94, z94 = llh2xyz(lat, lon, ell_ht_in)
-    x20, y20, z20, vcv94 = conform7(x94, y94, z94, -gda94_to_gda2020, vcv=vcv)
+    x20, y20, z20, vcv94 = conform7(x94, y94, z94, -gda1994_to_gda2020, vcv=vcv)
     lat, lon, ell_ht_out = xyz2llh(x20, y20, z20)
     if vcv94 is not None:
         vcv94 = vcv_cart2local(vcv94, lat, lon)
@@ -206,7 +206,7 @@ def mga2020_to_mga94(zone, east, north, ell_ht=False, vcv=None):
     return zone20, east20, north20, round(ell_ht_out, 4), vcv94
 
 
-def atrf2014_to_gda2020(x, y, z, epoch_from, vcv=None):
+def conform_atrf2014_to_gda2020(x, y, z, epoch_from, vcv=None):
     """
     Transforms Cartesian (x, y, z) Coordinates in terms of the Australian Terrestrial Reference Frame (ATRF) at
     a specified epoch to coordinates in terms of Geocentric Datum of Australia 2020 (GDA2020 - reference epoch 2020.0)
@@ -217,10 +217,10 @@ def atrf2014_to_gda2020(x, y, z, epoch_from, vcv=None):
     :param vcv: Optional 3*3 numpy array in Cartesian units to propagate tf uncertainty
     :return: Cartesian X, Y, Z Coordinates and vcv matrix in terms of GDA2020
     """
-    return conform14(x, y, z, epoch_from, atrf_gda2020, vcv=vcv)
+    return conform14(x, y, z, epoch_from, atrf2014_to_gda2020, vcv=vcv)
 
 
-def gda2020_to_atrf2014(x, y, z, epoch_to, vcv=None):
+def conform_gda2020_to_atrf2014(x, y, z, epoch_to, vcv=None):
     """
     Transforms Cartesian (x, y, z) Coordinates in terms of Geocentric Datum of Australia 2020
     (GDA2020 - reference epoch 2020.0) to coordinates in terms of the Australian Terrestrial Reference Frame (ATRF) at
@@ -232,7 +232,7 @@ def gda2020_to_atrf2014(x, y, z, epoch_to, vcv=None):
     :param vcv: Optional 3*3 numpy array in Cartesian units to propagate tf uncertainty
     :return: Cartesian X, Y, Z Coordinates and vcv matrix in terms of ATRF at the specified Epoch
     """
-    return conform14(x, y, z, epoch_to, -atrf_gda2020, vcv=vcv)
+    return conform14(x, y, z, epoch_to, -atrf2014_to_gda2020, vcv=vcv)
 
 
 def ntv2_2d(ntv2_grid, lat, lon, forward_tf=True, method='bicubic'):
