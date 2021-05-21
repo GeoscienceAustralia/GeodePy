@@ -15,7 +15,7 @@ import datetime
 from math import radians
 import numpy as np
 from geodepy.constants import (Transformation, TransformationSD,
-                               atrf2014_to_gda2020, gda1994_to_gda2020)
+                               atrf2014_to_gda2020, gda94_to_gda2020)
 from geodepy.statistics import vcv_local2cart, vcv_cart2local
 from geodepy.convert import (hp2dec, geo2grid,
                              grid2geo, xyz2llh, llh2xyz)
@@ -148,7 +148,7 @@ def conform14(x, y, z, to_epoch, trans, vcv=None):
     return xtrans, ytrans, ztrans, trans_vcv
 
 
-def mga94_to_mga2020(zone, east, north, ell_ht=False, vcv=None):
+def transform_mga94_to_mga2020(zone, east, north, ell_ht=False, vcv=None):
     """
     Performs conformal transformation of Map Grid of Australia 1994 to Map Grid of Australia 2020 Coordinates
     using the GDA2020 Tech Manual v1.2 7 parameter similarity transformation parameters
@@ -167,7 +167,7 @@ def mga94_to_mga2020(zone, east, north, ell_ht=False, vcv=None):
     if vcv is not None:
         vcv = vcv_local2cart(vcv, lat, lon)
     x94, y94, z94 = llh2xyz(lat, lon, ell_ht_in)
-    x20, y20, z20, vcv20 = conform7(x94, y94, z94, gda1994_to_gda2020, vcv)
+    x20, y20, z20, vcv20 = conform7(x94, y94, z94, gda94_to_gda2020, vcv)
     lat, lon, ell_ht_out = xyz2llh(x20, y20, z20)
     if vcv20 is not None:
         vcv20 = vcv_cart2local(vcv20, lat, lon)
@@ -177,7 +177,7 @@ def mga94_to_mga2020(zone, east, north, ell_ht=False, vcv=None):
     return zone20, east20, north20, round(ell_ht_out, 4), vcv20
 
 
-def mga2020_to_mga94(zone, east, north, ell_ht=False, vcv=None):
+def transform_mga2020_to_mga94(zone, east, north, ell_ht=False, vcv=None):
     """
     Performs conformal transformation of Map Grid of Australia 2020 to Map Grid of Australia 1994 Coordinates
     using the reverse form of the GDA2020 Tech Manual v1.2 7 parameter similarity transformation parameters
@@ -196,7 +196,7 @@ def mga2020_to_mga94(zone, east, north, ell_ht=False, vcv=None):
     if vcv is not None:
         vcv = vcv_local2cart(vcv, lat, lon)
     x94, y94, z94 = llh2xyz(lat, lon, ell_ht_in)
-    x20, y20, z20, vcv94 = conform7(x94, y94, z94, -gda1994_to_gda2020, vcv=vcv)
+    x20, y20, z20, vcv94 = conform7(x94, y94, z94, -gda94_to_gda2020, vcv=vcv)
     lat, lon, ell_ht_out = xyz2llh(x20, y20, z20)
     if vcv94 is not None:
         vcv94 = vcv_cart2local(vcv94, lat, lon)
@@ -206,7 +206,7 @@ def mga2020_to_mga94(zone, east, north, ell_ht=False, vcv=None):
     return zone20, east20, north20, round(ell_ht_out, 4), vcv94
 
 
-def conform_atrf2014_to_gda2020(x, y, z, epoch_from, vcv=None):
+def transform_atrf2014_to_gda2020(x, y, z, epoch_from, vcv=None):
     """
     Transforms Cartesian (x, y, z) Coordinates in terms of the Australian Terrestrial Reference Frame (ATRF) at
     a specified epoch to coordinates in terms of Geocentric Datum of Australia 2020 (GDA2020 - reference epoch 2020.0)
@@ -220,7 +220,7 @@ def conform_atrf2014_to_gda2020(x, y, z, epoch_from, vcv=None):
     return conform14(x, y, z, epoch_from, atrf2014_to_gda2020, vcv=vcv)
 
 
-def conform_gda2020_to_atrf2014(x, y, z, epoch_to, vcv=None):
+def transform_gda2020_to_atrf2014(x, y, z, epoch_to, vcv=None):
     """
     Transforms Cartesian (x, y, z) Coordinates in terms of Geocentric Datum of Australia 2020
     (GDA2020 - reference epoch 2020.0) to coordinates in terms of the Australian Terrestrial Reference Frame (ATRF) at
