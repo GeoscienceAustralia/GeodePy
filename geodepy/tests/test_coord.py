@@ -23,7 +23,6 @@ tm_ex4 = CoordTM(tm_ex1.zone, tm_ex1.east, tm_ex1.north, None, None,
                  hemi_north=False, projection=utm)
 
 
-
 class TestCoord(unittest.TestCase):
     def test_CoordCart(self):
         # Test Overloads
