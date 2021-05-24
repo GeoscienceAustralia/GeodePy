@@ -457,17 +457,17 @@ agd66_to_gda94_nt = Transformation(
     sc=-1.854,
     rx=0.008, ry=-0.557, rz=-0.178)
 
-gda19_to_itrf2008 = -itrf2008_to_gda94
-gda19_to_itrf2005 = -itrf2005_to_gda94
-gda19_to_itrf2000 = -itrf2000_to_gda94
-gda19_to_itrf97 = -itrf97_to_gda94
-gda19_to_itrf96 = -itrf96_to_gda94
-gda19_to_agd84 = -agd84_to_gda94
-gda19_to_agd66 = -agd66_to_gda94
-gda19_to_agd66_act = -agd66_to_gda94_act
-gda19_to_agd66_tas = -agd66_to_gda94_tas
-gda19_to_agd66_vicnsw = -agd66_to_gda94_vicnsw
-gda19_to_agd66_nt = -agd66_to_gda94_nt
+gda94_to_itrf2008 = -itrf2008_to_gda94
+gda94_to_itrf2005 = -itrf2005_to_gda94
+gda94_to_itrf2000 = -itrf2000_to_gda94
+gda94_to_itrf97 = -itrf97_to_gda94
+gda94_to_itrf96 = -itrf96_to_gda94
+gda94_to_agd84 = -agd84_to_gda94
+gda94_to_agd66 = -agd66_to_gda94
+gda94_to_agd66_act = -agd66_to_gda94_act
+gda94_to_agd66_tas = -agd66_to_gda94_tas
+gda94_to_agd66_vicnsw = -agd66_to_gda94_vicnsw
+gda94_to_agd66_nt = -agd66_to_gda94_nt
 
 
 # ITRF2014 parameters
