@@ -182,20 +182,20 @@ class TransformationSD(object):
                  sd_rx=None, sd_ry=None, sd_rz=None,
                  sd_d_tx=None, sd_d_ty=None, sd_d_tz=None, sd_d_sc=None,
                  sd_d_rx=None, sd_d_ry=None, sd_d_rz=None):
-        self.sd_tx = sd_tx             # one-sigma uncertainty of tx (m)
-        self.sd_ty = sd_ty             # one-sigma uncertainty of ty (m)
-        self.sd_tz = sd_tz             # one-sigma uncertainty of tz (m)
-        self.sd_sc = sd_sc             # one-sigma uncertainty of sc (ppm)
-        self.sd_rx = sd_rx             # one-sigma uncertainty of rx (arcsec/yr)
-        self.sd_ry = sd_ry             # one-sigma uncertainty of ry (arcsec/yr)
-        self.sd_rz = sd_rz             # one-sigma uncertainty of rz (arcsec/yr)
-        self.sd_d_tx = sd_d_tx         # one-sigma uncertainty of d_tx (m/yr)
-        self.sd_d_ty = sd_d_ty         # one-sigma uncertainty of d_ty (m/yr)
-        self.sd_d_tz = sd_d_tz         # one-sigma uncertainty of d_tz (m/yr)
-        self.sd_d_sc = sd_d_sc         # one-sigma uncertainty of d_sc (ppm/yr)
-        self.sd_d_rx = sd_d_rx         # one-sigma uncertainty of d_rx (arcsec/yr)
-        self.sd_d_ry = sd_d_ry         # one-sigma uncertainty of d_ry (arcsec/yr)
-        self.sd_d_rz = sd_d_rz         # one-sigma uncertainty of d_rz (arcsec/yr)
+        self.sd_tx = sd_tx         # one-sigma uncertainty of tx (m)
+        self.sd_ty = sd_ty         # one-sigma uncertainty of ty (m)
+        self.sd_tz = sd_tz         # one-sigma uncertainty of tz (m)
+        self.sd_sc = sd_sc         # one-sigma uncertainty of sc (ppm)
+        self.sd_rx = sd_rx         # one-sigma uncertainty of rx (arcsec/yr)
+        self.sd_ry = sd_ry         # one-sigma uncertainty of ry (arcsec/yr)
+        self.sd_rz = sd_rz         # one-sigma uncertainty of rz (arcsec/yr)
+        self.sd_d_tx = sd_d_tx     # one-sigma uncertainty of d_tx (m/yr)
+        self.sd_d_ty = sd_d_ty     # one-sigma uncertainty of d_ty (m/yr)
+        self.sd_d_tz = sd_d_tz     # one-sigma uncertainty of d_tz (m/yr)
+        self.sd_d_sc = sd_d_sc     # one-sigma uncertainty of d_sc (ppm/yr)
+        self.sd_d_rx = sd_d_rx     # one-sigma uncertainty of d_rx (arcsec/yr)
+        self.sd_d_ry = sd_d_ry     # one-sigma uncertainty of d_ry (arcsec/yr)
+        self.sd_d_rz = sd_d_rz     # one-sigma uncertainty of d_rz (arcsec/yr)
 
 
 def iers2trans(itrf_from, itrf_to, ref_epoch, tx, ty, tz, sc, rx, ry, rz,
@@ -233,17 +233,51 @@ def iers2trans(itrf_from, itrf_to, ref_epoch, tx, ty, tz, sc, rx, ry, rz,
                           round(-d_ry / 1000, 8), round(-d_rz / 1000, 8))
 
 
+"""
+Transformation Parameter Definitions
+
+Please note transformation parameter definitions should align to the following
+GeodePy conventions:
+
+Transformation Variable Naming:
+datumYYYY_to_datumYYYY[_suffix]
+where:
+datum - common abbreviation of datum name
+YYYY - year (last two digits of year if before 2000, 4 digits if 2000 or later)
+Suffix - optional extension used to differentiate between regional
+transformation parameters
+
+Transformation Standard Deviation Variable Naming:
+datumYYYY_to_datumYYYY[_suffix]_sd
+
+All parameters in a transformation variable definition should be explicitly
+named rather than positionally defined only, as this eases manual checking
+of parameters against sources. For example, the from datum should be defined
+as from_datum='datumYYYY' rather than just 'datumYYYY'.
+
+Reverse transformations should be explicitly defined using the negative
+overload, i.e:
+datum2YYYY_to_datum1YYYY = -datum1YYYY_to_datum2YYYY
+
+References to the source of the transformation(s) parameters should be given,
+including a web URL
+"""
 # GDA94 to GDA2020 transformation parameters [GDA2020 Tech Manual v1.2]
+# Ref: https://www.icsm.gov.au/gda2020-and-gda94-technical-manuals
+
 gda94_to_gda2020_sd = TransformationSD(
     sd_tx=0.0007, sd_ty=0.0006, sd_tz=0.0007,
     sd_sc=0.00010,
-    sd_rx=0.000011, sd_ry=0.000010, sd_rz=0.000011,
-)
-gda94_to_gda2020 = Transformation('GDA94', 'GDA2020', 0,
-                                  0.06155, -0.01087, -0.04019, -0.009994,
-                                  -0.0394924, -0.0327221, -0.0328979,
-                                  tf_sd=gda94_to_gda2020_sd
-                                  )
+    sd_rx=0.000011, sd_ry=0.000010, sd_rz=0.000011,)
+
+gda94_to_gda2020 = Transformation(
+    from_datum='GDA94', to_datum='GDA2020', ref_epoch=0,
+    tx=0.06155, ty=-0.01087, tz=-0.04019,
+    sc=-0.009994,
+    rx=-0.0394924, ry=-0.0327221, rz=-0.0328979,
+    tf_sd=gda94_to_gda2020_sd)
+
+gda2020_to_gda94 = -gda94_to_gda2020
 
 
 # ITRF2014 to GDA2020 transformation parameters [GDA2020 Tech Manual v1.2].
@@ -251,262 +285,459 @@ gda94_to_gda2020 = Transformation('GDA94', 'GDA2020', 0,
 # was derived using the 109 ARGN and AuScope GNSS CORS that were used to define
 # the National Measurement (Recognized-Value Standard of Measurement of
 # Position)Determination 2017.
-# https://www.legislation.gov.au/Details/F2017L01352
-itrf14togda20_sd = TransformationSD(
+# Ref: https://www.legislation.gov.au/Details/F2017L01352
+
+itrf2014_to_gda2020_sd = TransformationSD(
     sd_tx=0.00, sd_ty=0.00, sd_tz=0.00,
     sd_sc=0.00,
     sd_rx=0.00, sd_ry=0.00, sd_rz=0.00,
     sd_d_tx=0.00, sd_d_ty=0.00, sd_d_tz=0.00,
     sd_d_sc=0.00,
-    sd_d_rx=0.00000417, sd_d_ry=0.00000401, sd_d_rz=0.00000370
-)
-itrf14togda20 = Transformation('ITRF2014', 'GDA2020', date(2020, 1, 1),
-                               0, 0, 0, 0, 0, 0, 0,
-                               0, 0, 0, 0, 0.00150379, 0.00118346, 0.00120716,
-                               tf_sd=itrf14togda20_sd
-                               )
+    sd_d_rx=0.00000417, sd_d_ry=0.00000401, sd_d_rz=0.00000370)
+
+itrf2014_to_gda2020 = Transformation(
+    from_datum='ITRF2014', to_datum='GDA2020', ref_epoch=date(2020, 1, 1),
+    tx=0, ty=0, tz=0, sc=0, rx=0, ry=0, rz=0,
+    d_tx=0, d_ty=0, d_tz=0, d_sc=0,
+    d_rx=0.00150379, d_ry=0.00118346, d_rz=0.00120716,
+    tf_sd=itrf2014_to_gda2020_sd)
+
+gda2020_to_itrf2014 = -itrf2014_to_gda2020
+
 
 # ATRF2014 to GDA2020 transformation parameters. Note this transformation is
 # identical to the above Australian Plate Motion Model
-atrf_gda20_sd = TransformationSD(
+# Ref: https://www.icsm.gov.au/australian-terrestrial-reference-frame
+
+atrf2014_to_gda2020_sd = TransformationSD(
     sd_tx=0.00, sd_ty=0.00, sd_tz=0.00,
     sd_sc=0.00,
     sd_rx=0.00, sd_ry=0.00, sd_rz=0.00,
     sd_d_tx=0.00, sd_d_ty=0.00, sd_d_tz=0.00,
     sd_d_sc=0.00,
-    sd_d_rx=0.00000417, sd_d_ry=0.00000401, sd_d_rz=0.00000370
-)
-atrf_gda2020 = Transformation('ATRF2014', 'GDA2020', date(2020, 1, 1),
-                              0, 0, 0, 0, 0, 0, 0,
-                              0, 0, 0, 0, 0.00150379, 0.00118346, 0.00120716,
-                              tf_sd=atrf_gda20_sd
-                              )
+    sd_d_rx=0.00000417, sd_d_ry=0.00000401, sd_d_rz=0.00000370)
+
+atrf2014_to_gda2020 = Transformation(
+    from_datum='ATRF2014', to_datum='GDA2020', ref_epoch=date(2020, 1, 1),
+    tx=0, ty=0, tz=0, sc=0, rx=0, ry=0, rz=0,
+    d_tx=0, d_ty=0, d_tz=0, d_sc=0,
+    d_rx=0.00150379, d_ry=0.00118346, d_rz=0.00120716,
+    tf_sd=atrf2014_to_gda2020_sd)
+
 
 # GDA94 to ITRF transformation parameters [Dawson and Woods (2010)]
 # AGD66 and AGD84 to GDA94 transformation parameters [GDA94 Tech Manual v2.4]
 # http://www.icsm.gov.au/datum/gda2020-and-gda94-technical-manuals
-itrf08togda94_sd = TransformationSD(
+
+# Transformation Standard Deviations
+itrf2008_to_gda94_sd = TransformationSD(
     sd_tx=0.00091, sd_ty=0.00078, sd_tz=0.00106,
     sd_sc=0.000126,
     sd_rx=0.0000221, sd_ry=0.0000236, sd_rz=0.0000194,
     sd_d_tx=0.00008, sd_d_ty=0.00007, sd_d_tz=0.00011,
     sd_d_sc=0.000013,
-    sd_d_rx=0.0000028, sd_d_ry=0.0000030, sd_d_rz=0.0000023
-)
+    sd_d_rx=0.0000028, sd_d_ry=0.0000030, sd_d_rz=0.0000023)
 
-itrf05togda94_sd = TransformationSD(
+itrf2005_to_gda94_sd = TransformationSD(
     sd_tx=0.00256, sd_ty=0.00187, sd_tz=0.00337,
     sd_sc=0.000227,
     sd_rx=0.0000883, sd_ry=0.0000972, sd_rz=0.0000600,
     sd_d_tx=0.00028, sd_d_ty=0.00020, sd_d_tz=0.00036,
     sd_d_sc=0.000022,
-    sd_d_rx=0.0000096, sd_d_ry=0.0000106, sd_d_rz=0.0000070
-)
+    sd_d_rx=0.0000096, sd_d_ry=0.0000106, sd_d_rz=0.0000070)
 
-itrf00togda94_sd = TransformationSD(
+itrf2000_to_gda94_sd = TransformationSD(
     sd_tx=0.00874, sd_ty=0.00412, sd_tz=0.01105,
     sd_sc=0.000423,
     sd_rx=0.0002852, sd_ry=0.0003602, sd_rz=0.0001567,
     sd_d_tx=0.00166, sd_d_ty=0.00083, sd_d_tz=0.00209,
     sd_d_sc=0.000076,
-    sd_d_rx=0.0000537, sd_d_ry=0.0000677, sd_d_rz=0.0000317
-)
+    sd_d_rx=0.0000537, sd_d_ry=0.0000677, sd_d_rz=0.0000317)
 
-itrf97togda94_sd = TransformationSD(
+itrf97_to_gda94_sd = TransformationSD(
     sd_tx=0.01107, sd_ty=0.00574, sd_tz=0.01427,
     sd_sc=0.000425,
     sd_rx=0.0003757, sd_ry=0.0004642, sd_rz=0.0001955,
     sd_d_tx=0.00276, sd_d_ty=0.00136, sd_d_tz=0.00371,
     sd_d_sc=0.000101,
-    sd_d_rx=0.0000967, sd_d_ry=0.0001196, sd_d_rz=0.0000453
-)
+    sd_d_rx=0.0000967, sd_d_ry=0.0001196, sd_d_rz=0.0000453)
 
-itrf96togda94_sd = TransformationSD(
+itrf96_to_gda94_sd = TransformationSD(
     sd_tx=0.02033, sd_ty=0.01059, sd_tz=0.02866,
     sd_sc=0.000653,
     sd_rx=0.0007627, sd_ry=0.0009049, sd_rz=0.0003225,
     sd_d_tx=0.00753, sd_d_ty=0.00391, sd_d_tz=0.01074,
     sd_d_sc=0.000228,
-    sd_d_rx=0.0002850, sd_d_ry=0.0003382, sd_d_rz=0.0001169
-)
+    sd_d_rx=0.0002850, sd_d_ry=0.0003382, sd_d_rz=0.0001169)
 
-itrf08togda94 = Transformation(from_datum='ITRF2008', to_datum='GDA94', ref_epoch=date(1994, 1, 1),
-                               tx=-0.08468, ty=-0.01942, tz=0.03201,
-                               sc=0.00971,
-                               rx=-0.0004254, ry=0.0022578, rz=0.0024015,
-                               d_tx=0.00142, d_ty=0.00134, d_tz=0.00090,
-                               d_sc=0.000109,
-                               d_rx=0.0015461, d_ry=0.0011820, d_rz=0.0011551,
-                               tf_sd=itrf08togda94_sd)
+# Transformations
+itrf2008_to_gda94 = Transformation(
+    from_datum='ITRF2008', to_datum='GDA94', ref_epoch=date(1994, 1, 1),
+    tx=-0.08468, ty=-0.01942, tz=0.03201,
+    sc=0.00971,
+    rx=-0.0004254, ry=0.0022578, rz=0.0024015,
+    d_tx=0.00142, d_ty=0.00134, d_tz=0.00090,
+    d_sc=0.000109,
+    d_rx=0.0015461, d_ry=0.0011820, d_rz=0.0011551,
+    tf_sd=itrf2008_to_gda94_sd)
 
-itrf05togda94 = Transformation('ITRF2005', 'GDA94', date(1994, 1, 1),
-                               -0.07973, -0.00686, 0.03803,
-                               0.006636,
-                               -0.0000351, 0.0021211, 0.0021411,
-                               0.00225, -0.00062, -0.00056,
-                               0.000294,
-                               0.0014707, 0.0011443, 0.0011701,
-                               tf_sd=itrf05togda94_sd)
+itrf2005_to_gda94 = Transformation(
+    from_datum='ITRF2005', to_datum='GDA94', ref_epoch=date(1994, 1, 1),
+    tx=-0.07973, ty=-0.00686, tz=0.03803,
+    sc=0.006636,
+    rx=-0.0000351, ry=0.0021211, rz=0.0021411,
+    d_tx=0.00225, d_ty=-0.00062, d_tz=-0.00056,
+    d_sc=0.000294,
+    d_rx=0.0014707, d_ry=0.0011443, d_rz=0.0011701,
+    tf_sd=itrf2005_to_gda94_sd)
 
-itrf00togda94 = Transformation('ITRF2000', 'GDA94', date(1994, 1, 1),
-                               -0.04591, -0.02985, -0.02037,
-                               0.00707,
-                               -0.0016705, 0.0004594, 0.0019356,
-                               -0.00466, 0.00355, 0.01124,
-                               0.000249,
-                               0.0017454, 0.0014868, 0.001224,
-                               tf_sd=itrf00togda94_sd)
+itrf2000_to_gda94 = Transformation(
+    from_datum='ITRF2000', to_datum='GDA94', ref_epoch=date(1994, 1, 1),
+    tx=-0.04591, ty=-0.02985, tz=-0.02037,
+    sc=0.00707,
+    rx=-0.0016705, ry=0.0004594, rz=0.0019356,
+    d_tx=-0.00466, d_ty=0.00355, d_tz=0.01124,
+    d_sc=0.000249,
+    d_rx=0.0017454, d_ry=0.0014868, d_rz=0.001224,
+    tf_sd=itrf2000_to_gda94_sd)
 
-itrf97togda94 = Transformation('ITRF97', 'GDA94', date(1994, 1, 1),
-                               -0.01463, -0.02762, -0.02532,
-                               0.006695,
-                               -0.0017893, -0.0006047, 0.0009962,
-                               -0.00860, 0.00036, 0.01125,
-                               0.000007,
-                               0.0016394, 0.0015198, 0.0013801,
-                               tf_sd=itrf97togda94_sd)
+itrf97_to_gda94 = Transformation(
+    from_datum='ITRF97', to_datum='GDA94', ref_epoch=date(1994, 1, 1),
+    tx=-0.01463, ty=-0.02762, tz=-0.02532,
+    sc=0.006695,
+    rx=-0.0017893, ry=-0.0006047, rz=0.0009962,
+    d_tx=-0.00860, d_ty=0.00036, d_tz=0.01125,
+    d_sc=0.000007,
+    d_rx=0.0016394, d_ry=0.0015198, d_rz=0.0013801,
+    tf_sd=itrf97_to_gda94_sd)
 
-itrf96togda94 = Transformation('ITRF96', 'GDA94', date(1994, 1, 1),
-                               0.02454, -0.03643, -0.06812,
-                               0.006901,
-                               -0.0027359, -0.0020431, 0.0003731,
-                               -0.02180, 0.00471, 0.02627,
-                               0.000388,
-                               0.0020203, 0.0021735, 0.0016290,
-                               tf_sd=itrf96togda94_sd)
+itrf96_to_gda94 = Transformation(
+    from_datum='ITRF96', to_datum='GDA94', ref_epoch=date(1994, 1, 1),
+    tx=0.02454, ty=-0.03643, tz=-0.06812,
+    sc=0.006901,
+    rx=-0.0027359, ry=-0.0020431, rz=0.0003731,
+    d_tx=-0.02180, d_ty=0.00471, d_tz=0.02627,
+    d_sc=0.000388,
+    d_rx=0.0020203, d_ry=0.0021735, d_rz=0.0016290,
+    tf_sd=itrf96_to_gda94_sd)
 
-agd84togda94 = Transformation('AGD84', 'GDA94', 0,
-                              -117.763, -51.510, 139.061,
-                              -0.191,
-                              -0.292, -0.443, -0.277)
+agd84_to_gda94 = Transformation(
+    from_datum='AGD84', to_datum='GDA94', ref_epoch=0,
+    tx=-117.763, ty=-51.510, tz=139.061,
+    sc=-0.191,
+    rx=-0.292, ry=-0.443, rz=-0.277)
 
-agd66togda94 = Transformation('AGD66', 'GDA94', 0,
-                              -117.808, -51.536, 137.784,
-                              -0.290,
-                              -0.303, -0.446, -0.234)
+agd66_to_gda94 = Transformation(
+    from_datum='AGD66', to_datum='GDA94', ref_epoch=0,
+    tx=-117.808, ty=-51.536, tz=137.784,
+    sc=-0.290,
+    rx=-0.303, ry=-0.446, rz=-0.234)
 
-agd66togda94_act = Transformation('AGD66', 'GDA94', 0,
-                                  -129.193, -41.212, 130.730,
-                                  -2.955,
-                                  -0.246, -0.374, -0.329)
+agd66_to_gda94_act = Transformation(
+    from_datum='AGD66', to_datum='GDA94', ref_epoch=0,
+    tx=-129.193, ty=-41.212, tz=130.730,
+    sc=-2.955,
+    rx=-0.246, ry=-0.374, rz=-0.329)
 
-agd66togda94_tas = Transformation('AGD66', 'GDA94', 0,
-                                  -120.271, -64.543, 161.632,
-                                  2.499,
-                                  -0.217, 0.067, 0.129)
+agd66_to_gda94_tas = Transformation(
+    from_datum='AGD66', to_datum='GDA94', ref_epoch=0,
+    tx=-120.271, ty=-64.543, tz=161.632,
+    sc=2.499,
+    rx=-0.217, ry=0.067, rz=0.129)
 
-agd66togda94_vicnsw = Transformation('AGD66', 'GDA94', 0,
-                                     -119.353, -48.301, 139.484,
-                                     -0.613,
-                                     -0.415, -0.260, -0.437)
+agd66_to_gda94_vicnsw = Transformation(
+    from_datum='AGD66', to_datum='GDA94', ref_epoch=0,
+    tx=-119.353, ty=-48.301, tz=139.484,
+    sc=-0.613,
+    rx=-0.415, ry=-0.260, rz=-0.437)
 
-agd66togda94_nt = Transformation('AGD66', 'GDA94', 0,
-                                 -124.133, -42.003, 137.400,
-                                 -1.854,
-                                 0.008, -0.557, -0.178)
+agd66_to_gda94_nt = Transformation(
+    from_datum='AGD66', to_datum='GDA94', ref_epoch=0,
+    tx=-124.133, ty=-42.003, tz=137.400,
+    sc=-1.854,
+    rx=0.008, ry=-0.557, rz=-0.178)
+
+gda94_to_itrf2008 = -itrf2008_to_gda94
+gda94_to_itrf2005 = -itrf2005_to_gda94
+gda94_to_itrf2000 = -itrf2000_to_gda94
+gda94_to_itrf97 = -itrf97_to_gda94
+gda94_to_itrf96 = -itrf96_to_gda94
+gda94_to_agd84 = -agd84_to_gda94
+gda94_to_agd66 = -agd66_to_gda94
+gda94_to_agd66_act = -agd66_to_gda94_act
+gda94_to_agd66_tas = -agd66_to_gda94_tas
+gda94_to_agd66_vicnsw = -agd66_to_gda94_vicnsw
+gda94_to_agd66_nt = -agd66_to_gda94_nt
 
 
 # ITRF2014 parameters
-# http://itrf.ign.fr/doc_ITRF/Transfo-ITRF2014_ITRFs.txt
-itrf14to08 = iers2trans('ITRF2014', 'ITRF2008', date(2010, 1, 1),
-                        1.6, 1.9, 2.4, -0.02, 0, 0, 0,
-                        0.0, 0.0, -0.1, 0.03, 0, 0, 0)
+# Note: These parameter definitions use the units, rotation and delta-rotation
+# sign convention used by the IERS. Units are converted and rotations flipped in
+# the transformation object to allow compatibility with GeodePy functions.
+# For more information, see the GDA2020 tech manual section 2.2.1 available
+# here: https://www.icsm.gov.au/gda2020-and-gda94-technical-manuals
+# Ref: http://itrf.ign.fr/doc_ITRF/Transfo-ITRF2014_ITRFs.txt
 
-itrf14to05 = iers2trans('ITRF2014', 'ITRF2005', date(2010, 1, 1),
-                        2.6, 1.0, -2.3, 0.92, 0, 0, 0,
-                        0.3, 0.0, -0.1, 0.03, 0, 0, 0)
+itrf2014_to_itrf2008 = iers2trans(
+    itrf_from='ITRF2014', itrf_to='ITRF2008', ref_epoch=date(2010, 1, 1),
+    tx=1.6, ty=1.9, tz=2.4,
+    sc=-0.02,
+    rx=0, ry=0, rz=0,
+    d_tx=0.0, d_ty=0.0, d_tz=-0.1,
+    d_sc=0.03,
+    d_rx=0, d_ry=0, d_rz=0)
 
-itrf14to00 = iers2trans('ITRF2014', 'ITRF2000', date(2010, 1, 1),
-                        0.7, 1.2, -26.1, 2.12, 0, 0, 0,
-                        0.1, 0.1, -1.9, 0.11, 0, 0, 0)
+itrf2014_to_itrf2005 = iers2trans(
+    itrf_from='ITRF2014', itrf_to='ITRF2005', ref_epoch=date(2010, 1, 1),
+    tx=2.6, ty=1.0, tz=-2.3,
+    sc=0.92,
+    rx=0, ry=0, rz=0,
+    d_tx=0.3, d_ty=0.0, d_tz=-0.1,
+    d_sc=0.03,
+    d_rx=0, d_ry=0, d_rz=0)
 
-itrf14to97 = iers2trans('ITRF2014', 'ITRF97', date(2010, 1, 1),
-                        7.4, -0.5, -62.8, 3.80, 0, 0, 0.26,
-                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
+itrf2014_to_itrf2000 = iers2trans(
+    itrf_from='ITRF2014', itrf_to='ITRF2000', ref_epoch=date(2010, 1, 1),
+    tx=0.7, ty=1.2, tz=-26.1,
+    sc=2.12,
+    rx=0, ry=0, rz=0,
+    d_tx=0.1, d_ty=0.1, d_tz=-1.9,
+    d_sc=0.11,
+    d_rx=0, d_ry=0, d_rz=0)
 
-itrf14to96 = iers2trans('ITRF2014', 'ITRF96', date(2010, 1, 1),
-                        7.4, -0.5, -62.8, 3.80, 0, 0, 0.26,
-                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
+itrf2014_to_itrf97 = iers2trans(
+    itrf_from='ITRF2014', itrf_to='ITRF97', ref_epoch=date(2010, 1, 1),
+    tx=7.4, ty=-0.5, tz=-62.8,
+    sc=3.80,
+    rx=0, ry=0, rz=0.26,
+    d_tx=0.1, d_ty=-0.5, d_tz=-3.3,
+    d_sc=0.12,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf14to94 = iers2trans('ITRF2014', 'ITRF94', date(2010, 1, 1),
-                        7.4, -0.5, -62.8, 3.80, 0, 0, 0.26,
-                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
+itrf2014_to_itrf96 = iers2trans(
+    itrf_from='ITRF2014', itrf_to='ITRF96', ref_epoch=date(2010, 1, 1),
+    tx=7.4, ty=-0.5, tz=-62.8,
+    sc=3.80,
+    rx=0, ry=0, rz=0.26,
+    d_tx=0.1, d_ty=-0.5, d_tz=-3.3,
+    d_sc=0.12,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf14to93 = iers2trans('ITRF2014', 'ITRF93', date(2010, 1, 1),
-                        -50.4, 3.3, -60.2, 4.29, -2.81, -3.38, 0.40,
-                        -2.8, -0.1, -2.5, 0.12, -0.11, -0.19, 0.07)
+itrf2014_to_itrf94 = iers2trans(
+    itrf_from='ITRF2014', itrf_to='ITRF94', ref_epoch=date(2010, 1, 1),
+    tx=7.4, ty=-0.5, tz=-62.8,
+    sc=3.80,
+    rx=0, ry=0, rz=0.26,
+    d_tx=0.1, d_ty=-0.5, d_tz=-3.3,
+    d_sc=0.12,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf14to92 = iers2trans('ITRF2014', 'ITRF92', date(2010, 1, 1),
-                        15.4, 1.5, -70.8, 3.09, 0, 0, 0.26,
-                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
+itrf2014_to_itrf93 = iers2trans(
+    itrf_from='ITRF2014', itrf_to='ITRF93', ref_epoch=date(2010, 1, 1),
+    tx=-50.4, ty=3.3, tz=-60.2,
+    sc=4.29,
+    rx=-2.81, ry=-3.38, rz=0.40,
+    d_tx=-2.8, d_ty=-0.1, d_tz=-2.5,
+    d_sc=0.12,
+    d_rx=-0.11, d_ry=-0.19, d_rz=0.07)
 
-itrf14to91 = iers2trans('ITRF2014', 'ITRF91', date(2010, 1, 1),
-                        27.4, 15.5, -76.8, 4.49, 0, 0, 0.26,
-                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
+itrf2014_to_itrf92 = iers2trans(
+    itrf_from='ITRF2014', itrf_to='ITRF92', ref_epoch=date(2010, 1, 1),
+    tx=15.4, ty=1.5, tz=-70.8,
+    sc=3.09,
+    rx=0, ry=0, rz=0.26,
+    d_tx=0.1, d_ty=-0.5, d_tz=-3.3,
+    d_sc=0.12,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf14to90 = iers2trans('ITRF2014', 'ITRF90', date(2010, 1, 1),
-                        25.4, 11.5, -92.8, 4.79, 0, 0, 0.26,
-                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
+itrf2014_to_itrf91 = iers2trans(
+    itrf_from='ITRF2014', itrf_to='ITRF91', ref_epoch=date(2010, 1, 1),
+    tx=27.4, ty=15.5, tz=-76.8,
+    sc=4.49,
+    rx=0, ry=0, rz=0.26,
+    d_tx=0.1, d_ty=-0.5, d_tz=-3.3,
+    d_sc=0.12,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf14to89 = iers2trans('ITRF2014', 'ITRF89', date(2010, 1, 1),
-                        30.4, 35.5, -130.8, 8.19, 0, 0, 0.26,
-                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
+itrf2014_to_itrf90 = iers2trans(
+    itrf_from='ITRF2014', itrf_to='ITRF90', ref_epoch=date(2010, 1, 1),
+    tx=25.4, ty=11.5, tz=-92.8,
+    sc=4.79,
+    rx=0, ry=0, rz=0.26,
+    d_tx=0.1, d_ty=-0.5, d_tz=-3.3,
+    d_sc=0.12,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf14to88 = iers2trans('ITRF2014', 'ITRF88', date(2010, 1, 1),
-                        25.4, -0.5, -154.8, 11.29, 0.1, 0, 0.26,
-                        0.1, -0.5, -3.3, 0.12, 0, 0, 0.02)
+itrf2014_to_itrf89 = iers2trans(
+    itrf_from='ITRF2014', itrf_to='ITRF89', ref_epoch=date(2010, 1, 1),
+    tx=30.4, ty=35.5, tz=-130.8,
+    sc=8.19,
+    rx=0, ry=0, rz=0.26,
+    d_tx=0.1, d_ty=-0.5, d_tz=-3.3,
+    d_sc=0.12,
+    d_rx=0, d_ry=0, d_rz=0.02)
+
+itrf2014_to_itrf88 = iers2trans(
+    itrf_from='ITRF2014', itrf_to='ITRF88', ref_epoch=date(2010, 1, 1),
+    tx=25.4, ty=-0.5, tz=-154.8,
+    sc=11.29,
+    rx=0.1, ry=0, rz=0.26,
+    d_tx=0.1, d_ty=-0.5, d_tz=-3.3,
+    d_sc=0.12,
+    d_rx=0, d_ry=0, d_rz=0.02)
+
+itrf2008_to_itrf2014 = -itrf2014_to_itrf2008
+itrf2005_to_itrf2014 = -itrf2014_to_itrf2005
+itrf2000_to_itrf2014 = -itrf2014_to_itrf2000
+itrf97_to_itrf2014 = -itrf2014_to_itrf97
+itrf96_to_itrf2014 = -itrf2014_to_itrf96
+itrf94_to_itrf2014 = -itrf2014_to_itrf94
+itrf93_to_itrf2014 = -itrf2014_to_itrf93
+itrf92_to_itrf2014 = -itrf2014_to_itrf92
+itrf91_to_itrf2014 = -itrf2014_to_itrf91
+itrf90_to_itrf2014 = -itrf2014_to_itrf90
+itrf89_to_itrf2014 = -itrf2014_to_itrf89
+itrf88_to_itrf2014 = -itrf2014_to_itrf88
+
 
 # ITRF2008 parameters
-# http://itrf.ign.fr/doc_ITRF/Transfo-ITRF2008_ITRFs.txt
-itrf08to05 = iers2trans('ITRF2008', 'ITRF2005', date(2000, 1, 1),
-                        -2.0, -0.9, -4.7, 0.94, 0, 0, 0,
-                        0.3, 0.0, 0.0, 0.0, 0, 0, 0)
+# Note: These parameter definitions use the units, rotation and delta-rotation
+# sign convention used by the IERS. Units are converted and rotations flipped in
+# the transformation object to allow compatibility with GeodePy functions.
+# For more information, see the GDA2020 tech manual section 2.2.1 available
+# here: https://www.icsm.gov.au/gda2020-and-gda94-technical-manuals
+# Ref: http://itrf.ign.fr/doc_ITRF/Transfo-ITRF2008_ITRFs.txt
 
-itrf08to00 = iers2trans('ITRF2008', 'ITRF2000', date(2000, 1, 1),
-                        -1.9, -1.7, -10.5, 1.34, 0, 0, 0,
-                        0.1, 0.1, -1.8, 0.08, 0, 0, 0)
+itrf2008_to_itrf2005 = iers2trans(
+    itrf_from='ITRF2008', itrf_to='ITRF2005', ref_epoch=date(2000, 1, 1),
+    tx=-2.0, ty=-0.9, tz=-4.7,
+    sc=0.94,
+    rx=0, ry=0, rz=0,
+    d_tx=0.3, d_ty=0.0, d_tz=0.0,
+    d_sc=0.0,
+    d_rx=0, d_ry=0, d_rz=0)
 
-itrf08to97 = iers2trans('ITRF2008', 'ITRF97', date(2000, 1, 1),
-                        4.8, 2.6, -33.2, 2.92, 0, 0, 0.06,
-                        0.1, -0.5, -3.2, 0.09, 0, 0, 0.02)
+itrf2008_to_itrf2000 = iers2trans(
+    itrf_from='ITRF2008', itrf_to='ITRF2000', ref_epoch=date(2000, 1, 1),
+    tx=-1.9, ty=-1.7, tz=-10.5,
+    sc=1.34,
+    rx=0, ry=0, rz=0,
+    d_tx=0.1, d_ty=0.1, d_tz=-1.8,
+    d_sc=0.08,
+    d_rx=0, d_ry=0, d_rz=0)
 
-itrf08to96 = iers2trans('ITRF2008', 'ITRF96', date(2000, 1, 1),
-                        4.8, 2.6, -33.2, 2.92, 0, 0, 0.06,
-                        0.1, -0.5, -3.2, 0.09, 0, 0, 0.02)
+itrf2008_to_itrf97 = iers2trans(
+    itrf_from='ITRF2008', itrf_to='ITRF97', ref_epoch=date(2000, 1, 1),
+    tx=4.8, ty=2.6, tz=-33.2,
+    sc=2.92,
+    rx=0, ry=0, rz=0.06,
+    d_tx=0.1, d_ty=-0.5, d_tz=-3.2,
+    d_sc=0.09,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf08to94 = iers2trans('ITRF2008', 'ITRF94', date(2000, 1, 1),
-                        4.8, 2.6, -33.2, 2.92, 0, 0, 0.06,
-                        0.1, -0.5, -3.2, 0.09, 0, 0, 0.02)
+itrf2008_to_itrf96 = iers2trans(
+    itrf_from='ITRF2008', itrf_to='ITRF96', ref_epoch=date(2000, 1, 1),
+    tx=4.8, ty=2.6, tz=-33.2,
+    sc=2.92,
+    rx=0, ry=0, rz=0.06,
+    d_tx=0.1, d_ty=-0.5, d_tz=-3.2,
+    d_sc=0.09,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf08to93 = iers2trans('ITRF2008', 'ITRF93', date(2000, 1, 1),
-                        -24.0, 2.4, -38.6, 3.41, -1.71, -1.48, -0.30,
-                        -2.8, -0.1, -2.4, 0.09, -0.11, -0.19, 0.07)
+itrf2008_to_itrf94 = iers2trans(
+    itrf_from='ITRF2008', itrf_to='ITRF94', ref_epoch=date(2000, 1, 1),
+    tx=4.8, ty=2.6, tz=-33.2,
+    sc=2.92,
+    rx=0, ry=0, rz=0.06,
+    d_tx=0.1, d_ty=-0.5, d_tz=-3.2,
+    d_sc=0.09,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf08to92 = iers2trans('ITRF2008', 'ITRF92', date(2000, 1, 1),
-                        12.8, 4.6, -41.2, 2.21, 0, 0, 0.06,
-                        0.1, -0.5, -3.2, 0.09, 0, 0, 0.02)
+itrf2008_to_itrf93 = iers2trans(
+    itrf_from='ITRF2008', itrf_to='ITRF93', ref_epoch=date(2000, 1, 1),
+    tx=4-24.0, ty=2.4, tz=-38.6,
+    sc=3.41,
+    rx=-1.71, ry=-1.48, rz=-0.30,
+    d_tx=-2.8, d_ty=-0.1, d_tz=-2.4,
+    d_sc=0.09,
+    d_rx=-0.11, d_ry=-0.19, d_rz=0.07)
 
-itrf08to91 = iers2trans('ITRF2008', 'ITRF91', date(2000, 1, 1),
-                        24.8, 18.6, -47.2, 3.61, 0, 0, 0.06,
-                        0.1, -0.5, -3.2, 0.09, 0, 0, 0.02)
+itrf2008_to_itrf92 = iers2trans(
+    itrf_from='ITRF2008', itrf_to='ITRF92', ref_epoch=date(2000, 1, 1),
+    tx=12.8, ty=4.6, tz=-41.2,
+    sc=2.21,
+    rx=0, ry=0, rz=0.06,
+    d_tx=0.1, d_ty=-0.5, d_tz=-3.2,
+    d_sc=0.09,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf08to90 = iers2trans('ITRF2008', 'ITRF90', date(2000, 1, 1),
-                        22.8, 14.6, -63.2, 3.91, 0, 0, 0.06,
-                        0.1, -0.5, -3.2, 0.09, 0, 0, 0.02)
+itrf2008_to_itrf91 = iers2trans(
+    itrf_from='ITRF2008', itrf_to='ITRF91', ref_epoch=date(2000, 1, 1),
+    tx=24.8, ty=18.6, tz=-47.2,
+    sc=3.61,
+    rx=0, ry=0, rz=0.06,
+    d_tx=0.1, d_ty=-0.5, d_tz=-3.2,
+    d_sc=0.09,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf08to89 = iers2trans('ITRF2008', 'ITRF89', date(2000, 1, 1),
-                        27.8, 38.6, -101.2, 7.31, 0, 0, 0.06,
-                        0.1, -0.5, -3.2, 0.09, 0, 0, 0.02)
+itrf2008_to_itrf90 = iers2trans(
+    itrf_from='ITRF2008', itrf_to='ITRF90', ref_epoch=date(2000, 1, 1),
+    tx=22.8, ty=14.6, tz=-63.2,
+    sc=3.91,
+    rx=0, ry=0, rz=0.06,
+    d_tx=0.1, d_ty=-0.5, d_tz=-3.2,
+    d_sc=0.09,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf08to88 = iers2trans('ITRF2008', 'ITRF88', date(2000, 1, 1),
-                        22.8, 2.6, -125.2, 10.41, 0.10, 0, 0.06,
-                        0.1, -0.5, -3.2, 0.09, 0, 0, 0.02)
+itrf2008_to_itrf89 = iers2trans(
+    itrf_from='ITRF2008', itrf_to='ITRF89', ref_epoch=date(2000, 1, 1),
+    tx=27.8, ty=38.6, tz=-101.2,
+    sc=7.31,
+    rx=0, ry=0, rz=0.06,
+    d_tx=0.1, d_ty=-0.5, d_tz=-3.2,
+    d_sc=0.09,
+    d_rx=0, d_ry=0, d_rz=0.02)
+
+itrf2008_to_itrf88 = iers2trans(
+    itrf_from='ITRF2008', itrf_to='ITRF88', ref_epoch=date(2000, 1, 1),
+    tx=22.8, ty=2.6, tz=-125.2,
+    sc=10.41,
+    rx=0.10, ry=0, rz=0.06,
+    d_tx=0.1, d_ty=-0.5, d_tz=-3.2,
+    d_sc=0.09,
+    d_rx=0, d_ry=0, d_rz=0.02)
+
+itrf2005_to_itrf2008 = -itrf2008_to_itrf2005
+itrf2000_to_itrf2008 = -itrf2008_to_itrf2000
+itrf97_to_itrf2008 = -itrf2008_to_itrf97
+itrf96_to_itrf2008 = -itrf2008_to_itrf96
+itrf94_to_itrf2008 = -itrf2008_to_itrf94
+itrf93_to_itrf2008 = -itrf2008_to_itrf93
+itrf92_to_itrf2008 = -itrf2008_to_itrf92
+itrf91_to_itrf2008 = -itrf2008_to_itrf91
+itrf90_to_itrf2008 = -itrf2008_to_itrf90
+itrf89_to_itrf2008 = -itrf2008_to_itrf89
+itrf88_to_itrf2008 = -itrf2008_to_itrf88
+
 
 # ITRF2005 parameters
-# http://itrf.ensg.ign.fr/ITRF_solutions/2005/tp_05-00.php
-itrf05to00 = iers2trans('ITRF2005', 'ITRF2000', date(2000, 1, 1),
-                        0.1, -0.8, -5.8, 0.40, 0, 0, 0,
-                        -0.2, 0.1, -1.8, 0.08, 0, 0, 0)
+# Note: These parameter definitions use the units, rotation and delta-rotation
+# sign convention used by the IERS. Units are converted and rotations flipped in
+# the transformation object to allow compatibility with GeodePy functions.
+# For more information, see the GDA2020 tech manual section 2.2.1 available
+# here: https://www.icsm.gov.au/gda2020-and-gda94-technical-manuals
+# Ref: http://itrf.ensg.ign.fr/ITRF_solutions/2005/tp_05-00.php
+
+itrf2005_to_itrf2000 = iers2trans(
+    itrf_from='ITRF2005', itrf_to='ITRF2000', ref_epoch=date(2000, 1, 1),
+    tx=0.1, ty=-0.8, tz=-5.8,
+    sc=0.40,
+    rx=0, ry=0, rz=0,
+    d_tx=-0.2, d_ty=0.1, d_tz=-1.8,
+    d_sc=0.08,
+    d_rx=0, d_ry=0, d_rz=0)
+
+itrf2000_to_itrf2005 = -itrf2005_to_itrf2000
 
 # ITRF2000 parameters
 # ftp://ftp.iers.org/products/reference-systems/terrestrial/itrf/ITRF.TP
@@ -514,41 +745,97 @@ itrf05to00 = iers2trans('ITRF2005', 'ITRF2000', date(2000, 1, 1),
 # transformations are shown in millimetres.
 # NOTE: All translations and rates of translation shown below have been
 # converted to millimetres.
-itrf00to97 = iers2trans('ITRF2000', 'ITRF97', date(1997, 1, 1),
-                        6.7, 6.1, -18.5, 1.55, 0, 0, 0,
-                        0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
+itrf2000_to_itrf97 = iers2trans(
+    itrf_from='ITRF2000', itrf_to='ITRF97', ref_epoch=date(1997, 1, 1),
+    tx=6.7, ty=6.1, tz=-18.5,
+    sc=1.55,
+    rx=0, ry=0, rz=0,
+    d_tx=0.0, d_ty=-0.6, d_tz=-1.4,
+    d_sc=0.01,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf00to96 = iers2trans('ITRF2000', 'ITRF96', date(1997, 1, 1),
-                        6.7, 6.1, -18.5, 1.55, 0, 0, 0,
-                        0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
+itrf2000_to_itrf96 = iers2trans(
+    itrf_from='ITRF2000', itrf_to='ITRF96', ref_epoch=date(1997, 1, 1),
+    tx=6.7, ty=6.1, tz=-18.5,
+    sc=1.55,
+    rx=0, ry=0, rz=0,
+    d_tx=0.0, d_ty=-0.6, d_tz=-1.4,
+    d_sc=0.01,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf00to94 = iers2trans('ITRF2000', 'ITRF94', date(1997, 1, 1),
-                        6.7, 6.1, -18.5, 1.55, 0, 0, 0,
-                        0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
+itrf2000_to_itrf94 = iers2trans(
+    itrf_from='ITRF2000', itrf_to='ITRF94', ref_epoch=date(1997, 1, 1),
+    tx=6.7, ty=6.1, tz=-18.5,
+    sc=1.55,
+    rx=0, ry=0, rz=0,
+    d_tx=0.0, d_ty=-0.6, d_tz=-1.4,
+    d_sc=0.01,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf00to93 = iers2trans('ITRF2000', 'ITRF93', date(1988, 1, 1),
-                        12.7, 6.5, -20.9, 1.95, -0.39, 0.80, -1.14,
-                        -2.9, -0.2, -0.6, 0.01, -0.11, -0.19, 0.07)
+itrf2000_to_itrf93 = iers2trans(
+    itrf_from='ITRF2000', itrf_to='ITRF93', ref_epoch=date(1988, 1, 1),
+    tx=12.7, ty=6.5, tz=-20.9,
+    sc=1.95,
+    rx=-0.39, ry=0.80, rz=-1.14,
+    d_tx=-2.9, d_ty=-0.2, d_tz=-0.6,
+    d_sc=0.01,
+    d_rx=-0.11, d_ry=-0.19, d_rz=0.07)
 
-itrf00to92 = iers2trans('ITRF2000', 'ITRF92', date(1988, 1, 1),
-                        14.7, 13.5, -13.9, 0.75, 0, 0, -0.18,
-                        0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
+itrf2000_to_itrf92 = iers2trans(
+    itrf_from='ITRF2000', itrf_to='ITRF92', ref_epoch=date(1988, 1, 1),
+    tx=14.7, ty=13.5, tz=-13.9,
+    sc=0.75,
+    rx=0, ry=0, rz=-0.18,
+    d_tx=0.0, d_ty=-0.6, d_tz=-1.4,
+    d_sc=0.01,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf00to91 = iers2trans('ITRF2000', 'ITRF91', date(1988, 1, 1),
-                        26.7, 27.5, -19.9, 2.15, 0, 0, -0.18,
-                        0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
+itrf2000_to_itrf91 = iers2trans(
+    itrf_from='ITRF2000', itrf_to='ITRF91', ref_epoch=date(1988, 1, 1),
+    tx=26.7, ty=27.5, tz=-19.9,
+    sc=2.15,
+    rx=0, ry=0, rz=-0.18,
+    d_tx=0.0, d_ty=-0.6, d_tz=-1.4,
+    d_sc=0.01,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf00to90 = iers2trans('ITRF2000', 'ITRF90', date(1988, 1, 1),
-                        24.7, 23.5, -35.9, 2.45, 0, 0, -0.18,
-                        0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
+itrf2000_to_itrf90 = iers2trans(
+    itrf_from='ITRF2000', itrf_to='ITRF90', ref_epoch=date(1988, 1, 1),
+    tx=24.7, ty=23.5, tz=-35.9,
+    sc=2.45,
+    rx=0, ry=0, rz=-0.18,
+    d_tx=0.0, d_ty=-0.6, d_tz=-1.4,
+    d_sc=0.01,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf00to89 = iers2trans('ITRF2000', 'ITRF89', date(1988, 1, 1),
-                        29.7, 47.5, -73.9, 5.85, 0, 0, -0.18,
-                        0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
+itrf2000_to_itrf89 = iers2trans(
+    itrf_from='ITRF2000', itrf_to='ITRF89', ref_epoch=date(1988, 1, 1),
+    tx=29.7, ty=47.5, tz=-73.9,
+    sc=5.85,
+    rx=0, ry=0, rz=-0.18,
+    d_tx=0.0, d_ty=-0.6, d_tz=-1.4,
+    d_sc=0.01,
+    d_rx=0, d_ry=0, d_rz=0.02)
 
-itrf00to88 = iers2trans('ITRF2000', 'ITRF88', date(1988, 1, 1),
-                        24.7, 11.5, -97.9, 8.95, 0.10, 0, -0.18,
-                        0.0, -0.6, -1.4, 0.01, 0, 0, 0.02)
+itrf2000_to_itrf88 = iers2trans(
+    itrf_from='ITRF2000', itrf_to='ITRF88', ref_epoch=date(1988, 1, 1),
+    tx=24.7, ty=11.5, tz=-97.9,
+    sc=8.95,
+    rx=0.10, ry=0, rz=-0.18,
+    d_tx=0.0, d_ty=-0.6, d_tz=-1.4,
+    d_sc=0.01,
+    d_rx=0, d_ry=0, d_rz=0.02)
+
+itrf97_to_itrf2000 = -itrf2000_to_itrf97
+itrf96_to_itrf2000 = -itrf2000_to_itrf96
+itrf94_to_itrf2000 = -itrf2000_to_itrf94
+itrf93_to_itrf2000 = -itrf2000_to_itrf93
+itrf92_to_itrf2000 = -itrf2000_to_itrf92
+itrf91_to_itrf2000 = -itrf2000_to_itrf91
+itrf90_to_itrf2000 = -itrf2000_to_itrf90
+itrf89_to_itrf2000 = -itrf2000_to_itrf89
+itrf88_to_itrf2000 = -itrf2000_to_itrf88
+
 
 # The locations of files used in the height module
 aws_server = '/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/'

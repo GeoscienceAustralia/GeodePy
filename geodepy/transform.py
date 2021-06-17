@@ -14,11 +14,12 @@ http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 import datetime
 from math import radians
 import numpy as np
-from geodepy.constants import Transformation, TransformationSD, atrf_gda2020,\
-    gda94_to_gda2020
+from geodepy.constants import (Transformation, TransformationSD,
+                               atrf2014_to_gda2020, gda94_to_gda2020)
 from geodepy.statistics import vcv_local2cart, vcv_cart2local
-from geodepy.convert import hp2dec, geo2grid, \
-    grid2geo, xyz2llh, llh2xyz
+from geodepy.convert import (hp2dec, geo2grid,
+                             grid2geo, xyz2llh, llh2xyz)
+from geodepy.ntv2reader import NTv2Grid, interpolate_ntv2
 
 
 def conform7(x, y, z, trans, vcv=None):
@@ -147,7 +148,7 @@ def conform14(x, y, z, to_epoch, trans, vcv=None):
     return xtrans, ytrans, ztrans, trans_vcv
 
 
-def mga94_to_mga2020(zone, east, north, ell_ht=False, vcv=None):
+def transform_mga94_to_mga2020(zone, east, north, ell_ht=False, vcv=None):
     """
     Performs conformal transformation of Map Grid of Australia 1994 to Map Grid of Australia 2020 Coordinates
     using the GDA2020 Tech Manual v1.2 7 parameter similarity transformation parameters
@@ -176,7 +177,7 @@ def mga94_to_mga2020(zone, east, north, ell_ht=False, vcv=None):
     return zone20, east20, north20, round(ell_ht_out, 4), vcv20
 
 
-def mga2020_to_mga94(zone, east, north, ell_ht=False, vcv=None):
+def transform_mga2020_to_mga94(zone, east, north, ell_ht=False, vcv=None):
     """
     Performs conformal transformation of Map Grid of Australia 2020 to Map Grid of Australia 1994 Coordinates
     using the reverse form of the GDA2020 Tech Manual v1.2 7 parameter similarity transformation parameters
@@ -205,7 +206,7 @@ def mga2020_to_mga94(zone, east, north, ell_ht=False, vcv=None):
     return zone20, east20, north20, round(ell_ht_out, 4), vcv94
 
 
-def atrf2014_to_gda2020(x, y, z, epoch_from, vcv=None):
+def transform_atrf2014_to_gda2020(x, y, z, epoch_from, vcv=None):
     """
     Transforms Cartesian (x, y, z) Coordinates in terms of the Australian Terrestrial Reference Frame (ATRF) at
     a specified epoch to coordinates in terms of Geocentric Datum of Australia 2020 (GDA2020 - reference epoch 2020.0)
@@ -216,10 +217,10 @@ def atrf2014_to_gda2020(x, y, z, epoch_from, vcv=None):
     :param vcv: Optional 3*3 numpy array in Cartesian units to propagate tf uncertainty
     :return: Cartesian X, Y, Z Coordinates and vcv matrix in terms of GDA2020
     """
-    return conform14(x, y, z, epoch_from, atrf_gda2020, vcv=vcv)
+    return conform14(x, y, z, epoch_from, atrf2014_to_gda2020, vcv=vcv)
 
 
-def gda2020_to_atrf2014(x, y, z, epoch_to, vcv=None):
+def transform_gda2020_to_atrf2014(x, y, z, epoch_to, vcv=None):
     """
     Transforms Cartesian (x, y, z) Coordinates in terms of Geocentric Datum of Australia 2020
     (GDA2020 - reference epoch 2020.0) to coordinates in terms of the Australian Terrestrial Reference Frame (ATRF) at
@@ -231,4 +232,41 @@ def gda2020_to_atrf2014(x, y, z, epoch_to, vcv=None):
     :param vcv: Optional 3*3 numpy array in Cartesian units to propagate tf uncertainty
     :return: Cartesian X, Y, Z Coordinates and vcv matrix in terms of ATRF at the specified Epoch
     """
-    return conform14(x, y, z, epoch_to, -atrf_gda2020, vcv=vcv)
+    return conform14(x, y, z, epoch_to, -atrf2014_to_gda2020, vcv=vcv)
+
+
+def ntv2_2d(ntv2_grid, lat, lon, forward_tf=True, method='bicubic'):
+    """
+    Performs a 2D transformation based on ntv2 grid shifts.
+    :param ntv2_grid: Ntv2Grid object (create with read_ntv2_file() function in geodepy.ntv2reader module)
+    :param lat: latitude in decimal degrees
+    :param lon: longitude in decimal degrees
+    :param forward_tf: True/False:
+                       - True applies the shifts in the direction given in the grid.
+                       - False applies the shifts in the opposite direction of the grid
+    :param method: Interpolation strategy - either 'bicubic' or 'bilinear'
+    :return: Transformed latitude and longitude
+    """
+
+    # validate input data
+    if not isinstance(ntv2_grid, NTv2Grid):
+        raise TypeError('ntv2_grid must be Ntv2Grid object')
+    if method != 'bicubic' and method != 'bilinear':
+        raise ValueError(f'interpolation strategy "{method}" not supported')
+
+    # interrogate grid
+    shifts = interpolate_ntv2(ntv2_grid, lat, lon, method=method)
+
+    # null results are outside of grid extents.
+    if shifts[0] is None:
+        raise ValueError('Coordinate outside of grid extents')
+
+    if forward_tf:
+        tf_lat = lat + shifts[0] / 3600
+        tf_lon = lon - shifts[1] / 3600
+    else:
+        tf_lat = lat - shifts[0] / 3600
+        tf_lon = lon + shifts[1] / 3600
+
+    return tf_lat, tf_lon
+
