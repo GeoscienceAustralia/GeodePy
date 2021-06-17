@@ -6,7 +6,10 @@ GNSS Module
 
 In Development
 """
+
+import sys
 from numpy import zeros
+from geodepy.angles import DMSAngle
 
 
 def read_sinex_estimate(file):
@@ -228,3 +231,149 @@ def read_sinex_matrix(file):
                 matrix.append(info)
 
     return matrix
+
+
+def read_sinex_sites(file):
+
+    """This function reads in the SITE/ID block of a SINEX file. It returns
+    sites, a list of tuples:
+
+    sites = [(site, point, domes, obs, station_description, lon, lat, h)]
+
+    where:
+        * site is the site code
+        * point is the site's point code
+        * domes is the site's dome number
+        * obs is the observation technique
+        * station_description is a free format desciption of the site
+        * lon is the approximate longitude of the site as a DMSAngle object
+        * lat is the approximate latitude of the site as a DMSAngle object
+        * h is the approximate height of the site
+
+    :param file: the input SINEX file
+    :return: sites
+    """
+
+    # Read the SITE/ID block into a list
+    lines = []
+    go = False
+    with open(file) as f:
+        for line in f:
+            if line[:8] == '-SITE/ID':
+                break
+            if go and line[:8] == '*CODE PT':
+                pass
+            elif go:
+                lines.append(line)
+            if line[:8] == '+SITE/ID':
+                go = True
+    sites = []
+    for line in lines:
+        site = line[1:5]
+        point = line[6:8].lstrip()
+        domes = line[9:18]
+        obs = line[19:20]
+        station_description = line[21:43].lstrip()
+        lon = DMSAngle(line[44:55].lstrip())
+        lat = DMSAngle(line[56:67].lstrip())
+        h = float(line[67:73])
+        info = (site, point, domes, obs, station_description, lon, lat, h)
+        sites.append(info)
+
+    return sites
+
+def read_disconts(file):
+
+    """This function reads in the SOLUTION/DISCONTINUITY block of a
+    SINEX file. It returns disconts , a list of tuples:
+
+    sites = [(site, code1, point, code2, start, end, type)]
+
+    where:
+        * site is the site code
+        * code1 is unknown
+        * point is the site's point code
+        * code2 is unknown
+        * start is the start time for the point code in YY:DOY:SECOD
+        * end is the end time for the point code in YY:DOY:SECOD
+        * type is the type of discontinuity; P for position or V for
+            velocity
+
+    I could not find the format description for this block.
+
+    :param file: the input discontinuities file
+    :return: disconts
+    """
+
+    # Read the SOLUTION/DISCONTINUITY block into a list
+    lines = []
+    go = False
+    with open(file) as f:
+        for line in f:
+            if line[:23] == '-SOLUTION/DISCONTINUITY':
+                break
+            elif go:
+                lines.append(line)
+            if line[:23] == '+SOLUTION/DISCONTINUITY':
+                go = True
+    disconts = []
+    for line in lines:
+        site = line[1:5]
+        code1 = line[5:8].lstrip()
+        point = line[8:13].lstrip()
+        code2 = line[14:15]
+        start = line[16:28]
+        end = line[29:41]
+        type = line[42:43]
+        info = (site, code1, point, code2, start, end, type)
+        disconts.append(info)
+
+    return disconts
+
+def read_solution_epochs(file):
+
+    """This function reads in the SOLUTION/EPOCHS block of a SINEX file.
+    It returns epochs, a list of tuples:
+
+    epochs = [(site, point, sol, obs, start, end, mean)]
+
+    where:
+        * site is the site code
+        * point is the site's point code
+        * sol is the solution number at a site/point
+        * obs is the observation technique
+        * start is the start time for the solution in YY:DOY:SECOD
+        * end is the end time for the solution in YY:DOY:SECOD
+        * mean is the mean time for the solution in YY:DOY:SECOD
+
+    :param file: the input SINEX file
+    :return: epochs
+    """
+
+    # Read the SOLUTION/EPOCHS block into a list
+    lines = []
+    go = False
+    with open(file) as f:
+        for line in f:
+            if line[:16] == '-SOLUTION/EPOCHS':
+                break
+            if go and line[:8] == '*Code PT':
+                pass
+            elif go:
+                lines.append(line)
+            if line[:16] == '+SOLUTION/EPOCHS':
+                go = True
+    epochs = []
+    # Parse each line, create a tuple and add it to the list
+    for line in lines:
+        site = line[1:5]
+        point = line[6:8].lstrip()
+        sol = line[9:13].lstrip()
+        obs = line[14:15]
+        start = line[16:28]
+        end = line[29:41]
+        mean = line[42:55].rstrip()
+        info = (site, point, sol, obs, start, end, mean)
+        epochs.append(info)
+
+    return epochs
