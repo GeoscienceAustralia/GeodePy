@@ -357,7 +357,7 @@ def read_solution_epochs(file):
         for line in f:
             if line[:16] == '-SOLUTION/EPOCHS':
                 break
-            if go and line[:8] == '*CODE PT':
+            if go and line[:8] == '*Code PT':
                 pass
             elif go:
                 lines.append(line)
