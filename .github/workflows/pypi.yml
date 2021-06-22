@@ -6,11 +6,11 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: PyPI GeodePy
+name: GeodePy PyPI
 
 on:
   release:
-    types: [published]
+    types: [released]
 
 jobs:
   deploy:
