@@ -10,7 +10,7 @@ name: GeodePy PyPI
 
 on:
   release:
-    types: [released]
+    types: [published]
 
 jobs:
   deploy:
