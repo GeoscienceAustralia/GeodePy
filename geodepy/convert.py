@@ -8,7 +8,7 @@ Convert Module
 from math import (sin, cos, atan2, radians, degrees,
                   sqrt, cosh, sinh, tan, atan, log)
 import datetime
-from geodepy.constants import utm, grs80
+from geodepy.constants import utm, isg, grs80, ans
 from geodepy.angles import (DECAngle, HPAngle, GONAngle, DMSAngle, DDMAngle,
                             dec2hp, dec2hpa, dec2gon, dec2gona,
                             dec2dms, dec2ddm,
@@ -17,11 +17,6 @@ from geodepy.angles import (DECAngle, HPAngle, GONAngle, DMSAngle, DDMAngle,
                             gon2dec, gon2deca, gon2hp, gon2hpa,
                             gon2dms, gon2ddm, gon2rad,
                             dd2sec, angular_typecheck)
-
-
-# Universal Transverse Mercator Projection Parameters
-# TODO: Add this part into functions: geo2grid, grid2geo, psfandgridconv
-proj = utm
 
 
 def polar2rect(r, theta):
@@ -240,7 +235,7 @@ def beta_coeff(ellipsoid):
     return b2, b4, b6, b8, b10, b12, b14, b16
 
 
-def psfandgridconv(xi1, eta1, lat, lon, cm, conf_lat, ellipsoid=grs80):
+def psfandgridconv(xi1, eta1, lat, lon, cm, conf_lat, ellipsoid=grs80, prj=utm):
     """
     Calculates Point Scale Factor and Grid Convergence. Used in convert.geo2grid
     and convert.grid2geo
@@ -270,7 +265,7 @@ def psfandgridconv(xi1, eta1, lat, lon, cm, conf_lat, ellipsoid=grs80):
         p += 2*r * a[r-1] * cos(2*r * xi1) * cosh(2*r * eta1)
         q += 2*r * a[r-1] * sin(2*r * xi1) * sinh(2*r * eta1)
     q = -q
-    psf = (float(proj.cmscale)
+    psf = (float(prj.cmscale)
            * (A / ellipsoid.semimaj)
            * sqrt(q**2 + p**2)
            * ((sqrt(1 + (tan(lat)**2))
@@ -289,7 +284,7 @@ def psfandgridconv(xi1, eta1, lat, lon, cm, conf_lat, ellipsoid=grs80):
     return psf, grid_conv
 
 
-def geo2grid(lat, lon, zone=0, ellipsoid=grs80):
+def geo2grid(lat, lon, zone=0, ellipsoid=grs80, prj=utm):
     """
     Takes a geographic co-ordinate (latitude, longitude) and returns its
     corresponding Hemisphere, Zone and Projection Easting and Northing, Point
@@ -314,8 +309,12 @@ def geo2grid(lat, lon, zone=0, ellipsoid=grs80):
     lon = angular_typecheck(lon)
     # Input Validation - UTM Extents and Values
     zone = int(zone)
-    if zone < 0 or zone > 60:
-        raise ValueError('Invalid Zone - Zones from 1 to 60')
+    if prj == isg:
+        if zone not in (0, 541, 542, 543, 551, 552, 553, 561, 562, 563):
+            raise ValueError('Invalid Zone - Choose from 541, 542, 543, 551, 552, 553, 561, 562, 563')
+    else:
+        if zone < 0 or zone > 60:
+                raise ValueError('Invalid Zone - Zones from 1 to 60')
 
     if lat < -80 or lat > 84:
         raise ValueError('Invalid Latitude - Latitudes from -80 to +84')
@@ -323,14 +322,27 @@ def geo2grid(lat, lon, zone=0, ellipsoid=grs80):
     if lon < -180 or lon > 180:
         raise ValueError('Invalid Longitude - Longitudes from -180 to +180')
 
+    if prj == isg and ellipsoid != ans:
+        raise ValueError('Invalid ellipsoid for chosen projection')
+
     A = rect_radius(ellipsoid)
     a = alpha_coeff(ellipsoid)
     lat = radians(lat)
     # Calculate Zone
     if zone == 0:
-        zone = int((float(lon) - (
-                    proj.initialcm - (1.5 * proj.zonewidth))) / proj.zonewidth)
-    cm = float(zone * proj.zonewidth) + (proj.initialcm - proj.zonewidth)
+        if prj == isg:
+            amgzone = (float(lon) - (prj.initialcm - (4.5 * prj.zonewidth))) / (prj.zonewidth * 3)
+            subzone = int((amgzone - int(amgzone)) * 3 + 1)
+            amgzone = int(amgzone)
+            zone = int(f'{amgzone}{subzone}')
+        else:
+            zone = int((float(lon) - (prj.initialcm - (1.5 * prj.zonewidth))) / prj.zonewidth)
+    if prj == isg:
+        amgzone = int(str(zone)[:2])
+        subzone = int(str(zone)[2])
+        cm = float((amgzone - 1) * prj.zonewidth * 3 + prj.initialcm + (subzone - 2) * prj.zonewidth)
+    else:
+        cm = float(zone * prj.zonewidth + prj.initialcm - prj.zonewidth)
 
     # Conformal Latitude
     sigx = (ellipsoid.ecc1 * tan(lat)) / sqrt(1 + (tan(lat) ** 2))
@@ -357,14 +369,14 @@ def geo2grid(lat, lon, zone=0, ellipsoid=grs80):
     y = A * xi
 
     # Hemisphere-dependent UTM Projection Co-ordinates
-    east = proj.cmscale * x + proj.falseeast
+    east = prj.cmscale * x + prj.falseeast
     if y < 0:
         hemisphere = 'South'
-        north = proj.cmscale * y + proj.falsenorth
+        north = prj.cmscale * y + prj.falsenorth
     else:
         hemisphere = 'North'
         falsenorth = 0
-        north = proj.cmscale * y + falsenorth
+        north = prj.cmscale * y + falsenorth
 
     # Point Scale Factor and Grid Convergence
     psf, grid_conv = psfandgridconv(xi1, eta1, degrees(lat), lon, cm, conf_lat)
@@ -375,7 +387,7 @@ def geo2grid(lat, lon, zone=0, ellipsoid=grs80):
             round(psf, 8), grid_conv)
 
 
-def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
+def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80, prj=utm):
     """
     Takes a Transverse Mercator grid co-ordinate (Zone, Easting, Northing,
     Hemisphere) and returns its corresponding Geographic Latitude and Longitude,
@@ -393,8 +405,12 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
     """
     # Input Validation - UTM Extents and Values
     zone = int(zone)
-    if zone < 0 or zone > 60:
-        raise ValueError('Invalid Zone - Zones from 1 to 60')
+    if prj == isg:
+        if zone not in (541, 542, 543, 551, 552, 553, 561, 562, 563):
+            raise ValueError('Invalid Zone - Choose from 541, 542, 543, 551, 552, 553, 561, 562, 563')
+    else:
+        if zone < 0 or zone > 60:
+            raise ValueError('Invalid Zone - Zones from 1 to 60')
 
     if east < -2830000 or east > 3830000:
         raise ValueError('Invalid Easting - Must be within'
@@ -407,15 +423,18 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
     if h != 'north' and h != 'south':
         raise ValueError('Invalid Hemisphere - String, either North or South')
 
+    if prj == isg and ellipsoid != ans:
+        raise ValueError('Invalid ellipsoid for chosen projection')
+
     A = rect_radius(ellipsoid)
     b = beta_coeff(ellipsoid)
     # Transverse Mercator Co-ordinates
-    x = (east - float(proj.falseeast)) / float(proj.cmscale)
+    x = (east - float(prj.falseeast)) / float(prj.cmscale)
     if hemisphere.lower() == 'north':
-        y = -(north / float(proj.cmscale))
+        y = -(north / float(prj.cmscale))
         hemisign = -1
     else:
-        y = (north - float(proj.falsenorth)) / float(proj.cmscale)
+        y = (north - float(prj.falsenorth)) / float(prj.cmscale)
         hemisign = 1
 
     # Transverse Mercator Ratios
@@ -463,7 +482,12 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80):
     lat = degrees(atan(t))
 
     # Compute Longitude
-    cm = float((zone * proj.zonewidth) + proj.initialcm - proj.zonewidth)
+    if prj == isg:
+        amgzone = int(str(zone)[:2])
+        subzone = int(str(zone)[2])
+        cm = float((amgzone - 1) * prj.zonewidth * 3 + prj.initialcm + (subzone - 2) * prj.zonewidth)
+    else:
+        cm = float((zone * prj.zonewidth) + prj.initialcm - prj.zonewidth)
     long_diff = degrees(atan(sinh(eta1) / cos(xi1)))
     long = cm + long_diff
 
