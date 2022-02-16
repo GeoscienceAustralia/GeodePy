@@ -8,6 +8,7 @@ Convert Module
 from math import (sin, cos, atan2, radians, degrees,
                   sqrt, cosh, sinh, tan, atan, log)
 import datetime
+import warnings
 from geodepy.constants import utm, isg, grs80, ans
 from geodepy.angles import (DECAngle, HPAngle, GONAngle, DMSAngle, DDMAngle,
                             dec2hp, dec2hpa, dec2gon, dec2gona,
@@ -310,8 +311,8 @@ def geo2grid(lat, lon, zone=0, ellipsoid=grs80, prj=utm):
     # Input Validation - UTM Extents and Values
     zone = int(zone)
     if prj == isg:
-        if zone not in (0, 541, 542, 543, 551, 552, 553, 561, 562, 563):
-            raise ValueError('Invalid Zone - Choose from 541, 542, 543, 551, 552, 553, 561, 562, 563')
+        if zone not in (0, 541, 542, 543, 551, 552, 553, 561, 562, 563, 572):
+            raise ValueError('Invalid Zone - Choose from 541, 542, 543, 551, 552, 553, 561, 562, 563, 572')
     else:
         if zone < 0 or zone > 60:
                 raise ValueError('Invalid Zone - Zones from 1 to 60')
@@ -323,7 +324,7 @@ def geo2grid(lat, lon, zone=0, ellipsoid=grs80, prj=utm):
         raise ValueError('Invalid Longitude - Longitudes from -180 to +180')
 
     if prj == isg and ellipsoid != ans:
-        raise ValueError('Invalid ellipsoid for chosen projection')
+        warnings.warn(message='ISG projection should be used with ANS ellipsoid', category=UserWarning)
 
     A = rect_radius(ellipsoid)
     a = alpha_coeff(ellipsoid)
@@ -406,8 +407,8 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80, prj=utm):
     # Input Validation - UTM Extents and Values
     zone = int(zone)
     if prj == isg:
-        if zone not in (541, 542, 543, 551, 552, 553, 561, 562, 563):
-            raise ValueError('Invalid Zone - Choose from 541, 542, 543, 551, 552, 553, 561, 562, 563')
+        if zone not in (541, 542, 543, 551, 552, 553, 561, 562, 563, 572):
+            raise ValueError('Invalid Zone - Choose from 541, 542, 543, 551, 552, 553, 561, 562, 563, 572')
     else:
         if zone < 0 or zone > 60:
             raise ValueError('Invalid Zone - Zones from 1 to 60')
@@ -424,7 +425,7 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80, prj=utm):
         raise ValueError('Invalid Hemisphere - String, either North or South')
 
     if prj == isg and ellipsoid != ans:
-        raise ValueError('Invalid ellipsoid for chosen projection')
+        warnings.warn(message='ISG projection should be used with ANS ellipsoid', category=UserWarning)
 
     A = rect_radius(ellipsoid)
     b = beta_coeff(ellipsoid)
