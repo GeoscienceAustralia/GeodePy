@@ -66,6 +66,7 @@ class Projection(object):
 
 
 utm = Projection(500000, 10000000, 0.9996, 6, -177)
+isg = Projection(300000, 5000000, 0.99994, 2, -177)
 
 
 # Helmert 14 parameter transformation
