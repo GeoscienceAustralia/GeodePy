@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='geodepy',
-      version='0.0.21',
+      version='0.0.28',
       description='GA Geodesy Package',
       long_description='A toolkit for Geodesy and Surveying in Python',
       url='https://github.com/GeoscienceAustralia/GeodePy',
