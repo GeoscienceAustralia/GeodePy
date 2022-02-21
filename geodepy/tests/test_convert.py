@@ -3,6 +3,7 @@ import unittest
 import datetime
 import numpy as np
 from geodepy.fileio import read_dnacoord
+from geodepy.constants import grs80, ans, isg
 from geodepy.convert import (dec2hp, hp2dec, DMSAngle, DDMAngle, dec2dms,
                              dec2ddm, hp2dms, hp2ddm, dd2sec,
                              yyyydoy_to_date, date_to_yyyydoy, grid2geo,
@@ -79,6 +80,28 @@ class TestConvert(unittest.TestCase):
         np.testing.assert_almost_equal(gridded_geo[:, 2:4].astype(float),
                                        np.array(test_grid_coords[['east', 'north']].tolist()),
                                        decimal=3)
+
+    def test_geo_grid_transform_interoperability_isg(self):
+        abs_path = os.path.abspath(os.path.dirname(__file__))
+        test_geo_coords = np.genfromtxt(os.path.join(abs_path, 'resources/Test_Conversion_ISG_Geo.csv'),
+                                        delimiter=',',
+                                        dtype='S4,f8,f8',
+                                        names=['site', 'lat', 'lon'])
+
+        test_grid_coords = np.genfromtxt(os.path.join(abs_path, 'resources/Test_Conversion_ISG_Grid.csv'),
+                                         delimiter=',',
+                                         dtype='S4,i4,f8,f8',
+                                         names=['site', 'zone', 'east', 'north'])
+
+        geoed_grid = np.array(list(grid2geo(*x, ellipsoid=ans, prj=isg) for x in test_grid_coords[['zone', 'east', 'north']]))
+        np.testing.assert_almost_equal(geoed_grid[:, :2], np.array(test_geo_coords[['lat', 'lon']].tolist()),
+                                       decimal=8)
+
+        gridded_geo = np.stack(geo2grid(*x, ellipsoid=ans, prj=isg) for x in np.array(test_geo_coords[['lat', 'lon']].tolist()))
+        np.testing.assert_almost_equal(gridded_geo[:, 2:4].astype(float),
+                                       np.array(test_grid_coords[['east', 'north']].tolist()),
+                                       decimal=3)
+
 
     def test_llh2xyz(self):
 
@@ -197,6 +220,12 @@ class TestConvert(unittest.TestCase):
             geo2grid(0, -181, 0)
         with self.assertRaises(ValueError):
             geo2grid(0, 181, 0)
+        # test ValueError raised if not a valid ISG zone
+        with self.assertRaises(ValueError):
+            grid2geo(zone=530, east=300000, north=1500000, ellipsoid=ans, prj=isg)
+        # test UserWarning raised if prj/ellipsoid combination isn't recommended
+        with self.assertWarns(UserWarning):
+            grid2geo(zone=551, east=300000, north=1500000, ellipsoid=grs80, prj=isg)
 
     def test_grid2geo(self):
         abs_path = os.path.abspath(os.path.dirname(__file__))
@@ -233,7 +262,12 @@ class TestConvert(unittest.TestCase):
             grid2geo(0, 0, 10000001)
         with self.assertRaises(ValueError):
             grid2geo(0, 0, 500000, 'fail')
-
+        # test ValueError raised if not a valid ISG zone
+        with self.assertRaises(ValueError):
+            grid2geo(zone=530, east=300000, north=1500000, ellipsoid=ans, prj=isg)
+        # test UserWarning raised if prj/ellipsoid combination isn't recommended
+        with self.assertWarns(UserWarning):
+            grid2geo(zone=551, east=300000, north=1500000, ellipsoid=grs80, prj=isg)
 
 if __name__ == '__main__':
     unittest.main()

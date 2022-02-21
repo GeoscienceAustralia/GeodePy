@@ -67,6 +67,11 @@ class Projection(object):
 
 utm = Projection(500000, 10000000, 0.9996, 6, -177)
 
+# Integrated Survey Grid - used in NSW as the projection for AGD66
+# Spatial Services projections page - https://www.spatial.nsw.gov.au/surveying/geodesy/projections
+# ISG Technical Manual - https://www.spatial.nsw.gov.au/__data/assets/pdf_file/0017/25730/ISG.pdf
+isg = Projection(300000, 5000000, 0.99994, 2, -177)
+
 
 # Helmert 14 parameter transformation
 class Transformation(object):
