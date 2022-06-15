@@ -18,3 +18,13 @@ env
 .vscode
 .idea
 
+/geodepy/XVSOLFIN_20220219.SNX
+/geodepy/run_extx.py
+/geodepy/stns_in.dat
+/geodepy/stns_out.dat
+/resources/
+/geodepy/apref20190209.snx
+/geodepy/output.snx
+/geodepy/XVSOLFIN_20220115.SNX.AUS
+/geodepy/XVSOLFIN_20220115.SNX
+/geodepy/REDX.SNX

@@ -7,9 +7,9 @@ GNSS Module
 In Development
 """
 
-import sys
 from numpy import zeros
 from geodepy.angles import DMSAngle
+import sys
 
 
 def read_sinex_estimate(file):
@@ -110,7 +110,6 @@ def read_sinex_estimate(file):
 
 
 def read_sinex_matrix(file):
-
     """This function reads in the SOLUTION/MATRIX_ESTIMATE block of a SINEX
     file. It returns matrix, a list of tuples:
 
@@ -234,7 +233,6 @@ def read_sinex_matrix(file):
 
 
 def read_sinex_sites(file):
-
     """This function reads in the SITE/ID block of a SINEX file. It returns
     sites, a list of tuples:
 
@@ -282,8 +280,8 @@ def read_sinex_sites(file):
 
     return sites
 
-def read_disconts(file):
 
+def read_disconts(file):
     """This function reads in the SOLUTION/DISCONTINUITY block of a
     SINEX file. It returns disconts , a list of tuples:
 
@@ -324,14 +322,14 @@ def read_disconts(file):
         code2 = line[14:15]
         start = line[16:28]
         end = line[29:41]
-        type = line[42:43]
-        info = (site, code1, point, code2, start, end, type)
+        p_or_v = line[42:43]
+        info = (site, code1, point, code2, start, end, p_or_v)
         disconts.append(info)
 
     return disconts
 
-def read_solution_epochs(file):
 
+def read_solution_epochs(file):
     """This function reads in the SOLUTION/EPOCHS block of a SINEX file.
     It returns epochs, a list of tuples:
 
@@ -377,3 +375,216 @@ def read_solution_epochs(file):
         epochs.append(info)
 
     return epochs
+
+
+def read_sinex_header_block(sinex):
+    """This function reads in the header information of a SINEX file
+
+        :param str sinex: input SINEX file
+        return: block
+        """
+
+    block = []
+    with open(sinex, 'r') as f:
+        line = f.readline()
+        while line:
+            block.append(line)
+            line = f.readline()
+            if line.startswith('+SITE/ID'):
+                break
+
+    return block
+
+
+def read_sinex_site_id_block(sinex):
+    """This function reads in the SITE/ID block of a SINEX file
+
+    :param str sinex: input SINEX file
+    return: block
+    """
+
+    block = []
+    go = False
+    with open(sinex, 'r') as f:
+        line = f.readline()
+        while line:
+            if line.startswith('+SITE/ID'):
+                go = True
+            if go:
+                block.append(line)
+            if line.startswith('-SITE/ID'):
+                break
+            line = f.readline()
+
+    return block
+
+
+def read_sinex_solution_epochs_block(sinex):
+    """This function reads in the SOLUTION/EPOCHS block of a SINEX file
+
+    :param str sinex: input SINEX file
+    return: block
+    """
+
+    block = []
+    go = False
+    with open(sinex, 'r') as f:
+        line = f.readline()
+        while line:
+            if line.startswith('+SOLUTION/EPOCHS'):
+                go = True
+            if go:
+                block.append(line)
+            if line.startswith('-SOLUTION/EPOCHS'):
+                break
+            line = f.readline()
+    return block
+
+
+def read_sinex_solution_estimate_block(sinex):
+    """This function reads in the SOLUTION/ESTIMATE block of a SINEX
+    file
+
+    :param str sinex: input SINEX file
+    return: block
+    """
+
+    block = []
+    go = False
+    with open(sinex, 'r') as f:
+        line = f.readline()
+        while line:
+            if line.startswith('+SOLUTION/ESTIMATE'):
+                go = True
+            if go:
+                block.append(line)
+            if line.startswith('-SOLUTION/ESTIMATE'):
+                break
+            line = f.readline()
+    return block
+
+
+def read_sinex_solution_matrix_estimate_block(sinex):
+    """This function reads in the SOLUTION/MATRIX_ESTIMATE block of a SINEX
+    file
+
+    :param str sinex: input SINEX file
+    return: block
+    """
+
+    block = []
+    go = False
+    with open(sinex, 'r') as f:
+        line = f.readline()
+        while line:
+            if line.startswith('+SOLUTION/MATRIX_ESTIMATE'):
+                go = True
+            if go:
+                block.append(line)
+            if line.startswith('-SOLUTION/MATRIX_ESTIMATE'):
+                break
+            line = f.readline()
+    return block
+
+
+def remove_stns_sinex(sinex, sites):
+    """This function removes a list sites from a SINEX file
+
+    :param sinex: input SINEX file
+    :param sites: list of the sites to be removed
+    :return: SINEX file output.snx
+    """
+
+    separator = '*' + '-' * 79 + '\n'
+
+    with open('output.snx', 'w') as out:
+        header = read_sinex_header_block(sinex)
+        for line in header:
+            out.write(line)
+        del header
+        site_id = read_sinex_site_id_block(sinex)
+        for line in site_id:
+            if line.startswith('*') or line.startswith('+') or \
+                    line.startswith('-'):
+                out.write(line)
+            else:
+                site = line[1:5]
+                if site not in sites:
+                    out.write(line)
+        del site_id
+        out.write(separator)
+        solution_epochs = read_sinex_solution_epochs_block(sinex)
+        for line in solution_epochs:
+            if line.startswith('*') or line.startswith('+') or \
+                    line.startswith('-'):
+                out.write(line)
+            else:
+                site = line[1:5]
+                if site not in sites:
+                    out.write(line)
+        del solution_epochs
+        out.write(separator)
+        skip = []
+        estimate_number = 0
+        solution_estimate = read_sinex_solution_estimate_block(sinex)
+        for line in solution_estimate:
+            if line.startswith('*') or line.startswith('+') or \
+                    line.startswith('-'):
+                out.write(line)
+            else:
+                site = line[14:18]
+                if site in sites:
+                    num = int(line[0:6])
+                    skip.append(num)
+                else:
+                    estimate_number += 1
+                    number = '{:5d}'.format(estimate_number)
+                    line = ' ' + number + line[6:]
+                    out.write(line)
+        del solution_estimate
+        out.write(separator)
+        vcv = {}
+        solution_matrix_estimate = \
+            read_sinex_solution_matrix_estimate_block(sinex)
+        out.write(solution_matrix_estimate[0])
+        out.write(solution_matrix_estimate[1])
+        for line in solution_matrix_estimate:
+            if line.startswith(' '):
+                cols = line.split()
+                row = cols[0]
+                for i in range(2, len(cols)):
+                    try:
+                        vcv[row].append(cols[i])
+                    except KeyError:
+                        vcv[row] = []
+                        vcv[row].append(cols[i])
+        block_close = solution_matrix_estimate[-1]
+        del solution_matrix_estimate
+        sub_vcv = {}
+        sub_row = 0
+        for i in range(1, len(vcv)+1):
+            if i not in skip:
+                sub_row += 1
+                for j in range(i):
+                    if j+1 not in skip:
+                        try:
+                            sub_vcv[str(sub_row)].append(vcv[str(i)][j])
+                        except KeyError:
+                            sub_vcv[str(sub_row)] = []
+                            sub_vcv[str(sub_row)].append(vcv[str(i)][j])
+        for i in range(1, len(sub_vcv)+1):
+            para1 = '{:5d}'.format(i)
+            j = -2
+            while sub_vcv[str(i)]:
+                j += 3
+                para2 = '{:5d}'.format(j)
+                line = ' ' + para1 + ' ' + para2
+                n = min([3, len(sub_vcv[str(i)])])
+                for k in range(n):
+                    val = sub_vcv[str(i)].pop(0)
+                    line += ' ' + val
+                out.write(line + '\n')
+        out.write(block_close)
+        out.write('%ENDSNX\n')
+
+    return
