@@ -32,6 +32,19 @@ def set_creation_time():
     return creation_time
 
 
+def read_sinex_header_line(file):
+    """This function reads the header line of a SINEX file into a string
+
+    :param str file: the input SINEX file
+    :return: header_line
+    :rtype: str
+    """
+    with open(file) as f:
+        header_line = f.readline()
+
+    return header_line
+
+
 def read_sinex_estimate(file):
     """This function reads in the SOLUTION/ESTIMATE block of a SINEX file. It
     returns estimate, a list of tuples:
