@@ -7,9 +7,29 @@ GNSS Module
 In Development
 """
 
+from datetime import datetime
 from numpy import zeros
 from geodepy.angles import DMSAngle
-import sys
+
+
+def set_creation_time():
+    """This function sets the creation time, in format YY:DDD:SSSSS, for use
+    in the SINEX header line
+
+    :return: creation_time
+    :rtype: str
+    """
+    now = datetime.now()
+    time_tup = now.timetuple()
+    year = str(time_tup.tm_year)[2:]
+    doy = time_tup.tm_yday
+    doy = '{:03d}'.format(doy)
+    seconds = (now - now.replace(hour=0, minute=0, second=0, microsecond=0))\
+        .total_seconds()
+    seconds = '{:.0f}'.format(seconds)
+    creation_time = year + ':' + doy + ':' + seconds
+
+    return creation_time
 
 
 def read_sinex_estimate(file):
