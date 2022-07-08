@@ -7,6 +7,7 @@ GNSS Module
 In Development
 """
 
+import sys
 from datetime import datetime
 from numpy import zeros
 from geodepy.angles import DMSAngle
@@ -420,6 +421,7 @@ def read_sinex_header_block(sinex):
     block = []
     with open(sinex, 'r') as f:
         line = f.readline()
+        line = f.readline()
         while line:
             block.append(line)
             line = f.readline()
@@ -528,13 +530,36 @@ def remove_stns_sinex(sinex, sites):
     :return: SINEX file output.snx
     """
 
+    # The block separator
     separator = '*' + '-' * 79 + '\n'
 
+    # Open the output file
     with open('output.snx', 'w') as out:
-        header = read_sinex_header_block(sinex)
-        for line in header:
-            out.write(line)
-        del header
+
+        # Get header line and update the creation time and the number of
+        # parameter estimates. Write the updated header line to the new file
+        header = read_sinex_header_line(sinex)
+        old_creation_time = header[15:27]
+        creation_time = set_creation_time()
+        header = header.replace(old_creation_time, creation_time)
+        old_num_params = int(header[60:65])
+        if header[70:71] == 'V':
+            num_stn_params = 6
+        else:
+            num_stn_params = 3
+        solution_epochs = read_sinex_solution_epochs_block(sinex)
+        num_stns_to_remove = 0
+        for line in solution_epochs:
+            site = line[1:5]
+            if site in sites:
+                num_stns_to_remove += 1
+        del solution_epochs
+        num_params = old_num_params - num_stn_params * num_stns_to_remove
+        header = header.replace(str(old_num_params), str(num_params))
+        out.write(header)
+        out.write(separator)
+
+        # Read in the site ID block and write out the sites not being removed
         site_id = read_sinex_site_id_block(sinex)
         for line in site_id:
             if line.startswith('*') or line.startswith('+') or \
@@ -546,6 +571,9 @@ def remove_stns_sinex(sinex, sites):
                     out.write(line)
         del site_id
         out.write(separator)
+
+        # Read in the solution epochs block and write out the epochs of the
+        # sites not being removed
         solution_epochs = read_sinex_solution_epochs_block(sinex)
         for line in solution_epochs:
             if line.startswith('*') or line.startswith('+') or \
@@ -557,6 +585,9 @@ def remove_stns_sinex(sinex, sites):
                     out.write(line)
         del solution_epochs
         out.write(separator)
+
+        # Read in the solution estimate block and write out the estimates of
+        # the sites not being removed
         skip = []
         estimate_number = 0
         solution_estimate = read_sinex_solution_estimate_block(sinex)
@@ -576,6 +607,9 @@ def remove_stns_sinex(sinex, sites):
                     out.write(line)
         del solution_estimate
         out.write(separator)
+
+        # Read in the matrix estimate block and write out minus the sites
+        # being removed
         vcv = {}
         solution_matrix_estimate = \
             read_sinex_solution_matrix_estimate_block(sinex)
@@ -591,7 +625,7 @@ def remove_stns_sinex(sinex, sites):
                     except KeyError:
                         vcv[row] = []
                         vcv[row].append(cols[i])
-        block_close = solution_matrix_estimate[-1]
+        block_end = solution_matrix_estimate[-1]
         del solution_matrix_estimate
         sub_vcv = {}
         sub_row = 0
@@ -617,7 +651,9 @@ def remove_stns_sinex(sinex, sites):
                     val = sub_vcv[str(i)].pop(0)
                     line += ' ' + val
                 out.write(line + '\n')
-        out.write(block_close)
+        out.write(block_end)
+
+        # Write out the trailer line
         out.write('%ENDSNX\n')
 
     return

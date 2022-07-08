@@ -30,3 +30,7 @@ env
 /geodepy/REDX.SNX
 /geodepy/splitApref.py
 /geodepy/SNXEPO.SNX
+/geodepy/exciseStationsNGCA.py
+/geodepy/XVSOLFIN_20220326.SNX
+/geodepy/exciseStationsAPREF.py
+/geodepy/gda2020.dat
