@@ -17,8 +17,6 @@ def list_sinex_blocks(file):
     """This script lists the blocks in a SINEX file
 
     :param str file: the input SINEX file
-    :return: header_line
-    :rtype: str
     """
     blocks = []
     with open(file) as f:
@@ -30,6 +28,21 @@ def list_sinex_blocks(file):
     for block in blocks:
         print(block)
 
+
+def print_sinex_comments(file):
+    """This script lists prints comments in a SINEX file
+
+    :param str file: the input SINEX file
+    """
+    go = False
+    with open(file) as f:
+        for line in f.readlines():
+            if line.startswith('+FILE/COMMENT'):
+                go = True
+            if go:
+                print(line.strip())
+            if line.startswith('-FILE/COMMENT'):
+                go = False
 
 def set_creation_time():
     """This function sets the creation time, in format YY:DDD:SSSSS, for use
