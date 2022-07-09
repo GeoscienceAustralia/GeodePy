@@ -586,6 +586,7 @@ def remove_stns_sinex(sinex, sites):
                 num_stns_to_remove += 1
         del solution_epochs
         num_params = old_num_params - num_stn_params * num_stns_to_remove
+        num_params = '{:05d}'.format(num_params)
         header = header.replace(str(old_num_params), str(num_params))
         out.write(header)
         out.write(separator)
