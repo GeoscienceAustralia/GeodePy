@@ -13,6 +13,24 @@ from numpy import zeros
 from geodepy.angles import DMSAngle
 
 
+def list_sinex_blocks(file):
+    """This script lists the blocks in a SINEX file
+
+    :param str file: the input SINEX file
+    :return: header_line
+    :rtype: str
+    """
+    blocks = []
+    with open(file) as f:
+        for line in f.readlines():
+            if line.startswith('+'):
+                col = line.split(' ')
+                block = col[0].replace('+', '')
+                blocks.append(block.strip())
+    for block in blocks:
+        print(block)
+
+
 def set_creation_time():
     """This function sets the creation time, in format YY:DDD:SSSSS, for use
     in the SINEX header line
