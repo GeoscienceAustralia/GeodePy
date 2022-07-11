@@ -10,26 +10,66 @@ from statistics import mean, stdev
 from geodepy.convert import rect2polar, polar2rect
 
 
-def first_vel_params(wavelength, temp=12, pressure=1013.25, rel_humidity=60):
+def first_vel_params(wavelength, frequency, n_REF=None, unit_length=None):
     """
     Calculates the constant First Velocity Correction Parameters C and D
     for a given set of standard instrument settings
-    :param wavelength: Instrument Carrier Wavelength (micrometres)
-    :param temp: Standard Temperature (degrees Celsius)
-    :param pressure: Standard Pressure (hectopascals or millibars)
-    :param rel_humidity: Standard Relative Humidity (percentage)
+    :param wavelength: Instrument Carrier Wavelength (Nanometers) - Mandatory
+    :param frequency: Instrument modulation frequency (Hz) - Mandatory
+    :param n_REF: manufacturers reference refractive index - Recommended
+    :param unit_length: unit length of instrument - Optional
     :return: First Velocity Correction Parameters C and D
+    Reference Rueger, J.M., 2012, Electronic Distance Measurement – An Introduction, 4rd edition, Springer, Berlin
     """
-    group_refractivity = 287.6155 + (4.8866 / wavelength ** 2) + (0.068 / wavelength ** 4)
-    param_d = (273.15 / 1013.25) * group_refractivity
-    saturation_pressure = ((1.0007 + ((3.46 * pressure) * (10 ** -6)))
-                           * 6.1121 * exp((17.502 * temp) / (240.94 + temp)))
-    param_c = ((((group_refractivity * pressure) / (273.15 + temp)) * (273.15 / 1013.25))
-               - (11.27 * ((saturation_pressure * (rel_humidity / 100)) / (273.15 + temp))))
+    
+    if not n_REF and not unit_length:
+        raise ValueError('Error - n_REF and unit_length cannot both be None')
+        
+    if not n_REF:
+        # Rueger eq 6.3
+        n_REF = 299792458 / (2 * unit_length * frequency)
+    
+    # Rueger eq 6.12
+    param_c = (n_REF-1)*10**6
+    
+    # Rueger eq 5.12
+    # https://office.iag-aig.org/doc/5d7b8fda0c032.pdf Resolution 3
+    nG_1_10_6 = 287.6155 + (4.8866 / wavelength ** 2) + (0.068 / wavelength ** 4)
+    # Rueger eq 6.13
+    param_d = (273.15 / 1013.25) * nG_1_10_6
+    
     return param_c, param_d
 
 
-def first_vel_corrn(dist, first_vel_param, temp, pressure, rel_humidity):
+def part_h2o_vap_press(dry_temp, pressure, rel_humidity=None, wet_temp=None):
+    """
+    :param dry_temp: Observed Dry Temperature (degrees Celsius)
+    :param pressure: Observed Pressure (hectopascals or millibars)
+    :param rel_humidity: Observed Relative Humidity (percentage) - Optional if wet_temp supplied
+    :param wet_temp: Observed Wet Temperature (degrees Celsius) - Optional if rel_humidity supplied
+    Reference Rueger, J.M., 2012, Electronic Distance Measurement – An Introduction, 4rd edition, Springer, Berlin
+    """
+    
+    if not rel_humidity and not wet_temp:
+        raise ValueError('Error - rel_humidity and wet_temp cannot both be None')
+                         
+    if rel_humidity:
+        wet_temp = dry_temp
+    # Rueger eq 5.27
+    E_w = ((1.0007 + ((3.46 * pressure) * (10 ** -6)))
+         * 6.1121 * exp((17.502 * wet_temp) / (240.94 + wet_temp)))
+    
+    if rel_humidity:
+        # Rueger eq 5.29
+        e = (E_w*rel_humidity)/100
+    else:
+        e = E_w - 0.000662 * pressure * (dry_temp - wet_temp)
+    
+    return e
+    
+
+def first_vel_corrn(dist, first_vel_param, temp, pressure,
+                    rel_humidity=None, wet_temp=None):
     """
     Carries out First Velocity Correction of Electronic Distance Measurement,
     given correction parameters and atmospheric observations
@@ -42,11 +82,13 @@ def first_vel_corrn(dist, first_vel_param, temp, pressure, rel_humidity):
     """
     param_c = first_vel_param[0]
     param_d = first_vel_param[1]
-    part_h2o_press = exp((17.269 * temp) / (237.3 + temp))
-    first_vel_corrn_ppm = param_c - (
-                (param_d * pressure) / (273.15 + temp) + ((11.27 * part_h2o_press) * (0.061078 * rel_humidity)) / (
-                    273.15 + temp))
+    e = part_h2o_vap_press(temp, pressure, rel_humidity, wet_temp)
+    
+    # Rueger eq 6.11
+    t_273_15 = temp+273.15
+    first_vel_corrn_ppm = (param_c-((param_d*pressure)/t_273_15)+((11.27*e)/t_273_15))
     first_vel_corrn_metres = dist * first_vel_corrn_ppm * (10 ** -6)
+    
     return first_vel_corrn_metres
 
 
