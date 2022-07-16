@@ -7,7 +7,6 @@ GNSS Module
 In Development
 """
 
-import sys
 from datetime import datetime
 from numpy import zeros
 from geodepy.angles import DMSAngle
@@ -43,6 +42,7 @@ def print_sinex_comments(file):
                 print(line.strip())
             if line.startswith('-FILE/COMMENT'):
                 go = False
+
 
 def set_creation_time():
     """This function sets the creation time, in format YY:DDD:SSSSS, for use
@@ -451,7 +451,7 @@ def read_sinex_header_block(sinex):
 
     block = []
     with open(sinex, 'r') as f:
-        line = f.readline()
+        next(f)
         line = f.readline()
         while line:
             block.append(line)
@@ -561,9 +561,6 @@ def remove_stns_sinex(sinex, sites):
     :return: SINEX file output.snx
     """
 
-    # The block separator
-    separator = '*' + '-' * 79 + '\n'
-
     # Open the output file
     with open('output.snx', 'w') as out:
 
@@ -573,7 +570,7 @@ def remove_stns_sinex(sinex, sites):
         old_creation_time = header[15:27]
         creation_time = set_creation_time()
         header = header.replace(old_creation_time, creation_time)
-        old_num_params = int(header[60:65])
+        old_num_params = header[60:65]
         if header[70:71] == 'V':
             num_stn_params = 6
         else:
@@ -585,11 +582,10 @@ def remove_stns_sinex(sinex, sites):
             if site in sites:
                 num_stns_to_remove += 1
         del solution_epochs
-        num_params = old_num_params - num_stn_params * num_stns_to_remove
+        num_params = int(old_num_params) - num_stn_params * num_stns_to_remove
         num_params = '{:05d}'.format(num_params)
         header = header.replace(str(old_num_params), str(num_params))
         out.write(header)
-        out.write(separator)
 
         # Read in the site ID block and write out the sites not being removed
         site_id = read_sinex_site_id_block(sinex)
@@ -602,7 +598,6 @@ def remove_stns_sinex(sinex, sites):
                 if site not in sites:
                     out.write(line)
         del site_id
-        out.write(separator)
 
         # Read in the solution epochs block and write out the epochs of the
         # sites not being removed
@@ -616,7 +611,6 @@ def remove_stns_sinex(sinex, sites):
                 if site not in sites:
                     out.write(line)
         del solution_epochs
-        out.write(separator)
 
         # Read in the solution estimate block and write out the estimates of
         # the sites not being removed
@@ -638,15 +632,19 @@ def remove_stns_sinex(sinex, sites):
                     line = ' ' + number + line[6:]
                     out.write(line)
         del solution_estimate
-        out.write(separator)
 
         # Read in the matrix estimate block and write out minus the sites
         # being removed
         vcv = {}
         solution_matrix_estimate = \
             read_sinex_solution_matrix_estimate_block(sinex)
+        if solution_matrix_estimate[0][26:27] == 'L':
+            matrix = 'lower'
+        elif solution_matrix_estimate[0][26:27] == 'U':
+            matrix = 'upper'
         out.write(solution_matrix_estimate[0])
-        out.write(solution_matrix_estimate[1])
+        if solution_matrix_estimate[1].startswith('*'):
+            out.write(solution_matrix_estimate[1])
         for line in solution_matrix_estimate:
             if line.startswith(' '):
                 cols = line.split()
@@ -664,24 +662,36 @@ def remove_stns_sinex(sinex, sites):
         for i in range(1, len(vcv)+1):
             if i not in skip:
                 sub_row += 1
-                for j in range(i):
-                    if j+1 not in skip:
-                        try:
-                            sub_vcv[str(sub_row)].append(vcv[str(i)][j])
-                        except KeyError:
-                            sub_vcv[str(sub_row)] = []
-                            sub_vcv[str(sub_row)].append(vcv[str(i)][j])
+                if matrix == 'lower':
+                    for j in range(i):
+                        if j+1 not in skip:
+                            try:
+                                sub_vcv[str(sub_row)].append(vcv[str(i)][j])
+                            except KeyError:
+                                sub_vcv[str(sub_row)] = []
+                                sub_vcv[str(sub_row)].append(vcv[str(i)][j])
+                if matrix == 'upper':
+                    for j in range(len(vcv)-(i-1)):
+                        if j+i not in skip:
+                            try:
+                                sub_vcv[str(sub_row)].append(vcv[str(i)][j])
+                            except KeyError:
+                                sub_vcv[str(sub_row)] = []
+                                sub_vcv[str(sub_row)].append(vcv[str(i)][j])
         for i in range(1, len(sub_vcv)+1):
             para1 = '{:5d}'.format(i)
-            j = -2
+            if matrix == 'lower':
+                j = -2
+            elif matrix == 'upper':
+                j = i - 3
             while sub_vcv[str(i)]:
                 j += 3
                 para2 = '{:5d}'.format(j)
                 line = ' ' + para1 + ' ' + para2
                 n = min([3, len(sub_vcv[str(i)])])
                 for k in range(n):
-                    val = sub_vcv[str(i)].pop(0)
-                    line += ' ' + val
+                    val = '{:21.14e}'.format(float(sub_vcv[str(i)].pop(0)))
+                    line += ' ' + str(val)
                 out.write(line + '\n')
         out.write(block_end)
 
