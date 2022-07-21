@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='geodepy',
-      version='0.0.8',
+      version='0.3.0',
       description='GA Geodesy Package',
       long_description='A toolkit for Geodesy and Surveying in Python',
       url='https://github.com/GeoscienceAustralia/GeodePy',
@@ -9,4 +9,4 @@ setup(name='geodepy',
       author_email='geodesy@ga.gov.au',
       license='Apache License 2.0',
       packages=['geodepy'],
-      install_requires=['numpy'])
+      install_requires=['numpy', 'scipy'])
