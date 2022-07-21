@@ -92,6 +92,34 @@ def first_vel_corrn(dist, first_vel_param, temp, pressure,
     return first_vel_corrn_metres
 
 
+def mets_partial_differentials(group_ref_Index=1.00028, 
+                               temp=15, 
+                               pressure=1013.25,
+                               rel_humidity=60):
+    """ Returns the sensitivity coefficients for temp, pressure and humidity in ppm
+    :param group_ref_Index: manufacturers group refractive index of light
+    :param temp: Observed Dry Temperature (degrees Celsius)
+    :param pressure: Observed Pressure (hectopascals or millibars)
+    :param rel_humidity: Observed Relative Humidity (percentage) - Optional if wet_temp supplied
+    """
+    ng_1 = group_ref_Index - 1
+    t_273_15 = temp + 273.15
+    e = part_h2o_vap_press(temp, pressure, rel_humidity)
+    
+    param_k = (((((ng_1 * 273.15 * pressure)
+                  /1013.25)
+                 -(11.27 * e * 10**-6))
+                /t_273_15**2)
+               *(10**6))
+    param_l = (0.26957809 * (ng_1 / t_273_15)
+               *(10**6))
+    param_m = (((11.27 * 10**-6)
+               /t_273_15)
+               *(10**6))
+    
+    return param_k, param_l, param_m
+
+
 def precise_inst_ht(vert_list, spacing, offset):
     """
     Uses a set of Vertical Angle Observations taken to a
