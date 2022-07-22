@@ -11,7 +11,7 @@ class TestSurveyConvert(unittest.TestCase):
         n_REF = 1.000281783
         param_c = 281.783
         param_d = 79.393
-        params_new = first_vel_params(wavelength, frequency, n_REF)
+        params_new = first_vel_params(edm_wavelength, frequency, n_REF)
         self.assertEqual(round(params_new[0], 3), param_c)
         self.assertEqual(round(params_new[1], 3), param_d)
 
