@@ -25,6 +25,22 @@ class TestSurveyConvert(unittest.TestCase):
                                      obs_pressure, obs_relative_humidity)
         corrected_obs_distance = raw_obs_distance + correction
         self.assertEqual(round(corrected_obs_distance, 4), 1117.8624)
+        
+    def test_mets_partial_differentials(self):
+        group_ref_Index = 1.00028
+        temp = 15
+        pressure = 1013.25
+        rel_humidity = 60
+        K = round(0.91973804217265260,2)
+        L = round(0.2619533756724471,2)
+        M = round(0.03911157383307305,1)
+        differ_new = mets_partial_differentials(group_ref_Index, 
+                                                temp, 
+                                                pressure,
+                                                rel_humidity)
+        self.assertEqual(round(differ_new[0], 2), K)
+        self.assertEqual(round(differ_new[1], 2), L)
+        self.assertEqual(round(differ_new[2], 1), M)
 
     def test_va_conv(self):
         test1 = va_conv(92.24305555555556, 2116.254)
