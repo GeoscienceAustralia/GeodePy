@@ -33,14 +33,14 @@ class TestSurveyConvert(unittest.TestCase):
         rel_humidity = 60
         K = round(0.91973804217265260,2)
         L = round(0.2619533756724471,2)
-        M = round(0.03911157383307305,1)
+        M = round(0.03911157383307305,2)
         differ_new = mets_partial_differentials(group_ref_Index, 
                                                 temp, 
                                                 pressure,
                                                 rel_humidity)
         self.assertEqual(round(differ_new[0], 2), K)
         self.assertEqual(round(differ_new[1], 2), L)
-        self.assertEqual(round(differ_new[2], 1), M)
+        self.assertEqual(round(differ_new[2], 2), M)
 
     def test_va_conv(self):
         test1 = va_conv(92.24305555555556, 2116.254)
