@@ -1,8 +1,8 @@
 import unittest
 from geodepy.convert import DMSAngle
-from geodepy.survey import (first_vel_params, first_vel_corrn,
-                            precise_inst_ht, va_conv, radiations, joins)
-
+from geodepy.survey import (first_vel_params, first_vel_corrn, 
+                            mets_partial_differentials, precise_inst_ht, 
+                            va_conv, radiations, joins)
 
 class TestSurveyConvert(unittest.TestCase):
     def test_first_vel_params(self):
