@@ -474,6 +474,143 @@ gda94_to_agd66_tas = -agd66_to_gda94_tas
 gda94_to_agd66_vicnsw = -agd66_to_gda94_vicnsw
 gda94_to_agd66_nt = -agd66_to_gda94_nt
 
+# ITRF2020 parameters
+# Note: These parameter definitions use the units, rotation and delta-rotation
+# sign convention used by the IERS. Units are converted and rotations flipped in
+# the transformation object to allow compatibility with GeodePy functions.
+# Ref: https://itrf.ign.fr/docs/solutions/itrf2020/Transfo-ITRF2020_TRFs.txt
+
+itrf2020_to_itrf2014 = iers2trans(
+    itrf_from='ITRF2020', itrf_to='ITRF2014', ref_epoch=date(2015, 1, 1),
+    tx=-1.4, ty=-0.9, tz=1.4,
+    sc=-0.42,
+    rx=0.0, ry=0.0, rz=0.0,
+    d_tx=0.0, d_ty=-0.1, d_tz=0.2,
+    d_sc=0.0,
+    d_rx=0.0, d_ry=0.0, d_rz=0.0)
+
+itrf2020_to_itrf2008 = iers2trans(
+    itrf_from='ITRF2020', itrf_to='ITRF2008', ref_epoch=date(2015, 1, 1),
+    tx=0.2, ty=1.0, tz=3.3,
+    sc=-0.29,
+    rx=0.0, ry=0.0, rz=0.0,
+    d_tx=0.0, d_ty=-0.1, d_tz=0.1,
+    d_sc=0.03,
+    d_rx=0.0, d_ry=0.0, d_rz=0.0)
+
+itrf2020_to_itrf2005 = iers2trans(
+    itrf_from='ITRF2020', itrf_to='ITRF2005', ref_epoch=date(2015, 1, 1),
+    tx=2.7, ty=0.1, tz=-1.4,
+    sc=0.65,
+    rx=0.0, ry=0.0, rz=0.0,
+    d_tx=0.3, d_ty=-0.1, d_tz=0.1,
+    d_sc=0.03,
+    d_rx=0.0, d_ry=0.0, d_rz=0.0)
+
+itrf2020_to_itrf2000 = iers2trans(
+    itrf_from='ITRF2020', itrf_to='ITRF2000', ref_epoch=date(2015, 1, 1),
+    tx=-0.2, ty=0.8, tz=-34.2,
+    sc=2.25,
+    rx=0.0, ry=0.0, rz=0.0,
+    d_tx=0.1, d_ty=0.0, d_tz=-1.7,
+    d_sc=0.11,
+    d_rx=0.0, d_ry=0.0, d_rz=0.0)
+
+itrf2020_to_itrf97 = iers2trans(
+    itrf_from='ITRF2020', itrf_to='ITRF97', ref_epoch=date(2015, 1, 1),
+    tx=6.5, ty=-3.9, tz=-77.9,
+    sc=3.98,
+    rx=0.0, ry=0.0, rz=0.36,
+    d_tx=0.1, d_ty=-0.6, d_tz=-3.1,
+    d_sc=0.12,
+    d_rx=0.0, d_ry=0.0, d_rz=0.02)
+
+itrf2020_to_itrf96 = iers2trans(
+    itrf_from='ITRF2020', itrf_to='ITRF96', ref_epoch=date(2015, 1, 1),
+    tx=6.5, ty=-3.9, tz=-77.9,
+    sc=3.98,
+    rx=0.0, ry=0.0, rz=0.36,
+    d_tx=0.1, d_ty=-0.6, d_tz=-3.1,
+    d_sc=0.12,
+    d_rx=0.0, d_ry=0.0, d_rz=0.02)
+
+itrf2020_to_itrf94 = iers2trans(
+    itrf_from='ITRF2020', itrf_to='ITRF94', ref_epoch=date(2015, 1, 1),
+    tx=6.5, ty=-3.9, tz=-77.9,
+    sc=3.98,
+    rx=0.0, ry=0.0, rz=0.36,
+    d_tx=0.1, d_ty=-0.6, d_tz=-3.1,
+    d_sc=0.12,
+    d_rx=0.0, d_ry=0.0, d_rz=0.02)
+
+itrf2020_to_itrf93 = iers2trans(
+    itrf_from='ITRF2020', itrf_to='ITRF93', ref_epoch=date(2015, 1, 1),
+    tx=-65.8, ty=1.9, tz=-71.3,
+    sc=4.47,
+    rx=-3.36, ry=-4.33, rz=0.75,
+    d_tx=-2.8, d_ty=-0.2, d_tz=-2.3,
+    d_sc=0.12,
+    d_rx=-0.11, d_ry=-0.19, d_rz=0.07)
+
+itrf2020_to_itrf92 = iers2trans(
+    itrf_from='ITRF2020', itrf_to='ITRF92', ref_epoch=date(2015, 1, 1),
+    tx=14.5, ty=-1.9, tz=-85.9,
+    sc=3.27,
+    rx=0.0, ry=0.0, rz=0.36,
+    d_tx=0.1, d_ty=-0.6, d_tz=-3.1,
+    d_sc=0.12,
+    d_rx=0.0, d_ry=0.0, d_rz=0.02)
+
+itrf2020_to_itrf91 = iers2trans(
+    itrf_from='ITRF2020', itrf_to='ITRF91', ref_epoch=date(2015, 1, 1),
+    tx=26.5, ty=12.1, tz=-91.9,
+    sc=4.67,
+    rx=0.0, ry=0.0, rz=0.36,
+    d_tx=0.1, d_ty=-0.6, d_tz=-3.1,
+    d_sc=0.12,
+    d_rx=0.0, d_ry=0.0, d_rz=0.02)
+
+itrf2020_to_itrf90 = iers2trans(
+    itrf_from='ITRF2020', itrf_to='ITRF90', ref_epoch=date(2015, 1, 1),
+    tx=24.5, ty=8.1, tz=-107.9,
+    sc=4.97,
+    rx=0.0, ry=0.0, rz=0.36,
+    d_tx=0.1, d_ty=-0.6, d_tz=-3.1,
+    d_sc=0.12,
+    d_rx=0.0, d_ry=0.0, d_rz=0.02)
+
+itrf2020_to_itrf89 = iers2trans(
+    itrf_from='ITRF2020', itrf_to='ITRF89', ref_epoch=date(2015, 1, 1),
+    tx=29.5, ty=32.1, tz=-145.9,
+    sc=8.37,
+    rx=0.0, ry=0.0, rz=0.36,
+    d_tx=0.1, d_ty=-0.6, d_tz=-3.1,
+    d_sc=0.12,
+    d_rx=0.0, d_ry=0.0, d_rz=0.02)
+
+itrf2020_to_itrf88 = iers2trans(
+    itrf_from='ITRF2020', itrf_to='ITRF88', ref_epoch=date(2015, 1, 1),
+    tx=24.5, ty=-3.9, tz=-169.9,
+    sc=11.47,
+    rx=0.1, ry=0.0, rz=0.36,
+    d_tx=0.1, d_ty=-0.6, d_tz=-3.1,
+    d_sc=0.12,
+    d_rx=0.0, d_ry=0.0, d_rz=0.02)
+    
+itrf2014_to_itrf2020 = -itrf2020_to_itrf2014
+itrf2008_to_itrf2020 = -itrf2020_to_itrf2008
+itrf2005_to_itrf2020 = -itrf2020_to_itrf2005
+itrf2000_to_itrf2020 = -itrf2020_to_itrf2000
+itrf97_to_itrf2020 = -itrf2020_to_itrf97
+itrf96_to_itrf2020 = -itrf2020_to_itrf96
+itrf94_to_itrf2020 = -itrf2020_to_itrf94
+itrf93_to_itrf2020 = -itrf2020_to_itrf93
+itrf92_to_itrf2020 = -itrf2020_to_itrf92
+itrf91_to_itrf2020 = -itrf2020_to_itrf91
+itrf90_to_itrf2020 = -itrf2020_to_itrf90
+itrf89_to_itrf2020 = -itrf2020_to_itrf89
+itrf88_to_itrf2020 = -itrf2020_to_itrf88
+    
 
 # ITRF2014 parameters
 # Note: These parameter definitions use the units, rotation and delta-rotation
