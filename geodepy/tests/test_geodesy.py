@@ -77,6 +77,12 @@ class TestGeodesy(unittest.TestCase):
         test2 = vincinv(lat1, lon1, lat1, lon1)
         self.assertEqual(test2, (0, 0, 0))
 
+        # Test coincident coordinates (within float precision)
+        pl1 = (-30.645230675, 152.996285475)
+        pl2 = (-30.645230674999997, 152.996285475)
+        test3 = vincinv(pl1[0], pl1[1], pl2[0], pl2[1])
+        self.assertEqual(test3, (0, 0, 0))
+
         # Test DMSAngle Input
         ell_dist, azimuth1to2, azimuth2to1 = vincinv(lat1_DMS, lon1_DMS,
                                                      lat2_DMS, lon2_DMS)

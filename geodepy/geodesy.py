@@ -180,7 +180,8 @@ def vincinv(lat1, lon1, lat2, lon2, ellipsoid=grs80):
     lon2 = angular_typecheck(lon2)
 
     # Exit if the two input points are the same
-    if lat1 == lat2 and lon1 == lon2:
+    tolerance = 0.0000000001
+    if abs(lat1 - lat2) < tolerance and abs(lon1 - lon2) < tolerance:
         return 0, 0, 0
 
     # Equation numbering is from the GDA2020 Tech Manual v1.0
