@@ -867,12 +867,9 @@ def remove_matrixzeros_sinex(sinex):
     :param str sinex: input SINEX file
     return: SINEX file output.snx
     """
-
-    sinex = "apref20220423_NT.snx"
-    #sinex = "apref20210410_LowerTriangle.snx"
-
+    
     # Open the output file
-    with open('output_NT.snx', 'w') as out:
+    with open('output.snx', 'w') as out:
 
         # With header line:
         # - update the creation time 
