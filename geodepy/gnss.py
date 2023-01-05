@@ -722,7 +722,8 @@ def remove_velocity_sinex(sinex):
 
         # With header line: 
         # - update the creation time
-        # - update number of parameter estimates 
+        # - update number of parameter estimates
+        # - remove 'V' from parameter list 
         # - then write to file
         old_creation_time = header[15:27]
         creation_time = set_creation_time()
@@ -730,6 +731,7 @@ def remove_velocity_sinex(sinex):
         old_num_params = header[60:65]
         num_params = int(old_num_params) / 2
         header = header.replace(old_num_params, str(num_params))
+        header = header.replace('V', '')
         out.write(header)
         del header
         
@@ -769,7 +771,7 @@ def remove_velocity_sinex(sinex):
                 out.write(f"{line}")
         del solution_estimate
 
-        # Read in the +SOLUTION/MATRIX_ESTIMATE block
+        # Read in the +SOLUTION/MATRIX_ESTIMATE block:
         # - identify if matrix is upper or lower triangle form
         # - form full VCV matrix
         # - remove all rows/columns associated with velocity
@@ -792,7 +794,7 @@ def remove_velocity_sinex(sinex):
                 out.write(f"{line}")
                 continue
             if line[0]=="-":
-                block_end_title = line
+                block_end = line
             else:
                 lineVCV = re.split('\s+', line)
                 lineVCV = list(filter(None, lineVCV))
@@ -849,7 +851,7 @@ def remove_velocity_sinex(sinex):
                         j += 1
                     out.write(" \n")
         # Write out end of block line, and delete large variables
-        out.write(block_end_title)
+        out.write(block_end)
         del solution_matrix_estimate
         del Q
 
