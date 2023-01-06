@@ -44,6 +44,28 @@ def print_sinex_comments(file):
             if line.startswith('-FILE/COMMENT'):
                 go = False
 
+def read_sinex_comments(file):
+    """This function reads comments in a SINEX file.
+
+    :param str file: the input SINEX file
+    :return: comments block
+    :rtype: list of strings
+    """
+    comments = []
+    go = False
+    with open(file) as f:
+        for line in f.readlines():
+            if line.startswith('+FILE/COMMENT'):
+                go = True
+            if go:
+                comments.append(line.strip())
+            if line.startswith('-FILE/COMMENT'):
+                go = False
+
+        comments.insert(-1,f"* File created by Geodepy.gnss.py at {datetime.now().strftime('%d-%m-%Y, %H:%M')}")
+
+    return comments
+
 
 def set_creation_time():
     """This function sets the creation time, in format YY:DDD:SSSSS, for use
@@ -588,6 +610,15 @@ def remove_stns_sinex(sinex, sites):
         header = header.replace(str(old_num_params), str(num_params))
         out.write(header)
 
+        out.write("*-------------------------------------------------------------------------------\n")
+
+        # Read in the +FILE/COMMENT block and write to output file
+        comments = read_sinex_comments(sinex)
+        for i in comments:
+            out.write(f"{i}\n")
+
+        out.write("*-------------------------------------------------------------------------------\n")
+
         # Read in the site ID block and write out the sites not being removed
         site_id = read_sinex_site_id_block(sinex)
         for line in site_id:
@@ -599,6 +630,8 @@ def remove_stns_sinex(sinex, sites):
                 if site not in sites:
                     out.write(line)
         del site_id
+
+        out.write("*-------------------------------------------------------------------------------\n")
 
         # Read in the solution epochs block and write out the epochs of the
         # sites not being removed
@@ -612,6 +645,8 @@ def remove_stns_sinex(sinex, sites):
                 if site not in sites:
                     out.write(line)
         del solution_epochs
+
+        out.write("*-------------------------------------------------------------------------------\n")
 
         # Read in the solution estimate block and write out the estimates of
         # the sites not being removed
@@ -633,6 +668,8 @@ def remove_stns_sinex(sinex, sites):
                     line = ' ' + number + line[6:]
                     out.write(line)
         del solution_estimate
+
+        out.write("*-------------------------------------------------------------------------------\n")
 
         # Read in the matrix estimate block and write out minus the sites
         # being removed
@@ -734,12 +771,23 @@ def remove_velocity_sinex(sinex):
         header = header.replace('V', '')
         out.write(header)
         del header
+
+        out.write("*-------------------------------------------------------------------------------\n")
+
+        # Read in the +FILE/COMMENT block and write to output file
+        comments = read_sinex_comments(sinex)
+        for i in comments:
+            out.write(f"{i}\n")
+
+        out.write("*-------------------------------------------------------------------------------\n")
         
         # Read in the +SITE/ID block and write to file
         site_id = read_sinex_site_id_block(sinex)
         for line in site_id:
             out.write(f"{line}")  
         del site_id
+
+        out.write("*-------------------------------------------------------------------------------\n")
         
         # Read in the +SOLUTION/EPOCHS block and write to file
         # - also collect count on number of sites for use later
@@ -750,6 +798,8 @@ def remove_velocity_sinex(sinex):
             if line[0]!="+" and line[0]!="*" and line[0]!="-":
                 numSites+=1
         del solution_epochs
+
+        out.write("*-------------------------------------------------------------------------------\n")
 
         # Read in the +SOLUTION/ESTIMATE block: 
         # - gather velocity indices 
@@ -770,6 +820,8 @@ def remove_velocity_sinex(sinex):
                 line = ' ' + number + line[6:]
                 out.write(f"{line}")
         del solution_estimate
+
+        out.write("*-------------------------------------------------------------------------------\n")
 
         # Read in the +SOLUTION/MATRIX_ESTIMATE block:
         # - identify if matrix is upper or lower triangle form
@@ -880,12 +932,23 @@ def remove_matrixzeros_sinex(sinex):
         header = header.replace(old_creation_time, creation_time)
         out.write(header)
         del header
+
+        out.write("*-------------------------------------------------------------------------------\n")
+
+        # Read in the +FILE/COMMENT block and write to output file
+        comments = read_sinex_comments(sinex)
+        for i in comments:
+            out.write(f"{i}\n")
+
+        out.write("*-------------------------------------------------------------------------------\n")
         
         # Read in the +SITE/ID block and write to file
         site_id = read_sinex_site_id_block(sinex)
         for line in site_id:
             out.write(f"{line}")  
         del site_id
+
+        out.write("*-------------------------------------------------------------------------------\n")
         
         # Read in the +SOLUTION/EPOCHS block and write to file
         solution_epochs = read_sinex_solution_epochs_block(sinex)
@@ -893,11 +956,15 @@ def remove_matrixzeros_sinex(sinex):
             out.write(f"{line}")
         del solution_epochs
 
+        out.write("*-------------------------------------------------------------------------------\n")
+
         # Read in the +SOLUTION/ESTIMATE block
         solution_estimate = read_sinex_solution_estimate_block(sinex)
         for line in solution_estimate:
                 out.write(f"{line}")
         del solution_estimate
+
+        out.write("*-------------------------------------------------------------------------------\n")
 
         # Read in the +SOLUTION/MATRIX_ESTIMATE block:
         # - Remove lines that contain only zeros
