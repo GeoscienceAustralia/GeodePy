@@ -765,9 +765,9 @@ def remove_velocity_sinex(sinex):
         old_creation_time = header[15:27]
         creation_time = set_creation_time()
         header = header.replace(old_creation_time, creation_time)
-        old_num_params = header[60:65]
-        num_params = int(old_num_params) / 2
-        header = header.replace(old_num_params, str(num_params))
+        old_num_params = int(header[60:65])
+        num_params = int(old_num_params / 2)
+        header = header.replace(str(old_num_params), str(num_params))
         header = header.replace('V', '')
         out.write(header)
         del header
