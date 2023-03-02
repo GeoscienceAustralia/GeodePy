@@ -14,7 +14,7 @@ def first_vel_params(wavelength, frequency, n_REF=None, unit_length=None):
     """
     Calculates the constant First Velocity Correction Parameters C and D
     for a given set of standard instrument settings
-    :param wavelength: Instrument Carrier Wavelength (Nanometers) - Mandatory
+    :param wavelength: Instrument Carrier Wavelength (Micrometers) - Mandatory
     :param frequency: Instrument modulation frequency (Hz) - Mandatory
     :param n_REF: manufacturers reference refractive index - Recommended
     :param unit_length: unit length of instrument - Optional
@@ -78,7 +78,7 @@ def first_vel_corrn(dist, first_vel_param, temp, pressure,
     :param temp: Observed Temperature (degrees Celsius)
     :param pressure: Observed Pressure (hectopascals or millibars)
     :param rel_humidity: Observed Relative Humidity (percentage)
-    :return: Slope Distance with First Velocity Correction applied
+    :return: Slope Distance First Velocity Correction amount
     """
     param_c = first_vel_param[0]
     param_d = first_vel_param[1]
