@@ -25,6 +25,21 @@ class TestSurveyConvert(unittest.TestCase):
                                      obs_pressure, obs_relative_humidity)
         corrected_obs_distance = raw_obs_distance + correction
         self.assertEqual(round(corrected_obs_distance, 4), 1117.8624)
+
+    def test_first_vel_corrn_with_CO2(self):
+        edm_wavelength = 0.850
+        params = first_vel_params(edm_wavelength,49951.33424,1.000281783)
+        raw_obs_distance = 1117.8517
+        obs_temperature = 6.8
+        obs_pressure = 960.8
+        obs_relative_humidity = 58.6
+        CO2_ppm_2022 = 420
+        correction = first_vel_corrn(raw_obs_distance, params, obs_temperature,
+                                     obs_pressure, obs_relative_humidity,
+                                     CO2_ppm = CO2_ppm_2022, 
+                                     wavelength = edm_wavelength)
+        corrected_obs_distance = raw_obs_distance + correction
+        self.assertEqual(round(corrected_obs_distance, 4), 1117.8624)
         
     def test_mets_partial_differentials(self):
         group_ref_Index = 1.00028
