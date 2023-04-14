@@ -8,8 +8,9 @@ In Development
 """
 
 from datetime import datetime
-from numpy import zeros
+from numpy import zeros, delete
 from geodepy.angles import DMSAngle
+import re
 
 
 def list_sinex_blocks(file):
@@ -42,6 +43,28 @@ def print_sinex_comments(file):
                 print(line.strip())
             if line.startswith('-FILE/COMMENT'):
                 go = False
+
+def read_sinex_comments(file):
+    """This function reads comments in a SINEX file.
+
+    :param str file: the input SINEX file
+    :return: comments block
+    :rtype: list of strings
+    """
+    comments = []
+    go = False
+    with open(file) as f:
+        for line in f.readlines():
+            if line.startswith('+FILE/COMMENT'):
+                go = True
+            if go:
+                comments.append(line.strip())
+            if line.startswith('-FILE/COMMENT'):
+                go = False
+
+        comments.insert(-1,f"* File created by Geodepy.gnss.py at {datetime.now().strftime('%d-%m-%Y, %H:%M')}")
+
+    return comments
 
 
 def set_creation_time():
@@ -587,6 +610,15 @@ def remove_stns_sinex(sinex, sites):
         header = header.replace(str(old_num_params), str(num_params))
         out.write(header)
 
+        out.write("*-------------------------------------------------------------------------------\n")
+
+        # Read in the +FILE/COMMENT block and write to output file
+        comments = read_sinex_comments(sinex)
+        for i in comments:
+            out.write(f"{i}\n")
+
+        out.write("*-------------------------------------------------------------------------------\n")
+
         # Read in the site ID block and write out the sites not being removed
         site_id = read_sinex_site_id_block(sinex)
         for line in site_id:
@@ -598,6 +630,8 @@ def remove_stns_sinex(sinex, sites):
                 if site not in sites:
                     out.write(line)
         del site_id
+
+        out.write("*-------------------------------------------------------------------------------\n")
 
         # Read in the solution epochs block and write out the epochs of the
         # sites not being removed
@@ -611,6 +645,8 @@ def remove_stns_sinex(sinex, sites):
                 if site not in sites:
                     out.write(line)
         del solution_epochs
+
+        out.write("*-------------------------------------------------------------------------------\n")
 
         # Read in the solution estimate block and write out the estimates of
         # the sites not being removed
@@ -632,6 +668,8 @@ def remove_stns_sinex(sinex, sites):
                     line = ' ' + number + line[6:]
                     out.write(line)
         del solution_estimate
+
+        out.write("*-------------------------------------------------------------------------------\n")
 
         # Read in the matrix estimate block and write out minus the sites
         # being removed
@@ -694,6 +732,257 @@ def remove_stns_sinex(sinex, sites):
                     line += ' ' + str(val)
                 out.write(line + '\n')
         out.write(block_end)
+
+        # Write out the trailer line
+        out.write('%ENDSNX\n')
+
+    return
+
+def remove_velocity_sinex(sinex):
+    """This function reads in a SINEX file and removes the 
+    velocity parameters, including the zeros of the SOLUTION/MATRIX_ESTIMATE block,
+
+    :param str sinex: input SINEX file
+    return: SINEX file output.snx
+    """
+
+    # From header, confirm that the SINEX has velocity parameters
+    header = read_sinex_header_line(sinex)
+    if header[70:71] == 'V':
+        pass
+    else:
+        print("Not removing velocities because SINEX file does not have velocity parameters.")
+        exit()
+
+    # Open the output file
+    with open('output.snx', 'w') as out:
+
+        # With header line: 
+        # - update the creation time
+        # - update number of parameter estimates
+        # - remove 'V' from parameter list 
+        # - then write to file
+        old_creation_time = header[15:27]
+        creation_time = set_creation_time()
+        header = header.replace(old_creation_time, creation_time)
+        old_num_params = int(header[60:65])
+        num_params = int(old_num_params / 2)
+        header = header.replace(str(old_num_params), str(num_params))
+        header = header.replace('V', '')
+        out.write(header)
+        del header
+
+        out.write("*-------------------------------------------------------------------------------\n")
+
+        # Read in the +FILE/COMMENT block and write to output file
+        comments = read_sinex_comments(sinex)
+        for i in comments:
+            out.write(f"{i}\n")
+
+        out.write("*-------------------------------------------------------------------------------\n")
+        
+        # Read in the +SITE/ID block and write to file
+        site_id = read_sinex_site_id_block(sinex)
+        for line in site_id:
+            out.write(f"{line}")  
+        del site_id
+
+        out.write("*-------------------------------------------------------------------------------\n")
+        
+        # Read in the +SOLUTION/EPOCHS block and write to file
+        # - also collect count on number of sites for use later
+        numSites = 0
+        solution_epochs = read_sinex_solution_epochs_block(sinex)
+        for line in solution_epochs:
+            out.write(f"{line}")
+            if line[0]!="+" and line[0]!="*" and line[0]!="-":
+                numSites+=1
+        del solution_epochs
+
+        out.write("*-------------------------------------------------------------------------------\n")
+
+        # Read in the +SOLUTION/ESTIMATE block: 
+        # - gather velocity indices 
+        # - remove velocity rows 
+        # - change indices to account for removed velocities
+        # - write to file
+        vel_indices = []
+        estimate_number = 0
+        solution_estimate = read_sinex_solution_estimate_block(sinex)
+        for line in solution_estimate:
+            if line[7:10]=="VEL":
+                vel_indices.append(int(line[0:6]))
+            elif line[0]=="+" or line[0]=="*" or line[0]=="-":
+                out.write(f"{line}")
+            else:
+                estimate_number+=1
+                number = '{:5d}'.format(estimate_number)
+                line = ' ' + number + line[6:]
+                out.write(f"{line}")
+        del solution_estimate
+
+        out.write("*-------------------------------------------------------------------------------\n")
+
+        # Read in the +SOLUTION/MATRIX_ESTIMATE block:
+        # - identify if matrix is upper or lower triangle form
+        # - form full matrix
+        # - remove all rows/columns associated with velocity
+        # - write to file with new matrix indices (para1, para2)
+        solution_matrix_estimate = read_sinex_solution_matrix_estimate_block(sinex)
+        if solution_matrix_estimate[0][26:27] == 'L':
+                matrix = 'lower'
+        elif solution_matrix_estimate[0][26:27] == 'U':
+                matrix = 'upper'
+        # Size of original matrix
+        matrix_dim = numSites*6
+        # Setup matrix of zeros
+        Q = zeros((matrix_dim, matrix_dim))
+        # Write initial comment line(s), save last comment line, and form matrix
+        for line in solution_matrix_estimate:
+            if line[0]=="+":
+                out.write(f"{line}")
+                continue
+            if line[0]=="*":
+                out.write(f"{line}")
+                continue
+            if line[0]=="-":
+                block_end = line
+            else:
+                lineMAT = re.split('\s+', line)
+                lineMAT = list(filter(None, lineMAT))
+                row = int(lineMAT[0])
+                col = int(lineMAT[1])
+            if len(lineMAT) >= 3:
+                q1 = float(lineMAT[2])
+                Q[row-1, col-1] = q1
+                Q[col-1, row-1] = q1
+            if len(lineMAT) >= 4:
+                q2 = float(lineMAT[3])
+                Q[row-1, col] = q2
+                Q[col, row-1] = q2
+            if len(lineMAT) >= 5:
+                q3 = float(lineMAT[4])
+                Q[row-1, col+1] = q3
+                Q[col+1, row-1] = q3
+        # Remove velocity rows/columns from matrix
+        num_removed = 0
+        for i in vel_indices:
+            Q = delete(Q, i-1-num_removed, 0)
+            Q = delete(Q, i-1-num_removed, 1)
+            num_removed += 1
+        # Write matrix to SINEX (lower triangle)
+        if matrix == 'lower':
+            i = 0
+            j = 0
+            while i < len(Q):
+                while j <= i:
+                    out.write(f" {i+1:5d} {j+1:5d} {Q[i,j]:21.14E} ")
+                    j += 1
+                    if j <= i:
+                        out.write(f"{Q[i,j]:21.14E} ")
+                        j += 1
+                    if j <= i:
+                        out.write(f"{Q[i,j]:21.14E}")
+                        j += 1
+                    out.write(" \n")
+                j = 0
+                i += 1
+        # Write matrix to SINEX (upper triangle)
+        if matrix == 'upper':
+            j = 0
+            for i in range(len(Q)):
+                j = i 
+                while j < len(Q):
+                    out.write(f" {i+1:5d} {j+1:5d} {Q[i,j]:21.14E} ")
+                    j += 1
+                    if j < len(Q):
+                        out.write(f"{Q[i,j]:21.14E} ")
+                        j += 1
+                    if j < len(Q):
+                        out.write(f"{Q[i,j]:21.14E}")
+                        j += 1
+                    out.write(" \n")
+        # Write out end of block line, and delete large variables
+        out.write(block_end)
+        del solution_matrix_estimate
+        del Q
+
+        # Write out the trailer line
+        out.write('%ENDSNX\n')
+
+    return
+
+def remove_matrixzeros_sinex(sinex):
+    """This function reads in a SINEX file and removes the 
+    zeros from the SOLUTION/MATRIX_ESTIMATE block only. 
+
+    :param str sinex: input SINEX file
+    return: SINEX file output.snx
+    """
+    
+    # Open the output file
+    with open('output.snx', 'w') as out:
+
+        # With header line:
+        # - update the creation time 
+        # - then write to file
+        header = read_sinex_header_line(sinex)
+        old_creation_time = header[15:27]
+        creation_time = set_creation_time()
+        header = header.replace(old_creation_time, creation_time)
+        out.write(header)
+        del header
+
+        out.write("*-------------------------------------------------------------------------------\n")
+
+        # Read in the +FILE/COMMENT block and write to output file
+        comments = read_sinex_comments(sinex)
+        for i in comments:
+            out.write(f"{i}\n")
+
+        out.write("*-------------------------------------------------------------------------------\n")
+        
+        # Read in the +SITE/ID block and write to file
+        site_id = read_sinex_site_id_block(sinex)
+        for line in site_id:
+            out.write(f"{line}")  
+        del site_id
+
+        out.write("*-------------------------------------------------------------------------------\n")
+        
+        # Read in the +SOLUTION/EPOCHS block and write to file
+        solution_epochs = read_sinex_solution_epochs_block(sinex)
+        for line in solution_epochs:
+            out.write(f"{line}")
+        del solution_epochs
+
+        out.write("*-------------------------------------------------------------------------------\n")
+
+        # Read in the +SOLUTION/ESTIMATE block
+        solution_estimate = read_sinex_solution_estimate_block(sinex)
+        for line in solution_estimate:
+                out.write(f"{line}")
+        del solution_estimate
+
+        out.write("*-------------------------------------------------------------------------------\n")
+
+        # Read in the +SOLUTION/MATRIX_ESTIMATE block:
+        # - Remove lines that contain only zeros
+        solution_matrix_estimate = read_sinex_solution_matrix_estimate_block(sinex)
+        for line in solution_matrix_estimate:
+            col = line.split()
+            numCol = len(col)
+            if numCol==3:
+                if col[2]=="0.00000000000000e+00":
+                    continue
+            if numCol==4:
+                if col[2]=="0.00000000000000e+00" and col[3]=="0.00000000000000e+00":
+                    continue
+            if numCol==5:
+                if col[2]=="0.00000000000000e+00" and col[3]=="0.00000000000000e+00" and col[4]=="0.00000000000000e+00":
+                    continue
+            out.write(line)
+        del solution_matrix_estimate
 
         # Write out the trailer line
         out.write('%ENDSNX\n')
