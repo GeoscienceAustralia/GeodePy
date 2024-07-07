@@ -9,7 +9,7 @@
 # Import dependencies 
 import geodepy.constants as cons
 import geodepy.geodesy as gg
-import gdal
+from osgeo import gdal
 import numpy as np
 from scipy.interpolate import griddata
 import math as m
