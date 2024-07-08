@@ -5,6 +5,43 @@ Geoscience Australia - Python Geodesy Package
 GNSS Module
 
 In Development
+
+Specific utility functions for SINEX:
+
+    - remove_stns_sinex()
+    - remove_velocity_sinex()
+    - remove_matrixzeros_sinex()
+
+General functions for reading from SINEX: 
+
+    - list_sinex_blocks()
+    - read_sinex_comments() 
+    - read_sinex_header_line()
+    - read_sinex_custom()
+    - read_sinex_estimate()
+    - read_sinex_matrix()
+    - read_sinex_sites()
+    - read_disconts()
+    - read_solution_epochs()
+    - read_sinex_header_block()
+    - read_sinex_site_id_block()
+    - read_sinex_solution_epochs_block()
+    - read_sinex_solution_estimate_block()
+    - read_sinex_solution_matrix_estimate_block()
+    - matrix2dataframe_solution_matrix_estimate()
+    - sinex2dataframe_solution_estimate()
+    - sinex2dataframe_solution_matrix_estimate()
+
+General functions for writing to SINEX:
+    
+    - print_sinex_comments()
+    - set_creation_time()
+    - dataframe2sinex_solution_estimate()
+    - dataframe2matrix_snx_vcv()
+    - dataframe2matrix_solution_matrix_estimate()
+    - dataframe2sinex_solution_matrix_estimate()
+    - writeSINEX()
+    
 """
 
 from datetime import datetime
@@ -30,9 +67,8 @@ def list_sinex_blocks(file):
     for block in blocks:
         print(block)
 
-
 def print_sinex_comments(file):
-    """This script lists prints comments in a SINEX file
+    """This script prints comments in a SINEX file.
 
     :param str file: the input SINEX file
     """
@@ -68,7 +104,6 @@ def read_sinex_comments(file):
 
     return comments
 
-
 def set_creation_time():
     """This function sets the creation time, in format YY:DDD:SSSSS, for use
     in the SINEX header line
@@ -88,7 +123,6 @@ def set_creation_time():
 
     return creation_time
 
-
 def read_sinex_header_line(file):
     """This function reads the header line of a SINEX file into a string
 
@@ -102,7 +136,9 @@ def read_sinex_header_line(file):
     return header_line
 
 def read_sinex_custom(fp, start_line, end_line):
-    """Read custom line range from SINEX.
+    """Read custom line range from SINEX. Useful for 
+    SINEX with irregular formatting or block that has 
+    not been accounted for.
 
     :param str fp: Path to SINEX file.
     :param int start_line:   Beginning line number. 
@@ -219,7 +255,6 @@ def read_sinex_estimate(file):
 
     return estimate
 
-
 def read_sinex_matrix(file):
     """This function reads in the SOLUTION/MATRIX_ESTIMATE block of a SINEX
     file. It returns matrix, a list of tuples:
@@ -246,6 +281,11 @@ def read_sinex_matrix(file):
 
     Velocities are not included in all SINEX files and so their VCV information
     is only returned if they are present.
+
+    ToDo: 
+    1. The above order is only valid if the matrix is upper triangle. If it is
+       lower triangle, then the covar_xy is actually the var_y. Will need to fix 
+       this when time permits.
 
     :param file: the input SINEX file
     :return: matrix
@@ -342,7 +382,6 @@ def read_sinex_matrix(file):
 
     return matrix
 
-
 def read_sinex_sites(file):
     """This function reads in the SITE/ID block of a SINEX file. It returns
     sites, a list of tuples:
@@ -391,7 +430,6 @@ def read_sinex_sites(file):
 
     return sites
 
-
 def read_disconts(file):
     """This function reads in the SOLUTION/DISCONTINUITY block of a
     SINEX file. It returns disconts , a list of tuples:
@@ -438,7 +476,6 @@ def read_disconts(file):
         disconts.append(info)
 
     return disconts
-
 
 def read_solution_epochs(file):
     """This function reads in the SOLUTION/EPOCHS block of a SINEX file.
@@ -487,9 +524,9 @@ def read_solution_epochs(file):
 
     return epochs
 
-
 def read_sinex_header_block(sinex):
-    """This function reads in the header information of a SINEX file
+    """This function reads in the header block information 
+    of a SINEX file (All lines before the SITE/ID block).
 
         :param str sinex: input SINEX file
         return: block
@@ -500,16 +537,16 @@ def read_sinex_header_block(sinex):
         next(f)
         line = f.readline()
         while line:
-            block.append(line)
+            block.append(line.rstrip())
             line = f.readline()
             if line.startswith('+SITE/ID'):
                 break
 
     return block
 
-
 def read_sinex_site_id_block(sinex):
     """This function reads in the SITE/ID block of a SINEX file
+    into list of strings.
 
     :param str sinex: input SINEX file
     return: block
@@ -523,16 +560,16 @@ def read_sinex_site_id_block(sinex):
             if line.startswith('+SITE/ID'):
                 go = True
             if go:
-                block.append(line)
+                block.append(line.rstrip())
             if line.startswith('-SITE/ID'):
                 break
             line = f.readline()
 
     return block
 
-
 def read_sinex_solution_epochs_block(sinex):
     """This function reads in the SOLUTION/EPOCHS block of a SINEX file
+    into list of strings.
 
     :param str sinex: input SINEX file
     return: block
@@ -546,16 +583,15 @@ def read_sinex_solution_epochs_block(sinex):
             if line.startswith('+SOLUTION/EPOCHS'):
                 go = True
             if go:
-                block.append(line)
+                block.append(line.rstrip())
             if line.startswith('-SOLUTION/EPOCHS'):
                 break
             line = f.readline()
     return block
 
-
 def read_sinex_solution_estimate_block(sinex):
     """This function reads in the SOLUTION/ESTIMATE block of a SINEX
-    file
+    file into list of strings.
 
     :param str sinex: input SINEX file
     return: block
@@ -569,16 +605,15 @@ def read_sinex_solution_estimate_block(sinex):
             if line.startswith('+SOLUTION/ESTIMATE'):
                 go = True
             if go:
-                block.append(line)
+                block.append(line.rstrip())
             if line.startswith('-SOLUTION/ESTIMATE'):
                 break
             line = f.readline()
     return block
 
-
 def read_sinex_solution_matrix_estimate_block(sinex):
     """This function reads in the SOLUTION/MATRIX_ESTIMATE block of a SINEX
-    file
+    file into list of strings.
 
     :param str sinex: input SINEX file
     return: block
@@ -592,12 +627,469 @@ def read_sinex_solution_matrix_estimate_block(sinex):
             if line.startswith('+SOLUTION/MATRIX_ESTIMATE'):
                 go = True
             if go:
-                block.append(line)
+                block.append(line.rstrip())
             if line.startswith('-SOLUTION/MATRIX_ESTIMATE'):
                 break
             line = f.readline()
     return block
 
+def sinex2dataframe_solution_estimate(fp):
+    """This function reads in a SINEX file and returns 
+    a dataframe of SOLUTION/ESTIMATE block only. 
+
+    :param str sinex: path of input SINEX file
+    return: df
+    """
+    
+    # Get lines
+    lines = read_sinex_solution_estimate_block(fp)
+
+    # Remove non-data lines
+    for l in lines[:]:
+        if l.startswith('*'):
+            lines.remove(l)
+        if l.startswith('+'):
+            lines.remove(l)
+        if l.startswith('-'):
+            lines.remove(l)
+
+    # Split by column
+    lines = [i.split() for i in lines]
+
+    # Isolate into vectors
+    row = np.int_(list(zip(*lines))[0])
+    par = list(zip(*lines))[1]
+    code = list(zip(*lines))[2]
+    pt = list(zip(*lines))[3]
+    soln = list(zip(*lines))[4]
+    refEpoch = list(zip(*lines))[5]
+    unit = list(zip(*lines))[6]
+    s = np.int_(list(zip(*lines))[7])
+    est = np.float_(list(zip(*lines))[8])
+    sigma = np.float_(list(zip(*lines))[9])
+
+    # Organise into DataFrame
+    dict_temp = {
+                "row":row,
+                "par":par,
+                "code":code,
+                "pt":pt,
+                "soln":soln,
+                "refEpoch":refEpoch,
+                "unit":unit,
+                "s":s,
+                "est":est,
+                "sigma":sigma,
+    }
+    df = pd.DataFrame(dict_temp)
+
+    # Return
+    return df
+
+def sinex2dataframe_solution_matrix_estimate(fp):
+    """This function reads in a SINEX file and returns 
+    a dataframe of SOLUTION/MATRIX_ESTIMATE block only. 
+
+    :param str sinex: path of input SINEX file
+    return: df
+    """
+
+    # Get lines
+    lines = read_sinex_solution_matrix_estimate_block(fp)
+
+    # Remove non-data lines
+    for l in lines[:]:
+        if l.startswith('*'):
+            lines.remove(l)
+        if l.startswith('+'):
+            lines.remove(l)
+        if l.startswith('-'):
+            lines.remove(l)
+
+    # Split by column
+    lines = [i.split() for i in lines]
+
+    # Pad out lines with NaN
+    for i in range(len(lines)):
+        if len(lines[i])==5:
+            continue
+        if len(lines[i]) == 4:
+            lines[i].append(np.nan)
+        if len(lines[i]) == 3:
+            lines[i].append(np.nan)
+            lines[i].append(np.nan)
+        
+    # Isolate into vectors
+    row = np.int_(list(zip(*lines))[0])
+    col = np.int_(list(zip(*lines))[1])
+    q1 = np.float_(list(zip(*lines))[2])
+    q2 = np.float_(list(zip(*lines))[3])
+    q3 = np.float_(list(zip(*lines))[4])
+
+    # Organise into DataFrame
+    dict_temp = {
+                "row":row,
+                "col":col,
+                "q1":q1,
+                "q2":q2,
+                "q3":q3,
+    }
+    df = pd.DataFrame(dict_temp)
+
+    # Return
+    return df
+
+def dataframe2sinex_solution_estimate(df):
+    """This function reads in a dataframe of the 
+    SOLUTIONS/ESTIMATE block from a SINEX, then
+    converts each row to a string in a list 
+    ready for writing to SINEX.
+
+    :param dataframe df: dataframe of SOLUTION/ESTIMATE block
+    return: list of strings
+    """
+
+    lines =lines = ["+SOLUTION/ESTIMATE"]
+    lines.append("*INDEX TYPE__ CODE PT SOLN _REF_EPOCH__ UNIT S __ESTIMATED VALUE____ _STD_DEV___")
+
+    for i in range(len(df.code)):
+        l = " %5i %s   %s  %s    %s %s %-3s  %s %21.14e %.5e" % (df.row.iloc[i], df.par.iloc[i], df.code.iloc[i], df.pt.iloc[i], df.soln.iloc[i], df.refEpoch.iloc[i], df.unit.iloc[i], df.s.iloc[i], df.est.iloc[i], df.sigma.iloc[i])
+        lines.append(l)
+    
+    lines.append("-SOLUTION/ESTIMATE")
+
+    # Return
+    return lines
+
+def dataframe2matrix_snx_vcv(df, numPar=3):
+    """This function converts a dataframe created from a
+    SINEX VCV based from read_sinex_matrix(), and converts 
+    it to a full VCV without covariances between sites.
+
+    i.e.  xx xy xz          0  0  0
+          xy yy yz .  .  .  0  0  0
+          xz yz zz          0  0  0
+             .     .           .
+             .        .        .
+             .           .     .
+          0  0  0           xx xy xz 
+          0  0  0  .  .  .  xy yy yz
+          0  0  0           xz yz zz
+
+    :param DataFrame: dataframe formed from read_sinex_matrix():
+    return: Numpy matrix of VCV with no covariances between sites. 
+    """
+    
+    # Matrix dimensions
+    # - To Do: Handle check for velocities (?)
+    par = numPar # (is there a way to automatically determine if velocitie exist?)
+    n = len(df.code)*par
+    Q = np.zeros((n, n))
+
+    # Matrix elements and rows of dataframe
+    i = 0
+    j = 0
+    r = 0
+    while r < len(df.code):
+
+        # variances
+        Q[i+0, j+0] = df.xx[r]
+        Q[i+1, j+1] = df.yy[r]
+        Q[i+2, j+2] = df.zz[r]
+
+        # covariances
+        Q[i+1, j+0] = df.xy[r]
+        Q[i+0, j+1] = df.xy[r]
+        Q[i+2, j+0] = df.xz[r]
+        Q[i+0, j+2] = df.xz[r]
+        Q[i+2, j+1] = df.yz[r]
+        Q[i+1, j+2] = df.yz[r]
+        
+
+        # Counter
+        r = r+1
+        i = i+3
+        j = j+3
+
+    # Return
+    return Q
+    
+def dataframe2matrix_solution_matrix_estimate(df, tri="L"):
+    """This function reads in a dataframe of the SINEX 
+    SOLUTION/MATRIX_ESTIMATE block formed from 
+    sinex2dataframe_solution_matrix_estimate(), and then 
+    forms the full VCV matrix from that dataframe. 
+
+    :param DataFrame df: dataframe from sinex2dataframe_solution_matrix_estimate().
+    :param String tri: String to indicate "upper" or "lower" triagle matrix. 
+    return: Numpy matrix of full VCV. 
+    """
+
+    # Triangularity of matrix
+    triangle = tri
+
+    # Matrix size
+    n = df.row.iloc[-1]
+    Q = np.zeros((n, n))
+
+    if triangle == "L":
+
+        for i in range(len(df.row)):
+            
+            # Get matrix indices
+            row = int(df.row[i]) - 1
+            col = int(df.col[i]) - 1
+            
+            # Fill PARA2+0
+            q1 = df.q1[i]    
+            Q[row, col] = q1
+            Q[col, row] = q1
+            
+            # Fill PARA2+1
+            q2 = df.q2[i]
+            Q[row, col+1] = q2
+            Q[col+1, row] = q2
+            
+            # Fill PARA2+2
+            q3 = df.q3[i]
+            Q[row, col+2] = q3
+            Q[col+2, row] = q3
+        
+    if triangle == "U":
+
+        for i in range(len(df.row)):
+
+            # Get matrix indices
+            row = int(df.row[i]) - 1
+            col = int(df.col[i]) - 1
+
+            if df.col[i] < n-1:
+            
+                # Fill PARA2+0
+                q1 = df.q1[i]    
+                Q[row, col] = q1
+                Q[col, row] = q1
+                
+                # Fill PARA2+1
+                q2 = df.q2[i]
+                Q[row, col+1] = q2
+                Q[col+1, row] = q2
+                
+                # Fill PARA2+2
+                q3 = df.q3[i]
+                Q[row, col+2] = q3
+                Q[col+2, row] = q3
+            
+            if df.col[i] == n-1:
+            
+                # Fill PARA2+0
+                q1 = df.q1[i]    
+                Q[row, col] = q1
+                Q[col, row] = q1
+                
+                # Fill PARA2+1
+                q2 = df.q2[i]
+                Q[row, col+1] = q2
+                Q[col+1, row] = q2
+
+            if df.col[i] == n:
+            
+                # Fill PARA2+0
+                q1 = df.q1[i]    
+                Q[row, col] = q1
+                Q[col, row] = q1
+
+    # Return
+    return Q
+
+def matrix2dataframe_solution_matrix_estimate(m, tri="L"):
+    """This function reads a VCV in matrix format and writes it
+    to dataframe for SINEX SOLUTION/MATRIX_ESTIMATE format. It 
+    is the format produced from sinex2dataframe_solution_matrix_estimate().
+
+    :param numpy.array() m: A numpy array of the VCV matrix. 
+    :param String tri: String to indicate "upper" or "lower" triagle matrix. 
+    return: DataFrame df: A dataframe of SOLUTION/MATRIX_ESTIMATE.
+    """
+
+    # Matrix dimensions
+    Q = m
+    triangle = tri
+    n = np.shape(Q)[0]
+
+    if triangle == "L":
+
+        # Make upper triangle NaNs
+        Q[np.triu_indices(n, 1)] = np.nan
+
+        row = []
+        col = []
+        q1 = []
+        q2 = []
+        q3 = []
+        i = 0
+        j = 0
+        while i < n:
+            while j <= i:
+                row.append(i+1)
+                col.append(j+1)
+                q1.append(Q[i, j])
+                q2.append(Q[i, j+1])
+                q3.append(Q[i, j+2])
+                j += 3
+            j = 0
+            i += 1
+
+    if triangle == "U":
+
+        # Make lower triangle NaNs
+        Q[np.tril_indices(n, -1)] = np.nan
+
+        row = []
+        col = []
+        q1 = []
+        q2 = []
+        q3 = []
+        i = 0
+        j = 0
+        while i < n:
+            while j < n:
+                if j < n-2:
+                    row.append(i+1)
+                    col.append(j+1)
+                    q1.append(Q[i, j])
+                    q2.append(Q[i, j+1])
+                    q3.append(Q[i, j+2])
+                    j += 3
+
+                if j == n-2: 
+                    row.append(i+1)
+                    col.append(j+1)
+                    q1.append(Q[i, j])
+                    q2.append(Q[i, j+1])
+                    q3.append(np.nan)
+                    j += 3
+
+                if j == n-1: 
+                    row.append(i+1)
+                    col.append(j+1)
+                    q1.append(Q[i, j])
+                    q2.append(np.nan)
+                    q3.append(np.nan)
+                    j += 3
+            
+            i += 1
+            j = i
+
+    dict_temp = {
+                "row":row,
+                "col":col,
+                "q1":q1,
+                "q2":q2,
+                "q3":q3,
+    }
+    df = pd.DataFrame(dict_temp)
+
+    # Return
+    return df
+
+def dataframe2sinex_solution_matrix_estimate(df, tri="L"):
+    """This function reads in a dataframe of the 
+    SOLUTIONS/MATRIX_ESTIMATE block from a SINEX, the
+    converts each row to a string in a list 
+    ready for writing to SINEX.
+
+    :param dataframe df: dataframe of SOLUTION/ESTIMATE block
+    return: list of strings
+    """
+    
+    # Upper or lower triangle
+    triangle = tri
+
+    lines = [f"+SOLUTION/MATRIX_ESTIMATE {triangle} COVA"]
+    lines.append("*PARA1 PARA2 ____PARA2+0__________ ____PARA2+1__________ ____PARA2+2__________")
+
+    for i in range(len(df.row)):
+        p1 = df.row.iloc[i]
+        p2 = df.col.iloc[i]
+        q1 = df.q1.iloc[i]
+        q2 = df.q2.iloc[i]
+        q3 = df.q3.iloc[i]
+        l = ' {:5n} {:5n} {:>21.14e} {:>21.14e} {:>21.14e}'.format(p1, p2, q1, q2, q3)
+        l = l.replace('nan', '')
+        lines.append(l)
+    
+    lines.append(f"-SOLUTION/MATRIX_ESTIMATE {triangle} COVA")
+
+    # Return
+    return lines
+
+def writeSINEX(fp, header, comment, SiteID, SolutionEpochs, SolutionEstimate, SolutionMatrixEstimate):
+    """This function writes out SINEX blocks to new SINEX file. The
+    SINEX blocks can be obtained from many of the read_sinex_...() 
+    functions when writing the same input to output. Or can use the 
+    dataframe2sinex_...() functions when SIENX manipulations have
+    occurred on that specific block. 
+
+    Parameters:
+    fp (string): Full filepath to output SINEX. 
+    header (string): Single header line. Can get from read_sinex_header_line().
+    comment (list of strings): +FILE/COMMENT block. Can get from read_sinex_comments().
+    SiteID (list of strings): +SITE/ID block. Can get from read_sinex_site_id_block().
+    SolutionEpochs (list of strings): +SOLUTION/EPOCHS block. Can get from read_sinex_solution_epochs_block().
+    SolutionEstimatee (list of strings): +SOLUTION/ESTIMATE block. Can get from read_sinex_solution_estimate_block().
+    SolutionMatricEstimate (list of strings): +SOLUTION/MATRIX_ESTIMATE block. Can get from read_sinex_solution_matrix_estimate_block().
+
+    Return:
+    No return. But a new SINEX file will be written out to the file path (fp).
+
+    """
+
+    # Open File
+    with open(fp, 'w') as f:
+
+        # Header
+        f.write("{}".format(header))
+
+        f.write("*-------------------------------------------------------------------------------\n")
+
+        # Comment
+        for i in range(len(comment)):
+            
+            f.write("{}\n".format(comment[i]))
+
+        f.write("*-------------------------------------------------------------------------------\n")
+
+        #SITE/ID
+        for i in range(len(SiteID)):
+
+            f.write("{}\n".format(SiteID[i]))
+
+        f.write("*-------------------------------------------------------------------------------\n")
+
+        # SOLUTION/EPOCHS
+        for i in range(len(SolutionEpochs)):
+
+            f.write("{}\n".format(SolutionEpochs[i]))
+
+        f.write("*-------------------------------------------------------------------------------\n")
+
+        # SOLUTION/ESTIMATE
+        for i in range(len(SolutionEstimate)):
+
+            f.write("{}\n".format(SolutionEstimate[i]))
+
+        f.write("*-------------------------------------------------------------------------------\n")
+
+        # SOLUTION/MATRIX_ESTIMATE
+        for i in range(len(SolutionMatrixEstimate)):
+
+            f.write("{}\n".format(SolutionMatrixEstimate[i]))
+
+        # End Line
+        f.write("%ENDSNX")
+
+    f.close()
 
 def remove_stns_sinex(sinex, sites):
     """This function removes a list sites from a SINEX file
@@ -1013,308 +1505,3 @@ def remove_matrixzeros_sinex(sinex):
         out.write('%ENDSNX\n')
 
     return
-
-
-def sinex2dataframe_solution_estimate(fp):
-    """This function reads in a SINEX file and returns 
-    a dataframe of SOLUTION/ESTIMATE block only. 
-
-    :param str sinex: path of input SINEX file
-    return: dataframe
-    """
-    
-    # Get lines
-    lines = read_sinex_solution_estimate_block(fp)
-
-    # Remove non-data lines
-    for l in lines[:]:
-        if l.startswith('*'):
-            lines.remove(l)
-        if l.startswith('+'):
-            lines.remove(l)
-        if l.startswith('-'):
-            lines.remove(l)
-
-    # Split by column
-    lines = [i.split() for i in lines]
-
-    # Isolate into vectors
-    row = np.int_(list(zip(*lines))[0])
-    par = list(zip(*lines))[1]
-    code = list(zip(*lines))[2]
-    pt = list(zip(*lines))[3]
-    soln = list(zip(*lines))[4]
-    refEpoch = list(zip(*lines))[5]
-    unit = list(zip(*lines))[6]
-    s = np.int_(list(zip(*lines))[7])
-    est = np.float_(list(zip(*lines))[8])
-    sigma = np.float_(list(zip(*lines))[9])
-
-    # Organise into DataFrame
-    dict_temp = {
-                "row":row,
-                "par":par,
-                "code":code,
-                "pt":pt,
-                "soln":soln,
-                "refEpoch":refEpoch,
-                "unit":unit,
-                "s":s,
-                "est":est,
-                "sigma":sigma,
-    }
-    df = pd.DataFrame(dict_temp)
-
-    # Return
-    return df
-
-def sinex2dataframe_solution_matrix_estimate(fp):
-    """This function reads in a SINEX file and returns 
-    a dataframe of SOLUTION/MATRIX_ESTIMATE block only. 
-
-    :param str sinex: path of input SINEX file
-    return: dataframe
-    """
-
-    # Get lines
-    lines = read_sinex_solution_matrix_estimate_block(fp)
-
-    # Remove non-data lines
-    for l in lines[:]:
-        if l.startswith('*'):
-            lines.remove(l)
-        if l.startswith('+'):
-            lines.remove(l)
-        if l.startswith('-'):
-            lines.remove(l)
-
-    # Split by column
-    lines = [i.split() for i in lines]
-
-    # Pad out lines with NaN
-    for i in range(len(lines)):
-        if len(lines[i])==5:
-            continue
-        if len(lines[i]) == 4:
-            lines[i].append(np.nan)
-        if len(lines[i]) == 3:
-            lines[i].append(np.nan)
-            lines[i].append(np.nan)
-        
-    # Isolate into vectors
-    row = np.int_(list(zip(*lines))[0])
-    col = np.int_(list(zip(*lines))[1])
-    q1 = np.float_(list(zip(*lines))[2])
-    q2 = np.float_(list(zip(*lines))[3])
-    q3 = np.float_(list(zip(*lines))[4])
-
-    # Organise into DataFrame
-    dict_temp = {
-                "row":row,
-                "col":col,
-                "q1":q1,
-                "q2":q2,
-                "q3":q3,
-    }
-    df = pd.DataFrame(dict_temp)
-
-    # Return
-    return df
-
-def dataframe2sinex_solution_estimate(df):
-    """This function reads in a dataframe of the 
-    SOLUTIONS/ESTIMATE block from a SINEX, the
-    converts each row to a string in a list 
-    ready for writing to SINEX.
-
-    :param dataframe df: dataframe of SOLUTION/ESTIMATE block
-    return: list of strings
-    """
-
-    lines =lines = ["+SOLUTION/ESTIMATE"]
-    lines.append("*INDEX TYPE__ CODE PT SOLN _REF_EPOCH__ UNIT S __ESTIMATED VALUE____ _STD_DEV___")
-
-    for i in range(len(df.code)):
-        l = " %5i %s   %s  %s    %s %s %-3s  %s %21.14e %.5e" % (df.row.iloc[i], df.par.iloc[i], df.code.iloc[i], df.pt.iloc[i], df.soln.iloc[i], df.refEpoch.iloc[i], df.unit.iloc[i], df.s.iloc[i], df.est.iloc[i], df.sigma.iloc[i])
-        lines.append(l)
-    
-    lines.append("-SOLUTION/ESTIMATE")
-
-    # Return
-    return lines
-
-
-def dataframe2matrix_snx_vcv(df):
-    
-    # Matrix dimensions
-    # - To Do: Handle check for velocities
-    # - To Do: Handle lower/upper triangle
-    par = 3 # (check for velocities)
-    n = len(df.code)*par
-    Q = np.zeros((n, n))
-
-    # Matrix elements and rows of dataframe
-    i = 0
-    j = 0
-    r = 0
-    while r < len(df.code):
-
-        # variances
-        Q[i+0, j+0] = df.xx[r]
-        Q[i+1, j+1] = df.yy[r]
-        Q[i+2, j+2] = df.zz[r]
-
-        # covariances
-        Q[i+1, j] = df.xy[r]
-        Q[i+2, j] = df.xz[r]
-        Q[i+2, j+1] = df.yz[r]
-
-        # Counter
-        r = r+1
-        i = i+3
-        j = j+3
-
-    # Return
-    return Q
-    
-def dataframe2matrix_solution_matrix_estimate(df):
-
-    # Matrix size
-    n = df.row.iloc[-1]
-    Q = np.zeros((n, n))
-
-    for i in range(len(df.row)):
-        
-        # Get matrix indices
-        row = int(df.row[i])
-        col = int(df.col[i])
-        
-        # Fill PARA2+0
-        q1 = df.q1[i]    
-        Q[row-1, col-1] = q1
-        Q[col-1, row-1] = q1
-        
-        # Fill PARA2+1
-        q2 = df.q2[i]
-        Q[row-1, col] = q2
-        Q[col, row-1] = q2
-        
-        # Fill PARA2+2
-        q3 = df.q3[i]
-        Q[row-1, col+1] = q3
-        Q[col+1, row-1] = q3
-
-    # Return
-    return Q
-
-def matrix2dataframe_solution_matrix_estimate(m, par, tri):
-
-    # Matrix dimensions
-    # - To Do: Handle check for velocities
-    # - To Do: Handle lower/upper triangle
-    Q = m
-    par = 3
-    tri = 'lower'
-    n = np.shape(Q)[0]
-
-    row = []
-    col = []
-    q1 = []
-    q2 = []
-    q3 = []
-    i = 0
-    j = 0
-    while i < n:
-        while j <= i:
-            row.append(i+1)
-            col.append(j+1)
-            q1.append(Q[i, j])
-            q2.append(Q[i, j+1])
-            q3.append(Q[i, j+2])
-            j += par
-        j = 0
-        i += 1
-
-    dict_temp = {
-                "row":row,
-                "col":col,
-                "q1":q1,
-                "q2":q2,
-                "q3":q3,
-    }
-    df = pd.DataFrame(dict_temp)
-    df.replace(0.0, np.nan, inplace=True)
-
-    # Return
-    return df
-
-def dataframe2sinex_solution_matrix_estimate(df):
-    """This function reads in a dataframe of the 
-    SOLUTIONS/MATRIX_ESTIMATE block from a SINEX, the
-    converts each row to a string in a list 
-    ready for writing to SINEX.
-
-    :param dataframe df: dataframe of SOLUTION/ESTIMATE block
-    return: list of strings
-    """
-
-    lines =lines = ["+SOLUTION/MATRIX_ESTIMATE L COVA"]
-    lines.append("*PARA1 PARA2 ____PARA2+0__________ ____PARA2+1__________ ____PARA2+2__________")
-
-    for i in range(len(df.row)):
-        l = " %6i %5i %.14e %.14e %.14e" % (df.row.iloc[i], df.col.iloc[i], df.q1.iloc[i], df.q2.iloc[i], df.q3.iloc[i])
-        l = l.replace('nan', '')
-        lines.append(l)
-    
-    lines.append("-SOLUTION/MATRIX_ESTIMATE L COVA")
-
-    # Return
-    return lines
-
-def writeSINEX(fp, header, comment, SiteID, SolutionEpochs, SolutionEstimate, SolutionMatrixEstimate):
-
-    # Open File
-    with open(fp, 'w') as f:
-
-        # Header
-        f.write("{}".format(header))
-
-        f.write("*-------------------------------------------------------------------------------\n")
-
-        # Comment
-        for i in range(len(comment)):
-            
-            f.write("{}\n".format(comment[i]))
-
-        f.write("*-------------------------------------------------------------------------------\n")
-
-        #SITE/ID
-        for i in range(len(SiteID)):
-
-            f.write("{}".format(SiteID[i]))
-
-        f.write("*-------------------------------------------------------------------------------\n")
-
-        # SOLUTION/EPOCHS
-        for i in range(len(SolutionEpochs)):
-
-            f.write("{}".format(SolutionEpochs[i]))
-
-        f.write("*-------------------------------------------------------------------------------\n")
-
-        # SOLUTION/ESTIMATE
-        for i in range(len(SolutionEstimate)):
-
-            f.write("{}\n".format(SolutionEstimate[i]))
-
-        f.write("*-------------------------------------------------------------------------------\n")
-
-        # SOLUTION/MATRIX_ESTIMATE
-        for i in range(len(SolutionMatrixEstimate)):
-
-            f.write("{}".format(SolutionMatrixEstimate[i]))
-
-        # End Line
-        f.write("%ENDSNX")
-
-    f.close()

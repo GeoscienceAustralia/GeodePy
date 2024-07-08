@@ -480,6 +480,15 @@ gda94_to_agd66_nt = -agd66_to_gda94_nt
 # the transformation object to allow compatibility with GeodePy functions.
 # Ref: https://itrf.ign.fr/docs/solutions/itrf2020/Transfo-ITRF2020_TRFs.txt
 
+itrf2020_to_itrf2014_vel = iers2trans(
+    itrf_from='ITRF2020', itrf_to='ITRF2014', ref_epoch=date(2015, 1, 1),
+    tx=0.0, ty=-0.1, tz=0.2,
+    sc=-0.42,
+    rx=0.0, ry=0.0, rz=0.0,
+    d_tx=0.0, d_ty=0.0, d_tz=0.0,
+    d_sc=0.0,
+    d_rx=0.0, d_ry=0.0, d_rz=0.0)
+
 itrf2020_to_itrf2014 = iers2trans(
     itrf_from='ITRF2020', itrf_to='ITRF2014', ref_epoch=date(2015, 1, 1),
     tx=-1.4, ty=-0.9, tz=1.4,
