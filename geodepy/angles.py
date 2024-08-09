@@ -542,7 +542,7 @@ class DMSAngle(object):
         """
         # Convert formatted string 'DDD MM SS.SSS' to DMSAngle
         if type(degree) == str:
-            str_pts = degree.split(' ')
+            str_pts = degree.split()
             degree = int(str_pts[0])
             minute = int(str_pts[1])
             second = float(str_pts[2])
