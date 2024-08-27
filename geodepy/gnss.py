@@ -1334,15 +1334,12 @@ def writeSINEX(fp,
                siteEccentricity=None,
                solutionApriori=None,
                solutionMatrixApriori=None):
-    """This function writes out SINEX blocks to new SINEX file. The
+    """This function writes out SINEX blocks to a new SINEX file. The
     SINEX blocks can be obtained from many of the read_sinex_...() 
     functions when writing the same input to output. Or can use the 
     dataframe2sinex_...() functions when SINEX manipulations have
-    occurred on that specific block. An argument can be set to 'None'
-    if user does not want to write that block to file. This helps when
-    user has used read_sinex_custom() which may have included multiple
-    blocks and prevents writing the same block out twice, by skipping
-    that input argument.
+    occurred on that specific block. Input arguments are set to 'None'
+    by default. This allows user to only write out the required blocks.
 
     Parameters:
     fp (string): Full filepath to output SINEX. 
