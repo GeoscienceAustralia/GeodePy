@@ -24,12 +24,22 @@ General functions for reading from SINEX:
     - read_disconts()
     - read_solution_epochs()
     - read_sinex_header_block()
+    - read_sinex_file_reference_block()
+    - read_sinex_input_acknowledgments_block()
+    - read_sinex_solution_statistics_block()
+    - read_sinex_site_receiver_block()
+    - read_sinex_site_antenna_block()
+    - read_sinex_site_gps_phase_center_block()
+    - read_sinex_site_eccentricity_block()
     - read_sinex_site_id_block()
     - read_sinex_solution_epochs_block()
     - read_sinex_solution_estimate_block()
+    - read_sinex_solution_apriori_block()
     - read_sinex_solution_matrix_estimate_block()
+    - read_sinex_solution_matrix_apriori_block()
     - matrix2dataframe_solution_matrix_estimate()
     - sinex2dataframe_solution_estimate()
+    - sinex2dataframe_solution_apriori()
     - sinex2dataframe_solution_matrix_estimate()
 
 General functions for writing to SINEX:
@@ -37,6 +47,7 @@ General functions for writing to SINEX:
     - print_sinex_comments()
     - set_creation_time()
     - dataframe2sinex_solution_estimate()
+    - dataframe2sinex_solution_apriori()
     - dataframe2matrix_snx_vcv()
     - dataframe2matrix_solution_matrix_estimate()
     - dataframe2sinex_solution_matrix_estimate()
@@ -544,6 +555,167 @@ def read_sinex_header_block(sinex):
 
     return block
 
+def read_sinex_file_reference_block(sinex):
+    """This function reads in the +FILE/REFERENCE block 
+    of a SINEX file.
+
+        :param str sinex: input SINEX file
+        return: block
+        """
+
+    block = []
+    go = False
+    with open(sinex, 'r') as f:
+        line = f.readline()
+        while line:
+            if line.startswith('+FILE/REFERENCE'):
+                go = True
+            if go:
+                block.append(line.rstrip())
+            if line.startswith('-FILE/REFERENCE'):
+                break
+            line = f.readline()
+            
+    return block
+
+def read_sinex_input_acknowledgments_block(sinex):
+    """This function reads in the +INPUT/ACKNOWLEDGMENTS 
+    block of a SINEX file.
+
+        :param str sinex: input SINEX file
+        return: block
+        """
+
+    block = []
+    go = False
+    with open(sinex, 'r') as f:
+        line = f.readline()
+        while line:
+            if line.startswith('+INPUT/ACKNOWLEDGMENTS'):
+                go = True
+            if go:
+                block.append(line.rstrip())
+            if line.startswith('-INPUT/ACKNOWLEDGMENTS'):
+                break
+            line = f.readline()
+
+    return block
+
+def read_sinex_solution_statistics_block(sinex):
+    """This function reads in the +SOLUTION/STATISTICS
+    block of a SINEX file.
+
+        :param str sinex: input SINEX file
+        return: block
+        """
+
+    block = []
+    go = False
+    with open(sinex, 'r') as f:
+        line = f.readline()
+        while line:
+            if line.startswith('+SOLUTION/STATISTICS'):
+                go = True
+            if go:
+                block.append(line.rstrip())
+            if line.startswith('-SOLUTION/STATISTICS'):
+                break
+            line = f.readline()
+
+    return block
+
+def read_sinex_site_receiver_block(sinex):
+    """This function reads in the +SITE/RECEIVER
+    block of a SINEX file.
+
+        :param str sinex: input SINEX file
+        return: block
+        """
+
+    block = []
+    go = False
+    with open(sinex, 'r') as f:
+        line = f.readline()
+        while line:
+            if line.startswith('+SITE/RECEIVER'):
+                go = True
+            if go:
+                block.append(line.rstrip())
+            if line.startswith('-SITE/RECEIVER'):
+                break
+            line = f.readline()
+            
+    return block
+
+def read_sinex_site_antenna_block(sinex):
+    """This function reads in the +SITE/ANTENNA
+    block of a SINEX file.
+
+        :param str sinex: input SINEX file
+        return: block
+        """
+
+    block = []
+    go = False
+    with open(sinex, 'r') as f:
+        line = f.readline()
+        while line:
+            if line.startswith('+SITE/ANTENNA'):
+                go = True
+            if go:
+                block.append(line.rstrip())
+            if line.startswith('-SITE/ANTENNA'):
+                break
+            line = f.readline()
+            
+    return block
+
+def read_sinex_site_gps_phase_center_block(sinex):
+    """This function reads in the +SITE/GPS_PHASE_CENTER
+    block of a SINEX file.
+
+        :param str sinex: input SINEX file
+        return: block
+        """
+
+    block = []
+    go = False
+    with open(sinex, 'r') as f:
+        line = f.readline()
+        while line:
+            if line.startswith('+SITE/GPS_PHASE_CENTER'):
+                go = True
+            if go:
+                block.append(line.rstrip())
+            if line.startswith('-SITE/GPS_PHASE_CENTER'):
+                break
+            line = f.readline()
+            
+    return block
+
+def read_sinex_site_eccentricity_block(sinex):
+    """This function reads in the +SITE/ECCENTRICITY
+    block of a SINEX file.
+
+        :param str sinex: input SINEX file
+        return: block
+        """
+
+    block = []
+    go = False
+    with open(sinex, 'r') as f:
+        line = f.readline()
+        while line:
+            if line.startswith('+SITE/ECCENTRICITY'):
+                go = True
+            if go:
+                block.append(line.rstrip())
+            if line.startswith('-SITE/ECCENTRICITY'):
+                break
+            line = f.readline()
+            
+    return block
+
 def read_sinex_site_id_block(sinex):
     """This function reads in the SITE/ID block of a SINEX file
     into list of strings.
@@ -611,6 +783,29 @@ def read_sinex_solution_estimate_block(sinex):
             line = f.readline()
     return block
 
+def read_sinex_solution_apriori_block(sinex):
+    """This function reads in the +SOLUTION/APRIORI
+    block of a SINEX file.
+
+        :param str sinex: input SINEX file
+        return: block
+        """
+
+    block = []
+    go = False
+    with open(sinex, 'r') as f:
+        line = f.readline()
+        while line:
+            if line.startswith('+SOLUTION/APRIORI'):
+                go = True
+            if go:
+                block.append(line.rstrip())
+            if line.startswith('-SOLUTION/APRIORI'):
+                break
+            line = f.readline()
+            
+    return block
+
 def read_sinex_solution_matrix_estimate_block(sinex):
     """This function reads in the SOLUTION/MATRIX_ESTIMATE block of a SINEX
     file into list of strings.
@@ -631,6 +826,30 @@ def read_sinex_solution_matrix_estimate_block(sinex):
             if line.startswith('-SOLUTION/MATRIX_ESTIMATE'):
                 break
             line = f.readline()
+
+    return block
+
+def read_sinex_solution_matrix_apriori_block(sinex):
+    """This function reads in the SOLUTION/MATRIX_APRIORI block 
+    of a SINEX file into list of strings.
+
+    :param str sinex: input SINEX file
+    return: block
+    """
+
+    block = []
+    go = False
+    with open(sinex, 'r') as f:
+        line = f.readline()
+        while line:
+            if line.startswith('+SOLUTION/MATRIX_APRIORI'):
+                go = True
+            if go:
+                block.append(line.rstrip())
+            if line.startswith('-SOLUTION/MATRIX_APRIORI'):
+                break
+            line = f.readline()
+            
     return block
 
 def sinex2dataframe_solution_estimate(fp):
@@ -643,6 +862,59 @@ def sinex2dataframe_solution_estimate(fp):
     
     # Get lines
     lines = read_sinex_solution_estimate_block(fp)
+
+    # Remove non-data lines
+    for l in lines[:]:
+        if l.startswith('*'):
+            lines.remove(l)
+        if l.startswith('+'):
+            lines.remove(l)
+        if l.startswith('-'):
+            lines.remove(l)
+
+    # Split by column
+    lines = [i.split() for i in lines]
+
+    # Isolate into vectors
+    row = np.int_(list(zip(*lines))[0])
+    par = list(zip(*lines))[1]
+    code = list(zip(*lines))[2]
+    pt = list(zip(*lines))[3]
+    soln = list(zip(*lines))[4]
+    refEpoch = list(zip(*lines))[5]
+    unit = list(zip(*lines))[6]
+    s = np.int_(list(zip(*lines))[7])
+    est = np.float_(list(zip(*lines))[8])
+    sigma = np.float_(list(zip(*lines))[9])
+
+    # Organise into DataFrame
+    dict_temp = {
+                "row":row,
+                "par":par,
+                "code":code,
+                "pt":pt,
+                "soln":soln,
+                "refEpoch":refEpoch,
+                "unit":unit,
+                "s":s,
+                "est":est,
+                "sigma":sigma,
+    }
+    df = pd.DataFrame(dict_temp)
+
+    # Return
+    return df
+
+def sinex2dataframe_solution_apriori(fp):
+    """This function reads in a SINEX file and returns 
+    a dataframe of SOLUTION/APRIORI block only. 
+
+    :param str sinex: path of input SINEX file
+    return: df
+    """
+    
+    # Get lines
+    lines = read_sinex_solution_apriori_block(fp)
 
     # Remove non-data lines
     for l in lines[:]:
@@ -757,6 +1029,28 @@ def dataframe2sinex_solution_estimate(df):
         lines.append(l)
     
     lines.append("-SOLUTION/ESTIMATE")
+
+    # Return
+    return lines
+
+def dataframe2sinex_solution_apriori(df):
+    """This function reads in a dataframe of the 
+    SOLUTION/APRIORI block from a SINEX, then
+    converts each row to a string in a list 
+    ready for writing to SINEX.
+
+    :param dataframe df: dataframe of SOLUTION/APRIORI block
+    return: list of strings
+    """
+
+    lines =lines = ["+SOLUTION/APRIORI"]
+    lines.append("*INDEX TYPE__ CODE PT SOLN _REF_EPOCH__ UNIT S __ESTIMATED VALUE____ _STD_DEV___")
+
+    for i in range(len(df.code)):
+        l = " %5i %s   %s  %s    %s %s %-3s  %s %21.14e %.5e" % (df.row.iloc[i], df.par.iloc[i], df.code.iloc[i], df.pt.iloc[i], df.soln.iloc[i], df.refEpoch.iloc[i], df.unit.iloc[i], df.s.iloc[i], df.est.iloc[i], df.sigma.iloc[i])
+        lines.append(l)
+    
+    lines.append("-SOLUTION/APRIORI")
 
     # Return
     return lines
@@ -1024,12 +1318,31 @@ def dataframe2sinex_solution_matrix_estimate(df, tri="L"):
     # Return
     return lines
 
-def writeSINEX(fp, header, comment, SiteID, SolutionEpochs, SolutionEstimate, SolutionMatrixEstimate):
+def writeSINEX(fp, 
+               header=None, 
+               comment=None, 
+               siteID=None, 
+               solutionEpochs=None, 
+               solutionEstimate=None, 
+               solutionMatrixEstimate=None,
+               fileReference=None,
+               inputAcknowledgments=None,
+               solutionStatistics=None, 
+               siteReceiver=None,
+               siteAntenna=None,
+               siteGpsPhaseCenter=None,
+               siteEccentricity=None,
+               solutionApriori=None,
+               solutionMatrixApriori=None):
     """This function writes out SINEX blocks to new SINEX file. The
     SINEX blocks can be obtained from many of the read_sinex_...() 
     functions when writing the same input to output. Or can use the 
-    dataframe2sinex_...() functions when SIENX manipulations have
-    occurred on that specific block. 
+    dataframe2sinex_...() functions when SINEX manipulations have
+    occurred on that specific block. An argument can be set to 'None'
+    if user does not want to write that block to file. This helps when
+    user has used read_sinex_custom() which may have included multiple
+    blocks and prevents writing the same block out twice, by skipping
+    that input argument.
 
     Parameters:
     fp (string): Full filepath to output SINEX. 
@@ -1039,6 +1352,14 @@ def writeSINEX(fp, header, comment, SiteID, SolutionEpochs, SolutionEstimate, So
     SolutionEpochs (list of strings): +SOLUTION/EPOCHS block. Can get from read_sinex_solution_epochs_block().
     SolutionEstimatee (list of strings): +SOLUTION/ESTIMATE block. Can get from read_sinex_solution_estimate_block().
     SolutionMatricEstimate (list of strings): +SOLUTION/MATRIX_ESTIMATE block. Can get from read_sinex_solution_matrix_estimate_block().
+    fileReference (list of strings): +FILE/REFERENCE block. Can get from read_sinex_file_reference_block().
+    inputAcknowledgments (list of strings): +INPUT/ACKNOWLEDGEMENTS block. Can get from read_sinex_input_acknowledgments_block().
+    siteReceiver (list of strings): +SITE/RECEIVER block. Can get from read_sinex_site_receiver_block().
+    siteAntenna (list of strings): +SITE/ANTENNA block. Can get from read_sinex_site_antenna_block().
+    siteGpsPhaseCenter (list of strings): +SITE/GPS_PHASE_CENTER block. Can get from read_site_gps_phase_center_block().
+    siteEccentricity (list of strings): +SITE/ECCENTRICITY block. Can get from read_sinex_site_eccentricity_block().
+    solutionApriori (list of strings): +SOLUTION/APRIORI block. Can get from read_sinex_solution_apriori_block().
+    solutionMatrixApriori (list of strings): +SOLUTION/MATRIX_APRIORI block. Can get from read_sinex_solution_matric_apriori_block().
 
     Return:
     No return. But a new SINEX file will be written out to the file path (fp).
@@ -1049,42 +1370,138 @@ def writeSINEX(fp, header, comment, SiteID, SolutionEpochs, SolutionEstimate, So
     with open(fp, 'w') as f:
 
         # Header
-        f.write("{}".format(header))
+        if header == None:
+            pass
+        else:
+            f.write("{}".format(header))
 
-        f.write("*-------------------------------------------------------------------------------\n")
+            f.write("*-------------------------------------------------------------------------------\n")
 
         # Comment
-        for i in range(len(comment)):
-            
-            f.write("{}\n".format(comment[i]))
+        if comment == None:
+            pass
+        else:
+            for i in range(len(comment)):
+                f.write("{}\n".format(comment[i]))
 
-        f.write("*-------------------------------------------------------------------------------\n")
+            f.write("*-------------------------------------------------------------------------------\n")
+        
+        # FILE/REFERENCE
+        if fileReference == None:
+            pass
+        else:
+            for i in range(len(fileReference)):
+                f.write("{}\n".format(fileReference[i]))
 
+            f.write("*-------------------------------------------------------------------------------\n")
+
+        # INPUT/ACKNOWLEDGMENTS
+        if inputAcknowledgments == None:
+            pass
+        else:
+            for i in range(len(inputAcknowledgments)):
+                f.write("{}\n".format(inputAcknowledgments[i]))
+
+            f.write("*-------------------------------------------------------------------------------\n")
+
+        # SOLUTION/STATISTICS
+        if solutionStatistics == None:
+            pass
+        else:
+            for i in range(len(solutionStatistics)):
+                f.write("{}\n".format(solutionStatistics[i]))
+
+            f.write("*-------------------------------------------------------------------------------\n")
+        
         #SITE/ID
-        for i in range(len(SiteID)):
+        if siteID == None:
+            pass
+        else:
+            for i in range(len(siteID)):
+                f.write("{}\n".format(siteID[i]))
 
-            f.write("{}\n".format(SiteID[i]))
+            f.write("*-------------------------------------------------------------------------------\n")
 
-        f.write("*-------------------------------------------------------------------------------\n")
+        # SITE/RECEIVER
+        if siteReceiver == None:
+            pass
+        else:
+            for i in range(len(siteReceiver)):
+                f.write("{}\n".format(siteReceiver[i]))
+
+            f.write("*-------------------------------------------------------------------------------\n")
+
+        # SITE/ANTENNA
+        if siteAntenna == None:
+            pass
+        else:
+            for i in range(len(siteAntenna)):
+                f.write("{}\n".format(siteAntenna[i]))
+
+            f.write("*-------------------------------------------------------------------------------\n")
+
+        # SITE/GPS_PHASE_CENTER
+        if siteGpsPhaseCenter == None:
+            pass
+        else:
+            for i in range(len(siteGpsPhaseCenter)):
+                f.write("{}\n".format(siteGpsPhaseCenter[i]))
+
+            f.write("*-------------------------------------------------------------------------------\n")
+
+        # SITE/ECCENTRICITY
+        if siteEccentricity == None:
+            pass
+        else:
+            for i in range(len(siteEccentricity)):
+                f.write("{}\n".format(siteEccentricity[i]))
+
+            f.write("*-------------------------------------------------------------------------------\n")
 
         # SOLUTION/EPOCHS
-        for i in range(len(SolutionEpochs)):
+        if solutionEpochs == None:
+            pass
+        else:
+            for i in range(len(solutionEpochs)):
+                f.write("{}\n".format(solutionEpochs[i]))
 
-            f.write("{}\n".format(SolutionEpochs[i]))
-
-        f.write("*-------------------------------------------------------------------------------\n")
+            f.write("*-------------------------------------------------------------------------------\n")
 
         # SOLUTION/ESTIMATE
-        for i in range(len(SolutionEstimate)):
+        if solutionEstimate == None:
+            pass
+        else:
+            for i in range(len(solutionEstimate)):
+                f.write("{}\n".format(solutionEstimate[i]))
 
-            f.write("{}\n".format(SolutionEstimate[i]))
+            f.write("*-------------------------------------------------------------------------------\n")
 
-        f.write("*-------------------------------------------------------------------------------\n")
+        # SOLUTION/APRIORI
+        if solutionApriori == None:
+            pass
+        else:
+            for i in range(len(solutionApriori)):
+                f.write("{}\n".format(solutionApriori[i]))
+
+            f.write("*-------------------------------------------------------------------------------\n")
 
         # SOLUTION/MATRIX_ESTIMATE
-        for i in range(len(SolutionMatrixEstimate)):
+        if solutionMatrixEstimate == None:
+            pass
+        else:
+            for i in range(len(solutionMatrixEstimate)):
+                f.write("{}\n".format(solutionMatrixEstimate[i]))
 
-            f.write("{}\n".format(SolutionMatrixEstimate[i]))
+            f.write("*-------------------------------------------------------------------------------\n")
+        
+        # SOLUTION/MATRIX_APRIORI
+        if solutionMatrixApriori == None:
+            pass
+        else:
+            for i in range(len(solutionMatrixApriori)):
+                f.write("{}\n".format(solutionMatrixApriori[i]))
+            
+            f.write("*-------------------------------------------------------------------------------\n")
 
         # End Line
         f.write("%ENDSNX")
