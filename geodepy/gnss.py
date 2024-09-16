@@ -1553,11 +1553,11 @@ def remove_stns_sinex(sinex, sites):
         for line in site_id:
             if line.startswith('*') or line.startswith('+') or \
                     line.startswith('-'):
-                out.write(line)
+                out.write(f"{line}\n")
             else:
                 site = line[1:5]
                 if site not in sites:
-                    out.write(line)
+                    out.write(f"{line}\n")
         del site_id
 
         out.write("*-------------------------------------------------------------------------------\n")
@@ -1568,11 +1568,11 @@ def remove_stns_sinex(sinex, sites):
         for line in solution_epochs:
             if line.startswith('*') or line.startswith('+') or \
                     line.startswith('-'):
-                out.write(line)
+                out.write(f"{line}\n")
             else:
                 site = line[1:5]
                 if site not in sites:
-                    out.write(line)
+                    out.write(f"{line}\n")
         del solution_epochs
 
         out.write("*-------------------------------------------------------------------------------\n")
@@ -1585,7 +1585,7 @@ def remove_stns_sinex(sinex, sites):
         for line in solution_estimate:
             if line.startswith('*') or line.startswith('+') or \
                     line.startswith('-'):
-                out.write(line)
+                out.write(f"{line}\n")
             else:
                 site = line[14:18]
                 if site in sites:
@@ -1595,7 +1595,7 @@ def remove_stns_sinex(sinex, sites):
                     estimate_number += 1
                     number = '{:5d}'.format(estimate_number)
                     line = ' ' + number + line[6:]
-                    out.write(line)
+                    out.write(f"{line}\n")
         del solution_estimate
 
         out.write("*-------------------------------------------------------------------------------\n")
@@ -1609,9 +1609,9 @@ def remove_stns_sinex(sinex, sites):
             matrix = 'lower'
         elif solution_matrix_estimate[0][26:27] == 'U':
             matrix = 'upper'
-        out.write(solution_matrix_estimate[0])
+        out.write(f"{solution_matrix_estimate[0]}\n")
         if solution_matrix_estimate[1].startswith('*'):
-            out.write(solution_matrix_estimate[1])
+            out.write(f"{solution_matrix_estimate[1]}\n")
         for line in solution_matrix_estimate:
             if line.startswith(' '):
                 cols = line.split()
@@ -1715,7 +1715,7 @@ def remove_velocity_sinex(sinex):
         # Read in the +SITE/ID block and write to file
         site_id = read_sinex_site_id_block(sinex)
         for line in site_id:
-            out.write(f"{line}")  
+            out.write(f"{line}\n")  
         del site_id
 
         out.write("*-------------------------------------------------------------------------------\n")
@@ -1725,7 +1725,7 @@ def remove_velocity_sinex(sinex):
         numSites = 0
         solution_epochs = read_sinex_solution_epochs_block(sinex)
         for line in solution_epochs:
-            out.write(f"{line}")
+            out.write(f"{line}\n")
             if line[0]!="+" and line[0]!="*" and line[0]!="-":
                 numSites+=1
         del solution_epochs
@@ -1744,12 +1744,12 @@ def remove_velocity_sinex(sinex):
             if line[7:10]=="VEL":
                 vel_indices.append(int(line[0:6]))
             elif line[0]=="+" or line[0]=="*" or line[0]=="-":
-                out.write(f"{line}")
+                out.write(f"{line}\n")
             else:
                 estimate_number+=1
                 number = '{:5d}'.format(estimate_number)
                 line = ' ' + number + line[6:]
-                out.write(f"{line}")
+                out.write(f"{line}\n")
         del solution_estimate
 
         out.write("*-------------------------------------------------------------------------------\n")
@@ -1771,10 +1771,10 @@ def remove_velocity_sinex(sinex):
         # Write initial comment line(s), save last comment line, and form matrix
         for line in solution_matrix_estimate:
             if line[0]=="+":
-                out.write(f"{line}")
+                out.write(f"{line}\n")
                 continue
             if line[0]=="*":
-                out.write(f"{line}")
+                out.write(f"{line}\n")
                 continue
             if line[0]=="-":
                 block_end = line
@@ -1876,7 +1876,7 @@ def remove_matrixzeros_sinex(sinex):
         # Read in the +SITE/ID block and write to file
         site_id = read_sinex_site_id_block(sinex)
         for line in site_id:
-            out.write(f"{line}")  
+            out.write(f"{line}\n")  
         del site_id
 
         out.write("*-------------------------------------------------------------------------------\n")
@@ -1884,7 +1884,7 @@ def remove_matrixzeros_sinex(sinex):
         # Read in the +SOLUTION/EPOCHS block and write to file
         solution_epochs = read_sinex_solution_epochs_block(sinex)
         for line in solution_epochs:
-            out.write(f"{line}")
+            out.write(f"{line}\n")
         del solution_epochs
 
         out.write("*-------------------------------------------------------------------------------\n")
@@ -1892,7 +1892,7 @@ def remove_matrixzeros_sinex(sinex):
         # Read in the +SOLUTION/ESTIMATE block
         solution_estimate = read_sinex_solution_estimate_block(sinex)
         for line in solution_estimate:
-                out.write(f"{line}")
+                out.write(f"{line}\n")
         del solution_estimate
 
         out.write("*-------------------------------------------------------------------------------\n")
