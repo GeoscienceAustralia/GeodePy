@@ -884,8 +884,8 @@ def sinex2dataframe_solution_estimate(fp):
     refEpoch = list(zip(*lines))[5]
     unit = list(zip(*lines))[6]
     s = np.int_(list(zip(*lines))[7])
-    est = np.float_(list(zip(*lines))[8])
-    sigma = np.float_(list(zip(*lines))[9])
+    est = np.float64(list(zip(*lines))[8])
+    sigma = np.float64(list(zip(*lines))[9])
 
     # Organise into DataFrame
     dict_temp = {
@@ -937,8 +937,8 @@ def sinex2dataframe_solution_apriori(fp):
     refEpoch = list(zip(*lines))[5]
     unit = list(zip(*lines))[6]
     s = np.int_(list(zip(*lines))[7])
-    est = np.float_(list(zip(*lines))[8])
-    sigma = np.float_(list(zip(*lines))[9])
+    est = np.float64(list(zip(*lines))[8])
+    sigma = np.float64(list(zip(*lines))[9])
 
     # Organise into DataFrame
     dict_temp = {
@@ -994,9 +994,9 @@ def sinex2dataframe_solution_matrix_estimate(fp):
     # Isolate into vectors
     row = np.int_(list(zip(*lines))[0])
     col = np.int_(list(zip(*lines))[1])
-    q1 = np.float_(list(zip(*lines))[2])
-    q2 = np.float_(list(zip(*lines))[3])
-    q3 = np.float_(list(zip(*lines))[4])
+    q1 = np.float64(list(zip(*lines))[2])
+    q2 = np.float64(list(zip(*lines))[3])
+    q3 = np.float64(list(zip(*lines))[4])
 
     # Organise into DataFrame
     dict_temp = {
