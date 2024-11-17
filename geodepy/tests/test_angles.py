@@ -1,5 +1,6 @@
 import unittest
-from math import radians
+import os
+from math import radians, pi
 
 from geodepy.angles import (DECAngle, HPAngle, GONAngle, DMSAngle, DDMAngle,
                             dec2hp, dec2hpa, dec2gon, dec2gona,
@@ -85,6 +86,18 @@ gona_exs = [gona_ex, gona_ex2, gona_ex3, gona_ex4, gona_ex5]
 
 
 class TestConvert(unittest.TestCase):
+    def setUp(self):
+        self.testData = []
+        degreeValues = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256]
+        for deg in degreeValues:
+            for min in range(60):
+                for sec in range(60):
+                    hp = float(f'{deg:4d}.{min:02d}{sec:02d}')
+                    dec = deg + (min / 60.0 + sec / 3600.0)
+                    gon = dec * 400.0 / 360.0
+                    rad = dec * pi / 180.0
+                    self.testData.append([hp, dec, gon, rad])
+
     def test_DECAngle(self):
         # Test DECAngle Methods
         for num, ex in enumerate(deca_exs):
@@ -465,6 +478,10 @@ class TestConvert(unittest.TestCase):
         for num, ex in enumerate(hp_exs):
             self.assertAlmostEqual(ex, dec2hp(dec_exs[num]), 13)
             self.assertAlmostEqual(-ex, dec2hp(-dec_exs[num]), 13)
+        for check in self.testData:
+            hp, dec, gon, rad = check
+            self.assertAlmostEqual(hp, dec2hp(dec), 13)
+            self.assertAlmostEqual(-hp, dec2hp(-dec), 13)
 
     def test_dec2hpa(self):
         for num, ex in enumerate(dec_exs):
@@ -475,6 +492,10 @@ class TestConvert(unittest.TestCase):
         for num, ex in enumerate(dec_exs):
             self.assertAlmostEqual(dec2gon(ex), gon_exs[num], 13)
             self.assertAlmostEqual(dec2gon(-ex), -gon_exs[num], 13)
+        for check in self.testData:
+            hp, dec, gon, rad = check
+            self.assertAlmostEqual(gon, dec2gon(dec), 13)
+            self.assertAlmostEqual(-gon, dec2gon(-dec), 13)
 
     def test_dec2gona(self):
         for num, ex in enumerate(dec_exs):
@@ -495,6 +516,11 @@ class TestConvert(unittest.TestCase):
         for num, ex in enumerate(dec_exs):
             self.assertAlmostEqual(ex, hp2dec(hp_exs[num]), 13)
             self.assertAlmostEqual(-ex, hp2dec(-hp_exs[num]), 13)
+        for check in self.testData:
+            hp, dec, gon, rad = check
+            self.assertAlmostEqual(dec, hp2dec(hp), 13)
+            self.assertAlmostEqual(-dec, hp2dec(-hp), 13)
+
         self.assertAlmostEqual(hp2dec(hp_exs[0]) + hp2dec(hp_exs[1]),
                                dec_exs[0] + dec_exs[1], 13)
         # Test that invalid minutes and seconds components raise errors
@@ -523,6 +549,10 @@ class TestConvert(unittest.TestCase):
         for num, ex in enumerate(hp_exs):
             self.assertAlmostEqual(hp2gon(ex), gon_exs[num], 13)
             self.assertAlmostEqual(hp2gon(-ex), -gon_exs[num], 13)
+        for check in self.testData:
+            hp, dec, gon, rad = check
+            self.assertAlmostEqual(gon, hp2gon(hp), 13)
+            self.assertAlmostEqual(-gon, hp2gon(-hp), 13)
 
     def test_hp2gona(self):
         for num, ex in enumerate(hp_exs):
@@ -533,6 +563,10 @@ class TestConvert(unittest.TestCase):
         for num, ex in enumerate(hp_exs):
             self.assertEqual(hp2rad(ex), rad_exs[num])
             self.assertEqual(hp2rad(-ex), -rad_exs[num])
+        for check in self.testData:
+            hp, dec, gon, rad = check
+            self.assertAlmostEqual(rad, hp2rad(hp), 13)
+            self.assertAlmostEqual(-rad, hp2rad(-hp), 13)
 
     def test_hp2dms(self):
         self.assertEqual(dms_ex.degree, hp2dms(hp_ex).degree)
@@ -552,6 +586,10 @@ class TestConvert(unittest.TestCase):
         for num, ex in enumerate(gon_exs):
             self.assertAlmostEqual(gon2dec(ex), dec_exs[num], 14)
             self.assertAlmostEqual(gon2dec(-ex), -dec_exs[num], 14)
+        for check in self.testData:
+            hp, dec, gon, rad = check
+            self.assertAlmostEqual(dec, gon2dec(gon), 13)
+            self.assertAlmostEqual(-dec, gon2dec(-gon), 13)
 
     def test_gon2deca(self):
         for num, ex in enumerate(gon_exs):
@@ -562,6 +600,10 @@ class TestConvert(unittest.TestCase):
         for num, ex in enumerate(gon_exs):
             self.assertEqual(gon2hp(ex), hp_exs[num])
             self.assertEqual(gon2hp(-ex), -hp_exs[num])
+        for check in self.testData:
+            hp, dec, gon, rad = check
+            self.assertAlmostEqual(hp, gon2hp(gon), 13)
+            self.assertAlmostEqual(-hp, gon2hp(-gon), 13)
 
     def test_gon2hpa(self):
         for num, ex in enumerate(gon_exs):
@@ -572,6 +614,10 @@ class TestConvert(unittest.TestCase):
         for num, ex in enumerate(gon_exs):
             self.assertAlmostEqual(gon2rad(ex), rad_exs[num], 15)
             self.assertAlmostEqual(gon2rad(-ex), -rad_exs[num], 15)
+        for check in self.testData:
+            hp, dec, gon, rad = check
+            self.assertAlmostEqual(rad, gon2rad(gon), 13)
+            self.assertAlmostEqual(-rad, gon2rad(-gon), 13)
 
     def test_gon2dms(self):
         for num, ex in enumerate(gon_exs):
