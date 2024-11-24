@@ -89,14 +89,27 @@ class TestConvert(unittest.TestCase):
     def setUp(self):
         self.testData = []
         degreeValues = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256]
+        dec_places = 13
+        error = 10**-(dec_places - 4)
         for deg in degreeValues:
             for min in range(60):
                 for sec in range(60):
+                    if sec:
+                        hp_minus = float(f'{deg:4d}.{min:02d}{sec-1:02d}' + '9' * (dec_places - 4))
+                        dec_minus = deg + (min / 60.0 + (sec - error) / 3600.0)
+                        gon_minus = dec * 400.0 / 360.0
+                        rad_minus = dec * pi / 180.0
+                        self.testData.append([hp_minus, dec_minus, gon_minus, rad_minus])
                     hp = float(f'{deg:4d}.{min:02d}{sec:02d}')
+                    hp_plus = float(f'{deg:4d}.{min:02d}{sec:02d}' + '0' * (dec_places - 5) + '1')
                     dec = deg + (min / 60.0 + sec / 3600.0)
                     gon = dec * 400.0 / 360.0
                     rad = dec * pi / 180.0
                     self.testData.append([hp, dec, gon, rad])
+                    dec_plus = deg + (min / 60.0 + (sec + error) / 3600.0)
+                    gon_plus = dec * 400.0 / 360.0
+                    rad_plus = dec * pi / 180.0
+                    self.testData.append([hp_plus, dec_plus, gon_plus, rad_plus])
 
     def test_DECAngle(self):
         # Test DECAngle Methods

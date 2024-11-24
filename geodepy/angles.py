@@ -32,7 +32,14 @@ e.g. HPAngle(value).dec()
 """
 
 from math import radians
+import struct
 
+def add_bits(flt, bits_to_add = 1)->float:
+    p_flt = struct.pack('@d', flt)
+    ll = struct.unpack('@q', p_flt)[0]
+    ll += bits_to_add
+    p_flt = struct.pack('@q', ll)
+    return struct.unpack('@d', p_flt)[0]
 
 class DECAngle(float):
     """
@@ -934,11 +941,29 @@ def dec2hp(dec):
     :type dec: float
     :return: HP Notation (DDD.MMSSSS)
     :rtype: float
-    """
+    """      
     minute, second = divmod(abs(dec) * 3600, 60)
     degree, minute = divmod(minute, 60)
-    hp = degree + (minute / 100) + (second / 10000)
-    hp = round(hp, 16)
+
+    # floating point precision is 13 places for the variable 'dec' where values
+    # are between 256 and 512 degrees. Precision improves for smaller angles.
+    # In calculating the variable 'second' the precision is degraded by a factor of 3600 
+    # Therefore 'second' should be rounded to 9 DP and tested for carry.
+    if round(second, 9) == 60:
+        second = 0
+        minute += 1
+    
+    # to avoid precision issues with floating point operations
+    # a string will be built to represent a sexagesimal number and then converted to float
+    degree = f'{int(degree)}'
+    minute = f'{int(minute):02}'
+    second = f'{second:012.9f}'.rstrip('0').replace('.', '')
+    
+    hp_string = f'{degree}.{minute}{second}'
+    hp = float(hp_string)
+     
+    if hp >= 360:
+        hp -= 360
     return hp if dec >= 0 else -hp
 
 
