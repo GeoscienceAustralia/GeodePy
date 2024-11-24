@@ -32,14 +32,7 @@ e.g. HPAngle(value).dec()
 """
 
 from math import radians
-import struct
 
-def add_bits(flt, bits_to_add = 1)->float:
-    p_flt = struct.pack('@d', flt)
-    ll = struct.unpack('@q', p_flt)[0]
-    ll += bits_to_add
-    p_flt = struct.pack('@q', ll)
-    return struct.unpack('@d', p_flt)[0]
 
 class DECAngle(float):
     """
@@ -962,8 +955,6 @@ def dec2hp(dec):
     hp_string = f'{degree}.{minute}{second}'
     hp = float(hp_string)
      
-    if hp >= 360:
-        hp -= 360
     return hp if dec >= 0 else -hp
 
 
