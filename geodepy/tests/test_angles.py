@@ -534,6 +534,8 @@ class TestConvert(unittest.TestCase):
             self.assertAlmostEqual(dec, hp2dec(hp), 13)
             self.assertAlmostEqual(-dec, hp2dec(-hp), 13)
 
+        self.assertAlmostEqual(0, hp2dec(0), 13)
+        self.assertAlmostEqual(258, hp2dec(258), 13)
         self.assertAlmostEqual(hp2dec(hp_exs[0]) + hp2dec(hp_exs[1]),
                                dec_exs[0] + dec_exs[1], 13)
         # Test that invalid minutes and seconds components raise errors

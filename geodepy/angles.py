@@ -1031,18 +1031,19 @@ def hp2dec(hp):
     """
     # Check if 1st and 3rd decimal place greater than 5 (invalid HP Notation)
     hp = float(hp)
-    hp_dec_str = f'{hp:.17f}'.split('.')[1]
-    if int(hp_dec_str[0]) > 5:
+    hp_deg_str, hp_mmss_str = f'{hp:.13f}'.split('.')
+    if int(hp_mmss_str[0]) > 5:
         raise ValueError(f'Invalid HP Notation: 1st decimal place greater '
                          f'than 5: {hp}')
-    if len(hp_dec_str) > 2:
-        if int(hp_dec_str[2]) > 5:
+    if len(hp_mmss_str) > 2:
+        if int(hp_mmss_str[2]) > 5:
             raise ValueError(f'Invalid HP Notation: 3rd decimal place greater '
                              f'than 5: {hp}')
-    degmin, second = divmod(abs(hp) * 1000, 10)
-    degree, minute = divmod(degmin, 100)
-    dec = degree + (minute / 60) + (second / 360)
-    dec = round(dec, 16)
+    deg = abs(int(hp_deg_str))
+    min = int(hp_mmss_str[:2])
+    sec = float(hp_mmss_str[2:4] + '.' + hp_mmss_str[4:])
+    dec = sec / 3600 + min / 60 + deg
+
     return dec if hp >= 0 else -dec
 
 
