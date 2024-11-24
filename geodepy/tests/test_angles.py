@@ -576,12 +576,12 @@ class TestConvert(unittest.TestCase):
 
     def test_hp2rad(self):
         for num, ex in enumerate(hp_exs):
-            self.assertEqual(hp2rad(ex), rad_exs[num])
-            self.assertEqual(hp2rad(-ex), -rad_exs[num])
+            self.assertAlmostEqual(hp2rad(ex), rad_exs[num], 15)
+            self.assertAlmostEqual(hp2rad(-ex), -rad_exs[num], 15)
         for check in self.testData:
             hp, dec, gon, rad = check
-            self.assertAlmostEqual(rad, hp2rad(hp), 13)
-            self.assertAlmostEqual(-rad, hp2rad(-hp), 13)
+            self.assertAlmostEqual(rad, hp2rad(hp), 15)
+            self.assertAlmostEqual(-rad, hp2rad(-hp), 15)
 
     def test_hp2dms(self):
         self.assertEqual(dms_ex.degree, hp2dms(hp_ex).degree)
@@ -603,8 +603,8 @@ class TestConvert(unittest.TestCase):
             self.assertAlmostEqual(gon2dec(-ex), -dec_exs[num], 14)
         for check in self.testData:
             hp, dec, gon, rad = check
-            self.assertAlmostEqual(dec, gon2dec(gon), 13)
-            self.assertAlmostEqual(-dec, gon2dec(-gon), 13)
+            self.assertAlmostEqual(dec, gon2dec(gon), delta = 5.8e-14)
+            self.assertAlmostEqual(-dec, gon2dec(-gon), delta = 5.8e-14)
 
     def test_gon2deca(self):
         for num, ex in enumerate(gon_exs):

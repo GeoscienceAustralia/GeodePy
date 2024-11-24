@@ -1039,6 +1039,7 @@ def hp2dec(hp):
         if int(hp_mmss_str[2]) > 5:
             raise ValueError(f'Invalid HP Notation: 3rd decimal place greater '
                              f'than 5: {hp}')
+    # parse string to avoid precision problems with floating point ops and base 10 numbers
     deg = abs(int(hp_deg_str))
     min = int(hp_mmss_str[:2])
     sec = float(hp_mmss_str[2:4] + '.' + hp_mmss_str[4:])
