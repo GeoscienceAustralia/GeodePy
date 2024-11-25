@@ -934,11 +934,27 @@ def dec2hp(dec):
     :type dec: float
     :return: HP Notation (DDD.MMSSSS)
     :rtype: float
-    """
+    """      
     minute, second = divmod(abs(dec) * 3600, 60)
     degree, minute = divmod(minute, 60)
-    hp = degree + (minute / 100) + (second / 10000)
-    hp = round(hp, 16)
+
+    # floating point precision is 13 places for the variable 'dec' where values
+    # are between 256 and 512 degrees. Precision improves for smaller angles.
+    # In calculating the variable 'second' the precision is degraded by a factor of 3600 
+    # Therefore 'second' should be rounded to 9 DP and tested for carry.
+    if round(second, 9) == 60:
+        second = 0
+        minute += 1
+    
+    # to avoid precision issues with floating point operations
+    # a string will be built to represent a sexagesimal number and then converted to float
+    degree = f'{int(degree)}'
+    minute = f'{int(minute):02}'
+    second = f'{second:012.9f}'.rstrip('0').replace('.', '')
+    
+    hp_string = f'{degree}.{minute}{second}'
+    hp = float(hp_string)
+     
     return hp if dec >= 0 else -hp
 
 
@@ -1015,18 +1031,20 @@ def hp2dec(hp):
     """
     # Check if 1st and 3rd decimal place greater than 5 (invalid HP Notation)
     hp = float(hp)
-    hp_dec_str = f'{hp:.17f}'.split('.')[1]
-    if int(hp_dec_str[0]) > 5:
+    hp_deg_str, hp_mmss_str = f'{hp:.13f}'.split('.')
+    if int(hp_mmss_str[0]) > 5:
         raise ValueError(f'Invalid HP Notation: 1st decimal place greater '
                          f'than 5: {hp}')
-    if len(hp_dec_str) > 2:
-        if int(hp_dec_str[2]) > 5:
+    if len(hp_mmss_str) > 2:
+        if int(hp_mmss_str[2]) > 5:
             raise ValueError(f'Invalid HP Notation: 3rd decimal place greater '
                              f'than 5: {hp}')
-    degmin, second = divmod(abs(hp) * 1000, 10)
-    degree, minute = divmod(degmin, 100)
-    dec = degree + (minute / 60) + (second / 360)
-    dec = round(dec, 16)
+    # parse string to avoid precision problems with floating point ops and base 10 numbers
+    deg = abs(int(hp_deg_str))
+    min = int(hp_mmss_str[:2])
+    sec = float(hp_mmss_str[2:4] + '.' + hp_mmss_str[4:])
+    dec = sec / 3600 + min / 60 + deg
+
     return dec if hp >= 0 else -dec
 
 
