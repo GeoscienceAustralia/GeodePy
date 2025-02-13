@@ -12,77 +12,88 @@ from geodepy.angles import (DECAngle, HPAngle, GONAngle, DMSAngle, DDMAngle,
                             dd2sec, angular_typecheck)
 
 rad_exs = [radians(123.74875), radians(12.575), radians(-12.575),
-           radians(0.0525), radians(0.005)]
+           radians(0.0525), radians(0.005), radians(-0.005)]
 
 dec_ex = 123.74875
 dec_ex2 = 12.575
 dec_ex3 = -12.575
 dec_ex4 = 0.0525
 dec_ex5 = 0.005
-dec_exs = [dec_ex, dec_ex2, dec_ex3, dec_ex4, dec_ex5]
+dec_ex6 = -0.005
+dec_exs = [dec_ex, dec_ex2, dec_ex3, dec_ex4, dec_ex5, dec_ex6]
 
 deca_ex = DECAngle(123.74875)
 deca_ex2 = DECAngle(12.575)
 deca_ex3 = DECAngle(-12.575)
 deca_ex4 = DECAngle(0.0525)
 deca_ex5 = DECAngle(0.005)
-deca_exs = [deca_ex, deca_ex2, deca_ex3, deca_ex4, deca_ex5]
+deca_ex6 = DECAngle(-0.005)
+deca_exs = [deca_ex, deca_ex2, deca_ex3, deca_ex4, deca_ex5, deca_ex6]
 
 hp_ex = 123.44555
 hp_ex2 = 12.3430
 hp_ex3 = -12.3430
 hp_ex4 = 0.0309
 hp_ex5 = 0.0018
-hp_exs = [hp_ex, hp_ex2, hp_ex3, hp_ex4, hp_ex5]
+hp_ex6 = -0.0018
+hp_exs = [hp_ex, hp_ex2, hp_ex3, hp_ex4, hp_ex5, hp_ex6]
 
 hpa_ex = HPAngle(123.44555)
 hpa_ex2 = HPAngle(12.3430)
 hpa_ex3 = HPAngle(-12.3430)
 hpa_ex4 = HPAngle(0.0309)
 hpa_ex5 = HPAngle(0.0018)
-hpa_exs = [hpa_ex, hpa_ex2, hpa_ex3, hpa_ex4, hpa_ex5]
+hpa_ex6 = HPAngle(-0.0018)
+hpa_exs = [hpa_ex, hpa_ex2, hpa_ex3, hpa_ex4, hpa_ex5, hpa_ex6]
 
 dms_ex = DMSAngle(123, 44, 55.5)
 dms_ex2 = DMSAngle(12, 34, 30)
 dms_ex3 = DMSAngle(-12, -34, -30)
 dms_ex4 = DMSAngle(0, 3, 9)
 dms_ex5 = DMSAngle(0, 0, 18)
-dms_exs = [dms_ex, dms_ex2, dms_ex3, dms_ex4, dms_ex5]
+# dms_ex6 = DMSAngle(-0, 0, -18)
+dms_ex6 = DMSAngle(0, 0, 18, positive=False)
+dms_exs = [dms_ex, dms_ex2, dms_ex3, dms_ex4, dms_ex5, dms_ex6]
 
 dms_str = '123 44 55.5'
 dms_str2 = '12 34 30'
 dms_str3 = '-12 34 30'
 dms_str4 = '0 3 9'
 dms_str5 = '0 0 18'
-dms_strs = [dms_str, dms_str2, dms_str3, dms_str4, dms_str5]
+dms_str6 = '-0 0 18'
+dms_strs = [dms_str, dms_str2, dms_str3, dms_str4, dms_str5, dms_str6]
 
 ddm_ex = DDMAngle(123, 44.925)
 ddm_ex2 = DDMAngle(12, 34.5)
 ddm_ex3 = DDMAngle(-12, -34.5)
 ddm_ex4 = DDMAngle(0, 3.15)
 ddm_ex5 = DDMAngle(0, 0.3)
-ddm_exs = [ddm_ex, ddm_ex2, ddm_ex3, ddm_ex4, ddm_ex5]
+ddm_ex6 = DDMAngle(0, 0.3, positive=False)
+ddm_exs = [ddm_ex, ddm_ex2, ddm_ex3, ddm_ex4, ddm_ex5, ddm_ex6]
 
 ddm_str = '123 44.925'
 ddm_str2 = '12 34.5'
 ddm_str3 = '-12 34.5'
 ddm_str4 = '0 3.15'
 ddm_str5 = '0 0.3'
-ddm_strs = [ddm_str, ddm_str2, ddm_str3, ddm_str4, ddm_str5]
+ddm_str6 = '-0 0.3'
+ddm_strs = [ddm_str, ddm_str2, ddm_str3, ddm_str4, ddm_str5, ddm_str6]
 
 gon_ex = 137.4986111111111
 gon_ex2 = 13.97222222222222
 gon_ex3 = -13.97222222222222
 gon_ex4 = 0.05833333333333333
 gon_ex5 = 0.00555555555555555
-gon_exs = [gon_ex, gon_ex2, gon_ex3, gon_ex4, gon_ex5]
+gon_ex6 = -0.00555555555555555
+gon_exs = [gon_ex, gon_ex2, gon_ex3, gon_ex4, gon_ex5, gon_ex6]
 
 gona_ex = GONAngle(137.4986111111111)
 gona_ex2 = GONAngle(13.97222222222222)
 gona_ex3 = GONAngle(-13.97222222222222)
 gona_ex4 = GONAngle(0.05833333333333333)
 gona_ex5 = GONAngle(0.00555555555555555)
-gona_exs = [gona_ex, gona_ex2, gona_ex3, gona_ex4, gona_ex5]
+gona_ex6 = GONAngle(-0.00555555555555555)
+gona_exs = [gona_ex, gona_ex2, gona_ex3, gona_ex4, gona_ex5, gona_ex6]
 
 
 class TestConvert(unittest.TestCase):
@@ -350,7 +361,7 @@ class TestConvert(unittest.TestCase):
         self.assertTrue(DMSAngle(1, 2, -3).positive)
         self.assertFalse(DMSAngle(0, -1, 2).positive)
         self.assertFalse(DMSAngle(0, 0, -3).positive)
-        self.assertTrue(DMSAngle(-0, 1, 2).positive)
+        self.assertFalse(DMSAngle(0, 1, 2, positive=False).positive)
         self.assertFalse(DMSAngle(-0.0, 1, 2).positive)
         self.assertEqual(repr(dms_ex), '{DMSAngle: +123d 44m 55.5s}')
         self.assertEqual(repr(dms_ex3), '{DMSAngle: -12d 34m 30s}')
@@ -434,7 +445,7 @@ class TestConvert(unittest.TestCase):
         self.assertTrue(DDMAngle(1, -2).positive)
         self.assertTrue(DDMAngle(1, 2).positive)
         self.assertFalse(DDMAngle(0, -1).positive)
-        self.assertTrue(DDMAngle(-0, 1).positive)
+        self.assertFalse(DDMAngle(0, 1, positive=False).positive)
         self.assertFalse(DDMAngle(-0.0, 1).positive)
         self.assertEqual(repr(ddm_ex), '{DDMAngle: +123d 44.925m}')
         self.assertEqual(repr(ddm_ex3), '{DDMAngle: -12d 34.5m}')

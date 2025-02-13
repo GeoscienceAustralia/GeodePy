@@ -533,33 +533,38 @@ class DMSAngle(object):
     """
     Class for working with angles in Degrees, Minutes and Seconds format
     """
-    def __init__(self, degree, minute=0, second=0.0):
+    def __init__(self, degree, minute=0, second=0.0, positive=None):
         """
         :param degree: Angle: whole degrees component (floats truncated)
                        Alt: formatted string '±DDD MM SS.SSS'
+        :type degree: float | str
         :param minute: Angle: whole minutes component (floats truncated)
+        :type minute: float
         :param second: Angle: seconds component (floats preserved)
+        :type second: float
+        :param positive: Optional. True is positive, False is negative. Evaluated from deg/min/sec where None
+        :type positive: bool
         """
+        # evaluate sign
+        if positive is False or str(degree)[0] == '-':
+            self.positive = False
+        else:
+            self.positive = True
+
+        # check sign provided for minute and second where positive not provided and degree is int == 0
+        if degree == 0 and positive is None:
+            if minute < 0:
+                self.positive = False
+            elif second < 0:
+                self.positive = False
+
         # Convert formatted string 'DDD MM SS.SSS' to DMSAngle
         if type(degree) == str:
             str_pts = degree.split()
             degree = int(str_pts[0])
             minute = int(str_pts[1])
             second = float(str_pts[2])
-        # Set sign of object based on sign of any variable
-        if degree == 0:
-            if str(degree)[0] == '-':
-                self.positive = False
-            elif minute < 0:
-                self.positive = False
-            elif second < 0:
-                self.positive = False
-            else:
-                self.positive = True
-        elif degree > 0:
-            self.positive = True
-        else:  # degree < 0
-            self.positive = False
+
         self.degree = abs(int(degree))
         self.minute = abs(int(minute))
         self.second = abs(second)
@@ -656,6 +661,9 @@ class DMSAngle(object):
         else:
             return -DMSAngle(self.degree, self.minute, round(self.second, n))
 
+    def __mod__(self, other):
+        return dec2dms(self.dec() % other)
+
     def rad(self):
         """
         Convert to Radians
@@ -734,28 +742,33 @@ class DDMAngle(object):
     """
     Class for working with angles in Degrees, Decimal Minutes format
     """
-    def __init__(self, degree, minute=0.0):
+    def __init__(self, degree, minute=0.0, positive=None):
         """
         :param degree: Angle: whole degrees component (floats truncated)
-        :param minute: Angle:minutes component (floats preserved)
+        :type degree: float | str
+        :param minute: Angle: minutes component (floats preserved)
+        :type minute: float
+        :param positive: Optional. True is positive, False is negative. Evaluated from deg/min/sec where None
+        :type positive: bool
         """
+
+        # evaluate sign
+        if positive is False or str(degree)[0] == '-':
+            self.positive = False
+        else:
+            self.positive = True
+
+        # check sign provided for minute where positive not provided and degree is int == 0
+        if degree == 0 and positive is None:
+            if minute < 0:
+                self.positive = False
+
         # Convert formatted string 'DDD MM.MMMM' to DDMAngle
         if type(degree) == str:
             str_pts = degree.split(' ')
             degree = int(str_pts[0])
             minute = float(str_pts[1])
-        # Set sign of object based on sign of any variable
-        if degree == 0:
-            if str(degree)[0] == '-':
-                self.positive = False
-            elif minute < 0:
-                self.positive = False
-            else:
-                self.positive = True
-        elif degree > 0:
-            self.positive = True
-        else:  # degree < 0
-            self.positive = False
+
         self.degree = abs(int(degree))
         self.minute = abs(minute)
 
@@ -848,6 +861,10 @@ class DDMAngle(object):
             return DDMAngle(self.degree, round(self.minute, n))
         else:
             return DDMAngle(-self.degree, -round(self.minute, n))
+
+    def __mod__(self, other):
+        return dec2ddm(self.dec() % other)
+
 
     def rad(self):
         """
@@ -1001,8 +1018,8 @@ def dec2dms(dec):
     """
     minute, second = divmod(abs(dec) * 3600, 60)
     degree, minute = divmod(minute, 60)
-    return (DMSAngle(degree, minute, second) if dec >= 0
-            else DMSAngle(-degree, minute, second))
+    return (DMSAngle(degree, minute, second, positive=True) if dec >= 0
+            else DMSAngle(degree, minute, second, positive=False))
 
 
 def dec2ddm(dec):
@@ -1016,7 +1033,7 @@ def dec2ddm(dec):
     minute, second = divmod(abs(dec) * 3600, 60)
     degree, minute = divmod(minute, 60)
     minute = minute + (second / 60)
-    return DDMAngle(degree, minute) if dec >= 0 else DDMAngle(-degree, minute)
+    return DDMAngle(degree, minute, positive=True) if dec >= 0 else DDMAngle(degree, minute, positive=False)
 
 
 # Functions converting from Hewlett-Packard (HP) format to other formats
@@ -1102,8 +1119,8 @@ def hp2dms(hp):
     """
     degmin, second = divmod(abs(hp) * 1000, 10)
     degree, minute = divmod(degmin, 100)
-    return (DMSAngle(degree, minute, second * 10) if hp >= 0
-            else DMSAngle(-degree, minute, second * 10))
+    return (DMSAngle(degree, minute, second * 10, positive=True) if hp >= 0
+            else DMSAngle(degree, minute, second * 10, positive=False))
 
 
 def hp2ddm(hp):
@@ -1117,7 +1134,7 @@ def hp2ddm(hp):
     degmin, second = divmod(abs(hp) * 1000, 10)
     degree, minute = divmod(degmin, 100)
     minute = minute + (second / 6)
-    return DDMAngle(degree, minute) if hp >= 0 else DDMAngle(-degree, minute)
+    return DDMAngle(degree, minute, positive=True) if hp >= 0 else DDMAngle(degree, minute, positive=False)
 
 
 # Functions converting from Gradians format to other formats
