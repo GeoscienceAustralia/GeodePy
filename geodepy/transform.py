@@ -58,9 +58,9 @@ def conform7(x, y, z, trans, vcv=None):
     # Conformal Transform Eq
     xyz_after = translation + scale * rot_xyz
     # Convert Vector to Separate Variables
-    xtrans = float(xyz_after[0])
-    ytrans = float(xyz_after[1])
-    ztrans = float(xyz_after[2])
+    xtrans = float(xyz_after[0][0])
+    ytrans = float(xyz_after[1][0])
+    ztrans = float(xyz_after[2][0])
 
     # Transformation uncertainty propagation
     # Adapted from Harvey B.R. (1998) Practical least squares and statistics for surveyors,
