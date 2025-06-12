@@ -129,7 +129,8 @@ def set_creation_time():
     doy = '{:03d}'.format(doy)
     seconds = (now - now.replace(hour=0, minute=0, second=0, microsecond=0))\
         .total_seconds()
-    seconds = '{:.0f}'.format(seconds)
+    #seconds = '{:.0f}'.format(seconds)
+    seconds = '{:05.0f}'.format(seconds)
     creation_time = year + ':' + doy + ':' + seconds
 
     return creation_time
