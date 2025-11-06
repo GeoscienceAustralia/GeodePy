@@ -1,3 +1,5 @@
+.. _features/index:
+
 Features
 ========
 
