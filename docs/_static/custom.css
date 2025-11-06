@@ -1,0 +1,22 @@
+a {
+    color: #00718e;
+}
+
+a .sidebar-navigation{
+    color: #00718e;
+}
+
+.sidebar-tree a {
+    color: #00718e !important; /* Sidebar links */
+}
+
+.sidebar-tree svg {
+    color: #00718e !important; /* Normal arrow color */
+}
+
+/* Hide the TOC caption heading on the index page */
+.toctree-wrapper > p.caption {
+    display: none;
+}
+
+
