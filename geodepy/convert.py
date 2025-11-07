@@ -23,12 +23,12 @@ from geodepy.angles import (DECAngle, HPAngle, GONAngle, DMSAngle, DDMAngle,
 def polar2rect(r, theta):
     """
     Converts point in polar coordinates to corresponding rectangular coordinates
-    Theta is degrees and is measured clockwise from the positive y axis
-    (i.e. north)
+
     :param r: Radius
-    :param theta: Angle (decimal degrees)
+    :param theta: Angle (decimal degrees) from postive y axis (north)
     :type theta: Float (decimal degrees), DMSAngle or DDMAngle
     :return: Rectangular Coordinates X, Y
+
     """
     theta = angular_typecheck(theta)
     x = r * sin(radians(theta))
@@ -41,6 +41,7 @@ def rect2polar(x, y):
     Converts point in rectangular coordinates to corresponding polar coordinates
     Angular component of polar coordinates (theta) is in decimal degrees and
     is measured clockwise from the positive y axis (i.e. north)
+
     :param x: Rectangular Coordinate X
     :param y: Rectangular Coordinate Y
     :return r: Radius
@@ -60,6 +61,7 @@ def rect_radius(ellipsoid):
     """
     Computes the Rectifying Radius of an Ellipsoid with specified Inverse
     Flattening (See Ref 2 Equation 3)
+
     :param ellipsoid: Ellipsoid Object
     :type ellipsoid: Ellipsoid
     :return: Ellipsoid Rectifying Radius
@@ -81,6 +83,7 @@ def alpha_coeff(ellipsoid):
     """
     Computes the set of Alpha coefficients of an Ellipsoid with specified
     Inverse Flattening (See Ref 2 Equation 5)
+
     :param ellipsoid: Ellipsoid Object
     :type ellipsoid: Ellipsoid
     :return: Alpha coefficients a2, a4 ... a16
@@ -162,6 +165,7 @@ def beta_coeff(ellipsoid):
     """
     Computes the set of Beta coefficients of an Ellipsoid with specified
     Inverse Flattening (See Ref 2 Equation 23)
+
     :param ellipsoid: Ellipsoid Object
     :type ellipsoid: Ellipsoid
     :return: Alpha coefficients a2, a4 ... a16
@@ -240,6 +244,7 @@ def psfandgridconv(xi1, eta1, lat, lon, cm, conf_lat, ellipsoid=grs80, prj=utm):
     """
     Calculates Point Scale Factor and Grid Convergence. Used in convert.geo2grid
     and convert.grid2geo
+
     :param xi1: Transverse Mercator Ratio Xi
     :param eta1: Transverse Mercator Ratio Eta
     :param lat: Latitude
@@ -292,6 +297,7 @@ def geo2grid(lat, lon, zone=0, ellipsoid=grs80, prj=utm):
     Scale Factor and Grid Convergence. Default Projection is Universal
     Transverse Mercator Projection using
     GRS80 Ellipsoid parameters.
+
     :param lat: Latitude
     :type lat: Float (Decimal Degrees), DMSAngle or DDMAngle
     :param lon: Longitude
@@ -394,6 +400,7 @@ def grid2geo(zone, east, north, hemisphere='south', ellipsoid=grs80, prj=utm):
     Hemisphere) and returns its corresponding Geographic Latitude and Longitude,
     Point Scale Factor and Grid Convergence. Default Projection is Universal
     Transverse Mercator Projection using GRS80 Ellipsoid parameters.
+
     :param zone: Zone Number - 1 to 60
     :param east: Easting (m, within 3330km of Central Meridian)
     :param north: Northing (m, 0 to 10,000,000m)
@@ -504,13 +511,14 @@ def xyz2llh(x, y, z, ellipsoid=grs80):
     """
     Converts Cartesian X, Y, Z coordinate to Geographic Latitude, Longitude and
     Ellipsoid Height. Default Ellipsoid parameters used are GRS80.
+
     :param x: Cartesian X Coordinate (metres)
     :param y: Cartesian Y Coordinate (metres)
     :param z: Cartesian Z Coordinate (metres)
     :param ellipsoid: Ellipsoid Object
     :type ellipsoid: Ellipsoid
-    :return: Geographic Latitude (Decimal Degrees), Longitude (Decimal Degrees)
-    and Ellipsoid Height (metres)
+    :return: Geographic Latitude (Decimal Degrees), Longitude (Decimal Degrees) 
+             and Ellipsoid Height (metres)
     :rtype: tuple
     """
     # Calculate Longitude
@@ -536,6 +544,7 @@ def llh2xyz(lat, lon, ellht=0, ellipsoid=grs80):
     """
     Converts Geographic Latitude, Longitude and Ellipsoid Height to Cartesian
     X, Y and Z Coordinates. Default Ellipsoid parameters used are GRS80.
+
     :param lat: Geographic Latitude
     :type lat: Float (Decimal Degrees), DMSAngle or DDMAngle
     :param lon: Geographic Longitude
@@ -566,6 +575,7 @@ def date_to_yyyydoy(date):
     Convert a datetime.date object to a string in the form 'yyyy.doy',
     where yyyy is the 4 character year number and doy is the 3 character
     day of year
+
     :param date: datetime.date object
     :type date: datetime.date
     :return: string with date in the form 'yyyy.doy'
@@ -583,6 +593,7 @@ def yyyydoy_to_date(yyyydoy):
     Convert a string in the form of either 'yyyydoy' or 'yyyy.doy' to a
     datetime.date object, where yyyy is the 4 character year number and doy
     is the 3 character day of year
+
     :param yyyydoy: string with date in the form 'yyyy.doy' or 'yyyydoy'
     :return: datetime.date object
     :rtype: datetime.date

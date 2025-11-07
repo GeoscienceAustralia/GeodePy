@@ -37,11 +37,13 @@ from math import radians
 class DECAngle(float):
     """
     Class for working with angles in Decimal Degrees
+
     Note: GeodePy also supports working with angles in Decimal Degrees as floats
     """
 
     def __init__(self, dec_angle=0.0):
         """
+
         :param dec_angle: float Decimal Degrees angle
         """
         super().__init__()
@@ -135,6 +137,7 @@ class DECAngle(float):
     def rad(self):
         """
         Convert to radians
+
         :return: radians
         :rtype: float
         """
@@ -143,6 +146,7 @@ class DECAngle(float):
     def dec(self):
         """
         Convert to Decimal Degrees (float)
+
         :return: Decimal Degrees
         :rtype: float
         """
@@ -151,6 +155,7 @@ class DECAngle(float):
     def hp(self):
         """
         Convert to HP Notation
+
         :return: HP Notation (DDD.MMSSSS)
         :rtype: float
         """
@@ -159,6 +164,7 @@ class DECAngle(float):
     def hpa(self):
         """
         Convert to HP Notation (class)
+
         :return: HP Notation (DDD.MMSSSS)
         :rtype: HPAngle
         """
@@ -167,6 +173,7 @@ class DECAngle(float):
     def gon(self):
         """
         Convert to Gradians (float)
+
         :return: Gradians
         :rtype: float
         """
@@ -175,6 +182,7 @@ class DECAngle(float):
     def gona(self):
         """
         Convert to Gradians (class)
+
         :return: Gradians
         :rtype: GONAngle
         """
@@ -183,6 +191,7 @@ class DECAngle(float):
     def dms(self):
         """
         Convert to Degrees, Minutes, Seconds Object
+
         :return: Degrees, Minutes, Seconds Object
         :rtype: DMSAngle
         """
@@ -191,6 +200,7 @@ class DECAngle(float):
     def ddm(self):
         """
         Convert to Degrees, Decimal Minutes Object
+
         :return: Degrees, Decimal Minutes Object
         :rtype: DDMAngle
         """
@@ -200,6 +210,7 @@ class DECAngle(float):
 class HPAngle(object):
     """
     Class for working with angles in Hewlett-Packard (HP) format
+
     Note: GeodePy also supports working with angles in HP format as floats
     """
     def __init__(self, hp_angle=0.0):
@@ -305,6 +316,7 @@ class HPAngle(object):
     def rad(self):
         """
         Convert to Radians
+
         :return: Radians
         :rtype: float
         """
@@ -313,6 +325,7 @@ class HPAngle(object):
     def dec(self):
         """
         Convert to Decimal Degrees (float)
+
         :return: Decimal Degrees
         :rtype: float
         """
@@ -321,6 +334,7 @@ class HPAngle(object):
     def deca(self):
         """
         Convert to Decimal Degrees (class)
+
         :return: Decimal Degrees
         :rtype: DECAngle
         """
@@ -329,6 +343,7 @@ class HPAngle(object):
     def hp(self):
         """
         Convert to HP Notation (float)
+
         :return: HP Notation (DDD.MMSSSS)
         :rtype: float
         """
@@ -337,6 +352,7 @@ class HPAngle(object):
     def gon(self):
         """
         Convert to Gradians (float)
+
         :return: Gradians
         :rtype: float
         """
@@ -345,6 +361,7 @@ class HPAngle(object):
     def gona(self):
         """
         Convert to Gradians (class)
+
         :return: Gradians
         :rtype: GONAngle
         """
@@ -353,6 +370,7 @@ class HPAngle(object):
     def dms(self):
         """
         Convert to Degrees, Minutes, Seconds Object
+
         :return: Degrees, Minutes, Seconds Object
         :rtype: DMSAngle
         """
@@ -361,6 +379,7 @@ class HPAngle(object):
     def ddm(self):
         """
         Convert to Degrees, Decimal Minutes Object
+
         :return: Degrees, Decimal Minutes Object
         :rtype: DDMAngle
         """
@@ -370,6 +389,7 @@ class HPAngle(object):
 class GONAngle(object):
     """
     Class for working with angles in Gradians (90 degrees == 100 Gradians)
+
     Note: GeodePy also supports working with angles in Gradians as floats
     """
     def __init__(self, gon_angle=0.0):
@@ -467,6 +487,7 @@ class GONAngle(object):
     def rad(self):
         """
         Convert to Radians
+
         :return: Radians
         :rtype: float
         """
@@ -475,6 +496,7 @@ class GONAngle(object):
     def dec(self):
         """
         Convert to Decimal Degrees (float)
+
         :return: Decimal Degrees
         :rtype: float
         """
@@ -483,6 +505,7 @@ class GONAngle(object):
     def deca(self):
         """
         Convert to Decimal Degrees (class)
+
         :return: Decimal Degrees
         :rtype: DECAngle
         """
@@ -491,6 +514,7 @@ class GONAngle(object):
     def hp(self):
         """
         Convert to HP Notation (float)
+
         :return: HP Notation (DDD.MMSSSS)
         :rtype: float
         """
@@ -499,6 +523,7 @@ class GONAngle(object):
     def hpa(self):
         """
         Convert to HP Notation (class)
+
         :return: HP Notation (DDD.MMSSSS)
         :rtype: HPAngle
         """
@@ -507,6 +532,7 @@ class GONAngle(object):
     def gon(self):
         """
         Convert to Gradians (float)
+
         :return: Gradians
         :rtype: float
         """
@@ -515,6 +541,7 @@ class GONAngle(object):
     def dms(self):
         """
         Convert to Degrees, Minutes, Seconds Object
+
         :return: Degrees, Minutes, Seconds Object
         :rtype: DMSAngle
         """
@@ -523,6 +550,7 @@ class GONAngle(object):
     def ddm(self):
         """
         Convert to Degrees, Decimal Minutes Object
+
         :return: Degrees, Decimal Minutes Object
         :rtype: DDMAngle
         """
@@ -535,6 +563,7 @@ class DMSAngle(object):
     """
     def __init__(self, degree, minute=0, second=0.0, positive=None):
         """
+
         :param degree: Angle: whole degrees component (floats truncated)
                        Alt: formatted string '±DDD MM SS.SSS'
         :type degree: float | str
@@ -544,6 +573,7 @@ class DMSAngle(object):
         :type second: float
         :param positive: Optional. True is positive, False is negative. Evaluated from deg/min/sec where None
         :type positive: bool
+
         """
         # evaluate sign
         if positive is False or str(degree)[0] == '-':
@@ -667,6 +697,7 @@ class DMSAngle(object):
     def rad(self):
         """
         Convert to Radians
+
         :return: Radians
         :rtype: float
         """
@@ -675,6 +706,7 @@ class DMSAngle(object):
     def dec(self):
         """
         Convert to Decimal Degrees (float)
+
         :return: Decimal Degrees
         :rtype: float
         """
@@ -686,6 +718,7 @@ class DMSAngle(object):
     def deca(self):
         """
         Convert to Decimal Degrees (class)
+
         :return: Decimal Degrees
         :rtype: DECAngle
         """
@@ -694,6 +727,7 @@ class DMSAngle(object):
     def hp(self):
         """
         Convert to HP Notation (float)
+
         :return: HP Notation (DDD.MMSSSS)
         :rtype: float
         """
@@ -705,6 +739,7 @@ class DMSAngle(object):
     def hpa(self):
         """
         Convert to HP Notation (class)
+
         :return: HP Notation (DDD.MMSSSS)
         :rtype: HPAngle
         """
@@ -713,6 +748,7 @@ class DMSAngle(object):
     def gon(self):
         """
         Convert to Gradians (float)
+
         :return: Gradians
         :rtype: float
         """
@@ -721,6 +757,7 @@ class DMSAngle(object):
     def gona(self):
         """
         Convert to Gradians (class)
+
         :return: Gradians
         :rtype: GONAngle
         """
@@ -729,6 +766,7 @@ class DMSAngle(object):
     def ddm(self):
         """
         Convert to Degrees, Decimal Minutes Object
+
         :return: Degrees, Decimal Minutes Object
         :rtype: DDMAngle
         """
@@ -869,6 +907,7 @@ class DDMAngle(object):
     def rad(self):
         """
         Convert to Radians
+
         :return: Radians
         :rtype: float
         """
@@ -877,6 +916,7 @@ class DDMAngle(object):
     def dec(self):
         """
         Convert to Decimal Degrees (float)
+
         :return: Decimal Degrees
         :rtype: float
         """
@@ -888,6 +928,7 @@ class DDMAngle(object):
     def deca(self):
         """
         Convert to Decimal Degrees (class)
+
         :return: Decimal Degrees
         :rtype: DECAngle
         """
@@ -896,6 +937,7 @@ class DDMAngle(object):
     def hp(self):
         """
         Convert to HP Notation (float)
+
         :return: HP Notation (DDD.MMSSSS)
         :rtype: float
         """
@@ -908,6 +950,7 @@ class DDMAngle(object):
     def hpa(self):
         """
         Convert to HP Notation (class)
+
         :return: HP Notation (DDD.MMSSSS)
         :rtype: HPAngle
         """
@@ -916,6 +959,7 @@ class DDMAngle(object):
     def gon(self):
         """
         Convert to Gradians (float)
+
         :return: Gradians
         :rtype: float
         """
@@ -924,6 +968,7 @@ class DDMAngle(object):
     def gona(self):
         """
         Convert to Gradians (class)
+
         :return: Gradians
         :rtype: GONAngle
         """
@@ -932,6 +977,7 @@ class DDMAngle(object):
     def dms(self):
         """
         Convert to Degrees, Minutes, Seconds Object
+
         :return: Degrees, Minutes, Seconds Object
         :rtype: DMSAngle
         """
@@ -978,6 +1024,7 @@ def dec2hp(dec):
 def dec2hpa(dec):
     """
     Converts Decimal Degrees to HP Angle Object
+
     :param dec: Decimal Degrees
     :type dec: float
     :return: HP Angle Object (DDD.MMSSSS)
@@ -989,6 +1036,7 @@ def dec2hpa(dec):
 def dec2gon(dec):
     """
     Converts Decimal Degrees to Gradians
+
     :param dec: Decimal Degrees
     :type dec: float
     :return: Gradians
@@ -1000,6 +1048,7 @@ def dec2gon(dec):
 def dec2gona(dec):
     """
     Converts Decimal Degrees to Gradians (class)
+
     :param dec: Decimal Degrees
     :type dec: float
     :return: Gradians
@@ -1011,6 +1060,7 @@ def dec2gona(dec):
 def dec2dms(dec):
     """
     Converts Decimal Degrees to Degrees, Minutes, Seconds Object
+
     :param dec: Decimal Degrees
     :type dec: float
     :return: Degrees, Minutes, Seconds Object
@@ -1025,6 +1075,7 @@ def dec2dms(dec):
 def dec2ddm(dec):
     """
     Converts Decimal Degrees to Degrees, Decimal Minutes Object
+
     :param dec: Decimal Degrees
     :type dec: float
     :return: Degrees, Decimal Minutes Object
@@ -1041,6 +1092,7 @@ def dec2ddm(dec):
 def hp2dec(hp):
     """
     Converts HP Notation to Decimal Degrees
+
     :param hp: HP Notation (DDD.MMSSSS)
     :type hp: float
     :return: Decimal Degrees
@@ -1068,6 +1120,7 @@ def hp2dec(hp):
 def hp2deca(hp):
     """
     Converts HP Notation to DECAngle Object
+
     :param hp: HP Notation (DDD.MMSSSS)
     :type hp: float
     :return: Decimal Degrees Object
@@ -1079,6 +1132,7 @@ def hp2deca(hp):
 def hp2rad(hp):
     """
     Converts HP Notation to radians
+
     :param hp: HP Notation (DDD.MMSSSS)
     :type hp: float
     :return: radians
@@ -1090,6 +1144,7 @@ def hp2rad(hp):
 def hp2gon(hp):
     """
     Converts HP Notation to Gradians
+
     :param hp: HP Notation (DDD.MMSSSS)
     :type hp: float
     :return: Gradians
@@ -1101,6 +1156,7 @@ def hp2gon(hp):
 def hp2gona(hp):
     """
     Converts HP Notation to Gradians (class)
+
     :param hp: HP Notation (DDD.MMSSSS)
     :type hp: float
     :return: Gradians
@@ -1112,6 +1168,7 @@ def hp2gona(hp):
 def hp2dms(hp):
     """
     Converts HP Notation to Degrees, Minutes, Seconds Object
+
     :param hp: HP Notation (DDD.MMSSSS)
     :type hp: float
     :return: Degrees, Minutes, Seconds Object
@@ -1126,6 +1183,7 @@ def hp2dms(hp):
 def hp2ddm(hp):
     """
     Converts HP Notation to Degrees, Decimal Minutes Object
+
     :param hp: HP Notation (DDD.MMSSSS)
     :type hp: float
     :return: Degrees, Decimal Minutes Object
@@ -1142,6 +1200,7 @@ def hp2ddm(hp):
 def gon2dec(gon):
     """
     Converts Gradians to Decimal Degrees
+
     :param gon: Gradians
     :type gon: float
     :return: Decimal Degrees
@@ -1153,6 +1212,7 @@ def gon2dec(gon):
 def gon2deca(gon):
     """
     Converts Gradians to DECAngle Object
+
     :param gon: Gradians
     :type gon: float
     :return: Decimal Degrees Object
@@ -1164,6 +1224,7 @@ def gon2deca(gon):
 def gon2hp(gon):
     """
     Converts Gradians to HP Notation (float)
+
     :param gon: Gradians
     :type gon: float
     :return: HP Notation (DDD.MMSSSS)
@@ -1175,6 +1236,7 @@ def gon2hp(gon):
 def gon2hpa(gon):
     """
     Converts Gradians to HP Angle Object
+
     :param gon: Gradians
     :type gon: float
     :return: HP Angle Object (DDD.MMSSSS)
@@ -1186,6 +1248,7 @@ def gon2hpa(gon):
 def gon2rad(gon):
     """
     Converts Gradians to radians
+
     :param gon: Gradians
     :type gon: float
     :return: Radians
@@ -1197,6 +1260,7 @@ def gon2rad(gon):
 def gon2dms(gon):
     """
     Converts Gradians to Degrees, Minutes, Seconds Object
+
     :param gon: Gradians
     :type gon: float
     :return: Degrees, Minutes, Seconds Object
@@ -1208,6 +1272,7 @@ def gon2dms(gon):
 def gon2ddm(gon):
     """
     Converts Gradians to Degrees, Decimal Minutes Object
+
     :param gon: Gradians
     :type gon: float
     :return: Degrees, Decimal Minutes Object
@@ -1221,6 +1286,7 @@ def gon2ddm(gon):
 def dd2sec(dd):
     """
     Converts angle in decimal degrees to angle in seconds
+
     :param dd: Decimal Degrees
     :return: Seconds
     """
@@ -1247,7 +1313,14 @@ def hp2dec_v(hp):
 
 
 def angular_typecheck(angle):
-    # Converts Angle Objects to Decimal Degrees (float) for computations
+    '''
+    Converts Angle Objects to Decimal Degrees (float) for computations or returns
+    float input as-is.
+
+    :param angle: Angle Object or float
+    :return: Decimal Degrees
+    :rtype: float
+    '''
     supported_types = [DMSAngle, DDMAngle, DECAngle, HPAngle, GONAngle]
     if type(angle) in supported_types:
         return angle.dec()

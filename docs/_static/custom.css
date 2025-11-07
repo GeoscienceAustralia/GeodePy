@@ -19,4 +19,14 @@ a .sidebar-navigation{
     display: none;
 }
 
+/* Style the custom TOC expander arrows */
+.toctree-expander {
+    color: #00718e; /* Your preferred color */
+}
+
+/* Optional: Hover effect */
+.toctree-expander:hover {
+    color: #005f73;
+}
+
 

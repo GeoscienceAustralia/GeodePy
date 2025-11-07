@@ -1,0 +1,4 @@
+.. _features/statistics:
+
+Statistics
+==========

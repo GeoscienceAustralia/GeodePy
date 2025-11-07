@@ -26,18 +26,20 @@ Release v0.6.0
 
 **GeodePy** is a package of tools for manipulating geospatial datasets using Python.
 
-Feautres
+-------------------
+
+Features
 --------
 
-GeodePy includes a variety of features for geodesy and geospatial data manipulation, including:
+GeodePy includes a variety of :ref:`features <features/index>` for geodesy and geospatial data manipulation, including:
 
-* Converting between coordinate types
-* Transforming between datums
-* Calculating geodetic distances and bearings
-* Working with geoid models
-* Surveying calculations
-* Various classes for angles, corrdinates, and datums
-* Statistics
+* :ref:`Converting <features/convert>` between coordinate types
+* :ref:`Transforming <features/transform>` between datums
+* Calculating :ref:`geodetic <features/geodesy>` distances and bearings
+* Working with :ref:`geoid <features/height>` models
+* :ref:`Surveying <features/survey>` calculations
+* Various classes for :ref:`angles <features/angles>` , :ref:`corrdinates <features/coord>`, and :ref:`datums <features/constants>`
+* :ref:`Statistics <features/statistics>`
 * And more!
 
 User Guide

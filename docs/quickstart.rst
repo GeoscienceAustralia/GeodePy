@@ -10,7 +10,7 @@ First, ensure that:
 
 Let's get started with a simple example.
 
-Transforming from MGAA94 to MGA2020
+Transforming from MGA94 to MGA2020
 -----------------------------------
 
 Begin by importing GeodePy:
