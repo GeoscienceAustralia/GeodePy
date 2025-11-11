@@ -6,5 +6,8 @@ Tutorials
 .. toctree::
    :maxdepth: 2
 
+   anglestut
+   coordtut
+   vincenty
    convert
    transform
