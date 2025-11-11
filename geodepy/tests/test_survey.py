@@ -1,8 +1,15 @@
 import unittest
 from geodepy.convert import DMSAngle
-from geodepy.survey import (first_vel_params, first_vel_corrn, 
-                            mets_partial_differentials, precise_inst_ht, 
-                            va_conv, radiations, joins)
+from geodepy.survey import (
+    first_vel_params,
+    first_vel_corrn,
+    mets_partial_differentials,
+    precise_inst_ht,
+    va_conv,
+    radiations,
+    joins,
+)
+
 
 class TestSurveyConvert(unittest.TestCase):
     def test_first_vel_params(self):
@@ -16,43 +23,52 @@ class TestSurveyConvert(unittest.TestCase):
         self.assertEqual(round(params_new[1], 3), param_d)
 
     def test_first_vel_corrn(self):
-        params = first_vel_params(0.85,49951.33424,1.000281783)
+        params = first_vel_params(0.85, 49951.33424, 1.000281783)
         raw_obs_distance = 1117.8517
         obs_temperature = 6.8
         obs_pressure = 960.8
         obs_relative_humidity = 58.6
-        correction = first_vel_corrn(raw_obs_distance, params, obs_temperature,
-                                     obs_pressure, obs_relative_humidity)
+        correction = first_vel_corrn(
+            raw_obs_distance,
+            params,
+            obs_temperature,
+            obs_pressure,
+            obs_relative_humidity,
+        )
         corrected_obs_distance = raw_obs_distance + correction
         self.assertEqual(round(corrected_obs_distance, 4), 1117.8624)
 
     def test_first_vel_corrn_with_CO2(self):
         edm_wavelength = 0.850
-        params = first_vel_params(edm_wavelength,49951.33424,1.000281783)
+        params = first_vel_params(edm_wavelength, 49951.33424, 1.000281783)
         raw_obs_distance = 1117.8517
         obs_temperature = 6.8
         obs_pressure = 960.8
         obs_relative_humidity = 58.6
         CO2_ppm_2022 = 420
-        correction = first_vel_corrn(raw_obs_distance, params, obs_temperature,
-                                     obs_pressure, obs_relative_humidity,
-                                     CO2_ppm = CO2_ppm_2022, 
-                                     wavelength = edm_wavelength)
+        correction = first_vel_corrn(
+            raw_obs_distance,
+            params,
+            obs_temperature,
+            obs_pressure,
+            obs_relative_humidity,
+            CO2_ppm=CO2_ppm_2022,
+            wavelength=edm_wavelength,
+        )
         corrected_obs_distance = raw_obs_distance + correction
         self.assertEqual(round(corrected_obs_distance, 4), 1117.8624)
-        
+
     def test_mets_partial_differentials(self):
         group_ref_Index = 1.00028
         temp = 15
         pressure = 1013.25
         rel_humidity = 60
-        K = round(0.91973804217265260,2)
-        L = round(0.2619533756724471,2)
-        M = round(0.03911157383307305,2)
-        differ_new = mets_partial_differentials(group_ref_Index, 
-                                                temp, 
-                                                pressure,
-                                                rel_humidity)
+        K = round(0.91973804217265260, 2)
+        L = round(0.2619533756724471, 2)
+        M = round(0.03911157383307305, 2)
+        differ_new = mets_partial_differentials(
+            group_ref_Index, temp, pressure, rel_humidity
+        )
         self.assertEqual(round(differ_new[0], 2), K)
         self.assertEqual(round(differ_new[1], 2), L)
         self.assertEqual(round(differ_new[2], 2), M)
@@ -80,7 +96,7 @@ class TestSurveyConvert(unittest.TestCase):
         self.assertAlmostEqual(test4[3], 1.69995, 5)
         with self.assertRaises(ValueError):
             va_conv(-3.62, 1.5)
-            va_conv('brian', 16)
+            va_conv("brian", 16)
 
     def test_precise_inst_ht(self):
         va1 = 99.50920833333333
@@ -111,20 +127,30 @@ class TestSurveyConvert(unittest.TestCase):
         self.assertAlmostEqual(test4[1], 172.0831, 4)
 
     def test_radiations(self):
-        test1 = radiations(500, 500,
-                           DMSAngle(290, 13).dec(), 44.620,
-                           DMSAngle(2, 18, 35).dec(), 1.002515)
+        test1 = radiations(
+            500,
+            500,
+            DMSAngle(290, 13).dec(),
+            44.620,
+            DMSAngle(2, 18, 35).dec(),
+            1.002515,
+        )
         self.assertAlmostEqual(test1[0], 458.681, 3)
         self.assertAlmostEqual(test1[1], 517.137, 3)
         test2 = radiations(500, 500, DMSAngle(290, 13).dec(), 44.620)
         self.assertAlmostEqual(test2[0], 458.129, 3)
         self.assertAlmostEqual(test2[1], 515.419, 3)
-        test3 = radiations(564.747, 546.148,
-                           DMSAngle(41, 7).dec(), 27.720,
-                           DMSAngle(2, 18, 35).dec(), 1.002515)
+        test3 = radiations(
+            564.747,
+            546.148,
+            DMSAngle(41, 7).dec(),
+            27.720,
+            DMSAngle(2, 18, 35).dec(),
+            1.002515,
+        )
         self.assertAlmostEqual(test3[0], 583.850, 3)
         self.assertAlmostEqual(test3[1], 566.331, 3)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

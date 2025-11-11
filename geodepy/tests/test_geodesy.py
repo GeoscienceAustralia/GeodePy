@@ -2,8 +2,15 @@ import unittest
 import os.path
 import numpy as np
 import numpy.lib.recfunctions as rfn
-from geodepy.convert import (hp2dec, dec2hp, rect2polar, polar2rect,
-                             grid2geo, llh2xyz, DMSAngle)
+from geodepy.convert import (
+    hp2dec,
+    dec2hp,
+    rect2polar,
+    polar2rect,
+    grid2geo,
+    llh2xyz,
+    DMSAngle,
+)
 from geodepy.geodesy import vincinv, vincdir, vincinv_utm, vincdir_utm, enu2xyz, xyz2enu
 
 
@@ -21,14 +28,18 @@ class TestGeodesy(unittest.TestCase):
         MOBS_GDA1994_XYZ = llh2xyz(MOBS_GDA1994[0], MOBS_GDA1994[1], MOBS_MGA1994[3])
 
         # Generate Vector Between UTM Projection Coordinates
-        mga_vector = [MOBS_MGA2020[1] - MOBS_MGA1994[1],
-                      MOBS_MGA2020[2] - MOBS_MGA1994[2],
-                      MOBS_MGA2020[3] - MOBS_MGA1994[3]]
+        mga_vector = [
+            MOBS_MGA2020[1] - MOBS_MGA1994[1],
+            MOBS_MGA2020[2] - MOBS_MGA1994[2],
+            MOBS_MGA2020[3] - MOBS_MGA1994[3],
+        ]
 
         # Generate Vector Between Cartesian XYZ Coordinates
-        xyz_vector = (MOBS_GDA2020_XYZ[0] - MOBS_GDA1994_XYZ[0],
-                      MOBS_GDA2020_XYZ[1] - MOBS_GDA1994_XYZ[1],
-                      MOBS_GDA2020_XYZ[2] - MOBS_GDA1994_XYZ[2])
+        xyz_vector = (
+            MOBS_GDA2020_XYZ[0] - MOBS_GDA1994_XYZ[0],
+            MOBS_GDA2020_XYZ[1] - MOBS_GDA1994_XYZ[1],
+            MOBS_GDA2020_XYZ[2] - MOBS_GDA1994_XYZ[2],
+        )
 
         # Rotate UTM Projection Vector by Grid Convergence
         grid_dist, grid_brg = rect2polar(mga_vector[0], mga_vector[1])
@@ -84,8 +95,9 @@ class TestGeodesy(unittest.TestCase):
         self.assertEqual(test3, (0, 0, 0))
 
         # Test DMSAngle Input
-        ell_dist, azimuth1to2, azimuth2to1 = vincinv(lat1_DMS, lon1_DMS,
-                                                     lat2_DMS, lon2_DMS)
+        ell_dist, azimuth1to2, azimuth2to1 = vincinv(
+            lat1_DMS, lon1_DMS, lat2_DMS, lon2_DMS
+        )
         self.assertEqual(round(ell_dist, 3), 54972.271)
         self.assertEqual(round(dec2hp(azimuth1to2), 6), 306.520537)
         self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
@@ -94,16 +106,14 @@ class TestGeodesy(unittest.TestCase):
         self.assertEqual(test2, (0, 0, 0))
 
         # Test DDMAngle Input
-        (ell_dist,
-         azimuth1to2,
-         azimuth2to1) = vincinv(lat1_DMS.ddm(), lon1_DMS.ddm(),
-                                lat2_DMS.ddm(), lon2_DMS.ddm())
+        (ell_dist, azimuth1to2, azimuth2to1) = vincinv(
+            lat1_DMS.ddm(), lon1_DMS.ddm(), lat2_DMS.ddm(), lon2_DMS.ddm()
+        )
         self.assertEqual(round(ell_dist, 3), 54972.271)
         self.assertEqual(round(dec2hp(azimuth1to2), 6), 306.520537)
         self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
 
-        test2 = vincinv(lat1_DMS.ddm(), lon1_DMS.ddm(),
-                        lat1_DMS.ddm(), lon1_DMS.ddm())
+        test2 = vincinv(lat1_DMS.ddm(), lon1_DMS.ddm(), lat1_DMS.ddm(), lon1_DMS.ddm())
         self.assertEqual(test2, (0, 0, 0))
 
     def test_vincdir(self):
@@ -125,15 +135,17 @@ class TestGeodesy(unittest.TestCase):
         self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
 
         # Test DMSAngle Input
-        lat2, long2, azimuth2to1 = vincdir(lat1_DMS, lon1_DMS,
-                                           azimuth1to2_DMS, ell_dist)
+        lat2, long2, azimuth2to1 = vincdir(
+            lat1_DMS, lon1_DMS, azimuth1to2_DMS, ell_dist
+        )
         self.assertEqual(round(dec2hp(lat2), 8), -37.39101561)
         self.assertEqual(round(dec2hp(long2), 8), 143.55353839)
         self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
 
         # Test DDMAngle Input
-        lat2, long2, azimuth2to1 = vincdir(lat1_DMS.ddm(), lon1_DMS.ddm(),
-                                           azimuth1to2_DMS.ddm(), ell_dist)
+        lat2, long2, azimuth2to1 = vincdir(
+            lat1_DMS.ddm(), lon1_DMS.ddm(), azimuth1to2_DMS.ddm(), ell_dist
+        )
         self.assertEqual(round(dec2hp(lat2), 8), -37.39101561)
         self.assertEqual(round(dec2hp(long2), 8), 143.55353839)
         self.assertEqual(round(dec2hp(azimuth2to1), 6), 127.102507)
@@ -153,8 +165,9 @@ class TestGeodesy(unittest.TestCase):
         north3 = 5828674.3402
 
         # Test Coordinates in Zone 55 only
-        grid_dist, grid1to2, grid2to1, lsf = vincinv_utm(zone1, east1, north1,
-                                                         zone2, east2, north2)
+        grid_dist, grid1to2, grid2to1, lsf = vincinv_utm(
+            zone1, east1, north1, zone2, east2, north2
+        )
         self.assertAlmostEqual(lsf, 1.00036397, 8)
         self.assertAlmostEqual(grid_dist, 54992.279, 3)
         self.assertAlmostEqual(dec2hp(grid1to2), 305.17017259, 7)
@@ -162,8 +175,9 @@ class TestGeodesy(unittest.TestCase):
 
         # Test Coordinates in Different Zones (55 and 54)
         # (Point 2 Grid Bearing Different (Zone 54 Grid Bearing))
-        grid_dist, grid1to2, grid2to1, lsf = vincinv_utm(zone1, east1, north1,
-                                                         zone3, east3, north3)
+        grid_dist, grid1to2, grid2to1, lsf = vincinv_utm(
+            zone1, east1, north1, zone3, east3, north3
+        )
         self.assertAlmostEqual(lsf, 1.00036397, 8)
         self.assertAlmostEqual(grid_dist, 54992.279, 3)
         self.assertAlmostEqual(dec2hp(grid1to2), 305.17017259, 7)
@@ -180,9 +194,9 @@ class TestGeodesy(unittest.TestCase):
         grid1to2_DMS = DMSAngle(305, 17, 1.7259)
 
         # Test Decimal Degrees Input
-        (zone2, east2, north2,
-         grid2to1, lsf) = vincdir_utm(zone1, east1, north1,
-                                      grid1to2, grid_dist)
+        (zone2, east2, north2, grid2to1, lsf) = vincdir_utm(
+            zone1, east1, north1, grid1to2, grid_dist
+        )
         self.assertEqual(zone2, zone1)
         self.assertAlmostEqual(east2, 228854.0513, 3)
         self.assertAlmostEqual(north2, 5828259.0384, 3)
@@ -190,9 +204,9 @@ class TestGeodesy(unittest.TestCase):
         self.assertAlmostEqual(lsf, 1.00036397, 8)
 
         # Test DMSAngle Input
-        (zone2, east2, north2,
-         grid2to1, lsf) = vincdir_utm(zone1, east1, north1,
-                                      grid1to2_DMS, grid_dist)
+        (zone2, east2, north2, grid2to1, lsf) = vincdir_utm(
+            zone1, east1, north1, grid1to2_DMS, grid_dist
+        )
         self.assertEqual(zone2, zone1)
         self.assertAlmostEqual(east2, 228854.0513, 3)
         self.assertAlmostEqual(north2, 5828259.0384, 3)
@@ -203,39 +217,51 @@ class TestGeodesy(unittest.TestCase):
         # Test multiple point-to-point vincinv calculations
         abs_path = os.path.abspath(os.path.dirname(__file__))
 
-        test_geo_coords =\
-            np.genfromtxt(os.path.join(abs_path,
-                                       'resources/Test_Conversion_Geo.csv'),
-                                        delimiter=',',
-                                        dtype='S4,f8,f8',
-                                        names=['site', 'lat1', 'long1'],
-                                        usecols=('lat1', 'long1'))
+        test_geo_coords = np.genfromtxt(
+            os.path.join(abs_path, "resources/Test_Conversion_Geo.csv"),
+            delimiter=",",
+            dtype="S4,f8,f8",
+            names=["site", "lat1", "long1"],
+            usecols=("lat1", "long1"),
+        )
 
-        test_geo_coord2 = \
-            np.genfromtxt(os.path.join(abs_path,
-                                       'resources/Test_Conversion_Geo.csv'),
-                                        delimiter=',',
-                                        dtype='S4,f8,f8',
-                                        names=['site', 'lat2', 'long2'],
-                                        usecols=('lat2', 'long2'))
+        test_geo_coord2 = np.genfromtxt(
+            os.path.join(abs_path, "resources/Test_Conversion_Geo.csv"),
+            delimiter=",",
+            dtype="S4,f8,f8",
+            names=["site", "lat2", "long2"],
+            usecols=("lat2", "long2"),
+        )
 
         # Form array with point pairs from test file
-        test_pairs = rfn.merge_arrays([test_geo_coords, np.roll(test_geo_coord2, 1)], flatten=True)
+        test_pairs = rfn.merge_arrays(
+            [test_geo_coords, np.roll(test_geo_coord2, 1)], flatten=True
+        )
 
         # Calculate Vincenty's Inverse Result using Lat, Long Pairs
-        vincinv_result = np.array(list(vincinv(*x) for x in test_pairs[['lat1', 'long1', 'lat2', 'long2']]))
+        vincinv_result = np.array(
+            list(vincinv(*x) for x in test_pairs[["lat1", "long1", "lat2", "long2"]])
+        )
 
         # Calculate Vincenty's Direct Result using Results from Inverse Function
-        vincdir_input = rfn.merge_arrays([test_geo_coords, vincinv_result[:, 1], vincinv_result[:, 0]], flatten=True)
-        vincdir_input.dtype.names = ['lat1', 'long1', 'az1to2', 'ell_dist']
-        vincdir_result = np.array(list(vincdir(*x) for x in vincdir_input[['lat1', 'long1', 'az1to2', 'ell_dist']]))
+        vincdir_input = rfn.merge_arrays(
+            [test_geo_coords, vincinv_result[:, 1], vincinv_result[:, 0]], flatten=True
+        )
+        vincdir_input.dtype.names = ["lat1", "long1", "az1to2", "ell_dist"]
+        vincdir_result = np.array(
+            list(
+                vincdir(*x)
+                for x in vincdir_input[["lat1", "long1", "az1to2", "ell_dist"]]
+            )
+        )
 
-        np.testing.assert_almost_equal(test_pairs['lat2'],
-                                       vincdir_result[:, 0], decimal=8)
-        np.testing.assert_almost_equal(test_pairs['long2'],
-                                       vincdir_result[:, 1], decimal=8)
-        np.testing.assert_almost_equal(vincinv_result[:, 2],
-                                       vincdir_result[:, 2])
+        np.testing.assert_almost_equal(
+            test_pairs["lat2"], vincdir_result[:, 0], decimal=8
+        )
+        np.testing.assert_almost_equal(
+            test_pairs["long2"], vincdir_result[:, 1], decimal=8
+        )
+        np.testing.assert_almost_equal(vincinv_result[:, 2], vincdir_result[:, 2])
 
     def test_vincinv_edgecases(self):
         lat1 = -32.153892
@@ -251,5 +277,5 @@ class TestGeodesy(unittest.TestCase):
         self.assertEqual(az21, az21_2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

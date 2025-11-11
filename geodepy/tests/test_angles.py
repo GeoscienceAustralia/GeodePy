@@ -2,17 +2,44 @@ import unittest
 import os
 from math import radians, pi
 
-from geodepy.angles import (DECAngle, HPAngle, GONAngle, DMSAngle, DDMAngle,
-                            dec2hp, dec2hpa, dec2gon, dec2gona,
-                            dec2dms, dec2ddm,
-                            hp2dec, hp2deca, hp2gon, hp2gona,
-                            hp2dms, hp2ddm, hp2rad,
-                            gon2dec, gon2deca, gon2hp, gon2hpa,
-                            gon2dms, gon2ddm, gon2rad,
-                            dd2sec, angular_typecheck)
+from geodepy.angles import (
+    DECAngle,
+    HPAngle,
+    GONAngle,
+    DMSAngle,
+    DDMAngle,
+    dec2hp,
+    dec2hpa,
+    dec2gon,
+    dec2gona,
+    dec2dms,
+    dec2ddm,
+    hp2dec,
+    hp2deca,
+    hp2gon,
+    hp2gona,
+    hp2dms,
+    hp2ddm,
+    hp2rad,
+    gon2dec,
+    gon2deca,
+    gon2hp,
+    gon2hpa,
+    gon2dms,
+    gon2ddm,
+    gon2rad,
+    dd2sec,
+    angular_typecheck,
+)
 
-rad_exs = [radians(123.74875), radians(12.575), radians(-12.575),
-           radians(0.0525), radians(0.005), radians(-0.005)]
+rad_exs = [
+    radians(123.74875),
+    radians(12.575),
+    radians(-12.575),
+    radians(0.0525),
+    radians(0.005),
+    radians(-0.005),
+]
 
 dec_ex = 123.74875
 dec_ex2 = 12.575
@@ -55,12 +82,12 @@ dms_ex5 = DMSAngle(0, 0, 18)
 dms_ex6 = DMSAngle(0, 0, 18, positive=False)
 dms_exs = [dms_ex, dms_ex2, dms_ex3, dms_ex4, dms_ex5, dms_ex6]
 
-dms_str = '123 44 55.5'
-dms_str2 = '12 34 30'
-dms_str3 = '-12 34 30'
-dms_str4 = '0 3 9'
-dms_str5 = '0 0 18'
-dms_str6 = '-0 0 18'
+dms_str = "123 44 55.5"
+dms_str2 = "12 34 30"
+dms_str3 = "-12 34 30"
+dms_str4 = "0 3 9"
+dms_str5 = "0 0 18"
+dms_str6 = "-0 0 18"
 dms_strs = [dms_str, dms_str2, dms_str3, dms_str4, dms_str5, dms_str6]
 
 ddm_ex = DDMAngle(123, 44.925)
@@ -71,12 +98,12 @@ ddm_ex5 = DDMAngle(0, 0.3)
 ddm_ex6 = DDMAngle(0, 0.3, positive=False)
 ddm_exs = [ddm_ex, ddm_ex2, ddm_ex3, ddm_ex4, ddm_ex5, ddm_ex6]
 
-ddm_str = '123 44.925'
-ddm_str2 = '12 34.5'
-ddm_str3 = '-12 34.5'
-ddm_str4 = '0 3.15'
-ddm_str5 = '0 0.3'
-ddm_str6 = '-0 0.3'
+ddm_str = "123 44.925"
+ddm_str2 = "12 34.5"
+ddm_str3 = "-12 34.5"
+ddm_str4 = "0 3.15"
+ddm_str5 = "0 0.3"
+ddm_str6 = "-0 0.3"
 ddm_strs = [ddm_str, ddm_str2, ddm_str3, ddm_str4, ddm_str5, ddm_str6]
 
 gon_ex = 137.4986111111111
@@ -101,18 +128,24 @@ class TestConvert(unittest.TestCase):
         self.testData = []
         degreeValues = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256]
         dec_places = 13
-        error = 10**-(dec_places - 4)
+        error = 10 ** -(dec_places - 4)
         for deg in degreeValues:
             for min in range(60):
                 for sec in range(60):
                     if sec:
-                        hp_minus = float(f'{deg:4d}.{min:02d}{sec-1:02d}' + '9' * (dec_places - 4))
+                        hp_minus = float(
+                            f"{deg:4d}.{min:02d}{sec-1:02d}" + "9" * (dec_places - 4)
+                        )
                         dec_minus = deg + (min / 60.0 + (sec - error) / 3600.0)
-                        gon_minus =  400.0 / 360.0 * dec_minus
+                        gon_minus = 400.0 / 360.0 * dec_minus
                         rad_minus = pi / 180.0 * dec_minus
-                        self.testData.append([hp_minus, dec_minus, gon_minus, rad_minus])
-                    hp = float(f'{deg:4d}.{min:02d}{sec:02d}')
-                    hp_plus = float(f'{deg:4d}.{min:02d}{sec:02d}' + '0' * (dec_places - 5) + '1')
+                        self.testData.append(
+                            [hp_minus, dec_minus, gon_minus, rad_minus]
+                        )
+                    hp = float(f"{deg:4d}.{min:02d}{sec:02d}")
+                    hp_plus = float(
+                        f"{deg:4d}.{min:02d}{sec:02d}" + "0" * (dec_places - 5) + "1"
+                    )
                     dec = deg + (min / 60.0 + sec / 3600.0)
                     gon = 400.0 / 360.0 * dec
                     rad = pi / 180.0 * dec
@@ -148,8 +181,8 @@ class TestConvert(unittest.TestCase):
             self.assertEqual(round(ex), DECAngle(round(dec_exs[num])))
 
         # Test HPAngle Representation
-        self.assertEqual(repr(deca_ex), '{DECAngle: +123.74875}')
-        self.assertEqual(repr(deca_ex3), '{DECAngle: -12.575}')
+        self.assertEqual(repr(deca_ex), "{DECAngle: +123.74875}")
+        self.assertEqual(repr(deca_ex3), "{DECAngle: -12.575}")
 
         # Test DECAngle Overloads
         self.assertEqual(dec_ex + dec_ex2, (deca_ex + deca_ex2).dec())
@@ -171,19 +204,19 @@ class TestConvert(unittest.TestCase):
         self.assertTrue(deca_ex2 < deca_ex)
         self.assertFalse(deca_ex < deca_ex2)
         with self.assertRaises(TypeError):
-            deca_ex * 'a'
+            deca_ex * "a"
         with self.assertRaises(TypeError):
-            'a' * deca_ex
+            "a" * deca_ex
         with self.assertRaises(TypeError):
-            deca_ex / 'a'
+            deca_ex / "a"
         with self.assertRaises(TypeError):
-            deca_ex + 'a'
+            deca_ex + "a"
         with self.assertRaises(TypeError):
-            'a' + deca_ex
+            "a" + deca_ex
         with self.assertRaises(TypeError):
-            deca_ex - 'a'
+            deca_ex - "a"
         with self.assertRaises(TypeError):
-            'a' - deca_ex
+            "a" - deca_ex
 
     def test_HPAngle(self):
         # Test HPAngle Methods
@@ -211,8 +244,8 @@ class TestConvert(unittest.TestCase):
             self.assertEqual(round(ex), HPAngle(round(hp_exs[num])))
 
         # Test HPAngle Representation
-        self.assertEqual(repr(hpa_ex), '{HPAngle: +123.44555}')
-        self.assertEqual(repr(hpa_ex3), '{HPAngle: -12.343}')
+        self.assertEqual(repr(hpa_ex), "{HPAngle: +123.44555}")
+        self.assertEqual(repr(hpa_ex3), "{HPAngle: -12.343}")
 
         # Test DMSAngle Overloads
         self.assertAlmostEqual(dec_ex + dec_ex2, (hpa_ex + hpa_ex2).dec(), 12)
@@ -234,19 +267,19 @@ class TestConvert(unittest.TestCase):
         self.assertTrue(hpa_ex2 < hpa_ex)
         self.assertFalse(hpa_ex < hpa_ex2)
         with self.assertRaises(TypeError):
-            hpa_ex * 'a'
+            hpa_ex * "a"
         with self.assertRaises(TypeError):
-            'a' * hpa_ex
+            "a" * hpa_ex
         with self.assertRaises(TypeError):
-            hpa_ex / 'a'
+            hpa_ex / "a"
         with self.assertRaises(TypeError):
-            hpa_ex + 'a'
+            hpa_ex + "a"
         with self.assertRaises(TypeError):
-            'a' + hpa_ex
+            "a" + hpa_ex
         with self.assertRaises(TypeError):
-            hpa_ex - 'a'
+            hpa_ex - "a"
         with self.assertRaises(TypeError):
-            'a' - hpa_ex
+            "a" - hpa_ex
 
         # Test Validity Checking of HP format input
         with self.assertRaises(ValueError):
@@ -279,8 +312,8 @@ class TestConvert(unittest.TestCase):
             self.assertEqual(round(ex), GONAngle(round(gon_exs[num])))
 
         # Test GONAngle Representation
-        self.assertEqual(repr(gona_ex), '{GONAngle: +137.4986111111111}')
-        self.assertEqual(repr(gona_ex3), '{GONAngle: -13.97222222222222}')
+        self.assertEqual(repr(gona_ex), "{GONAngle: +137.4986111111111}")
+        self.assertEqual(repr(gona_ex3), "{GONAngle: -13.97222222222222}")
 
         # Test DMSAngle Overloads
         self.assertAlmostEqual(dec_ex + dec_ex2, (gona_ex + gona_ex2).dec(), 12)
@@ -302,19 +335,19 @@ class TestConvert(unittest.TestCase):
         self.assertTrue(gona_ex2 < gona_ex)
         self.assertFalse(gona_ex < gona_ex2)
         with self.assertRaises(TypeError):
-            gona_ex * 'a'
+            gona_ex * "a"
         with self.assertRaises(TypeError):
-            'a' * gona_ex
+            "a" * gona_ex
         with self.assertRaises(TypeError):
-            gona_ex / 'a'
+            gona_ex / "a"
         with self.assertRaises(TypeError):
-            gona_ex + 'a'
+            gona_ex + "a"
         with self.assertRaises(TypeError):
-            'a' + gona_ex
+            "a" + gona_ex
         with self.assertRaises(TypeError):
-            gona_ex - 'a'
+            gona_ex - "a"
         with self.assertRaises(TypeError):
-            'a' - gona_ex
+            "a" - gona_ex
 
     def test_DMSAngle(self):
         # Test DMSAngle Methods
@@ -339,14 +372,18 @@ class TestConvert(unittest.TestCase):
             self.assertEqual((round(-ex, 2)).hp(), round(-hp_exs[num], 5))
 
         # Test DMSAngle Sign Conventions
-        self.assertEqual(-dec_ex, DMSAngle(-dms_ex.degree, dms_ex.minute,
-                                           dms_ex.second).dec())
-        self.assertEqual(dec_ex, DMSAngle(dms_ex.degree, -dms_ex.minute,
-                                          -dms_ex.second).dec())
-        self.assertAlmostEqual(-dec_ex4, DMSAngle(0, -dms_ex4.minute,
-                                                  dms_ex4.second).dec(), 9)
-        self.assertAlmostEqual(dec_ex4, DMSAngle(0, dms_ex4.minute,
-                                                 dms_ex4.second).dec(), 9)
+        self.assertEqual(
+            -dec_ex, DMSAngle(-dms_ex.degree, dms_ex.minute, dms_ex.second).dec()
+        )
+        self.assertEqual(
+            dec_ex, DMSAngle(dms_ex.degree, -dms_ex.minute, -dms_ex.second).dec()
+        )
+        self.assertAlmostEqual(
+            -dec_ex4, DMSAngle(0, -dms_ex4.minute, dms_ex4.second).dec(), 9
+        )
+        self.assertAlmostEqual(
+            dec_ex4, DMSAngle(0, dms_ex4.minute, dms_ex4.second).dec(), 9
+        )
         self.assertEqual(-dec_ex5, DMSAngle(0, 0, -dms_ex5.second).dec())
         self.assertEqual(dec_ex5, DMSAngle(0, 0, dms_ex5.second).dec())
         self.assertEqual(-dms_ex3, DMSAngle(12, 34, -30))
@@ -363,8 +400,8 @@ class TestConvert(unittest.TestCase):
         self.assertFalse(DMSAngle(0, 0, -3).positive)
         self.assertFalse(DMSAngle(0, 1, 2, positive=False).positive)
         self.assertFalse(DMSAngle(-0.0, 1, 2).positive)
-        self.assertEqual(repr(dms_ex), '{DMSAngle: +123d 44m 55.5s}')
-        self.assertEqual(repr(dms_ex3), '{DMSAngle: -12d 34m 30s}')
+        self.assertEqual(repr(dms_ex), "{DMSAngle: +123d 44m 55.5s}")
+        self.assertEqual(repr(dms_ex3), "{DMSAngle: -12d 34m 30s}")
 
         # Test DMSAngle Overloads
         self.assertEqual(dec_ex + dec_ex2, (dms_ex + dms_ex2).dec())
@@ -387,19 +424,19 @@ class TestConvert(unittest.TestCase):
         self.assertTrue(dms_ex2 < dms_ex)
         self.assertFalse(dms_ex < dms_ex2)
         with self.assertRaises(TypeError):
-            dms_ex * 'a'
+            dms_ex * "a"
         with self.assertRaises(TypeError):
-            'a' * dms_ex
+            "a" * dms_ex
         with self.assertRaises(TypeError):
-            dms_ex / 'a'
+            dms_ex / "a"
         with self.assertRaises(TypeError):
-            dms_ex + 'a'
+            dms_ex + "a"
         with self.assertRaises(TypeError):
-            'a' + dms_ex
+            "a" + dms_ex
         with self.assertRaises(TypeError):
-            dms_ex - 'a'
+            dms_ex - "a"
         with self.assertRaises(TypeError):
-            'a' - dms_ex
+            "a" - dms_ex
 
         # Test reading in formatted strings
         for num, ex in enumerate(dms_strs):
@@ -429,8 +466,7 @@ class TestConvert(unittest.TestCase):
             self.assertEqual((round(-ex)).hp(), round(-hp_exs[num], 2))
 
         # Test DMSAngle Sign Conventions
-        self.assertEqual(-dec_ex, DDMAngle(-dms_ex.degree,
-                                           ddm_ex.minute).dec())
+        self.assertEqual(-dec_ex, DDMAngle(-dms_ex.degree, ddm_ex.minute).dec())
         self.assertEqual(dec_ex, DDMAngle(dms_ex.degree, -ddm_ex.minute).dec())
         self.assertAlmostEqual(-dec_ex4, DDMAngle(0, -ddm_ex4.minute).dec(), 9)
         self.assertAlmostEqual(dec_ex4, DDMAngle(0, ddm_ex4.minute).dec(), 9)
@@ -447,8 +483,8 @@ class TestConvert(unittest.TestCase):
         self.assertFalse(DDMAngle(0, -1).positive)
         self.assertFalse(DDMAngle(0, 1, positive=False).positive)
         self.assertFalse(DDMAngle(-0.0, 1).positive)
-        self.assertEqual(repr(ddm_ex), '{DDMAngle: +123d 44.925m}')
-        self.assertEqual(repr(ddm_ex3), '{DDMAngle: -12d 34.5m}')
+        self.assertEqual(repr(ddm_ex), "{DDMAngle: +123d 44.925m}")
+        self.assertEqual(repr(ddm_ex3), "{DDMAngle: -12d 34.5m}")
 
         # Test DDMAngle Overloads
         self.assertEqual(dec_ex + dec_ex2, (ddm_ex + ddm_ex2).dec())
@@ -471,19 +507,19 @@ class TestConvert(unittest.TestCase):
         self.assertTrue(ddm_ex2 < ddm_ex)
         self.assertFalse(ddm_ex < ddm_ex2)
         with self.assertRaises(TypeError):
-            ddm_ex * 'a'
+            ddm_ex * "a"
         with self.assertRaises(TypeError):
-            'a' * ddm_ex
+            "a" * ddm_ex
         with self.assertRaises(TypeError):
-            ddm_ex / 'a'
+            ddm_ex / "a"
         with self.assertRaises(TypeError):
-            ddm_ex + 'a'
+            ddm_ex + "a"
         with self.assertRaises(TypeError):
-            'a' + ddm_ex
+            "a" + ddm_ex
         with self.assertRaises(TypeError):
-            ddm_ex - 'a'
+            ddm_ex - "a"
         with self.assertRaises(TypeError):
-            'a' - ddm_ex
+            "a" - ddm_ex
 
         # Test reading in formatted strings
         for num, ex in enumerate(ddm_strs):
@@ -492,11 +528,9 @@ class TestConvert(unittest.TestCase):
 
     def test_angles_interoperability(self):
         self.assertEqual(DMSAngle(1, 2, 3) + DDMAngle(2, 3), DMSAngle(3, 5, 3))
-        self.assertEqual(DMSAngle(3, 2, 0) - DDMAngle(2, 2.5),
-                         DMSAngle(0, 59, 30))
+        self.assertEqual(DMSAngle(3, 2, 0) - DDMAngle(2, 2.5), DMSAngle(0, 59, 30))
         self.assertEqual(DDMAngle(2, 3) + DMSAngle(1, 2, 3), DDMAngle(3, 5.05))
-        self.assertEqual(DDMAngle(3, 2) - DMSAngle(2, 2, 30),
-                         DDMAngle(0, 59.5))
+        self.assertEqual(DDMAngle(3, 2) - DMSAngle(2, 2, 30), DDMAngle(0, 59.5))
 
     def test_dec2hp(self):
         for num, ex in enumerate(hp_exs):
@@ -523,10 +557,8 @@ class TestConvert(unittest.TestCase):
 
     def test_dec2gona(self):
         for num, ex in enumerate(dec_exs):
-            self.assertEqual(round(dec2gona(ex), 13),
-                             round(gona_exs[num], 13))
-            self.assertEqual(round(dec2gona(-ex), 13),
-                             round(-gona_exs[num], 13))
+            self.assertEqual(round(dec2gona(ex), 13), round(gona_exs[num], 13))
+            self.assertEqual(round(dec2gona(-ex), 13), round(-gona_exs[num], 13))
 
     def test_dec2dms(self):
         self.assertEqual(dms_ex, dec2dms(dec_ex))
@@ -547,8 +579,9 @@ class TestConvert(unittest.TestCase):
 
         self.assertAlmostEqual(0, hp2dec(0), 13)
         self.assertAlmostEqual(258, hp2dec(258), 13)
-        self.assertAlmostEqual(hp2dec(hp_exs[0]) + hp2dec(hp_exs[1]),
-                               dec_exs[0] + dec_exs[1], 13)
+        self.assertAlmostEqual(
+            hp2dec(hp_exs[0]) + hp2dec(hp_exs[1]), dec_exs[0] + dec_exs[1], 13
+        )
         # Test that invalid minutes and seconds components raise errors
         # (Minutes and/or Seconds can't be greater than 60, therefore
         #  123.718 - representing 123 degrees, 71 minutes, 80 seconds
@@ -614,8 +647,8 @@ class TestConvert(unittest.TestCase):
             self.assertAlmostEqual(gon2dec(-ex), -dec_exs[num], 14)
         for check in self.testData:
             hp, dec, gon, rad = check
-            self.assertAlmostEqual(dec, gon2dec(gon), delta = 5.8e-14)
-            self.assertAlmostEqual(-dec, gon2dec(-gon), delta = 5.8e-14)
+            self.assertAlmostEqual(dec, gon2dec(gon), delta=5.8e-14)
+            self.assertAlmostEqual(-dec, gon2dec(-gon), delta=5.8e-14)
 
     def test_gon2deca(self):
         for num, ex in enumerate(gon_exs):
@@ -670,14 +703,12 @@ class TestConvert(unittest.TestCase):
         class_exs = [deca_exs, hpa_exs, gona_exs, dms_exs, ddm_exs]
         for class_ex in class_exs:
             for num, ex in enumerate(class_ex):
-                self.assertAlmostEqual(angular_typecheck(ex),
-                                       dec_exs[num], 13)
-                self.assertAlmostEqual(angular_typecheck(-ex),
-                                       -dec_exs[num], 13)
+                self.assertAlmostEqual(angular_typecheck(ex), dec_exs[num], 13)
+                self.assertAlmostEqual(angular_typecheck(-ex), -dec_exs[num], 13)
         for ex in dec_exs:
             self.assertEqual(angular_typecheck(ex), ex)
             self.assertEqual(angular_typecheck(-ex), -ex)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
