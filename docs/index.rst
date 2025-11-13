@@ -67,3 +67,6 @@ This section contains information for contributors to the GeodePy project.
 
    community/contributing
    community/authors
+
+.. meta::
+    :google-site-verification: i5FHdaluOAMrReuJqp3xes1IEXOpwgcMMBriCqpU0lE
