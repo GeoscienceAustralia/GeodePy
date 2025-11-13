@@ -57,3 +57,4 @@ html_css_files = [
 html_js_files = [
     'custom.js',
 ]
+html_extra_path=['/home/ubuntu/GeodePy/docs/_static/googlecc5675ba94e6e756.html']
