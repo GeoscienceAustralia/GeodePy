@@ -5,7 +5,96 @@ Angle Classes and Converstions
 
 GeodePy has 5 main angle classes to represent angles in different formats. These will be explored here along with how to convert between these types.
 
-Creating Angle Class
+The 5 classes are:
+
+* :ref:`Degrees, Minutes and Second (dms) <tut/dms>`
+* :ref:`Degrees and Decimal Minutes (ddm) <tut/ddm>`
+* :ref:`Decimal Degrees (dec) <tut/dd>`
+* :ref:`HP notation (hpa) <tut/hp>`
+* :ref:`Gradians (gona) <tut/grad>`
+
+Classes
+-------
+
+.. _tut/dms:
+
+Degrees, Minutes and Seconds (dms)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Angles expressed in degrees, minutes, and seconds.
+
+- **Format:** ``ddd° mm' ss.s"``
+- **Conversion:** 1° = 60′, 1′ = 60″
+- **Example:** ``123° 34' 56.2"``
+
+To initalise a dms class:
+
+.. code:: python
+
+    angle1 = geodepy.angles.DMSAngle(d, m, s)
+
+.. _tut/ddm:
+
+Degrees and Decimal Minutes (ddm)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Angles expressed in degrees and minutes, with minutes shown as a decimal fraction.
+
+- **Format:** ``ddd° mm.mm'``
+- **Example:** ``123° 34.933'``
+
+To initalise a ddm class:
+
+.. code:: python
+
+    angle1 = geodepy.angles.DDMAngle(d, dm)
+
+.. _tut/dd:
+
+Decimal Degrees (dec)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Angles expressed entirely in decimal degrees.
+
+- **Format:** ``ddd.ddd°``
+- **Example:** ``123.5823°``
+
+To initalise a dec class:
+
+.. code:: python
+
+    angle1 = geodepy.angles.DECAngle(d)
+
+.. _tut/hp:
+
+HP Notation (hpa)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Hemispheric Positive notation expresses latitude and longitude as positive values with hemisphere indicators.
+
+- **Format:** ``ddd.mmssss``
+- **Example:** ``123.231524°``
+
+To initalise a hpa class:
+
+.. code:: python
+
+    angle1 = geodepy.angles.HPAngle(hp)
+
+.. _tut/grad:
+
+Gradians (gona)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+A metric-based angle unit where a full circle equals 400 gradians.
+
+- **Format** ``ggg.ggg``
+- **Conversion:** 1 grad = 0.9°
+- **Example:** ``137.5``
+
+To initalise a gona class:
+
+.. code:: python
+
+    angle1 = geodepy.angles.GONAngle(gon)
+
+
+Using Angle Classes
 --------------------
 
 First import GeodePy
@@ -21,9 +110,21 @@ In this example a DMS angle will be created. This object can be initalised by in
     angle1 = angles.DMSAngle(30, 5, 42)
     print(angle1)
 
-    >> 30 5 42
+    >>30 5 42
 
-The methods within the class can be used to convert the angle into different types. This is seen below:
+Using this class we can get individual variables for degree minute and seconds componets seperately.
+
+.. code:: python
+
+    print(angle1.degree)
+    print(angle1.minute)
+    print(angle1.second)
+
+    >>30
+    >>5
+    >>42
+
+The methods within the class can also be used to convert the angle into different types. This is seen below:
 
 .. code:: python
 
@@ -95,5 +196,5 @@ The following operators can be preformed on angle objects:
 | Round                |     round()      |
 +----------------------+------------------+
 
-
+.. caution:: Basic arthimitc should not be completed on HPA class. These should be converted on decimal degree first.
 

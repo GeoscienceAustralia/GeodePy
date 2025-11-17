@@ -8,6 +8,10 @@ Tutorials
 
    anglestut
    coordtut
-   vincenty
-   convert
-   transform
+   edmcorrectiontut
+   errortut
+   sinextut
+   transformtut
+   timedeptranstut
+   verticaldatumtut
+   vincentytut
