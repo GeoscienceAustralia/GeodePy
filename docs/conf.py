@@ -57,3 +57,6 @@ html_css_files = [
 html_js_files = [
     'custom.js',
 ]
+html_favicon = '/home/ubuntu/GeodePy/docs/_static/favicon.ico'
+html_title = "GeodePy: Geodesy in Python -- v" + release + " Documentation"
+ogp_site_name = "GeodePy: Geodesy in Python"
