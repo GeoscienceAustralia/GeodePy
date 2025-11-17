@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/installation.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/quickstart.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/features/index.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/features/angles.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/features/constants.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/features/convert.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/features/coord.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/features/geodesy.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/features/gnss.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/features/height.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/features/inputoutput.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/features/ntv2reader.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/features/statistics.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/features/survey.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/features/transform.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/tutorials/index.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/tutorials/anglestut.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/tutorials/coordtut.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/tutorials/vincenty.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/tutorials/convert.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/tutorials/transform.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/community/contributing.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/community/authors.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/index.rst.txt</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/index.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/installation.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/quickstart.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/features/index.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/features/angles.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_modules/geodepy/angles.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/features/constants.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_modules/geodepy/constants.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/features/convert.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_modules/geodepy/convert.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/features/coord.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_modules/geodepy/coord.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/features/geodesy.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_modules/geodepy/geodesy.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/features/gnss.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_modules/geodepy/gnss.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/features/height.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/features/inputoutput.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_modules/geodepy/inputoutput.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/features/ntv2reader.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_modules/geodepy/ntv2reader.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/features/statistics.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_modules/geodepy/statistics.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/features/survey.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_modules/geodepy/survey.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/features/transform.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_modules/geodepy/transform.html</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/tutorials/index.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/tutorials/anglestut.rst.txt</loc>
+  <lastmod>2025-11-17T01:27:53+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/tutorials/coordtut.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/tutorials/vincenty.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/tutorials/convert.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/tutorials/transform.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/community/contributing.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://geodepy.readthedocs.io/en/latest/_sources/community/authors.rst.txt</loc>
+  <lastmod>2025-11-13T22:45:29+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+
+
+</urlset>

@@ -60,3 +60,4 @@ html_js_files = [
 html_favicon = '_static/favicon.ico'
 html_title = "GeodePy: Geodesy in Python -- v" + release + " Documentation"
 ogp_site_name = "GeodePy: Geodesy in Python"
+html_extra_path = ["_static/robots.txt", "_static/sitemap.xml"]
