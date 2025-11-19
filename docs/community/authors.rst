@@ -7,6 +7,6 @@ GeodePy is developed and maintained by the Geoscience Australia National Geodesy
 * **Josh Batchelor** - Initial Work, Geodesy and Surveying - `BatchelorJ <https://github.com/BatchelorJ>`_
 * **Jonathan Mettes** - Testing, Integration and Development - `jmettes <https://github.com/jmettes>`_
 * **Jack McCubbine** - Height Module - `JackMcCubbineGA <https://github.com/JackMcCubbineGA>`_
-* **Kyran Cook** - Documentation and Uplift - `KyranCookGA <https://github.com/KyranCookGA>`_
+* **Kyran Cook** - Documentation and Uplift - `Kyran-Cook <https://github.com/Kyran-Cook>`_
 
 See also the list of `contributors <https://github.com/GeoscienceAustralia/geodepy/graphs/contributors>`_ who have participated in this project.

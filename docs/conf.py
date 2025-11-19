@@ -58,6 +58,7 @@ html_js_files = [
     'custom.js',
 ]
 html_favicon = '_static/favicon.ico'
-html_title = "GeodePy: Geodesy in Python -- v" + release + " Documentation"
+em_dash_char = chr(8212)
+html_title = "GeodePy: Geodesy in Python " + em_dash_char+  " v" + release + " Documentation"
 ogp_site_name = "GeodePy: Geodesy in Python"
 html_extra_path = ["_static/robots.txt", "_static/sitemap.xml"]

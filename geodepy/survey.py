@@ -53,6 +53,7 @@ def part_h2o_vap_press(dry_temp, pressure, rel_humidity=None, wet_temp=None):
     :param pressure: Observed Pressure (hectopascals or millibars)
     :param rel_humidity: Observed Relative Humidity (percentage) - Optional if wet_temp supplied
     :param wet_temp: Observed Wet Temperature (degrees Celsius) - Optional if rel_humidity supplied
+    :return: Partial water vapour pressure
 
     """
 
@@ -96,7 +97,7 @@ def first_vel_corrn(
     :param temp: Observed Temperature (degrees Celsius)
     :param pressure: Observed Pressure (hectopascals or millibars)
     :param rel_humidity: Observed Relative Humidity (percentage)
-    :return: Slope Distance with First Velocity Correction applied
+    :return: First Velocity Correction
     """
     param_c = first_vel_param[0]
     if not CO2_ppm:

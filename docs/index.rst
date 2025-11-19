@@ -65,3 +65,6 @@ This section contains information for contributors to the GeodePy project.
 
 .. meta::
     :google-site-verification: i5FHdaluOAMrReuJqp3xes1IEXOpwgcMMBriCqpU0lE
+    :description lang=en:
+        GeodePy: A Python library for geodetic computations, coordinate transformations, 
+        and surveying tools. Includes tutorials, installation guides, and examples for geospatial professionals.

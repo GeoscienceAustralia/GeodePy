@@ -8,10 +8,10 @@ Tutorials
 
    anglestut
    coordtut
+   vincentytut
    edmcorrectiontut
    errortut
    sinextut
    transformtut
    timedeptranstut
    verticaldatumtut
-   vincentytut
