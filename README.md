@@ -4,9 +4,9 @@
 
 This is a package of tools for manipulating geospatial datasets using Python and tested in Python 3.6.4.
 
-### Tutorials
+### Documentation
 
-See [here](https://github.com/GeoscienceAustralia/GeodePy/tree/master/docs/tutorials) for worked examples of common GeodePy functions and routines.
+See [here](https://geodepy.readthedocs.io/) for documentation around downloading and using GeodePy.
 
 ### Dependencies
 

@@ -18,6 +18,8 @@ These classes can be used to create objects that store the relevant parameters f
 .. autoclass:: geodepy.constants.Projection
     :members:   
 
+.. _transclass:
+
 .. autoclass:: geodepy.constants.Transformation
     :members:
 
@@ -61,6 +63,8 @@ For :class:`~geodepy.constants.Projection`:
 +-----------------------------+---------------------+-------------------------------------------------------------+
 | isg                         | Projection          | Integrated Survey Grid (NSW, AGD66)                         |
 +-----------------------------+---------------------+-------------------------------------------------------------+
+
+.. _features/constants/transform:
 
 Transformation
 ^^^^^^^^^^^^^^
