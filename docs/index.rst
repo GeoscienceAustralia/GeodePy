@@ -33,7 +33,7 @@ GeodePy includes a variety of :ref:`features <features/index>` for geodesy and g
 * Calculating :ref:`geodetic <features/geodesy>` distances and bearings
 * Working with :ref:`geoid <features/height>` models
 * :ref:`Surveying <features/survey>` calculations
-* Various classes for :ref:`angles <features/angles>` , :ref:`corrdinates <features/coord>`, and :ref:`datums <features/constants>`
+* Various classes for :ref:`angles <features/angles>` , :ref:`coordinates <features/coord>`, and :ref:`datums <features/constants>`
 * :ref:`Statistics <features/statistics>`
 * And more!
 

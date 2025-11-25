@@ -196,5 +196,5 @@ The following operators can be preformed on angle objects:
 | Round                |     round()      |
 +----------------------+------------------+
 
-.. caution:: Basic arthimitc should not be completed on HPA class. These should be converted on decimal degree first.
+.. caution:: Basic arthimitc should not be completed on HPA class. These should be converted to decimal degree first.
 

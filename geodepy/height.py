@@ -18,6 +18,14 @@ import math as m
 # ___________________________________________________________________________#
 # Interpolation functions
 def interp_file(Lat, Long, file):
+    """
+    Interpolates files at specific Latitude and Longitude. Uses files found in 
+    geodepy.constants and vsicurl to access only part of file.
+
+    :param Lat: Latitude in decimal degrees
+    :param Long: Longitude in decimal degrees
+    :param file: grid file to be interpolated
+    """
     # Import the DOVPM file
     f = gdal.Open(file)
     # load band (akin to a variable in dataset)

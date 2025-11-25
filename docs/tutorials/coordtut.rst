@@ -7,7 +7,7 @@ GeodePy has 3 coordinate classes that can be used to store coordinates and conve
 
 The three different classes are:
 
-- :ref:`CoordCart - Cartesian Corrdinates <tut/cart>`
+- :ref:`CoordCart - Cartesian Coordinates <tut/cart>`
 - :ref:`CoordGeo - Geographic Coordinates <tut/geo>`
 - :ref:`CoordTM - Transverse Mercator Coordinates <tut/tm>`
 
