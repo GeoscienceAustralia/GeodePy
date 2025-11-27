@@ -24,7 +24,8 @@ def interp_file(Lat, Long, file):
 
     :param Lat: Latitude in decimal degrees
     :param Long: Longitude in decimal degrees
-    :param file: grid file to be interpolated
+    :param file: Grid file to be interpolated
+    :return: Interpolated value
     """
     # Import the DOVPM file
     f = gdal.Open(file)
@@ -58,6 +59,15 @@ def interp_file(Lat, Long, file):
 # ___________________________________________________________________________#
 # Functions to handle the conversions from one height to another
 def GPS_to_AVWS(Lat, Long, GPS_H):
+    """
+    Convert from ellipsoidal height to AVWS height
+
+    :param Lat: Latitude in decimal degrees
+    :param Long: Longitude in decimal degrees
+    :param GPS_H: Ellipsoidal height on GRS80 (m)
+    :return: - AVWS height (m)
+             - Geoid std (m)
+    """
     zeta = interp_file(Lat, Long, cons.file_AVWS)  # AVWS file
     zeta_std = interp_file(Lat, Long, cons.file_AVWS_STD)  # AVWS STD file
     NORMAL_H = GPS_H - zeta
@@ -65,6 +75,15 @@ def GPS_to_AVWS(Lat, Long, GPS_H):
 
 
 def AVWS_to_GPS(Lat, Long, AVWS_H):
+    """
+    Convert from AVWS height to ellipsoidal height
+
+    :param Lat: Latitude in decimal degrees
+    :param Long: Longitude in decimal degrees
+    :param AVWS_H: AVWS height (m)
+    :return: - Ellipsoidal height on GRS80 (m)
+             - Geoid std (m)
+    """
     zeta = interp_file(Lat, Long, cons.file_AVWS)  # AVWS file
     zeta_std = interp_file(Lat, Long, cons.file_AVWS_STD)  # AVWS STD file
     GPS_H = AVWS_H + zeta
@@ -72,6 +91,14 @@ def AVWS_to_GPS(Lat, Long, AVWS_H):
 
 
 def AHD_to_AVWS(Lat, Long, AHD_H):
+    """
+    Convert from AHD to AVWS
+
+    :param Lat: Latitude in decimal degrees
+    :param Long: Longitude in decimal degrees
+    :param AHD_H: AHD height (m)
+    :return: AVWS height (m)
+    """    
     # Convert to GPS
     GPS_H = AHD_H + interp_file(Lat, Long, cons.file_AG2020)  # AUSGEOID2020 file
     # Convert to AVWS
@@ -80,6 +107,15 @@ def AHD_to_AVWS(Lat, Long, AHD_H):
 
 
 def GPS_to_AHD(Lat, Long, GPS_H):
+    """
+    Convert from ellipsoidal height to AHD
+
+    :param Lat: Latitude in decimal degrees
+    :param Long: Longitude in decimal degrees
+    :param GPS_H: Ellipsoidal height on GRS80 (m)
+    :return: - AHD (m)
+             - Geoid STD
+    """
     N = interp_file(Lat, Long, cons.file_AG2020)  # AUSGEOID2020 file
     N_std = interp_file(Lat, Long, cons.file_AG2020_STD)  # AUSGEOID2020 STD file
     AHD_H = GPS_H - N
@@ -87,21 +123,46 @@ def GPS_to_AHD(Lat, Long, GPS_H):
 
 
 def AHD_to_GPS(Lat, Long, AHD_H):
+    """
+    Convert from AHD to ellipsoidal height
+
+    :param Lat: Latitude in decimal degrees
+    :param Long: Longitude in decimal degrees
+    :param AHD_H: AHD (m)
+    :return: - Ellipsoidal height (m)
+             - Geoid STD
+    """
     N = interp_file(Lat, Long, cons.file_AG2020)  # AUSGEOID2020 file
     N_std = interp_file(Lat, Long, cons.file_AG2020_STD)  # AUSGEOID2020 STD file
     GPS_H = AHD_H + N
     return [GPS_H, N_std]
 
 
-def AVWS_to_AHD(Lat, Long, Normal_H):
+def AVWS_to_AHD(Lat, Long, AVWS_H):
+    """
+    Convert from AVWS to AHD
+
+    :param Lat: Latitude in decimal degrees
+    :param Long: Longitude in decimal degrees
+    :param AVWS_H: AVWS height (m)
+    :return: AHD height (m)
+    """   
     # Convert to GPS
-    GPS_H = Normal_H + interp_file(Lat, Long, cons.file_AVWS)  # AVWS file
+    GPS_H = AVWS_H + interp_file(Lat, Long, cons.file_AVWS)  # AVWS file
     # Convert to AHD
     AHD_H = GPS_H - interp_file(Lat, Long, cons.file_AG2020)  # AUSGEOID2020 file
     return [AHD_H]
 
 
 def DOV(Lat, Long):
+    """
+    Deflection of the vertical in the north-south and east west direction from AUSGeoid2020
+
+    :param Lat: Latitude in decimal degrees
+    :param Long: Longitude in decimal degrees
+    :return: - DOV in north-south
+             - DOV in east-west
+    """
     # Convert to GPS
     DOV_PM = interp_file(Lat, Long, cons.file_DOV_PM)  # AVWS file
     # Convert to AHD
@@ -110,30 +171,70 @@ def DOV(Lat, Long):
 
 
 def GPS_to_AUSGeoid98(Lat, Long, GPS_H):
+    """
+    Convert from ellipsoidal height to heights using AUSGeoid98
+
+    :param Lat: Latitude in decimal degrees
+    :param Long: Longitude in decimal degrees
+    :param GPS_H: Ellipsoidal height (m)
+    :return: AHD using AUSGeoid98 (m)
+    """  
     N = interp_file(Lat, Long, cons.file_AG98)  # AUSGEOID98 file
     AHD_H = GPS_H - N
     return [AHD_H]
 
 
 def AUSGeoid98_to_GPS(Lat, Long, AHD_H):
+    """
+    Convert from height using AUSGeoid98 to ellipsoidal height
+
+    :param Lat: Latitude in decimal degrees
+    :param Long: Longitude in decimal degrees
+    :param AHD_H: height using AUSGEOID98 (m)
+    :return: Ellipsoidal height (m)
+    """ 
     N = interp_file(Lat, Long, cons.file_AG98)  # AUSGEOID98 file
     GPS_H = AHD_H + N
     return [GPS_H]
 
 
 def GPS_to_AUSGeoid09(Lat, Long, GPS_H):
+    """
+    Convert from ellipsoidal height to AHD using AUSGeoid09
+
+    :param Lat: Latitude in decimal degrees
+    :param Long: Longitude in decimal degrees
+    :param AHD_H: ellipsoidal height (m)
+    :return: AHD using AUSGeoid09 (m)
+    """ 
     N = interp_file(Lat, Long, cons.file_AG09)  # AUSGEOID09 file
     AHD_H = GPS_H - N
     return [AHD_H]
 
 
 def AUSGeoid09_to_GPS(Lat, Long, AHD_H):
+    """
+    Convert from AHD using AUSGeoid09 to ellipsoidal height
+
+    :param Lat: Latitude in decimal degrees
+    :param Long: Longitude in decimal degrees
+    :param AHD_H: AHD using AUSGEOID98 (m)
+    :return: Ellipsoidal height (m)
+    """ 
     N = interp_file(Lat, Long, cons.file_AG09)  # AUSGEOID09 file
     GPS_H = AHD_H + N
     return [GPS_H]
 
 
 def DOV_09(Lat, Long):
+    """
+    Deflection of the vertical in the north-south and east west direction from AUSGeoid09
+
+    :param Lat: Latitude in decimal degrees
+    :param Long: Longitude in decimal degrees
+    :return: - DOV in north-south
+             - DOV in east-west
+    """
     # Interp PM
     DOV_PM = interp_file(Lat, Long, cons.file_AG09_DOV_PM)  # AGQG09 DOV file
     # Interp PV
@@ -142,6 +243,14 @@ def DOV_09(Lat, Long):
 
 
 def DOV_98(Lat, Long):
+    """
+    Deflection of the vertical in the north-south and east west direction from AUSGeoid98
+
+    :param Lat: Latitude in decimal degrees
+    :param Long: Longitude in decimal degrees
+    :return: - DOV in north-south
+             - DOV in east-west
+    """
     # Interp PM
     DOV_PM = interp_file(Lat, Long, cons.file_AG98_DOV_PM)  # AGQG98 DOV file
     # Interp PV
@@ -150,6 +259,13 @@ def DOV_98(Lat, Long):
 
 
 def mean_normal_grav(Lat, h):
+    """
+    Gives the mean gravity between the ellipsoid and the height above ellipsoid given.
+
+    :param Lat: Latitude in decimal degrees
+    :param h: Height above ellipsoid (m)
+    :return: Average gravity value from ellipsoid to h
+    """
     # GRS 80 constants
     a = 6378137
     b = 6356752.3141
@@ -185,6 +301,13 @@ def mean_normal_grav(Lat, h):
 
 
 def normal_grav(Lat, h):
+    """
+    Gives the normal gravity at height above ellipsoid.
+
+    :param Lat: Latitude in decimal degrees
+    :param h: Height above ellipsoid (m)
+    :return: Normal gravity at h above ellipsoid
+    """
     # GRS 80 constants
     a = 6378137
     b = 6356752.3141
@@ -210,6 +333,18 @@ def normal_grav(Lat, h):
 
 
 def mean_surface_grav(Lat_A, Long_A, H_A, Lat_B, Long_B, H_B):
+    """
+    Mean surface gravity between two points. Uses anomalies, normal theoretical 
+    gravity and the Bouguer slab correction.
+
+    :param Lat_A: Latitude of point A in decimal degrees
+    :param Long_A: Longitude of point A in decimal degrees
+    :param H_A: AHD of point A
+    :param Lat_B: Latitude of point B in decimal degrees
+    :param Long_B: Longitude of point B in decimal degrees
+    :param H_B: AHD of point B
+    :return: Mean surface gravity between two points
+    """
     Surf_Grav_A = (
         interp_grav(Lat_A, Long_A) * (10**-5)
         + normal_grav(Lat_A, H_A)
@@ -225,6 +360,13 @@ def mean_surface_grav(Lat_A, Long_A, H_A, Lat_B, Long_B, H_B):
 
 
 def interp_grav(Lat, Long):
+    """
+    Finds gravity anomalies at set lat and long.
+
+    :param Lat: Latitude in decimal degrees
+    :param Long: Longitude in decimal degrees
+    :return: Gravity anomalies
+    """
     # Grid resolution (known)
     res = 1.0 / 60
     # open geotiff file
@@ -255,6 +397,18 @@ def interp_grav(Lat, Long):
 
 
 def normal_correction(Lat_A, Long_A, H_A, Lat_B, Long_B, H_B):
+    """
+    The normal gravity correction between two points.
+
+    :param Lat_A: Latitude of point A in decimal degrees
+    :param Long_A: Longitude of point A in decimal degrees
+    :param H_A: AHD of point A
+    :param Lat_B: Latitude of point B in decimal degrees
+    :param Long_B: Longitude of point B in decimal degrees
+    :param H_B: AHD of point B
+    :return: - normal gravity correction
+             - Mean surface gravity between two points
+    """
     # ellipsoidal gravity at 45 deg. Lat
     Gamma_0 = 9.8061992115
     # Normal Gravity at the point

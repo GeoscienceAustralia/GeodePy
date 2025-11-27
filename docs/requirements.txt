@@ -1,3 +1,6 @@
 furo
 pandas
 sphinxext-opengraph
+gdal
+numpy>1.0.0 wheel setuptools>=67
+gdal[numpy]=="$(gdal-config --version).*"
