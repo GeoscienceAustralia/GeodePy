@@ -5,4 +5,4 @@ gdal
 numpy>=1.26
 wheel>=0.41 
 setuptools>=67
-gdal[numpy]=="$(gdal-config --version).*"
+#gdal[numpy]=="$(gdal-config --version).*"
