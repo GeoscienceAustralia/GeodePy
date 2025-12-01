@@ -6,6 +6,7 @@ Datum Transformation
 GeodePy has the ability to tranform between datums. Here we will discuss how to 
 change between datums without changing the reference epoch while in the 
 :ref:`time dependant <tutorials/timetrans>` tutorial we will discuss changing epochs.
+To learn more about transformation refer to the `GDA2020 technical manual <https://www.anzlic.gov.au/sites/default/files/files/GDA2020%20Technical%20Manual%20V1.8_published.pdf>`_.
 
 Common Example
 --------------
@@ -40,19 +41,14 @@ Now, transform this coordinate to MGA2020:
         north_94
     )
 
-Finally, print the transformed coordinate:
-
-.. code:: python
-
     print(zone_20, east_20, north_20)
 
-This will output the zone, easting and northing of the coordinate in MGA2020.
+    >>55 696053.872 6086611.549
 
-.. code::
+This it the MGA2020 coordinates.
 
-    >> 55 696053.872 6086611.549
-
-In this transformation you can see that a function from the transformation module was used.
+To complete this transformation a function from the transformation module was used. This 
+will not always be the case. In the next section this will be explored more.
 
 .. _tutorials/transformfunc:
 
@@ -60,7 +56,7 @@ Constructing a new Transformation Function
 ------------------------------------------
 
 Here we will explore how to complete a transformation between datums without a dedicated function.
-We will then create a new function for this new transformation. Here we are going to transform between agd84 to gda2020
+We will then create a new function for this new transformation. Here we are going to transform between AGD84 to GDA2020
 
 First import GeodePy.
 
@@ -91,9 +87,9 @@ All transformations in GeodePy need to be completed with corrdinates in cartesia
 
     >>-4050634.051819 4220935.13646 -2533555.369303
 
-Now the transformation parameters need to be entered. Within Geodepy there are many transformaton parameters already 
-entered within the constants module. A table of these can be seen :ref:`here <features/constants/transform>`. If the 
-transformation needed isn't currently in Geodepy, new transofmrations can be added using the :ref:`transformation class <transclass>`. 
+Now we need some transformation parameters. Within Geodepy there are many transformaton parameters already 
+present within the constants module. A table of these can be seen :ref:`here <features/constants/transform>`. If the 
+transformation needed isn't currently in Geodepy, new transformations can be added using the :ref:`transformation class <transclass>`. 
 Here the agd66_to_gda94 transformation will be used.
 
 .. code:: python

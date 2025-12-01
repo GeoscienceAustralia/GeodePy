@@ -7,9 +7,11 @@ GeodePy has 3 coordinate classes that can be used to store coordinates and conve
 
 The three different classes are:
 
-- :ref:`CoordCart - Cartesian Coordinates <tut/cart>`
-- :ref:`CoordGeo - Geographic Coordinates <tut/geo>`
-- :ref:`CoordTM - Transverse Mercator Coordinates <tut/tm>`
+- :ref:`CoordCart - Cartesian Coordinates (x, y, z) <tut/cart>`
+- :ref:`CoordGeo - Geographic Coordinates (lat, long, H) <tut/geo>`
+- :ref:`CoordTM - Transverse Mercator Coordinates (e, n, H) <tut/tm>`
+
+To learn more about these corrdinate types refer to the `GDA2020 technical manual <https://www.anzlic.gov.au/sites/default/files/files/GDA2020%20Technical%20Manual%20V1.8_published.pdf>`_.
 
 Classes
 --------

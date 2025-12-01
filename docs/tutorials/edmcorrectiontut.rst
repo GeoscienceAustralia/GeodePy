@@ -83,7 +83,7 @@ This gives a more accurate result but requires the co2 ppm and the wavelength.
     >>0.0020756
     >>145.2670756
 
-Now the horizontal distacne can be found. The first correctedditance will be used for this.
+Now the horizontal distance can be found using the zenith angle and corrected distance.
 
 .. code:: python
 

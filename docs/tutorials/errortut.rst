@@ -1,4 +1,0 @@
-.. _tutorials/errors:
-
-Errors
-=======

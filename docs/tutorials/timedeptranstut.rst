@@ -4,7 +4,8 @@ Time Dependant Transformations
 ==============================
 
 In this tutorial we will discuss time dependant transformations. 
-To see transformations between static datums view the :ref:`datum transformation <tutorials/transform>` tutorial.
+To see transformations between static datums view the :ref:`datum transformation <tutorials/transform>` tutorial. 
+To learn more about time dependant transformations refer to the `GDA2020 technical manual <https://www.anzlic.gov.au/sites/default/files/files/GDA2020%20Technical%20Manual%20V1.8_published.pdf>`_.
 
 Time dependant transformation are much more complex then transformation between static datums. First we will complete a simply example.
 
@@ -39,7 +40,7 @@ Transforming between Dynamic and Static Datums
 The simpliest time dependant transformations go between static and dynamic datums. This is because often the 
 transformation paramters are already present. Below we will complete an example that doesnt include a dedicated function.
 
-Here we will transform from GDA2020 to ITRF2008 at 1/1/2007.
+Here we will transform from GDA94 to ITRF2008 at 1/1/2007.
 
 .. code:: python
 
@@ -47,27 +48,17 @@ Here we will transform from GDA2020 to ITRF2008 at 1/1/2007.
     import geodepy.constants
     from datetime import date
 
-To go from gda2020 to ITRF2008 we need to investigate what transformations are present in GeodePy. This can be found 
-in :ref:`this <features/constants/transform>` table. Here it can be seen that to get to ITRF2008 there is a transformation from GDA94.
-As such we need to first covert from GDA2020 to GDA94. As these are two dynamic datums this can be completed using the conform7 function.
+To go from GDA94 to ITRF2008 we need to investigate what transformations are present in GeodePy. This can be found 
+in :ref:`this <features/constants/transform>` table. Here we can see that there is a direct transformation from GDA94 to ITRF2008.
+We will use this to complete our transformation.
 
 .. code:: python
 
-    x, y, z, vcv = geodepy.transform.conform7(-4050763.124034, 4220880.753100, -2533399.713463, geodepy.constants.gda2020_to_gda94)
+    x, y, z, vcv = geodepy.transform.conform14(-4050763.124034, 4220880.753100, -2533399.713463, date(2007,1,1), geodepy.constants.gda94_to_itrf2008)
 
     print(x, y, z)
 
-    >>-4050762.150962573 4220880.967167697 -2533401.149358874
-
-Now we can convert from GDA94 to ITRF2008
-
-.. code:: python
-
-    x, y, z, vcv = geodepy.transform.conform14(x, y, z, date(2007,1,1), geodepy.constants.gda94_to_itrf2008)
-
-    print(x, y, z)
-
-    >>-4050762.612530 4220880.821783 -2533400.416214
+    >>-4050763.585602 4220880.607715 -2533398.980318
 
 This is the ITRF2008 coordinate on 1/1/2007
 

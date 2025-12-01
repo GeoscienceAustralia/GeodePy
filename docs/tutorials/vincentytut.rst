@@ -3,7 +3,8 @@
 Connecting Two Points
 =====================
 
-GeodePy has the ability to calculate the relationship between two points in two different ways, either on a flat plane or curved plane.
+GeodePy can calculate the relationship between two points in two different ways, either on a flat plane or curved plane.
+To learn more about geodetic formulas refer to the `GDA2020 technical manual <https://www.anzlic.gov.au/sites/default/files/files/GDA2020%20Technical%20Manual%20V1.8_published.pdf>`_.
 
 Flat plane
 ----------
@@ -23,7 +24,7 @@ To calculate the distance and bearing between two points the following command c
 
     >>The connection is: 886.2834 @ 125 57 11.37834570
 
-Here the first number is distance while the second is the bearing. It might look clearer when converting the bearng to DMS
+Here the first number is the distance while the second is the bearing. It might look clearer when converting the bearng to DMS
 
 You can also determine the coordinate of a second point given first coordinate and a bearing and distance. 
 
@@ -39,8 +40,8 @@ As can be seen this value matches the coordinate of the second point entered in 
 Curved Plane
 ------------
 
-To calculate the joins between two points on a curved plan vincenty's formula can be used. In this example we will 
-use the utm vincenty functions but tihs same process can be undertaken using the normal formulas and lat and longs.
+To calculate the joins between two points on a curved plane, vincenty's formula can be used. In this example we will 
+use the utm vincenty functions but this same process can be undertaken using the normal formula with latitude and longitude.
 
 .. code:: python 
 

@@ -4,6 +4,7 @@ Vertical Datums
 ===============
 
 This tutorial will work through converting between different vertical datums and working with gravity.
+To learn more about vertical datums refer to the `GDA2020 technical manual <https://www.anzlic.gov.au/sites/default/files/files/GDA2020%20Technical%20Manual%20V1.8_published.pdf>`_.
 
 Converting Between Vertical Datums
 ----------------------------------

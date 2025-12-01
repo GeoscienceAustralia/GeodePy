@@ -205,7 +205,7 @@ def read_sinex_estimate(file):
     present.
 
     :param file: the input SINEX file
-    :return: estimate
+    :return: Sinex estimates as list of lists
     """
 
     # Create data structures and set variables
@@ -318,7 +318,7 @@ def read_sinex_matrix(file):
     is only returned if they are present.
 
     :param file: the input SINEX file
-    :return: matrix
+    :return: Sinex matrix as list of lists
     """
     '''
     ToDo:

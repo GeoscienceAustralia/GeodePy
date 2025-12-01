@@ -10,7 +10,6 @@ Tutorials
    coordtut
    vincentytut
    edmcorrectiontut
-   errortut
    sinextut
    transformtut
    timedeptranstut
