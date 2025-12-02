@@ -21,7 +21,7 @@ Classes
 Cartesian Coordinates
 ^^^^^^^^^^^^^^^^^^^^^^
 Cartesian coordinates represent points in three dimensions (X, Y, Z), typically in an Earth-Centered, Earth-Fixed (ECEF) system. 
-In this class an n value can also be added representing seperation between ellipsoid and geiod.
+In this class an "n" value can also be added representing seperation between ellipsoid and geiod.
 
 - **Description:** Defines a point by its distance along three perpendicular axes.
 - **Format:** ``(X, Y, Z)`` in meters.
@@ -68,7 +68,10 @@ To initalise a transverse mercator coordinate class:
 Converting Between Classes
 --------------------------
 
-First import GeodePy
+Coordinate classes can be used to hold coordinate variables and convert between different coordinate types. 
+This will be explored here.
+
+First import GeodePy.
 
 .. code:: python
 
@@ -79,7 +82,7 @@ We can now create a coordinate obect. For this example we will use a transverse 
 
 .. code:: python
 
-    coord1 = geodepy.coord.CoordTM(55, 696053.337, 6086610.13)
+    coord1 = geodepy.coord.CoordTM(55, 696053.337, 6086610.13) #(zone, E, N)
     print(coord1)
 
     >>CoordTM: Zone: 55 East: 696053.337 North: 6086610.13 Ell_Ht: None Orth_Ht: None Hemisphere: South
@@ -113,7 +116,7 @@ Instead of using classes, function can also be used to convert between coordinat
 
 Both of these functions can be reversed to convert the other way.
 
-To convert using function first geodepy needs to be imported
+To convert using functions first geodepy needs to be imported.
 
 .. code:: python
 
@@ -124,12 +127,17 @@ Now either of the functions can be used
 
 .. code:: python
 
-    coordGeo = geodepy.convert.grid2geo(55, 696053.337, 6086610.13)
+    coordGeo = geodepy.convert.grid2geo(55, 696053.337, 6086610.13) #zone, E, N
     print(coordGeo)
 
     >>(-35.34455523, 149.15740394, 1.0000737, 1.2484390010290551)
 
-    coordllh = geodepy.convert.xyz2llh(-4471828.926838844, 2670252.9985762094, -3669113.8962611817)
+    coordllh = geodepy.convert.xyz2llh(
+        -4471828.926838844, #x
+        2670252.9985762094, #y
+        -3669113.8962611817 #z
+    )
+
     print(coordllh)
 
     >>(-35.34455523, 149.15740394, 0)
@@ -138,7 +146,7 @@ These function can be used together to convert between grid and cartesian.
 
 .. code:: python
 
-    coordGeo = geodepy.convert.grid2geo(55, 696053.337, 6086610.13)
+    coordGeo = geodepy.convert.grid2geo(55, 696053.337, 6086610.13) #zone, E, N
     coordCart = geodepy.convert.llh2xyz(coordGeo[0],coordGeo[1])
     print(coordCart)
 

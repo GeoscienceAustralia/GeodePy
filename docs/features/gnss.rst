@@ -32,14 +32,6 @@ Reading Sinex Files
 .. autofunction:: geodepy.gnss.read_sinex_solution_matrix_estimate_block
 .. autofunction:: geodepy.gnss.read_sinex_solution_matrix_apriori_block
 
-Converting Sinex Data to DataFrames
-------------------------------------
-
-.. autofunction:: geodepy.gnss.matrix2dataframe_solution_matrix_estimate
-.. autofunction:: geodepy.gnss.sinex2dataframe_solution_estimate
-.. autofunction:: geodepy.gnss.sinex2dataframe_solution_apriori
-.. autofunction:: geodepy.gnss.sinex2dataframe_solution_matrix_estimate
-
 Writing Sinex Files
 --------------------
 
@@ -51,6 +43,14 @@ Writing Sinex Files
 .. autofunction:: geodepy.gnss.dataframe2matrix_solution_matrix_estimate
 .. autofunction:: geodepy.gnss.dataframe2sinex_solution_matrix_estimate
 .. autofunction:: geodepy.gnss.writeSINEX
+
+Converting Sinex Data to DataFrames
+------------------------------------
+
+.. autofunction:: geodepy.gnss.matrix2dataframe_solution_matrix_estimate
+.. autofunction:: geodepy.gnss.sinex2dataframe_solution_estimate
+.. autofunction:: geodepy.gnss.sinex2dataframe_solution_apriori
+.. autofunction:: geodepy.gnss.sinex2dataframe_solution_matrix_estimate
 
 Specific Sinex Functions
 --------------------------

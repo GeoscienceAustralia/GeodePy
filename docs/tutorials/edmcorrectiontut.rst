@@ -16,7 +16,7 @@ Within GeodePy, EDM corrections can be completed. To complete an EDM correction 
 
 Using these we can calculate the first velocity correction and reduce to a horizontal distance.
 
-First the variables need to be defined. Below is the values for a Lecia Viva.
+First, the variables need to be defined. Below is the values for a Lecia Viva.
 
 .. code:: python
 
@@ -35,7 +35,7 @@ First the variables need to be defined. Below is the values for a Lecia Viva.
 First Velocity Parameters
 -------------------------
 
-Now we can calculate the first velocity parameters
+Now we can calculate the first velocity parameters.
 
 .. code:: python
 

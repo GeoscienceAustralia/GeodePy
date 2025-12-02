@@ -132,7 +132,7 @@ For :class:`~geodepy.constants.Transformation`:
 +-----------------------------+---------------------+-------------------------------------------------------------+
 
 
-All other combinations of ITRF transofmrations are available.
+All other combinations of ITRF transformations are available.
 
 IERS to GeodePy Transformation
 ------------------------------

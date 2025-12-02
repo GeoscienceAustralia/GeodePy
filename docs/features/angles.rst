@@ -32,7 +32,7 @@ GeodePy supports Angular Notation in 9 different formats
 
 Conversion between all formats is supported as shown below:
 
-* Radians to/from Decimal Degrees via builtin math.radians and math.degrees
+* Radians to/from Decimal Degrees via built in math.radians and math.degrees
 
 * Formats as floats to all other types via functions in the form abrv2abrv
   

@@ -66,7 +66,7 @@ To initalise a dec class:
 
 HP Notation (hpa)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Hemispheric Positive notation expresses latitude and longitude as positive values with hemisphere indicators.
+HP notation expresses latitude and longitude as positive values with hemisphere indicators.
 
 - **Format:** ``ddd.mmssss``
 - **Example:** ``123.231524°``
@@ -97,7 +97,10 @@ To initalise a gona class:
 Using Angle Classes
 --------------------
 
-First import GeodePy
+Angle classes can be used to hold angle variables, transform to different angle types and 
+complete arthimitc. These will be explored below.
+
+First import GeodePy.
 
 .. code:: python
 
@@ -124,7 +127,7 @@ Using this class we can get individual variables for degree minute and seconds c
     >>5
     >>42
 
-The methods within the class can also be used to convert the angle into different types. This is seen below:
+The methods within the class can also be used to convert the angle into different types.
 
 .. code:: python
 
@@ -140,9 +143,10 @@ The methods within the class can also be used to convert the angle into differen
     >>30.0542
     >>0.5252568383876934
 
-This can be completed with any of the 5 angle classes within GeodePy. To complete math on the angle classes the following can be completed.
+This can be completed with any of the 5 angle classes within GeodePy. 
 
-First a new angle needs to be defined. This will be done using the DDM Angle class
+Arthimitc can be completed on angle classes as seen below. First a new angle needs to be defined. 
+This will be done using the DDM Angle class
 
 .. code:: python
 

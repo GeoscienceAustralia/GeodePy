@@ -3,7 +3,7 @@
 Surveying Calculations
 =======================
 
-This module provides various surveying calculation functions commonly used in geodetic and surveying applications.
+This module provides various surveying calculation commonly used in geodetic and surveying applications.
 
 EDM Corrections
 -----------------

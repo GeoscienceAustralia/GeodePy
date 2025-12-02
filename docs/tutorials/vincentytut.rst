@@ -9,14 +9,20 @@ To learn more about geodetic formulas refer to the `GDA2020 technical manual <ht
 Flat plane
 ----------
 
-To calculate the distance and bearing between two points the following command can be used.
+To calculate the distance and bearing between two points the following command can be used. Here the coordinates of two 
+points are entered.
 
 .. code:: python
 
     import geodepy.survey
     import geodepy.angles
 
-    connection = geodepy.survey.joins(696053.337, 6086610.13, 696770.781, 6086089.772)
+    connection = geodepy.survey.joins(
+        696053.337, #easting of A
+        6086610.13, #northing of A
+        696770.781, #easting of B
+        6086089.772 #northing of B
+    )
     bearing = connection[1]
     bearing = geodepy.angles.dec2dms(bearing)
 
@@ -24,13 +30,18 @@ To calculate the distance and bearing between two points the following command c
 
     >>The connection is: 886.2834 @ 125 57 11.37834570
 
-Here the first number is the distance while the second is the bearing. It might look clearer when converting the bearng to DMS
+Here the first number is the horizontal distance while the second is the bearing, here converted to DMS.
 
-You can also determine the coordinate of a second point given first coordinate and a bearing and distance. 
+You can also determine the coordinate of a second point given the first coordinate and a bearing and distance. 
 
 .. code:: python
 
-    coord = geodepy.survey.radiations(696053.337, 6086610.13, bearing.dec(), 886.2834)
+    coord = geodepy.survey.radiations(
+        696053.337, #easting of A
+        6086610.13, #northing of A
+        bearing.dec(), #bearing A to B
+        886.2834 #distance A to B
+    )
     print(f"The point 2 coord is: {coord[0]:.3f} {coord[1]:.3f}")
 
     >>The point 2 coord is: 696770.781 6086089.772
@@ -40,15 +51,23 @@ As can be seen this value matches the coordinate of the second point entered in 
 Curved Plane
 ------------
 
-To calculate the joins between two points on a curved plane, vincenty's formula can be used. In this example we will 
-use the utm vincenty functions but this same process can be undertaken using the normal formula with latitude and longitude.
+To calculate the joins between two points on a curved plane, vincenty's formula can be used. Within GeodePy there 
+are two types of Vincenty's that either use geographic coordinates or grid coordinates. In this example we will 
+use the utm vincenty functions that uses grid coordinates but this same process can be undertaken using latitude and longitude.
 
 .. code:: python 
 
     import geodepy.geodesy
     import geodepy.angles
 
-    connection2 = geodepy.geodesy.vincinv_utm(55, 696053.337, 6086610.13, 55, 696770.781, 6086089.772)
+    connection2 = geodepy.geodesy.vincinv_utm(
+        55, #zone of A
+        696053.337, #easting of A
+        6086610.13, #northing of A
+        55, #zone of B
+        696770.781, #easting of B
+        6086089.772 #northing of B
+    )
     bearing2 = connection2[1]
     bearing2 = geodepy.angles.dec2dms(bearing2)
 
@@ -62,7 +81,13 @@ The coordinate of a second point can also be calculated.
 
 .. code:: python
 
-    coord2 = geodepy.geodesy.vincdir_utm(55, 696053.337, 6086610.13, bearing2.dec(), 886.2839)
+    coord2 = geodepy.geodesy.vincdir_utm(
+        55, #zone of A
+        696053.337, #easting of A
+        6086610.13, #northing of A
+        bearing2.dec(), #bearing A to B
+        886.2839 #distance A to B
+    )
     print(f"The point 2 coord is: {coord2[1]:.3f} {coord2[2]:.3f}")
 
     >>The point 2 coord is: 696770.781 6086089.772

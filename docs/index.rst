@@ -19,7 +19,7 @@ Release v0.6.0
     :target: https://www.anzlic.gov.au/ICSM
     :alt: Paper Badge
 
-**GeodePy** is a package of tools for manipulating geospatial datasets using Python.
+**GeodePy** is a python package for precise geodetic and survey computations.
 
 -------------------
 
