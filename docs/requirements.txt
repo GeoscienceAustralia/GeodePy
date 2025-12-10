@@ -7,3 +7,4 @@ wheel>=0.41
 setuptools>=67
 scipy>=1.11
 #gdal[numpy]=="$(gdal-config --version).*"
+sphinx-copybutton
