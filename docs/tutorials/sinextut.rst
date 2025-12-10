@@ -11,8 +11,10 @@ generated using AUSPOS.
 Reading Sinex Files
 -------------------
 
-Sinex files are split into different blocks all containing different types of information. These blocks are deliniated by a starting line that uses a "+BLOCKNAME" and an ending line using a "-BLOCKNAME".
- The blocks found in a sinex file can be printed using the read_sinex_blocks function as seen below.
+Sinex files are split into different blocks all containing different types of information. 
+These blocks are deliniated by a starting line that uses a "+BLOCKNAME" and an ending line 
+using a "-BLOCKNAME". The blocks found in a sinex file can be printed using the read_sinex_blocks 
+function as seen below.
 
 .. code:: python
 
