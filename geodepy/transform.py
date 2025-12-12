@@ -146,6 +146,38 @@ def conform14(x, y, z, to_epoch, trans, vcv=None):
     xtrans, ytrans, ztrans, trans_vcv = conform7(x, y, z, timetrans, vcv=vcv)
     return xtrans, ytrans, ztrans, trans_vcv
 
+def plate_motion_transformation(x, y, z, from_epoch, to_epoch, plate_motion, vcv=None):
+    """
+    Preforms plate motion transformations using a helmert 14 conformal transformation.
+
+    :param x: Cartesian X (m)
+    :param y: Cartesian Y (m)
+    :param z: Cartesian Z (m)
+    :param from_epoch: Epoch the co-ordinate transformation is from (datetime.date Object)
+    :param to_epoch: Epoch the co-ordinate transformation is to (datetime.date Object)
+    :param plate_motion: Plate motion model for transformation
+    :param vcv: Optional 3*3 numpy array in Cartesian units to propagate tf uncertainty
+    :return: Cartesian X, Y, Z co-ordinates and vcv matrix transformed using plate motion to desired epoch
+    """
+    if type(to_epoch) != datetime.date:
+        raise ValueError("to_epoch must be a datetime.date Object")
+    if type(from_epoch) != datetime.date:
+        raise ValueError("from_epoch must be a datetime.date Object")
+    if type(plate_motion) != Transformation:
+        raise ValueError("plate_motion must be a Transformation Object")
+
+    #calculate number of years to be moved
+    timediff= to_epoch - from_epoch
+
+    #calculate epoch needed for plate motion
+    change_epoch = plate_motion.ref_epoch - timediff
+
+    # Calculate 7 Parameters from 14 Parameter Transformation Object
+    timetrans = plate_motion + change_epoch
+
+    # Perform Transformation
+    xtrans, ytrans, ztrans, trans_vcv = conform7(x, y, z, timetrans, vcv=vcv)
+    return xtrans, ytrans, ztrans, trans_vcv
 
 def transform_mga94_to_mga2020(zone, east, north, ell_ht=False, vcv=None):
     """
