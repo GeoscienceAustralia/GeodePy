@@ -6,29 +6,51 @@ from geodepy.coord import CoordCart, CoordGeo, CoordTM
 cart_ex1 = CoordCart(-4052052.7379, 4212835.9897, -2545104.5898, 14.269)
 cart_ex2 = CoordCart(-4052052.7379, 4212835.9897, -2545104.5898)
 
-geo_ex1 = CoordGeo(DMSAngle(-23, 40, 12.39650).deca(),
-                   DMSAngle(133, 53, 7.87779).deca(),
-                   603.2489, 588.9799)
+geo_ex1 = CoordGeo(
+    DMSAngle(-23, 40, 12.39650).deca(),
+    DMSAngle(133, 53, 7.87779).deca(),
+    603.2489,
+    588.9799,
+)
 geo_ex2 = CoordGeo(geo_ex1.lat, geo_ex1.lon, None, 588.9799)
 geo_ex3 = CoordGeo(geo_ex1.lat, geo_ex1.lon, 603.2489, None)
 geo_ex4 = CoordGeo(geo_ex1.lat, geo_ex1.lon)
 
-tm_ex1 = CoordTM(53, 386353.2343, 7381852.2986, 603.2489, 588.9799,
-                 hemi_north=False, projection=utm)
-tm_ex2 = CoordTM(tm_ex1.zone, tm_ex1.east, tm_ex1.north, None, tm_ex1.orth_ht,
-                 hemi_north=False, projection=utm)
-tm_ex3 = CoordTM(tm_ex1.zone, tm_ex1.east, tm_ex1.north, tm_ex1.ell_ht, None,
-                 hemi_north=False, projection=utm)
-tm_ex4 = CoordTM(tm_ex1.zone, tm_ex1.east, tm_ex1.north, None, None,
-                 hemi_north=False, projection=utm)
+tm_ex1 = CoordTM(
+    53, 386353.2343, 7381852.2986, 603.2489, 588.9799, hemi_north=False, projection=utm
+)
+tm_ex2 = CoordTM(
+    tm_ex1.zone,
+    tm_ex1.east,
+    tm_ex1.north,
+    None,
+    tm_ex1.orth_ht,
+    hemi_north=False,
+    projection=utm,
+)
+tm_ex3 = CoordTM(
+    tm_ex1.zone,
+    tm_ex1.east,
+    tm_ex1.north,
+    tm_ex1.ell_ht,
+    None,
+    hemi_north=False,
+    projection=utm,
+)
+tm_ex4 = CoordTM(
+    tm_ex1.zone, tm_ex1.east, tm_ex1.north, None, None, hemi_north=False, projection=utm
+)
 
 
 class TestCoord(unittest.TestCase):
     def test_CoordCart(self):
         # Test Overloads
-        self.assertEqual(repr(cart_ex1), 'CoordCart: X: -4052052.7379 '
-                                         'Y: 4212835.9897 Z: -2545104.5898 '
-                                         'NVal: 14.269')
+        self.assertEqual(
+            repr(cart_ex1),
+            "CoordCart: X: -4052052.7379 "
+            "Y: 4212835.9897 Z: -2545104.5898 "
+            "NVal: 14.269",
+        )
 
         self.assertEqual(cart_ex1, cart_ex1)
         with self.assertRaises(ValueError):
@@ -64,9 +86,12 @@ class TestCoord(unittest.TestCase):
 
     def test_CoordGeo(self):
         # Test Overloads
-        self.assertEqual(repr(geo_ex1), 'CoordGeo: Lat: -23.67011013888889 '
-                                        'Lon: 133.88552160833333 '
-                                        'Ell_Ht: 603.2489 Orth_Ht: 588.9799')
+        self.assertEqual(
+            repr(geo_ex1),
+            "CoordGeo: Lat: -23.67011013888889 "
+            "Lon: 133.88552160833333 "
+            "Ell_Ht: 603.2489 Orth_Ht: 588.9799",
+        )
 
         self.assertEqual(geo_ex1, geo_ex1)
         with self.assertRaises(ValueError):
@@ -115,9 +140,12 @@ class TestCoord(unittest.TestCase):
 
     def test_CoordTM(self):
         # Test Overloads
-        self.assertEqual(repr(tm_ex1), 'CoordTM: Zone: 53 East: 386353.2343 '
-                                       'North: 7381852.2986 Ell_Ht: 603.2489 '
-                                       'Orth_Ht: 588.9799 Hemisphere: South')
+        self.assertEqual(
+            repr(tm_ex1),
+            "CoordTM: Zone: 53 East: 386353.2343 "
+            "North: 7381852.2986 Ell_Ht: 603.2489 "
+            "Orth_Ht: 588.9799 Hemisphere: South",
+        )
 
         self.assertEqual(tm_ex1, tm_ex1)
         with self.assertRaises(ValueError):

@@ -14,11 +14,14 @@ http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 import datetime
 from math import radians
 import numpy as np
-from geodepy.constants import (Transformation, TransformationSD,
-                               atrf2014_to_gda2020, gda94_to_gda2020)
+from geodepy.constants import (
+    Transformation,
+    TransformationSD,
+    atrf2014_to_gda2020,
+    gda94_to_gda2020,
+)
 from geodepy.statistics import vcv_local2cart, vcv_cart2local
-from geodepy.convert import (hp2dec, geo2grid,
-                             grid2geo, xyz2llh, llh2xyz)
+from geodepy.convert import hp2dec, geo2grid, grid2geo, xyz2llh, llh2xyz
 from geodepy.ntv2reader import NTv2Grid, interpolate_ntv2
 
 
@@ -26,6 +29,7 @@ def conform7(x, y, z, trans, vcv=None):
     """
     Performs a Helmert 7 Parameter Conformal Transformation using Cartesian point co-ordinates
     and a predefined transformation object.
+
     :param x: Cartesian X (m)
     :param y: Cartesian Y (m)
     :param z: Cartesian Z (m)
@@ -34,24 +38,18 @@ def conform7(x, y, z, trans, vcv=None):
     :return: Transformed X, Y, Z Cartesian Co-ordinates, vcv matrix
     """
     if type(trans) != Transformation:
-        raise ValueError('trans must be a Transformation Object')
+        raise ValueError("trans must be a Transformation Object")
     # Create XYZ Vector
-    xyz_before = np.array([[x],
-                           [y],
-                           [z]])
+    xyz_before = np.array([[x], [y], [z]])
     # Convert Units for Transformation Parameters
     scale = 1 + trans.sc / 1000000
     rx = radians(hp2dec(trans.rx / 10000))
     ry = radians(hp2dec(trans.ry / 10000))
     rz = radians(hp2dec(trans.rz / 10000))
     # Create Translation Vector
-    translation = np.array([[trans.tx],
-                            [trans.ty],
-                            [trans.tz]])
+    translation = np.array([[trans.tx], [trans.ty], [trans.tz]])
     # Create Rotation Matrix
-    rotation = np.array([[1., rz, -ry],
-                         [-rz, 1., rx],
-                         [ry, -rx, 1.]])
+    rotation = np.array([[1.0, rz, -ry], [-rz, 1.0, rx], [ry, -rx, 1.0]])
 
     rot_xyz = rotation @ xyz_before
 
@@ -74,10 +72,10 @@ def conform7(x, y, z, trans, vcv=None):
                 q_mat[i, j] = vcv[i, j]
 
         # transformation variances
-        q_mat[3, 3] = (trans.tf_sd.sd_sc / 1000000)**2
-        q_mat[4, 4] = radians(trans.tf_sd.sd_rx/3600)**2
-        q_mat[5, 5] = radians(trans.tf_sd.sd_ry/3600)**2
-        q_mat[6, 6] = radians(trans.tf_sd.sd_rz/3600)**2
+        q_mat[3, 3] = (trans.tf_sd.sd_sc / 1000000) ** 2
+        q_mat[4, 4] = radians(trans.tf_sd.sd_rx / 3600) ** 2
+        q_mat[5, 5] = radians(trans.tf_sd.sd_ry / 3600) ** 2
+        q_mat[6, 6] = radians(trans.tf_sd.sd_rz / 3600) ** 2
         q_mat[7, 7] = trans.tf_sd.sd_tx**2
         q_mat[8, 8] = trans.tf_sd.sd_ty**2
         q_mat[9, 9] = trans.tf_sd.sd_tz**2
@@ -128,6 +126,7 @@ def conform14(x, y, z, to_epoch, trans, vcv=None):
     Performs a Helmert 14 Parameter Conformal Transformation using Cartesian point co-ordinates
     and a predefined transformation object. The transformation parameters are projected from
     the transformation objects reference epoch to a specified epoch.
+
     :param x: Cartesian X (m)
     :param y: Cartesian Y (m)
     :param z: Cartesian Z (m)
@@ -137,9 +136,9 @@ def conform14(x, y, z, to_epoch, trans, vcv=None):
     :return: Cartesian X, Y, Z co-ordinates and vcv matrix transformed using Transformation parameters at desired epoch
     """
     if type(trans) != Transformation:
-        raise ValueError('trans must be a Transformation Object')
+        raise ValueError("trans must be a Transformation Object")
     if type(to_epoch) != datetime.date:
-        raise ValueError('to_epoch must be a datetime.date Object')
+        raise ValueError("to_epoch must be a datetime.date Object")
     # Calculate 7 Parameters from 14 Parameter Transformation Object
     timetrans = trans + to_epoch
 
@@ -152,6 +151,7 @@ def transform_mga94_to_mga2020(zone, east, north, ell_ht=False, vcv=None):
     """
     Performs conformal transformation of Map Grid of Australia 1994 to Map Grid of Australia 2020 Coordinates
     using the GDA2020 Tech Manual v1.2 7 parameter similarity transformation parameters
+
     :param zone: Zone Number - 1 to 60
     :param east: Easting (m, within 3330km of Central Meridian)
     :param north: Northing (m, 0 to 10,000,000m)
@@ -181,6 +181,7 @@ def transform_mga2020_to_mga94(zone, east, north, ell_ht=False, vcv=None):
     """
     Performs conformal transformation of Map Grid of Australia 2020 to Map Grid of Australia 1994 Coordinates
     using the reverse form of the GDA2020 Tech Manual v1.2 7 parameter similarity transformation parameters
+
     :param zone: Zone Number - 1 to 60
     :param east: Easting (m, within 3330km of Central Meridian)
     :param north: Northing (m, 0 to 10,000,000m)
@@ -210,6 +211,7 @@ def transform_atrf2014_to_gda2020(x, y, z, epoch_from, vcv=None):
     """
     Transforms Cartesian (x, y, z) Coordinates in terms of the Australian Terrestrial Reference Frame (ATRF) at
     a specified epoch to coordinates in terms of Geocentric Datum of Australia 2020 (GDA2020 - reference epoch 2020.0)
+
     :param x: ATRF Cartesian X Coordinate (m)
     :param y: ATRF Cartesian Y Coordinate (m)
     :param z: ATRF Cartesian Z Coordinate (m)
@@ -225,6 +227,7 @@ def transform_gda2020_to_atrf2014(x, y, z, epoch_to, vcv=None):
     Transforms Cartesian (x, y, z) Coordinates in terms of Geocentric Datum of Australia 2020
     (GDA2020 - reference epoch 2020.0) to coordinates in terms of the Australian Terrestrial Reference Frame (ATRF) at
     a specified epoch
+
     :param x: GDA2020 Cartesian X Coordinate (m)
     :param y: GDA2020 Cartesian Y Coordinate (m)
     :param z: GDA2020 Cartesian Z Coordinate (m)
@@ -235,9 +238,10 @@ def transform_gda2020_to_atrf2014(x, y, z, epoch_to, vcv=None):
     return conform14(x, y, z, epoch_to, -atrf2014_to_gda2020, vcv=vcv)
 
 
-def ntv2_2d(ntv2_grid, lat, lon, forward_tf=True, method='bicubic'):
+def ntv2_2d(ntv2_grid, lat, lon, forward_tf=True, method="bicubic"):
     """
     Performs a 2D transformation based on ntv2 grid shifts.
+    
     :param ntv2_grid: Ntv2Grid object (create with read_ntv2_file() function in geodepy.ntv2reader module)
     :param lat: latitude in decimal degrees
     :param lon: longitude in decimal degrees
@@ -250,8 +254,8 @@ def ntv2_2d(ntv2_grid, lat, lon, forward_tf=True, method='bicubic'):
 
     # validate input data
     if not isinstance(ntv2_grid, NTv2Grid):
-        raise TypeError('ntv2_grid must be Ntv2Grid object')
-    if method != 'bicubic' and method != 'bilinear':
+        raise TypeError("ntv2_grid must be Ntv2Grid object")
+    if method != "bicubic" and method != "bilinear":
         raise ValueError(f'interpolation strategy "{method}" not supported')
 
     # interrogate grid
@@ -259,7 +263,7 @@ def ntv2_2d(ntv2_grid, lat, lon, forward_tf=True, method='bicubic'):
 
     # null results are outside of grid extents.
     if shifts[0] is None:
-        raise ValueError('Coordinate outside of grid extents')
+        raise ValueError("Coordinate outside of grid extents")
 
     if forward_tf:
         tf_lat = lat + shifts[0] / 3600

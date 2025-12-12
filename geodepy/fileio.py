@@ -9,8 +9,25 @@ from geodepy.convert import hp2dec
 
 
 class DNACoord(object):
-    def __init__(self, pointid, const, easting, northing, zone, lat,
-                 long, ortho_ht, ell_ht, x, y, z, x_sd, y_sd, z_sd, desc):
+    def __init__(
+        self,
+        pointid,
+        const,
+        easting,
+        northing,
+        zone,
+        lat,
+        long,
+        ortho_ht,
+        ell_ht,
+        x,
+        y,
+        z,
+        x_sd,
+        y_sd,
+        z_sd,
+        desc,
+    ):
         self.pointid = pointid
         self.const = const
         self.easting = easting
@@ -35,7 +52,7 @@ class DNACoord(object):
 
 def read_dnacoord(fn):
     coord_list = []
-    with open(fn, 'r') as file:
+    with open(fn, "r") as file:
         dnadata = file.readlines()
         for line in dnadata:
             pointid = line[0:20]
@@ -54,8 +71,23 @@ def read_dnacoord(fn):
             y_sd = float(line[172:181])
             z_sd = float(line[182:191])
             desc = line[192:-1]
-            record = DNACoord(pointid.strip(), const.strip(), easting,
-                              northing, zone, lat, long, ortho_ht, ell_ht, x,
-                              y, z, x_sd, y_sd, z_sd, desc.strip())
+            record = DNACoord(
+                pointid.strip(),
+                const.strip(),
+                easting,
+                northing,
+                zone,
+                lat,
+                long,
+                ortho_ht,
+                ell_ht,
+                x,
+                y,
+                z,
+                x_sd,
+                y_sd,
+                z_sd,
+                desc.strip(),
+            )
             coord_list.append(record)
     return coord_list

@@ -1,14 +1,33 @@
 # ![GeodePy](https://github.com/GeoscienceAustralia/GeodePy/blob/master/docs/geodepy-logo.png)
 
-[![Travis](https://img.shields.io/travis/GeoscienceAustralia/GeodePy/master.svg?label=Travis%20CI)](https://travis-ci.org/GeoscienceAustralia/GeodePy) [![Coverage Status](https://coveralls.io/repos/github/GeoscienceAustralia/GeodePy/badge.svg)](https://coveralls.io/github/GeoscienceAustralia/GeodePy)
+GeodePy is a python package for precise geodetic and survey computations.
 
-This is a package of tools for manipulating geospatial datasets using Python and tested in Python 3.6.4.
+## Documentation
 
-### Tutorials
+See [here](https://geodepy.readthedocs.io/) for documentation around downloading and using GeodePy.
 
-See [here](https://github.com/GeoscienceAustralia/GeodePy/tree/master/docs/tutorials) for worked examples of common GeodePy functions and routines.
+## Features
 
-### Dependencies
+GeodePy includes a variety of features for geodesy and geospatial data manipulation, including:
+
+* Converting between coordinate types
+* Transforming between datums
+* Calculating geodetic distances and bearings
+* Working with geoid models
+* Surveying calculations
+* Various classes for angles, coordinates, and datums
+* Statistics
+* And more!
+
+## Installation
+
+GeodePy is available on PyPi:
+
+```console
+$ pip install geodepy
+```
+
+## Dependencies
 
 This package requires the following PyPI Packages installed:
 
@@ -19,32 +38,21 @@ SciPy
 
 Additionally, the geodepy.height module requires the GDAL library (tested using GDAL 3.0.4). For more information, see [here](https://gdal.org/index.html) for information about GDAL, [here](https://anaconda.org/conda-forge/gdal) for Anaconda support for GDAL and [here](http://www.gisinternals.com/release.php) for GDAL Binaries for Windows.
 
-### Testing
+## Testing
 
 Run: `python -m unittest discover geodepy/tests/ --verbose`
 
-## API
-
-```
-cd api/
-virtualenv env
-source env/bin/activate
-pip install -r requirements.txt
-zappa deploy dev
-```
-
-For subsequent updating run: `zappa update dev`
-
-### Authors
+## Authors
 
 * **Craig Harrison** - *Project Management* - [harry093](https://github.com/harry093)
 * **Josh Batchelor** - *Initial Work, Geodesy and Surveying* - [BatchelorJ](https://github.com/BatchelorJ)
 * **Jonathan Mettes** - *Testing, Integration and Deployment* - [jmettes](https://github.com/jmettes)
 * **Jack McCubbine** - *Height Module* - [JackMcCubbineGA](https://github.com/JackMcCubbineGA)
+* **Kyran Cook** - *Documentation and Uplift* - [Kyran-Cook](https://github.com/Kyran-Cook)
 
 See also the list of [contributors](https://github.com/GeoscienceAustralia/geodepy/graphs/contributors) who participated in this project.
 
-### License
+## License
 
 Copyright 2018-2020 Geoscience Australia
 
