@@ -12,7 +12,7 @@ http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 """
 
 import datetime
-from math import radians
+from math import radians, sqrt
 import numpy as np
 from geodepy.constants import (
     Transformation,
@@ -178,6 +178,87 @@ def plate_motion_transformation(x, y, z, from_epoch, to_epoch, plate_motion, vcv
     # Perform Transformation
     xtrans, ytrans, ztrans, trans_vcv = conform7(x, y, z, timetrans, vcv=vcv)
     return xtrans, ytrans, ztrans, trans_vcv
+
+def helmert7_from_xyz(source_xyz, source_name, target_xyz, target_name, ref_epoch):
+    """
+    Compute best-fit 7-parameter Helmert (Bursa-Wolf / similarity) from paired XYZ points.
+
+    This process follows a similar approach to Sjöberg, L.E, 2013 @ https://doi.org/10.2478/jogs-2013-0002
+
+    :param source_xyz: Array of (x, y, z) co-ordinates in source datum. Points must be co-located with points in target_xyz and in the same order.
+    :param source_name: Name of source datum
+    :param target_xyz: Array of (x, y, z) co-ordinates in target datum. Points must be co-located with points in target_xyz and in the same order.
+    :param target_name: Name of target datum
+    :param ref_epoch: Reference epoch of transformation (datetime.date Object) 
+
+    Returns: geodepy.constants.Transformation object with 7 paramter transformation between source and target datums
+    """
+
+    ARCSEC_PER_RAD = 180 * 3600 / np.pi 
+
+    # create array of input and output points
+    X = np.asarray(source_xyz, dtype=float)
+    Y = np.asarray(target_xyz, dtype=float)
+
+    if X.shape != Y.shape or X.ndim != 2 or X.shape[1] != 3:
+        raise ValueError("source_xyz and target_xyz must be Nx3 arrays of the same shape.")
+    if X.shape[0] < 3:
+        raise ValueError("Need at least 3 common points.")
+
+    # centroids
+    mx = X.mean(axis=0)
+    my = Y.mean(axis=0)
+
+    # demeaned coordinates
+    Xc = X - mx
+    Yc = Y - my
+
+    # covariance
+    S = (Yc.T @ Xc) / X.shape[0]
+
+    # SVD
+    U, D, Vt = np.linalg.svd(S)
+
+    # rotation (ensure right-handed)
+    R = U @ Vt
+    if np.linalg.det(R) < 0:
+        U[:, -1] *= -1
+        R = U @ Vt
+
+    # scale (using Umeyama)
+    var_x = (Xc**2).sum() / X.shape[0]
+    s = D.sum() / var_x  # scale factor (unitless)
+
+    # translation
+    t = my - s * (R @ mx)
+
+    # residuals
+    Yhat = (s * (X @ R.T)) + t  # note: (R @ x) vs x @ R.T depending on row/col convention
+    resid = Y - Yhat
+    rms = sqrt(np.mean(np.sum(resid**2, axis=1)))
+
+    # Convert rotation matrix to small-angle rotations (radians) near identity
+    rx_rad = 0.5 * (R[2,1] - R[1,2])
+    ry_rad = 0.5 * (R[0,2] - R[2,0])
+    rz_rad = 0.5 * (R[1,0] - R[0,1])
+
+    # Convert to arcseconds
+    rx = rx_rad * ARCSEC_PER_RAD
+    ry = ry_rad * ARCSEC_PER_RAD
+    rz = rz_rad * ARCSEC_PER_RAD
+
+    # Convert scale to ppm
+    sc_ppm = (s - 1.0) * 1e6
+
+    rx, ry, rz = -rx, -ry, -rz
+
+    print(f"tx: {t[0]:.6f} m, ty: {t[1]:.6f} m, tz: {t[2]:.6f} m")
+    print(f"rx: {rx:.6f} arcsec, ry: {ry:.6f} arcsec, rz: {rz:.6f} arcsec")
+    print(f"sc: {sc_ppm:.6f} ppm")
+    print(f"RMS residual: {rms:.10f} m")
+
+    return Transformation(source_name, target_name, ref_epoch, 
+                                            float(t[0]), float(t[1]), float(t[2]), float(sc_ppm), float(rx), float(ry), float(rz))
 
 def transform_mga94_to_mga2020(zone, east, north, ell_ht=False, vcv=None):
     """
