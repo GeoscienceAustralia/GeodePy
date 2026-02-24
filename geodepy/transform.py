@@ -185,9 +185,9 @@ def helmert7_from_xyz(source_xyz, source_name, target_xyz, target_name, ref_epoc
 
     This process follows a similar approach to Sjöberg, L.E, 2013 @ https://doi.org/10.2478/jogs-2013-0002
 
-    :param source_xyz: Array of (x, y, z) co-ordinates in source datum. Points must be co-located with points in target_xyz and in the same order.
+    :param source_xyz: Array of at least 3 (x, y, z) co-ordinates in source datum. Points must be co-located with points in target_xyz and in the same order.
     :param source_name: Name of source datum
-    :param target_xyz: Array of (x, y, z) co-ordinates in target datum. Points must be co-located with points in target_xyz and in the same order.
+    :param target_xyz: Array of at least 3 (x, y, z) co-ordinates in target datum. Points must be co-located with points in target_xyz and in the same order.
     :param target_name: Name of target datum
     :param ref_epoch: Reference epoch of transformation (datetime.date Object) 
 
