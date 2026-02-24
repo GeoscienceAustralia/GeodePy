@@ -255,10 +255,11 @@ def helmert7_from_xyz(source_xyz, source_name, target_xyz, target_name, ref_epoc
     print(f"tx: {t[0]:.6f} m, ty: {t[1]:.6f} m, tz: {t[2]:.6f} m")
     print(f"rx: {rx:.6f} arcsec, ry: {ry:.6f} arcsec, rz: {rz:.6f} arcsec")
     print(f"sc: {sc_ppm:.6f} ppm")
-    print(f"RMS residual: {rms:.10f} m")
+    print(f"RMS residual: {rms:.6f} m")
 
     return Transformation(source_name, target_name, ref_epoch, 
-                                            float(t[0]), float(t[1]), float(t[2]), float(sc_ppm), float(rx), float(ry), float(rz))
+                          float(t[0]), float(t[1]), float(t[2]), 
+                          float(sc_ppm), float(rx), float(ry), float(rz))
 
 def transform_mga94_to_mga2020(zone, east, north, ell_ht=False, vcv=None):
     """
