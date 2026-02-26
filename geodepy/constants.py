@@ -362,6 +362,7 @@ def iers2trans(
     d_rx,
     d_ry,
     d_rz,
+    tf_sd=None
 ):
     """
     Used to convert IERS transformation parameters into GeodePy Transformation
@@ -405,6 +406,61 @@ def iers2trans(
         round(-d_rx / 1000, 8),
         round(-d_ry / 1000, 8),
         round(-d_rz / 1000, 8),
+        tf_sd=tf_sd
+    )
+
+def iers2transSD(
+    sd_tx=None,
+    sd_ty=None,
+    sd_tz=None,
+    sd_sc=None,
+    sd_rx=None,
+    sd_ry=None,
+    sd_rz=None,
+    sd_d_tx=None,
+    sd_d_ty=None,
+    sd_d_tz=None,
+    sd_d_sc=None,
+    sd_d_rx=None,
+    sd_d_ry=None,
+    sd_d_rz=None,
+):
+    """
+    Used to convert IERS transformation standard deviation parameters into GeodePy TransformationSD
+    class parameters.
+    Note: All rotation and delta rotation terms have the sign change applied.
+    
+    :param sd_tx: one-sigma uncertainty of tx (mm)
+    :param sd_ty: one-sigma uncertainty of ty (mm)
+    :param sd_tz: one-sigma uncertainty of tz (mm)
+    :param sd_sc: one-sigma uncertainty of sc (ppb)
+    :param sd_rx: one-sigma uncertainty of rx (milliarcsec)
+    :param sd_ry: one-sigma uncertainty of ry (milliarcsec)
+    :param sd_rz: one-sigma uncertainty of rz (milliarcsec)
+    :param sd_d_tx: one-sigma uncertainty of d_tx (mm/yr)
+    :param sd_d_ty: one-sigma uncertainty of d_ty (mm/yr)
+    :param sd_d_tz: one-sigma uncertainty of d_tz (mm/yr)
+    :param sd_d_sc: one-sigma uncertainty of d_sc (ppb/yr)
+    :param sd_d_rx: one-sigma uncertainty of d_rx (milliarcsec/yr)
+    :param sd_d_ry: one-sigma uncertainty of d_ry (milliarcsec/yr)
+    :param sd_d_rz: one-sigma uncertainty of d_rz (milliarcsec/yr)
+    :return: TransformationSD object following the Australian convention
+    """
+    return TransformationSD(
+        round(sd_tx / 1000, 8),
+        round(sd_ty / 1000, 8),
+        round(sd_tz / 1000, 8),
+        round(sd_sc / 1000, 8),
+        round(-sd_rx / 1000, 8),
+        round(-sd_ry / 1000, 8),
+        round(-sd_rz / 1000, 8),
+        round(sd_d_tx / 1000, 8),
+        round(sd_d_ty / 1000, 8),
+        round(sd_d_tz / 1000, 8),
+        round(sd_d_sc / 1000, 8),
+        round(-sd_d_rx / 1000, 8),
+        round(-sd_d_ry / 1000, 8),
+        round(-sd_d_rz / 1000, 8),
     )
 
 
@@ -1874,6 +1930,469 @@ itrf90_to_itrf2000 = -itrf2000_to_itrf90
 itrf89_to_itrf2000 = -itrf2000_to_itrf89
 itrf88_to_itrf2000 = -itrf2000_to_itrf88
 
+# WGS84 (G2296) parameters
+# https://navi.ion.org/content/72/2/navi.693
+
+wgs84g2139_to_wgs84g2296_sd = iers2transSD(
+    sd_tx=1.5,
+    sd_ty=1.5,
+    sd_tz=1.5,
+    sd_sc=0.23,
+    sd_rx=0.06,
+    sd_ry=0.06,
+    sd_rz=0.06,
+    sd_d_tx=0.3,
+    sd_d_ty=0.3,
+    sd_d_tz=0.3,
+    sd_d_sc=0.04,
+    sd_d_rx=0.01,
+    sd_d_ry=0.01,
+    sd_d_rz=0.01
+)
+
+wgs84g1762_to_wgs84g2296_sd = iers2transSD(
+    sd_tx=3.6,
+    sd_ty=3.6,
+    sd_tz=3.6,
+    sd_sc=0.56,
+    sd_rx=0.15,
+    sd_ry=0.15,
+    sd_rz=0.13,
+    sd_d_tx=0.6,
+    sd_d_ty=0.6,
+    sd_d_tz=0.6,
+    sd_d_sc=0.09,
+    sd_d_rx=0.02,
+    sd_d_ry=0.03,
+    sd_d_rz=0.02
+)
+
+wgs84g2296_to_itrf2020_sd = TransformationSD(
+    sd_tx=0.02,
+    sd_ty=0.02,
+    sd_tz=0.02,
+    sd_sc=0.0,
+    sd_rx=0.0,
+    sd_ry=0.0,
+    sd_rz=0.0,
+    sd_d_tx=0.0,
+    sd_d_ty=0.0,
+    sd_d_tz=0.0,
+    sd_d_sc=0.0,
+    sd_d_rx=0.0,
+    sd_d_ry=0.0,
+    sd_d_rz=0.0
+)
+
+wgs84g2296_to_itrf2020 = Transformation(
+    itrf_from="WGS84 (G2296)",
+    itrf_to="ITRF2020",
+    ref_epoch=date(2024, 1, 1),
+    tx=0.0,
+    ty=0.0,
+    tz=0.0,
+    sc=0.0,
+    rx=0.0,
+    ry=0.0,
+    rz=-0.0,
+    d_tx=0.0,
+    d_ty=0.0,
+    d_tz=0.0,
+    d_sc=0.0,
+    d_rx=0.0,
+    d_ry=0.0,
+    d_rz=0.0,
+    tf_sd=wgs84g2296_to_itrf2020_sd
+)
+
+wgs84g2139_to_wgs84g2296 = iers2trans(
+    itrf_from="WGS84 (G2139)",
+    itrf_to="WGS84 (G2296)",
+    ref_epoch=date(2024, 1, 1),
+    tx=2.6,
+    ty=5.4,
+    tz=-0.9,
+    sc=0.06,
+    rx=-0.01,
+    ry=-0.07,
+    rz=0.0,
+    d_tx=0.0,
+    d_ty=0.8,
+    d_tz=0.1,
+    d_sc=-0.01,
+    d_rx=0.0,
+    d_ry=-0.02,
+    d_rz=-0.02,
+    tf_sd=wgs84g2139_to_wgs84g2296_sd
+)
+
+wgs84g1762_to_wgs84g2296 = iers2trans(
+    itrf_from="WGS84 (G1762)",
+    itrf_to="WGS84G2296",
+    ref_epoch=date(2024, 1, 1),
+    tx=4.2,
+    ty=-3.0,
+    tz=5.6,
+    sc=-4.24,
+    rx=-0.14,
+    ry=0.05,
+    rz=0.43,
+    d_tx=0.8,
+    d_ty=0.0,
+    d_tz=-0.1,
+    d_sc=0.04,
+    d_rx=0.0,
+    d_ry=-0.02,
+    d_rz=0.01,
+    tf_sd=wgs84g1762_to_wgs84g2296_sd
+)
+
+itrf2020_to_wgs84g2296 = -wgs84g2296_to_itrf2020
+wgs84g2296to_wgs84g2139 = -wgs84g2139_to_wgs84g2296
+wgs84g2296_to_wgs84g1762 = -wgs84g1762_to_wgs84g2296
+
+#WGS84 (G2139) paramters
+# https://www.unoosa.org/documents/pdf/icg/2023/ICG-17/icg17_wgd_02_02.pdf
+
+wgs84g2139_to_itrf2014_sd = TransformationSD(
+    sd_tx=0.02,
+    sd_ty=0.02,
+    sd_tz=0.02,
+    sd_sc=0.0,
+    sd_rx=0.0,
+    sd_ry=0.0,
+    sd_rz=0.0,
+    sd_d_tx=0.0,
+    sd_d_ty=0.0,
+    sd_d_tz=0.0,
+    sd_d_sc=0.0,
+    sd_d_rx=0.0,
+    sd_d_ry=0.0,
+    sd_d_rz=0.0
+)
+
+wgs84g2139_to_itrf2014 = Transformation(
+    itrf_from="WGS84 (G2139)",
+    itrf_to="ITRF2014",
+    ref_epoch=date(2016, 1, 1),
+    tx=0.0,
+    ty=0.0,
+    tz=0.0,
+    sc=0.0,
+    rx=0.0,
+    ry=0.0,
+    rz=-0.0,
+    d_tx=0.0,
+    d_ty=0.0,
+    d_tz=0.0,
+    d_sc=0.0,
+    d_rx=0.0,
+    d_ry=0.0,
+    d_rz=0.0,
+    tf_sd=wgs84g2139_to_itrf2014_sd
+)
+
+itrf2014_to_wgs84g2139 = -wgs84g2139_to_itrf2014
+
+#WGS84 (G1762) parameters
+# https://www.unoosa.org/documents/pdf/icg/2023/ICG-17/icg17_wgd_02_02.pdf
+
+wgs84g1762_to_itrf2008_sd = TransformationSD(
+    sd_tx=0.02,
+    sd_ty=0.02,
+    sd_tz=0.02,
+    sd_sc=0.0,
+    sd_rx=0.0,
+    sd_ry=0.0,
+    sd_rz=0.0,
+    sd_d_tx=0.0,
+    sd_d_ty=0.0,
+    sd_d_tz=0.0,
+    sd_d_sc=0.0,
+    sd_d_rx=0.0,
+    sd_d_ry=0.0,
+    sd_d_rz=0.0
+)
+
+wgs84g1762_to_itrf2008 = Transformation(
+    itrf_from="WGS84 (G1762)",
+    itrf_to="ITRF2008",
+    ref_epoch=date(2005, 1, 1),
+    tx=0.0,
+    ty=0.0,
+    tz=0.0,
+    sc=0.0,
+    rx=0.0,
+    ry=0.0,
+    rz=-0.0,
+    d_tx=0.0,
+    d_ty=0.0,
+    d_tz=0.0,
+    d_sc=0.0,
+    d_rx=0.0,
+    d_ry=0.0,
+    d_rz=0.0,
+    tf_sd=wgs84g1762_to_itrf2008_sd
+)
+
+itrf2008_to_wgs84g1762 = -wgs84g1762_to_itrf2008
+
+#WGS84 (G1674) parameters
+# https://www.unoosa.org/documents/pdf/icg/2023/ICG-17/icg17_wgd_02_02.pdf
+
+wgs84g1674_to_itrf2008_sd = TransformationSD(
+    sd_tx=0.02,
+    sd_ty=0.02,
+    sd_tz=0.02,
+    sd_sc=0.0,
+    sd_rx=0.0,
+    sd_ry=0.0,
+    sd_rz=0.0,
+    sd_d_tx=0.0,
+    sd_d_ty=0.0,
+    sd_d_tz=0.0,
+    sd_d_sc=0.0,
+    sd_d_rx=0.0,
+    sd_d_ry=0.0,
+    sd_d_rz=0.0
+)
+
+wgs84g1674_to_itrf2008 = Transformation(
+    itrf_from="WGS84 (G1674)",
+    itrf_to="ITRF2008",
+    ref_epoch=date(2005, 1, 1),
+    tx=0.0,
+    ty=0.0,
+    tz=0.0,
+    sc=0.0,
+    rx=0.0,
+    ry=0.0,
+    rz=-0.0,
+    d_tx=0.0,
+    d_ty=0.0,
+    d_tz=0.0,
+    d_sc=0.0,
+    d_rx=0.0,
+    d_ry=0.0,
+    d_rz=0.0,
+    tf_sd=wgs84g1762_to_itrf2008_sd
+)
+
+itrf2008_to_wgs84g1674 = -wgs84g1674_to_itrf2008
+
+#WGS84 (G1150) parameters
+# https://www.unoosa.org/documents/pdf/icg/2023/ICG-17/icg17_wgd_02_02.pdf
+
+wgs84g1150_to_itrf2000_sd = TransformationSD(
+    sd_tx=0.02,
+    sd_ty=0.02,
+    sd_tz=0.02,
+    sd_sc=0.0,
+    sd_rx=0.0,
+    sd_ry=0.0,
+    sd_rz=0.0,
+    sd_d_tx=0.0,
+    sd_d_ty=0.0,
+    sd_d_tz=0.0,
+    sd_d_sc=0.0,
+    sd_d_rx=0.0,
+    sd_d_ry=0.0,
+    sd_d_rz=0.0
+)
+
+wgs84g1150_to_itrf2000 = Transformation(
+    itrf_from="WGS84 (G1150)",
+    itrf_to="ITRF2000",
+    ref_epoch=date(2001, 1, 1),
+    tx=0.0,
+    ty=0.0,
+    tz=0.0,
+    sc=0.0,
+    rx=0.0,
+    ry=0.0,
+    rz=-0.0,
+    d_tx=0.0,
+    d_ty=0.0,
+    d_tz=0.0,
+    d_sc=0.0,
+    d_rx=0.0,
+    d_ry=0.0,
+    d_rz=0.0,
+    tf_sd=wgs84g1150_to_itrf2000_sd
+)
+
+itrf2000_to_wgs84g1150 = -wgs84g1150_to_itrf2000
+
+#WGS84 (G873) parameters
+# https://www.unoosa.org/documents/pdf/icg/2023/ICG-17/icg17_wgd_02_02.pdf
+
+wgs84g873_to_itrf94_sd = TransformationSD(
+    sd_tx=0.05,
+    sd_ty=0.05,
+    sd_tz=0.05,
+    sd_sc=0.0,
+    sd_rx=0.0,
+    sd_ry=0.0,
+    sd_rz=0.0,
+    sd_d_tx=0.0,
+    sd_d_ty=0.0,
+    sd_d_tz=0.0,
+    sd_d_sc=0.0,
+    sd_d_rx=0.0,
+    sd_d_ry=0.0,
+    sd_d_rz=0.0
+)
+
+wgs84g873_to_itrf94 = Transformation(
+    itrf_from="WGS84 (G873)",
+    itrf_to="ITRF94",
+    ref_epoch=date(1997, 1, 1),
+    tx=0.0,
+    ty=0.0,
+    tz=0.0,
+    sc=0.0,
+    rx=0.0,
+    ry=0.0,
+    rz=-0.0,
+    d_tx=0.0,
+    d_ty=0.0,
+    d_tz=0.0,
+    d_sc=0.0,
+    d_rx=0.0,
+    d_ry=0.0,
+    d_rz=0.0,
+    tf_sd=wgs84g873_to_itrf94_sd
+)
+
+itrf94_to_wgs84g873 = -wgs84g873_to_itrf94
+
+#WGS84 (G730) parameters
+# https://www.unoosa.org/documents/pdf/icg/2023/ICG-17/icg17_wgd_02_02.pdf
+
+wgs84g730_to_itrf91_sd = TransformationSD(
+    sd_tx=0.1,
+    sd_ty=0.1,
+    sd_tz=0.1,
+    sd_sc=0.0,
+    sd_rx=0.0,
+    sd_ry=0.0,
+    sd_rz=0.0,
+    sd_d_tx=0.0,
+    sd_d_ty=0.0,
+    sd_d_tz=0.0,
+    sd_d_sc=0.0,
+    sd_d_rx=0.0,
+    sd_d_ry=0.0,
+    sd_d_rz=0.0
+)
+
+wgs84g730_to_itrf91 = Transformation(
+    itrf_from="WGS84 (G730)",
+    itrf_to="ITRF91",
+    ref_epoch=date(1994, 1, 1),
+    tx=0.0,
+    ty=0.0,
+    tz=0.0,
+    sc=0.0,
+    rx=0.0,
+    ry=0.0,
+    rz=-0.0,
+    d_tx=0.0,
+    d_ty=0.0,
+    d_tz=0.0,
+    d_sc=0.0,
+    d_rx=0.0,
+    d_ry=0.0,
+    d_rz=0.0,
+    tf_sd=wgs84g730_to_itrf91_sd
+)
+
+itrf91_to_wgs84g730 = -wgs84g730_to_itrf91
+
+#WGS84 (Transit) parameters
+# https://www.unoosa.org/documents/pdf/icg/2023/ICG-17/icg17_wgd_02_02.pdf
+
+wgs84trans_to_itrf90_sd = TransformationSD(
+    sd_tx=2.0,
+    sd_ty=2.0,
+    sd_tz=2.0,
+    sd_sc=0.0,
+    sd_rx=0.0,
+    sd_ry=0.0,
+    sd_rz=0.0,
+    sd_d_tx=0.0,
+    sd_d_ty=0.0,
+    sd_d_tz=0.0,
+    sd_d_sc=0.0,
+    sd_d_rx=0.0,
+    sd_d_ry=0.0,
+    sd_d_rz=0.0
+)
+
+wgs84trans_to_itrf90 = Transformation(
+    itrf_from="WGS84 (Transit)",
+    itrf_to="ITRF90",
+    ref_epoch=date(1990, 7, 1),
+    tx=-0.06,
+    ty=0.517,
+    tz=0.223,
+    sc=0.011,
+    rx=-0.0183,
+    ry=0.0003,
+    rz=-0.007,
+    d_tx=0.0,
+    d_ty=0.0,
+    d_tz=0.0,
+    d_sc=0.0,
+    d_rx=0.0,
+    d_ry=0.0,
+    d_rz=0.0,
+    tf_sd=wgs84trans_to_itrf90_sd
+)
+
+itrf90_to_wgs84trans = -wgs84trans_to_itrf90
+
+#WGS84 Ensemble parameters
+
+wgs84ensemble_to_itrf2014_sd = TransformationSD(
+    sd_tx=3.0,
+    sd_ty=3.0,
+    sd_tz=3.0,
+    sd_sc=0.0,
+    sd_rx=0.0,
+    sd_ry=0.0,
+    sd_rz=0.0,
+    sd_d_tx=0.0,
+    sd_d_ty=0.0,
+    sd_d_tz=0.0,
+    sd_d_sc=0.0,
+    sd_d_rx=0.0,
+    sd_d_ry=0.0,
+    sd_d_rz=0.0
+)
+
+wgs84ensemble_to_itrf2014 = Transformation(
+    itrf_from="WGS84 Ensemble",
+    itrf_to="ITRF2014",
+    ref_epoch=date(2014, 1, 1),
+    tx=0.0,
+    ty=0.0,
+    tz=0.0,
+    sc=0.0,
+    rx=0.0,
+    ry=0.0,
+    rz=-0.0,
+    d_tx=0.0,
+    d_ty=0.0,
+    d_tz=0.0,
+    d_sc=0.0,
+    d_rx=0.0,
+    d_ry=0.0,
+    d_rz=0.0,
+    tf_sd=wgs84ensemble_to_itrf2014_sd
+)
+
+itrf2014_to_wgs84ensemble = -wgs84ensemble_to_itrf2014
 
 # The locations of files used in the height module
 aws_server = "/vsicurl/https://geoid.s3-ap-southeast-2.amazonaws.com/"
