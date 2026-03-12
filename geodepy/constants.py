@@ -1868,6 +1868,7 @@ itrf88_to_itrf2008 = -itrf2008_to_itrf88
 # For more information, see the GDA2020 tech manual section 2.2.1 available
 # here: https://www.icsm.gov.au/gda2020-and-gda94-technical-manuals
 # Ref: http://itrf.ensg.ign.fr/ITRF_solutions/2005/tp_05-00.php
+# Ref: https://itrf.ign.fr/en/solutions/transformations
 
 # Ref: https://itrf.ign.fr/en/solutions/itrf2005
 itrf2005_to_itrf2000_sd = iers2transSD(
@@ -1908,7 +1909,196 @@ itrf2005_to_itrf2000 = iers2trans(
     tf_sd=itrf2005_to_itrf2000_sd,
 )
 
+itrf2005_to_itrf97 = iers2trans(
+    itrf_from="ITRF2005",
+    itrf_to="ITRF97",
+    ref_epoch=date(2000, 1, 1),
+    tx=6.8,
+    ty=3.5,
+    tz=-28.5,
+    sc=1.98,
+    rx=0,
+    ry=0,
+    rz=0.06,
+    d_tx=-0.2,
+    d_ty=-0.5,
+    d_tz=-3.2,
+    d_sc=0.09,
+    d_rx=0,
+    d_ry=0,
+    d_rz=0.02,
+)
+
+itrf2005_to_itrf96 = iers2trans(
+    itrf_from="ITRF2005",
+    itrf_to="ITRF96",
+    ref_epoch=date(2000, 1, 1),
+    tx=6.8,
+    ty=3.5,
+    tz=-28.5,
+    sc=1.98,
+    rx=0,
+    ry=0,
+    rz=0.06,
+    d_tx=-0.2,
+    d_ty=-0.5,
+    d_tz=-3.2,
+    d_sc=0.09,
+    d_rx=0,
+    d_ry=0,
+    d_rz=0.02,
+)
+
+itrf2005_to_itrf94 = iers2trans(
+    itrf_from="ITRF2005",
+    itrf_to="ITRF94",
+    ref_epoch=date(2000, 1, 1),
+    tx=6.8,
+    ty=3.5,
+    tz=-28.5,
+    sc=1.98,
+    rx=0,
+    ry=0,
+    rz=0.06,
+    d_tx=-0.2,
+    d_ty=-0.5,
+    d_tz=-3.2,
+    d_sc=0.09,
+    d_rx=0,
+    d_ry=0,
+    d_rz=0.02,
+)
+
+itrf2005_to_itrf93 = iers2trans(
+    itrf_from="ITRF2005",
+    itrf_to="ITRF93",
+    ref_epoch=date(2000, 1, 1),
+    tx=-22.0,
+    ty=3.3,
+    tz=-33.9,
+    sc=2.47,
+    rx=-1.71,
+    ry=-1.48,
+    rz=-0.3,
+    d_tx=-3.1,
+    d_ty=-0.1,
+    d_tz=-2.4,
+    d_sc=0.09,
+    d_rx=-0.11,
+    d_ry=-0.19,
+    d_rz=0.07,
+)
+
+itrf2005_to_itrf92 = iers2trans(
+    itrf_from="ITRF2005",
+    itrf_to="ITRF92",
+    ref_epoch=date(2000, 1, 1),
+    tx=14.8,
+    ty=5.5,
+    tz=-36.5,
+    sc=1.27,
+    rx=0,
+    ry=0,
+    rz=0.06,
+    d_tx=-0.2,
+    d_ty=-0.5,
+    d_tz=-3.2,
+    d_sc=0.09,
+    d_rx=0,
+    d_ry=0,
+    d_rz=0.02,
+)
+
+itrf2005_to_itrf91 = iers2trans(
+    itrf_from="ITRF2005",
+    itrf_to="ITRF91",
+    ref_epoch=date(2000, 1, 1),
+    tx=26.8,
+    ty=19.5,
+    tz=-42.5,
+    sc=2.67,
+    rx=0,
+    ry=0,
+    rz=0.06,
+    d_tx=-0.2,
+    d_ty=-0.5,
+    d_tz=-3.2,
+    d_sc=0.09,
+    d_rx=0,
+    d_ry=0,
+    d_rz=0.02,
+)
+
+itrf2005_to_itrf90 = iers2trans(
+    itrf_from="ITRF2005",
+    itrf_to="ITRF90",
+    ref_epoch=date(2000, 1, 1),
+    tx=24.8,
+    ty=15.5,
+    tz=-58.5,
+    sc=2.97,
+    rx=0,
+    ry=0,
+    rz=0.06,
+    d_tx=-0.2,
+    d_ty=-0.5,
+    d_tz=-3.2,
+    d_sc=0.09,
+    d_rx=0,
+    d_ry=0,
+    d_rz=0.02,
+)
+
+itrf2005_to_itrf89 = iers2trans(
+    itrf_from="ITRF2005",
+    itrf_to="ITRF89",
+    ref_epoch=date(2000, 1, 1),
+    tx=29.8,
+    ty=39.5,
+    tz=-96.5,
+    sc=6.37,
+    rx=0,
+    ry=0,
+    rz=0.06,
+    d_tx=-0.2,
+    d_ty=-0.5,
+    d_tz=-3.2,
+    d_sc=0.09,
+    d_rx=0,
+    d_ry=0,
+    d_rz=0.02,
+)
+
+itrf2005_to_itrf88 = iers2trans(
+    itrf_from="ITRF2005",
+    itrf_to="ITRF88",
+    ref_epoch=date(2000, 1, 1),
+    tx=24.8,
+    ty=3.5,
+    tz=-120.5,
+    sc=9.47,
+    rx=0.1,
+    ry=0,
+    rz=0.06,
+    d_tx=-0.2,
+    d_ty=-0.5,
+    d_tz=-3.2,
+    d_sc=0.09,
+    d_rx=0,
+    d_ry=0,
+    d_rz=0.02,
+)
+
 itrf2000_to_itrf2005 = -itrf2005_to_itrf2000
+itrf97_to_itrf2005 = -itrf2005_to_itrf97
+itrf96_to_itrf2005 = -itrf2005_to_itrf96
+itrf94_to_itrf2005 = -itrf2005_to_itrf94
+itrf93_to_itrf2005 = -itrf2005_to_itrf93
+itrf92_to_itrf2005 = -itrf2005_to_itrf92
+itrf91_to_itrf2005 = -itrf2005_to_itrf91
+itrf90_to_itrf2005 = -itrf2005_to_itrf90
+itrf89_to_itrf2005 = -itrf2005_to_itrf89
+itrf88_to_itrf2005 = -itrf2005_to_itrf88
 
 # ITRF2000 parameters
 # ftp://ftp.iers.org/products/reference-systems/terrestrial/itrf/ITRF.TP
