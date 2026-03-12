@@ -613,6 +613,46 @@ atrf2014_to_gda2020 = Transformation(
     tf_sd=atrf2014_to_gda2020_sd,
 )
 
+itrf2014_to_atrf2014_sd = TransformationSD(
+    sd_tx=0.00,
+    sd_ty=0.00,
+    sd_tz=0.00,
+    sd_sc=0.00,
+    sd_rx=0.00,
+    sd_ry=0.00,
+    sd_rz=0.00,
+    sd_d_tx=0.00,
+    sd_d_ty=0.00,
+    sd_d_tz=0.00,
+    sd_d_sc=0.00,
+    sd_d_rx=0.00,
+    sd_d_ry=0.00,
+    sd_d_rz=0.00,
+)
+
+itrf2014_to_atrf2014 = atrf2014_to_gda2020 = Transformation(
+    from_datum="ITRF2014",
+    to_datum="ATRF2014",
+    ref_epoch=date(2020, 1, 1),
+    tx=0,
+    ty=0,
+    tz=0,
+    sc=0,
+    rx=0,
+    ry=0,
+    rz=0,
+    d_tx=0,
+    d_ty=0,
+    d_tz=0,
+    d_sc=0,
+    d_rx=0.00,
+    d_ry=0.00,
+    d_rz=0.00,
+    tf_sd=itrf2014_to_atrf2014_sd,
+)
+
+gda2020_to_atrf2014 = -atrf2014_to_gda2020
+atrf2014_to_itrf2014 = -itrf2014_to_atrf2014
 
 # GDA94 to ITRF transformation parameters [Dawson and Woods (2010)]
 # AGD66 and AGD84 to GDA94 transformation parameters [GDA94 Tech Manual v2.4]
@@ -703,6 +743,8 @@ itrf96_to_gda94_sd = TransformationSD(
     sd_d_ry=0.0003382,
     sd_d_rz=0.0001169,
 )
+
+#Found here https://espace.curtin.edu.au/bitstream/handle/20.500.11937/22267/20908_downloaded_stream_364.pdf?sequence=2&isAllowed=y
 
 agd84_to_gda94_sd = TransformationSD(
     sd_tx=1.0,
@@ -984,6 +1026,7 @@ itrf2020_to_itrf2014_vel = iers2trans(
     d_rz=0.0,
 )
 
+# Ref: https://itrf.ign.fr/en/solutions/itrf2020
 itrf2020_to_itrf2014_sd = iers2transSD(
     sd_tx=0.2,
     sd_ty=0.2,
@@ -1285,6 +1328,8 @@ itrf88_to_itrf2020 = -itrf2020_to_itrf88
 # here: https://www.icsm.gov.au/gda2020-and-gda94-technical-manuals
 # Ref: http://itrf.ign.fr/doc_ITRF/Transfo-ITRF2014_ITRFs.txt
 
+
+# Ref: https://itrf.ign.fr/en/solutions/itrf2014
 itrf2014_to_itrf2008_sd = iers2transSD(
     sd_tx=0.2,
     sd_ty=0.1,
@@ -1565,6 +1610,7 @@ itrf88_to_itrf2014 = -itrf2014_to_itrf88
 # here: https://www.icsm.gov.au/gda2020-and-gda94-technical-manuals
 # Ref: http://itrf.ign.fr/doc_ITRF/Transfo-ITRF2008_ITRFs.txt
 
+# Ref: https://itrf.ign.fr/en/solutions/itrf2008
 itrf2008_to_itrf2005_sd = iers2transSD(
     sd_tx=0.2,
     sd_ty=0.2,
@@ -1823,6 +1869,7 @@ itrf88_to_itrf2008 = -itrf2008_to_itrf88
 # here: https://www.icsm.gov.au/gda2020-and-gda94-technical-manuals
 # Ref: http://itrf.ensg.ign.fr/ITRF_solutions/2005/tp_05-00.php
 
+# Ref: https://itrf.ign.fr/en/solutions/itrf2005
 itrf2005_to_itrf2000_sd = iers2transSD(
     sd_tx=0.3,
     sd_ty=0.3,
@@ -1869,6 +1916,26 @@ itrf2000_to_itrf2005 = -itrf2005_to_itrf2000
 # transformations are shown in millimetres.
 # NOTE: All translations and rates of translation shown below have been
 # converted to millimetres.
+# Ref: https://itrf.ign.fr/en/solutions/transformations
+
+# Ref: https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2001JB000561
+itrf2000_to_itrf97_sd = iers2transSD(
+    sd_tx=0.3,
+    sd_ty=0.3,
+    sd_tz=0.3,
+    sd_sc=0.05,
+    sd_rx=0.012,
+    sd_ry=0.012,
+    sd_rz=0.014,
+    sd_d_tx=0.3,
+    sd_d_ty=0.3,
+    sd_d_tz=0.3,
+    sd_d_sc=0.05,
+    sd_d_rx=0.012,
+    sd_d_ry=0.012,
+    sd_d_rz=0.014
+)
+
 itrf2000_to_itrf97 = iers2trans(
     itrf_from="ITRF2000",
     itrf_to="ITRF97",
@@ -1887,6 +1954,7 @@ itrf2000_to_itrf97 = iers2trans(
     d_rx=0,
     d_ry=0,
     d_rz=0.02,
+    tf_sd=itrf2000_to_itrf97_sd
 )
 
 itrf2000_to_itrf96 = iers2trans(
@@ -1907,6 +1975,7 @@ itrf2000_to_itrf96 = iers2trans(
     d_rx=0,
     d_ry=0,
     d_rz=0.02,
+    tf_sd=itrf2000_to_itrf97_sd
 )
 
 itrf2000_to_itrf94 = iers2trans(
@@ -1927,6 +1996,7 @@ itrf2000_to_itrf94 = iers2trans(
     d_rx=0,
     d_ry=0,
     d_rz=0.02,
+    tf_sd=itrf2000_to_itrf97_sd
 )
 
 itrf2000_to_itrf93 = iers2trans(
@@ -2060,6 +2130,7 @@ itrf89_to_itrf2000 = -itrf2000_to_itrf89
 itrf88_to_itrf2000 = -itrf2000_to_itrf88
 
 # ITRF97 paramters
+# Ref: https://itrf.ign.fr/en/solutions/transformations
 
 itrf97_to_itrf96 = iers2trans(
     itrf_from="ITRF97",
@@ -2231,6 +2302,7 @@ itrf89_to_itrf97 = -itrf97_to_itrf89
 itrf88_to_itrf97 = -itrf97_to_itrf88    
 
 # itrf96
+# Ref: https://itrf.ign.fr/en/solutions/transformations
 
 itrf96_to_itrf94 = iers2trans(
     itrf_from="ITRF96",
@@ -2381,6 +2453,7 @@ itrf89_to_itrf96 = -itrf96_to_itrf89
 itrf88_to_itrf96 = -itrf96_to_itrf88 
 
 # ITRF94 parameters
+# Ref: https://itrf.ign.fr/en/solutions/transformations
 
 itrf94_to_itrf93 = iers2trans(
     itrf_from="ITRF94",
@@ -2510,6 +2583,7 @@ itrf89_to_itrf94 = -itrf94_to_itrf89
 itrf88_to_itrf94 = -itrf94_to_itrf88 
 
 # ITRF93 paramters
+# Ref: https://itrf.ign.fr/en/solutions/transformations
 
 itrf93_to_itrf92 = iers2trans(
     itrf_from="ITRF93",
@@ -2618,6 +2692,7 @@ itrf89_to_itrf93 = -itrf93_to_itrf89
 itrf88_to_itrf93 = -itrf93_to_itrf88 
 
 # ITRF92 paramters
+# Ref: https://itrf.ign.fr/en/solutions/transformations
 
 itrf92_to_itrf91 = iers2trans(
     itrf_from="ITRF92",
@@ -2705,6 +2780,7 @@ itrf89_to_itrf92 = -itrf92_to_itrf89
 itrf88_to_itrf92 = -itrf92_to_itrf88
 
 # ITRF91 parameters
+# Ref: https://itrf.ign.fr/en/solutions/transformations
 
 itrf91_to_itrf90 = iers2trans(
     itrf_from="ITRF91",
@@ -2771,6 +2847,7 @@ itrf89_to_itrf91 = -itrf91_to_itrf89
 itrf88_to_itrf91 = -itrf91_to_itrf88
 
 # ITRF90 Parameters
+# Ref: https://itrf.ign.fr/en/solutions/transformations
 
 itrf90_to_itrf89 = iers2trans(
     itrf_from="ITRF90",
@@ -2816,6 +2893,7 @@ itrf89_to_itrf90 = -itrf90_to_itrf89
 itrf88_to_itrf90 = -itrf90_to_itrf88
 
 #ITRF89 Paramters
+# Ref: https://itrf.ign.fr/en/solutions/transformations
 
 itrf89_to_itrf88 = iers2trans(
     itrf_from="ITRF89",
@@ -3356,7 +3434,7 @@ wgs84g730_to_itrf91 = Transformation(
 itrf91_to_wgs84g730 = -wgs84g730_to_itrf91
 
 #WGS84 (Transit) parameters
-# https://www.unoosa.org/documents/pdf/icg/2023/ICG-17/icg17_wgd_02_02.pdf
+# Kelly and Dennis (2022)
 
 wgs84trans_to_itrf90_sd = TransformationSD(
     sd_tx=2.0,
@@ -3398,7 +3476,7 @@ wgs84trans_to_itrf90 = Transformation(
 
 itrf90_to_wgs84trans = -wgs84trans_to_itrf90
 
-#WGS84 Ensemble parameters
+# WGS84 Ensemble parameters
 
 wgs84ensemble_to_itrf2014_sd = TransformationSD(
     sd_tx=3.0,
