@@ -630,7 +630,7 @@ itrf2014_to_atrf2014_sd = TransformationSD(
     sd_d_rz=0.00,
 )
 
-itrf2014_to_atrf2014 = atrf2014_to_gda2020 = Transformation(
+itrf2014_to_atrf2014 = Transformation(
     from_datum="ITRF2014",
     to_datum="ATRF2014",
     ref_epoch=date(2020, 1, 1),
@@ -3567,23 +3567,6 @@ itrf97_to_wgs84g873 = -wgs84g873_to_itrf97
 # https://www.unoosa.org/documents/pdf/icg/2023/ICG-17/icg17_wgd_02_02.pdf
 
 wgs84g730_to_itrf91_sd = TransformationSD(
-    sd_tx=0.1,
-    sd_ty=0.1,
-    sd_tz=0.1,
-    sd_sc=0.0,
-    sd_rx=0.0,
-    sd_ry=0.0,
-    sd_rz=0.0,
-    sd_d_tx=0.0,
-    sd_d_ty=0.0,
-    sd_d_tz=0.0,
-    sd_d_sc=0.0,
-    sd_d_rx=0.0,
-    sd_d_ry=0.0,
-    sd_d_rz=0.0
-)
-
-wgs84g730_to_itrf90_sd = TransformationSD(
     sd_tx=0.1,
     sd_ty=0.1,
     sd_tz=0.1,
