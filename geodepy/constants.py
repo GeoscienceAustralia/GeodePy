@@ -2492,8 +2492,8 @@ wgs84ensemble_to_itrf2014_sd = TransformationSD(
 )
 
 wgs84ensemble_to_itrf2014 = Transformation(
-    itrf_from="WGS84 Ensemble",
-    itrf_to="ITRF2014",
+    from_datum="WGS84 Ensemble",
+    to_datum="ITRF2014",
     ref_epoch=date(2014, 1, 1),
     tx=0.0,
     ty=0.0,
