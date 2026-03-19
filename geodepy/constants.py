@@ -2451,8 +2451,8 @@ wgs84trans_to_itrf90_sd = TransformationSD(
 )
 
 wgs84trans_to_itrf90 = iers2trans(
-    from_datum="WGS84 (Transit)",
-    to_datum="ITRF90",
+    itrf_from="WGS84 (Transit)",
+    itrf_to="ITRF90",
     ref_epoch=date(1990, 7, 1),
     tx=-60,
     ty=517,
@@ -2492,8 +2492,8 @@ wgs84ensemble_to_itrf2014_sd = TransformationSD(
 )
 
 wgs84ensemble_to_itrf2014 = Transformation(
-    from_datum="WGS84 Ensemble",
-    to_datum="ITRF2014",
+    itrf_from="WGS84 Ensemble",
+    itrf_to="ITRF2014",
     ref_epoch=date(2014, 1, 1),
     tx=0.0,
     ty=0.0,
