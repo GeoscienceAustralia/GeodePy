@@ -362,6 +362,7 @@ def iers2trans(
     d_rx,
     d_ry,
     d_rz,
+    tf_sd=None
 ):
     """
     Used to convert IERS transformation parameters into GeodePy Transformation
@@ -385,6 +386,7 @@ def iers2trans(
     :param d_rx: Rate of change in Rotation about X (milliarcsec/yr)
     :param d_ry: Rate of change in Rotation about X (milliarcsec/yr)
     :param d_rz: Rate of change in Rotation about X (milliarcsec/yr)
+    :param tf_sd: TransformationSD object
     :return: Transformation object following the Australian convention
     """
     return Transformation(
@@ -405,6 +407,7 @@ def iers2trans(
         round(-d_rx / 1000, 8),
         round(-d_ry / 1000, 8),
         round(-d_rz / 1000, 8),
+        tf_sd=tf_sd
     )
 
 def iers2transSD(
