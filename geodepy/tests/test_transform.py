@@ -3,6 +3,7 @@ import unittest
 from geodepy.transform import (
     conform7,
     conform14,
+    plate_motion_transformation,
     atrf2014_to_gda2020,
     transform_gda2020_to_atrf2014,
     transform_atrf2014_to_gda2020,
@@ -45,6 +46,22 @@ class TestTransforms(unittest.TestCase):
         assert abs(alic_gda2020_comp[0] - alic_gda2020[0]) < 5e-5
         assert abs(alic_gda2020_comp[1] - alic_gda2020[1]) < 5e-5
         assert abs(alic_gda2020_comp[2] - alic_gda2020[2]) < 5e-5
+
+    def test_plate_motion_transformation(self):
+        alic_atrf14at2018 = (-4052052.6588, 4212835.9938, -2545104.6946)
+        alic_atrf14at2025 = (-4052052.9336, 4212835.9577, -2545104.3168)
+        alic_atrf14at2025_comp = plate_motion_transformation(
+            *alic_atrf14at2018, date(2018,1,1), date(2025,1,1),itrf2014_to_gda2020
+        )
+        alic_atrf14at2018_comp = plate_motion_transformation(
+            *alic_atrf14at2025, date(2025,1,1), date(2018,1,1), itrf2014_to_gda2020
+        )
+        assert abs(alic_atrf14at2018_comp[0] - alic_atrf14at2018[0]) < 5e-5
+        assert abs(alic_atrf14at2018_comp[1] - alic_atrf14at2018[1]) < 5e-5
+        assert abs(alic_atrf14at2018_comp[2] - alic_atrf14at2018[2]) < 5e-5
+        assert abs(alic_atrf14at2025_comp[0] - alic_atrf14at2025[0]) < 5e-5
+        assert abs(alic_atrf14at2025_comp[1] - alic_atrf14at2025[1]) < 5e-5
+        assert abs(alic_atrf14at2025_comp[2] - alic_atrf14at2025[2]) < 5e-5
 
     def test_transform_atrf2014_to_gda2020(self):
         alic_gda2020 = (-4052052.7373, 4212835.9835, -2545104.5867)
