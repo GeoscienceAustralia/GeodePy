@@ -13,6 +13,8 @@ Helmert Transformations
 
 .. autofunction:: geodepy.transform.conform14
 
+.. autofunction:: geodepy.transform.plate_motion_transformation
+
 Common Geodetic Transformations
 --------------------------------
 

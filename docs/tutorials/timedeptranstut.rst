@@ -108,30 +108,29 @@ Now we have an ITRF2014 coordinate at 1/1/2007. Now this needs to be moved to th
 done using the ITRF2014 to GDA2020 transformation which approximates plate motion in Australia. To complete 
 this transformation on another plate a different plate motion model should be used. 
 
-Some careful math needs to be completed here. To go from 2007 to 2030, 23 years 
-of plate motion needs to be added. The reference epoch of the ITRF2014 to GDA2020 transformation is 2020. 
-As such 23 needs to be subtracted from 2020 to get the desired motion. This means the epoch 1/1/1993 should be entered.
+The plate_motion_transformation function can be used to move coordinates in time. This avoids the need to 
+calculate the difference between the reference epoch and the epoch required. This can be seen below.
 
 .. caution::
     Transformations using the plate motion model of itrf2014_to_gda2020 should only be completed for epochs between
     2005 - 2035. For transformations outside of this range refer to the :ref:`next <tutorials/transold>` section.
 
-
 .. code:: python
 
-    x, y, z, vcv = geodepy.transform.conform14(
+    x, y, z, vcv = geodepy.transform.plate_motion_transformation(
         x, 
         y, 
-        z, 
-        date(1997, 1, 1), #plate motion epoch
+        z,
+        date(2007, 1, 1), #from epoch
+        date(2030, 1, 1), #to epoch
         geodepy.constants.itrf2014_to_gda2020 #transformation paramters
     )
 
     print(x, y, z)
 
-    >>-4050763.516973 4220880.699906 -2533399.176976
+    >>-4050763.517081 4220880.699892 -2533399.176829
 
-This is now the ITRF2014 corrdinate at 1/1/2030. Now we can convert this ITRF2014 cooridnate to ITRF2020.
+This is now the ITRF2014 corrdinate at 1/1/2030. Now we can convert this ITRF2014 coordinate to ITRF2020.
 
 .. code:: python
 
@@ -145,7 +144,7 @@ This is now the ITRF2014 corrdinate at 1/1/2030. Now we can convert this ITRF201
 
     print(x, y, z)
 
-    >>-4050763.517274 4220880.704079 -2533399.182440
+    >>-4050763.517382 4220880.704065 -2533399.182293
 
 This is the final cooridnate in ITRF2020 at 1/1/2030.
 

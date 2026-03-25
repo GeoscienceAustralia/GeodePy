@@ -33,8 +33,9 @@ The requirements can be seen below.
 .. code::
 
     NumPy
-    SciPy
-    GDAL #only needed for height module
+    SciPy # only needed for height module
+    GDAL # only needed for height module
+    Pandas # only for sinex module
 
 GDAL is only used for the heights module and sometimes can be difficult to install. For more information on 
 installing GDAL see the `GDAL pypi <https://pypi.org/project/GDAL/>`_ page.
