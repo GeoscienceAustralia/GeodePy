@@ -9,7 +9,7 @@ import datetime
 import geodepy.point_in_polygon as pp
 
 # Setup for transformation paths
-with open("transformation_routes_v3.json", "r", encoding="utf-8") as f:
+with open("other_files/transformation_routes_v3.json", "r", encoding="utf-8") as f:
     ROUTING = json.load(f)
 
 ROUTES = ROUTING["routes"]
@@ -38,8 +38,11 @@ def resolve_path(src, dst):
     Find path between source and destination reference paths from json file.
 
     :param src: Source reference frame
+    :type src: str
     :param dst: Destination reference frame
+    :type dst: str
     :return: Return path from source to destination as array
+    :rtype: list of str
     """
     if src == dst:
         return [src]
@@ -66,7 +69,9 @@ def ref_frame_parser(ref_name):
     Return GeodePy compliant refernece frame name from generic name.
 
     :param ref_name: Reference frame name
+    :type ref_name: str
     :return: Return GeodePy compliant reference frame name
+    :rtype: str
     """
 
     # Dictionary of reference frame names
@@ -96,7 +101,9 @@ def transformation_type(path):
     4. dynamic_to_dynamic
 
     :param path: The path between reference frames
+    :type path: list of str
     :return: Returns string with one of four options
+    :rtype: str
     """
 
     # Reference frame types dictionary
@@ -140,11 +147,17 @@ def static_to_static_trans(x, y, z, path, vcv):
     Completes static to static transformation
 
     :param x: Cartesian X (m)
+    :type x: float
     :param y: Cartesian Y (m)
+    :type y: float
     :param z: Cartesian Z (m)
+    :type z: float
     :param path: Array with path between reference frames
+    :type path: list of str
     :param vcv: Optional 3*3 numpy array in Cartesian units to propagate tf uncertainty
+    :type vcv: numpy.ndarray
     :return: Cartesian X, Y, Z co-ordinates and vcv matrix transformed
+    :rtype: tuple
     """
     
     i = 1
@@ -177,12 +190,19 @@ def static_to_dynamic_trans(x, y, z, to_epoch, path, vcv):
     Completes static to dynamic transformation
 
     :param x: Cartesian X (m)
+    :type x: float
     :param y: Cartesian Y (m)
+    :type y: float
     :param z: Cartesian Z (m)
+    :type z: float
     :param to_epoch: The target epoch for the dynamic reference frame (datetime.date Object)
+    :type to_epoch: datetime.date
     :param path: Array with path between reference frames
+    :type path: list of str
     :param vcv: Optional 3*3 numpy array in Cartesian units to propagate tf uncertainty
+    :type vcv: numpy.ndarray
     :return: Cartesian X, Y, Z co-ordinates and vcv matrix transformed
+    :rtype: tuple
     """
 
     i = 1
@@ -220,12 +240,19 @@ def dynamic_to_static_trans(x, y, z, from_epoch, path, vcv):
     Completes dynamic to static transformation
 
     :param x: Cartesian X (m)
+    :type x: float
     :param y: Cartesian Y (m)
+    :type y: float
     :param z: Cartesian Z (m)
+    :type z: float
     :param from_epoch: The source epoch for the dynamic reference frame (datetime.date Object)
+    :type from_epoch: datetime.date
     :param path: Array with path between reference frames
+    :type path: list of str
     :param vcv: Optional 3*3 numpy array in Cartesian units to propagate tf uncertainty
+    :type vcv: numpy.ndarray
     :return: Cartesian X, Y, Z co-ordinates and vcv matrix transformed
+    :rtype: tuple
     """
 
     i = 1
@@ -263,14 +290,25 @@ def dynamic_to_dynamic_trans(x, y, z, from_ref, to_ref, from_epoch, to_epoch, pl
     Completes dynamic to dynamic transformation
 
     :param x: Cartesian X (m)
+    :type x: float
     :param y: Cartesian Y (m)
+    :type y: float
     :param z: Cartesian Z (m)
+    :type z: float
     :param from_ref: Source reference frame
+    :type from_ref: str
     :param to_ref: Target reference frame
+    :type to_ref: str
     :param from_epoch: The source epoch for the dynamic reference frame (datetime.date Object)
+    :type from_epoch: datetime.date
     :param to_epoch: The target epoch for the dynamic reference frame (datetime.date Object)
+    :type to_epoch: datetime.date
+    :param plate_motion: The plate motion model to use
+    :type plate_motion: str
     :param vcv: Optional 3*3 numpy array in Cartesian units to propagate tf uncertainty
+    :type vcv: numpy.ndarray
     :return: Cartesian X, Y, Z co-ordinates and vcv matrix transformed
+    :rtype: tuple
     """
 
     # If from and to epoch are the same then direct transformation without plate motion 
@@ -339,7 +377,7 @@ def dynamic_to_dynamic_trans(x, y, z, from_ref, to_ref, from_epoch, to_epoch, pl
 
         i+=1
 
-    # Decide which plate motion
+    # Decide which plate motion to use
     if plate_motion == "auto":
         x, y, z, vcv = pp.universal_plate_motion_transformation(x, y, z, from_epoch, to_epoch, vcv)
 
@@ -380,26 +418,34 @@ def dynamic_to_dynamic_trans(x, y, z, from_ref, to_ref, from_epoch, to_epoch, pl
     print("Completed Transformation")
     return round(x,4), round(y, 4), round(z, 4), vcv
 
-import datetime as dt
-
-
-
-
 def universal_transform(x, y, z, from_ref, to_ref, from_epoch=None, to_epoch=None, plate_motion="auto", vcv=None, return_type="xyz", ignore_errors=False):
     """
     Completes a transformation from any reference frame to any other
 
     :param x: Cartesian X (m)
+    :type x: float
     :param y: Cartesian Y (m)
+    :type y: float
     :param z: Cartesian Z (m)
+    :type z: float
     :param from_ref: Source reference frame
+    :type from_ref: str
     :param to_ref: Target reference frame
+    :type to_ref: str
     :param from_epoch: The source epoch for the dynamic reference frame (datetime.date Object)
+    :type from_epoch: datetime.date
     :param to_epoch: The target epoch for the dynamic reference frame (datetime.date Object)
+    :type to_epoch: datetime.date
     :param plate_motion: Set what plate motion to use: "auto" Automatically finds plate motion, "aus" use australian plate motion model.
+    :type plate_motion: str
     :param vcv: Optional 3*3 numpy array in Cartesian units to propagate tf uncertainty
-    :param return_type: 
-    :return: Cartesian X, Y, Z co-ordinates and vcv matrix transformed
+    :type vcv: numpy.ndarray
+    :param return_type: The type of coordinates to return, either "xyz", "llh" or "enu"
+    :type return_type: str
+    :param ignore_errors: If True, will not raise errors about point not being on Australia's plate
+    :type ignore_errors: bool
+    :return: Co-ordinates and vcv matrix transformed and in the return type given
+    :rtype: dict
     """
     # MGA can not be enters as from_ref for xyz
     if from_ref.lower() in ("mga94", "mga2020"):
@@ -438,7 +484,7 @@ def universal_transform(x, y, z, from_ref, to_ref, from_epoch=None, to_epoch=Non
             raise ValueError(f"VCV must be shape (3,3), got {vcv.shape}")
     
     # If using Australian plate motion ("aus"), check point is on australian plate
-    plates = pp.build_plate_index("MORVEL56_plates.dig")
+    plates = pp.build_plate_index("other_files/MORVEL56_plates.dig")
     plate_id = pp.plate_from_xyz(x, y, z, plates)
 
     if plate_motion == "aus" and plate_id != "AU" and not ignore_errors:
@@ -448,7 +494,7 @@ def universal_transform(x, y, z, from_ref, to_ref, from_epoch=None, to_epoch=Non
     aus_frames = ("GDA94", "GDA2020", "AGD66", "AGD84", "ATRF2020")
     
     if (from_ref in aus_frames) or (to_ref in aus_frames):
-        plates = pp.build_plate_index("EEZ_australia_approx.dig")
+        plates = pp.build_plate_index("other_files/EEZ_australia_approx.dig")
         plate_id = pp.plate_from_xyz(x, y, z, plates)
 
         if plate_id is None and not ignore_errors:
@@ -541,17 +587,30 @@ def universal_transform_llh(lat, lon, el_height, from_ref, to_ref, from_epoch=No
     """
     Completes a transformation from any reference frame to any other
 
-    :param x: Cartesian X (m)
-    :param y: Cartesian Y (m)
-    :param z: Cartesian Z (m)
+    :param lat: Latitude (degrees)
+    :type lat: float
+    :param lon: Longitude (degrees)
+    :type lon: float
+    :param el_height: Ellipsoidal height (m)
+    :type el_height: float
     :param from_ref: Source reference frame
+    :type from_ref: str
     :param to_ref: Target reference frame
+    :type to_ref: str
     :param from_epoch: The source epoch for the dynamic reference frame (datetime.date Object)
+    :type from_epoch: datetime.date
     :param to_epoch: The target epoch for the dynamic reference frame (datetime.date Object)
+    :type to_epoch: datetime.date
     :param plate_motion: Set what plate motion to use: "auto" Automatically finds plate motion, "aus" use australian plate motion model.
+    :type plate_motion: str
     :param vcv: Optional 3*3 numpy array in Cartesian units to propagate tf uncertainty
-    :param return_type: 
-    :return: Cartesian X, Y, Z co-ordinates and vcv matrix transformed
+    :type vcv: numpy.ndarray
+    :param return_type: The type of coordinates to return, either "xyz", "llh" or "enu"
+    :type return_type: str
+    :param ignore_errors: If True, will not raise errors about point not being on Australia's plate
+    :type ignore_errors: bool
+    :return: Co-ordinates and vcv matrix transformed and in the return type given
+    :rtype: dict
     """
     # Can not have mga as from_ref for llh input
     if from_ref.lower() in ("mga94", "mga2020"):
@@ -626,17 +685,32 @@ def universal_transform_enu(east, north, height, zone, from_ref, to_ref, from_ep
     """
     Completes a transformation from any reference frame to any other
 
-    :param x: Cartesian X (m)
-    :param y: Cartesian Y (m)
-    :param z: Cartesian Z (m)
+    :param east: Easting (m)
+    :type east: float
+    :param north: Northing (m)
+    :type north: float
+    :param height: Ellipsoidal height (m)
+    :type height: float
+    :param zone: UTM zone
+    :type zone: int
     :param from_ref: Source reference frame
+    :type from_ref: str
     :param to_ref: Target reference frame
+    :type to_ref: str
     :param from_epoch: The source epoch for the dynamic reference frame (datetime.date Object)
+    :type from_epoch: datetime.date
     :param to_epoch: The target epoch for the dynamic reference frame (datetime.date Object)
+    :type to_epoch: datetime.date
     :param plate_motion: Set what plate motion to use: "auto" Automatically finds plate motion, "aus" use australian plate motion model.
+    :type plate_motion: str
     :param vcv: Optional 3*3 numpy array in Cartesian units to propagate tf uncertainty
-    :param return_type: 
-    :return: Cartesian X, Y, Z co-ordinates and vcv matrix transformed
+    :type vcv: numpy.ndarray
+    :param return_type: The type of coordinates to return, either "xyz", "llh" or "enu"
+    :type return_type: str
+    :param ignore_errors: If True, will not raise errors about point not being on Australia's plate
+    :type ignore_errors: bool
+    :return: Co-ordinates and vcv matrix transformed and in the return type given
+    :rtype: dict
     """
     # Can not have mga as from_ref for llh input
     if from_ref.lower() not in ("mga94", "mga2020"):
@@ -710,45 +784,3 @@ def universal_transform_enu(east, north, height, zone, from_ref, to_ref, from_ep
         }
     
     return output
-
-
-
-"""
-# Testing point on Aus mainland
-x, y, z = -4130636.759, 2894953.142, -3890530.249
-
-sigma = 0.003
-vcv_xyz = np.diag([sigma**2, sigma**2, sigma**2])
-#vcv_xyz=3
-
-x, y, z, vcv = universal_transform(x, y, z, "WGS84 Ensemble","GDA2020", date(2005,1,1), date(2000,1,1), "aus", vcv=vcv_xyz)
-
-print(x, y, z)
-try:
-    sigmas_out = np.sqrt(np.diag(vcv))
-    #print(sigmas_out)
-    for sigma in sigmas_out:   
-        print(f"{sigma:.3f}")
-except:
-    print(vcv)
-
-# Testing point on Aus plate but outside of EEZ
-lat, lon, h = -18.38, 104.11, 0
-x, y, z = con.llh2xyz(lat, lon, h)
-
-x, y, z, vcv = universal_transform(x, y, z, "WGS84 Ensemble","ITRF2020", date(2005,1,1), date(2005,1,1), "aus", vcv=vcv_xyz)
-
-print(x, y, z)
-
-# Testing llh
-lat, lon, h = -24.38, 120.11, 0.0
-
-#lat, lon, h, vcv = universal_transform_llh(lat, lon, h, "WGS84 Ensemble","MGA2020", date(2005,1,1), date(2005,1,1), "aus", vcv=vcv_xyz, return_type="llh")
-east, north, h, zone, vcv = universal_transform_llh(lat, lon, h, "WGS84 Ensemble","MGA2020", date(2005,1,1), date(2005,1,1), "aus", vcv=vcv_xyz, return_type="enu")
-
-#print(lat, lon, h)
-print(east, north, h, zone)
-
-x, y, z, vcv = universal_transform_enu(east, north, h, zone,"MGA2020", "WGS84 Ensemble", date(2005,1,1), date(2005,1,1), "aus", vcv=vcv_xyz, return_type="xyz")
-print(x, y, z)
-"""

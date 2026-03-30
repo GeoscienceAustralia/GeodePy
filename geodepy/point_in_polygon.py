@@ -23,7 +23,9 @@ def lon_to_180(lon):
     Normalize longitude to between -180 and 180
     
     :param lon: Longitude
+    :type lon: float
     :return: Longitude between -180 to 180
+    :rtype: float
     """
     return ((lon + 180.0) % 360.0) - 180.0
 
@@ -33,7 +35,9 @@ def circular_mean_lon(lons_deg):
     Circular mean longitude in degrees, returned in [-180,180).
 
     :param lons_deg: Longitdue in degrees
+    :type lons_deg: list of floats
     :return: Returns the mean longitude
+    :rtype: float
     """
     angles = [math.radians(l) for l in lons_deg]
     sx = sum(math.cos(a) for a in angles)
@@ -47,8 +51,11 @@ def unwrap_lons_to_reference(coords, ref_lon):
     This avoids seam jumps when projecting.
 
     :param coords: Array with lat and lon
-    :param ref_lon: Mean Lonitude
-    :return: Unwrapped Lonitude
+    :type coords: list of tuples
+    :param ref_lon: Mean Longitude
+    :type ref_lon: float
+    :return: Unwrapped Longitude
+    :rtype: list of tuples
     """
     out = []
     for lon, lat in coords:
@@ -65,7 +72,9 @@ def read_morvel_plate_file(path):
     Read MORVEL file and place into dictionary
     
     :param path: Path to morvel plate file
+    :type path: str
     :return: Dictionary of plates with their boundaries
+    :rtype: dict
     """
     plates= {}
     current_plate = None
@@ -131,7 +140,9 @@ def build_plate_index(dig_path):
       }
     
     :param dig_path: Path to morvel plate file
+    :type dig_path: str
     :return: Dictionary of plates
+    :rtype: dict
     """
     plates = read_morvel_plate_file(dig_path)
     index = {}
@@ -204,9 +215,13 @@ def plate_from_ll(lat, lon, plate_index):
     Find plate for geographic lat/lon (degrees).
 
     :param lat: Latitude of point
+    :type lat: float
     :param lon: Longitude of point
+    :type lon: float
     :param plate_index: Dictionary of plates
+    :type plate_index: dict
     :return: Plate ID
+    :rtype: Array of strings or None
     """
     lon = lon_to_180(lon)
 
@@ -235,10 +250,15 @@ def plate_from_xyz(x, y, z, plate_index):
     Converts XYZ to LLH and runs plate_from_ll to find plate
 
     :param x: Cartesian X (m)
+    :type x: float
     :param y: Cartesian Y (m)
+    :type y: float
     :param z: Cartesian Z (m)
+    :type z: float
     :param plate_index: Dictionary of plates
+    :type plate_index: dict
     :return: plate ID
+    :rtype: Array of strings or None
     """
     lat, lon, h = geodepy.convert.xyz2llh(x, y, z)
     return plate_from_ll(lat, lon, plate_index)
@@ -265,7 +285,9 @@ def load_poles(path):
     where rot is deg/Ma anti-clockwise.
 
     :param path: Path to plate motion file
+    :type path: str
     :return: Array of PlatePole objects containing each plate
+    :rtype: list of PlatePole
     """
     path = Path(path)
     poles = []
@@ -308,9 +330,13 @@ def euler_to_drx_dry_drz(lat_deg, lon_deg, rot_deg_ma):
     Convert Euler pole (lat, lon, rot deg/Ma) to GeodePy rotation rates d_rx,d_ry,d_rz in arcsec/yr.
 
     :param lat_deg: Euler pole Latitude in degrees
+    :type lat_deg: float
     :param lon_deg: Euler pole Longitude in degrees
+    :type lon_deg: float
     :param rot_deg_ma: Euler pole rotation in deg/Ma
+    :type rot_deg_ma: float
     :return: Rotation paramters in rx, ry, rz
+    :rtype: tuple of floats (d_rx, d_ry, d_rz)
     """
     phi = math.radians(lat_deg)
     lam = math.radians(lon_deg)
@@ -331,9 +357,13 @@ def sd_drot_from_rms_and_pole(rms_mm_yr, lat_deg, lon_deg, radius_m=6378137.0):
     Assumes uncertainty is magnitude-only along pole direction.
     
     :param rms_mm_yr: RMS of pole in mm/yr
+    :type rms_mm_yr: float
     :param lat_deg: Euler pole Latitude in degrees
+    :type lat_deg: float
     :param lon_deg: Euler pole Longitude in degrees
+    :type lon_deg: float
     :return: RMS values for rotation paramters
+    :rtype: tuple of floats (sd_d_rx, sd_d_ry, sd_d_rz)
     """
     # RMS speed -> m/yr
     sigma_v = rms_mm_yr / 1000.0
@@ -373,10 +403,15 @@ def plate_transformation(
       d_rx/d_ry/d_rz = Euler pole converted to arcsec/yr
 
     :param plate_code: Plate code eg "AU"
+    :type plate_code: str
     :param poles_file: Path to plate motion file
+    :type poles_file: str
     :param ref_epoch: Reference epoch of transformation
+    :type ref_epoch: datetime.date
     :param from_datum: Source datum for transformation
+    :type from_datum: str
     :param to_datum: Destination datum for transformation
+    :type to_datum: str
     :return: Geodepy.constants.Transformation Object
     """
     poles = load_poles(poles_file)
@@ -419,18 +454,32 @@ def plate_transformation(
 
 def universal_plate_motion_transformation(x ,y, z, 
                                           from_epoch, to_epoch, vcv=None,
-                                          plate_file = "MORVEL56_plates.dig", 
-                                          poles_file = "NNR-MORVEL56_poles.txt", 
+                                          plate_file = "other_files/MORVEL56_plates.dig", 
+                                          poles_file = "other_files/NNR-MORVEL56_poles.txt", 
                                           ref_epoch = date(2020, 1, 1)):
     """
     Given ECEF XYZ coordinates, find the plate, find the plate motion and transform point.
 
     :param x: Cartesian X (m)
+    :type x: float
     :param y: Cartesian Y (m)
+    :type y: float
     :param z: Cartesian Z (m)
+    :type z: float
     :param from_epoch: Source epoch for plate motion
+    :type from_epoch: datetime.date
     :param to_epoch: Destination epoch for plate motion
-    :param vcv: 
+    :type to_epoch: datetime.date
+    :param vcv: Optional 3*3 numpy array in Cartesian units to propagate tf uncertainty
+    :type vcv: numpy.ndarray
+    :param plate_file: Path to morvel plate file
+    :type plate_file: str
+    :param poles_file: Path to plate motion file
+    :type poles_file: str
+    :param ref_epoch: Reference epoch of transformation
+    :type ref_epoch: datetime.date
+    :return: Transformed XYZ and VCV
+    :rtype: tuple (xtrans, ytrans, ztrans, vcv)
     """
 
     # Create Index of plates
@@ -450,75 +499,3 @@ def universal_plate_motion_transformation(x ,y, z,
     xtrans, ytrans, ztrans, vcv = geodepy.transform.plate_motion_transformation(x, y, z, from_epoch, to_epoch, transformation, vcv)
 
     return xtrans, ytrans, ztrans, vcv
-
-"""
-x, y, z = -4130636.759, 2894953.142, -3890530.249
-sigma = 0.003
-vcv_xyz = np.diag([sigma**2, sigma**2, sigma**2])
-
-x, y, z, vcv = universal_plate_motion_transformation(x, y, z, date(2020,1,1), date(2025,1,1), vcv=vcv_xyz)
-print(x, y, z)
-
-
-x, y, z, vcv = geodepy.transform.plate_motion_transformation(x, y, z, date(2020,1,1), date(2025, 1, 1), geodepy.constants.itrf2014_to_gda2020, vcv=vcv_xyz)
-print(x, y, z)
-sigmas_out = np.sqrt(np.diag(vcv))
-print(sigmas_out)
-"""
-"""
-x, y, z = -4130636.759, 2894953.142, -3890530.249
-
-eez = build_plate_index("EEZ_australia_approx.dig")
-
-x, y, z = -4130636.759, 2894953.142, -3890530.249
-plate_id = plate_from_xyz(x, y, z, eez)
-print(f"ID: {plate_id} (Should be MA)")
-
-lon, lat = 170.48, -27.31
-plate_id = plate_from_ll(lat, lon, eez)
-print(f"ID: {plate_id} (Should be MA)")
-
-lon, lat = 161.28, -36.12
-plate_id = plate_from_ll(lat, lon, eez)
-print(f"ID: {plate_id} (Should be MA)")
-
-lon, lat = 133.71, -23.33
-plate_id = plate_from_ll(lat, lon, eez)
-print(f"ID: {plate_id} (Should be MA)")
-
-lon, lat = 109.73, -33.88
-plate_id = plate_from_ll(lat, lon, eez)
-print(f"ID: {plate_id} (Should be MA)")
-
-lon, lat = 116.65, -14.18
-plate_id = plate_from_ll(lat, lon, eez)
-print(f"ID: {plate_id} (Should be MA)")
-
-lon, lat = 159.71, -59.28
-plate_id = plate_from_ll(lat, lon, eez)
-print(f"ID: {plate_id} (Should be MQ)")
-
-lon, lat = 107.35, -12.09
-plate_id = plate_from_ll(lat, lon, eez)
-print(f"ID: {plate_id} (Should be CH)")
-
-lon, lat = 95.7, -10.5
-plate_id = plate_from_ll(lat, lon, eez)
-print(f"ID: {plate_id} (Should be CO)")
-
-lon, lat = 170.63, -43.66
-plate_id = plate_from_ll(lat, lon, eez)
-print(f"ID: {plate_id} (Should be None)")
-
-lon, lat = 156.6, -37.39
-plate_id = plate_from_ll(lat, lon, eez)
-print(f"ID: {plate_id} (Should be None)")
-
-lon, lat = 108.59, -29.73
-plate_id = plate_from_ll(lat, lon, eez)
-print(f"ID: {plate_id} (Should be None)")
-
-lon, lat = -97.1, 38.8
-plate_id = plate_from_ll(lat, lon, eez)
-print(f"ID: {plate_id} (Should be None)")
-"""
