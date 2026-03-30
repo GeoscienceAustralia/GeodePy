@@ -1,0 +1,1706 @@
+{
+  "version": 3,
+  "source": "Transformation paths.xlsx::Sheet1",
+  "frames_order": [
+    "GDA2020",
+    "GDA94",
+    "AGD66",
+    "AGD84",
+    "ATRF2014",
+    "ITRF88",
+    "ITRF89",
+    "ITRF90",
+    "ITRF91",
+    "ITRF92",
+    "ITRF93",
+    "ITRF94",
+    "ITRF96",
+    "ITRF97",
+    "ITRF2000",
+    "ITRF2005",
+    "ITRF2008",
+    "ITRF2014",
+    "ITRF2020",
+    "WGS84 (G2296)",
+    "WGS84 (G2139)",
+    "WGS84 (G1762)",
+    "WGS84 (G1674)",
+    "WGS84 (G1150)",
+    "WGS84 (G873)",
+    "WGS84 (G730)",
+    "WGS84 (Transit)",
+    "WGS84 Ensemble"
+  ],
+  "routes": {
+    "GDA2020|AGD66": [
+      "GDA2020",
+      "GDA94",
+      "AGD66"
+    ],
+    "GDA2020|AGD84": [
+      "GDA2020",
+      "GDA94",
+      "AGD84"
+    ],
+    "GDA2020|ITRF88": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF88"
+    ],
+    "GDA2020|ITRF89": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF89"
+    ],
+    "GDA2020|ITRF90": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF90"
+    ],
+    "GDA2020|ITRF91": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF91"
+    ],
+    "GDA2020|ITRF92": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF92"
+    ],
+    "GDA2020|ITRF93": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF93"
+    ],
+    "GDA2020|ITRF94": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF94"
+    ],
+    "GDA2020|ITRF96": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF96"
+    ],
+    "GDA2020|ITRF97": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF97"
+    ],
+    "GDA2020|ITRF2000": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF2000"
+    ],
+    "GDA2020|ITRF2005": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF2005"
+    ],
+    "GDA2020|ITRF2008": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF2008"
+    ],
+    "GDA2020|ITRF2020": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF2020"
+    ],
+    "GDA2020|WGS84 (G2296)": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "GDA2020|WGS84 (G2139)": [
+      "GDA2020",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "GDA2020|WGS84 (G1762)": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "GDA2020|WGS84 (G1674)": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "GDA2020|WGS84 (G1150)": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "GDA2020|WGS84 (G873)": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "GDA2020|WGS84 (G730)": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "GDA2020|WGS84 (Transit)": [
+      "GDA2020",
+      "ITRF2014",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "GDA2020|WGS84 Ensemble": [
+      "GDA2020",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "GDA94|ATRF2014": [
+      "GDA94",
+      "GDA2020",
+      "ATRF2014"
+    ],
+    "GDA94|ITRF88": [
+      "GDA94",
+      "ITRF2008",
+      "ITRF88"
+    ],
+    "GDA94|ITRF89": [
+      "GDA94",
+      "ITRF2008",
+      "ITRF89"
+    ],
+    "GDA94|ITRF90": [
+      "GDA94",
+      "ITRF2008",
+      "ITRF90"
+    ],
+    "GDA94|ITRF91": [
+      "GDA94",
+      "ITRF2008",
+      "ITRF91"
+    ],
+    "GDA94|ITRF92": [
+      "GDA94",
+      "ITRF2008",
+      "ITRF92"
+    ],
+    "GDA94|ITRF93": [
+      "GDA94",
+      "ITRF2008",
+      "ITRF93"
+    ],
+    "GDA94|ITRF94": [
+      "GDA94",
+      "ITRF96",
+      "ITRF94"
+    ],
+    "GDA94|ITRF2014": [
+      "GDA94",
+      "GDA2020",
+      "ITRF2014"
+    ],
+    "GDA94|ITRF2020": [
+      "GDA94",
+      "GDA2020",
+      "ITRF2014",
+      "ITRF2020"
+    ],
+    "GDA94|WGS84 (G2296)": [
+      "GDA94",
+      "GDA2020",
+      "ITRF2014",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "GDA94|WGS84 (G2139)": [
+      "GDA94",
+      "GDA2020",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "GDA94|WGS84 (G1762)": [
+      "GDA94",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "GDA94|WGS84 (G1674)": [
+      "GDA94",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "GDA94|WGS84 (G1150)": [
+      "GDA94",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "GDA94|WGS84 (G873)": [
+      "GDA94",
+      "ITRF96",
+      "WGS84 (G873)"
+    ],
+    "GDA94|WGS84 (G730)": [
+      "GDA94",
+      "ITRF2008",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "GDA94|WGS84 (Transit)": [
+      "GDA94",
+      "ITRF2008",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "GDA94|WGS84 Ensemble": [
+      "GDA94",
+      "GDA2020",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "AGD66|AGD84": [
+      "AGD66",
+      "GDA94",
+      "AGD84"
+    ],
+    "AGD66|ATRF2014": [
+      "AGD66",
+      "GDA94",
+      "GDA2020",
+      "ATRF2014"
+    ],
+    "AGD66|ITRF88": [
+      "AGD66",
+      "GDA94",
+      "ITRF2008",
+      "ITRF88"
+    ],
+    "AGD66|ITRF89": [
+      "AGD66",
+      "GDA94",
+      "ITRF2008",
+      "ITRF89"
+    ],
+    "AGD66|ITRF90": [
+      "AGD66",
+      "GDA94",
+      "ITRF2008",
+      "ITRF90"
+    ],
+    "AGD66|ITRF91": [
+      "AGD66",
+      "GDA94",
+      "ITRF2008",
+      "ITRF91"
+    ],
+    "AGD66|ITRF92": [
+      "AGD66",
+      "GDA94",
+      "ITRF2008",
+      "ITRF92"
+    ],
+    "AGD66|ITRF93": [
+      "AGD66",
+      "GDA94",
+      "ITRF2008",
+      "ITRF93"
+    ],
+    "AGD66|ITRF94": [
+      "AGD66",
+      "GDA94",
+      "ITRF96", 
+      "ITRF94"
+    ],
+    "AGD66|ITRF96": [
+      "AGD66",
+      "GDA94",
+      "ITRF96"
+    ],
+    "AGD66|ITRF97": [
+      "AGD66",
+      "GDA94",
+      "ITRF97"
+    ],
+    "AGD66|ITRF2000": [
+      "AGD66",
+      "GDA94",
+      "ITRF2000"
+    ],
+    "AGD66|ITRF2005": [
+      "AGD66",
+      "GDA94",
+      "ITRF2005"
+    ],
+    "AGD66|ITRF2008": [
+      "AGD66",
+      "GDA94",
+      "ITRF2008"
+    ],
+    "AGD66|ITRF2014": [
+      "AGD66",
+      "GDA94",
+      "GDA2020",
+      "ITRF2014"
+    ],
+    "AGD66|ITRF2020": [
+      "AGD66",
+      "GDA94",
+      "GDA2020",
+      "ITRF2014",
+      "ITRF2020"
+    ],
+    "AGD66|WGS84 (G2296)": [
+      "AGD66",
+      "GDA94",
+      "GDA2020",
+      "ITRF2014",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "AGD66|WGS84 (G2139)": [
+      "AGD66",
+      "GDA94",
+      "GDA2020",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "AGD66|WGS84 (G1762)": [
+      "AGD66",
+      "GDA94",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "AGD66|WGS84 (G1674)": [
+      "AGD66",
+      "GDA94",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "AGD66|WGS84 (G1150)": [
+      "AGD66",
+      "GDA94",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "AGD66|WGS84 (G873)": [
+      "AGD66",
+      "GDA94",
+      "ITRF96",
+      "WGS84 (G873)"
+    ],
+    "AGD66|WGS84 (G730)": [
+      "AGD66",
+      "GDA94",
+      "ITRF2008",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "AGD66|WGS84 (Transit)": [
+      "AGD66",
+      "GDA94",
+      "ITRF2008",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "AGD66|WGS84 Ensemble": [
+      "AGD66",
+      "GDA94",
+      "GDA2020",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "AGD84|ATRF2014": [
+      "AGD84",
+      "GDA94",
+      "GDA2020",
+      "ATRF2014"
+    ],
+    "AGD84|ITRF88": [
+      "AGD84",
+      "GDA94",
+      "ITRF2008",
+      "ITRF88"
+    ],
+    "AGD84|ITRF89": [
+      "AGD84",
+      "GDA94",
+      "ITRF2008",
+      "ITRF89"
+    ],
+    "AGD84|ITRF90": [
+      "AGD84",
+      "GDA94",
+      "ITRF2008",
+      "ITRF90"
+    ],
+    "AGD84|ITRF91": [
+      "AGD84",
+      "GDA94",
+      "ITRF2008",
+      "ITRF91"
+    ],
+    "AGD84|ITRF92": [
+      "AGD84",
+      "GDA94",
+      "ITRF2008",
+      "ITRF92"
+    ],
+    "AGD84|ITRF93": [
+      "AGD84",
+      "GDA94",
+      "ITRF2008",
+      "ITRF93"
+    ],
+    "AGD84|ITRF94": [
+      "AGD84",
+      "GDA94",
+      "ITRF96",
+      "ITRF94"
+    ],
+    "AGD84|ITRF96": [
+      "AGD84",
+      "GDA94",
+      "ITRF96"
+    ],
+    "AGD84|ITRF97": [
+      "AGD84",
+      "GDA94",
+      "ITRF97"
+    ],
+    "AGD84|ITRF2000": [
+      "AGD84",
+      "GDA94",
+      "ITRF2000"
+    ],
+    "AGD84|ITRF2005": [
+      "AGD84",
+      "GDA94",
+      "ITRF2005"
+    ],
+    "AGD84|ITRF2008": [
+      "AGD84",
+      "GDA94",
+      "ITRF2008"
+    ],
+    "AGD84|ITRF2014": [
+      "AGD84",
+      "GDA94",
+      "GDA2020",
+      "ITRF2014"
+    ],
+    "AGD84|ITRF2020": [
+      "AGD84",
+      "GDA94",
+      "GDA2020",
+      "ITRF2014",
+      "ITRF2020"
+    ],
+    "AGD84|WGS84 (G2296)": [
+      "AGD84",
+      "GDA94",
+      "GDA2020",
+      "ITRF2014",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "AGD84|WGS84 (G2139)": [
+      "AGD84",
+      "GDA94",
+      "GDA2020",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "AGD84|WGS84 (G1762)": [
+      "AGD84",
+      "GDA94",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "AGD84|WGS84 (G1674)": [
+      "AGD84",
+      "GDA94",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "AGD84|WGS84 (G1150)": [
+      "AGD84",
+      "GDA94",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "AGD84|WGS84 (G873)": [
+      "AGD84",
+      "GDA94",
+      "ITRF96",
+      "WGS84 (G873)"
+    ],
+    "AGD84|WGS84 (G730)": [
+      "AGD84",
+      "GDA94",
+      "ITRF2008",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "AGD84|WGS84 (Transit)": [
+      "AGD84",
+      "GDA94",
+      "ITRF2008",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "AGD84|WGS84 Ensemble": [
+      "AGD84",
+      "GDA94",
+      "GDA2020",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "ATRF2014|ITRF88": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF88"
+    ],
+    "ATRF2014|ITRF89": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF89"
+    ],
+    "ATRF2014|ITRF90": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF90"
+    ],
+    "ATRF2014|ITRF91": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF91"
+    ],
+    "ATRF2014|ITRF92": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF92"
+    ],
+    "ATRF2014|ITRF93": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF93"
+    ],
+    "ATRF2014|ITRF94": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF94"
+    ],
+    "ATRF2014|ITRF96": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF96"
+    ],
+    "ATRF2014|ITRF97": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF97"
+    ],
+    "ATRF2014|ITRF2000": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF2000"
+    ],
+    "ATRF2014|ITRF2005": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF2005"
+    ],
+    "ATRF2014|ITRF2008": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF2008"
+    ],
+    "ATRF2014|ITRF2020": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF2020"
+    ],
+    "ATRF2014|WGS84 (G2296)": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "ATRF2014|WGS84 (G2139)": [
+      "ATRF2014",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "ATRF2014|WGS84 (G1762)": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "ATRF2014|WGS84 (G1674)": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "ATRF2014|WGS84 (G1150)": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "ATRF2014|WGS84 (G873)": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "ATRF2014|WGS84 (G730)": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "ATRF2014|WGS84 (Transit)": [
+      "ATRF2014",
+      "ITRF2014",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "ATRF2014|WGS84 Ensemble": [
+      "ATRF2014",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "ITRF88|WGS84 (G2296)": [
+      "ITRF88",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "ITRF88|WGS84 (G2139)": [
+      "ITRF88",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "ITRF88|WGS84 (G1762)": [
+      "ITRF88",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "ITRF88|WGS84 (G1674)": [
+      "ITRF88",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "ITRF88|WGS84 (G1150)": [
+      "ITRF88",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "ITRF88|WGS84 (G873)": [
+      "ITRF88",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "ITRF88|WGS84 (G730)": [
+      "ITRF88",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "ITRF88|WGS84 (Transit)": [
+      "ITRF88",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "ITRF88|WGS84 Ensemble": [
+      "ITRF88",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "ITRF89|WGS84 (G2296)": [
+      "ITRF89",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "ITRF89|WGS84 (G2139)": [
+      "ITRF89",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "ITRF89|WGS84 (G1762)": [
+      "ITRF89",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "ITRF89|WGS84 (G1674)": [
+      "ITRF89",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "ITRF89|WGS84 (G1150)": [
+      "ITRF89",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "ITRF89|WGS84 (G873)": [
+      "ITRF89",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "ITRF89|WGS84 (G730)": [
+      "ITRF89",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "ITRF89|WGS84 (Transit)": [
+      "ITRF89",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "ITRF89|WGS84 Ensemble": [
+      "ITRF89",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "ITRF90|WGS84 (G2296)": [
+      "ITRF90",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "ITRF90|WGS84 (G2139)": [
+      "ITRF90",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "ITRF90|WGS84 (G1762)": [
+      "ITRF90",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "ITRF90|WGS84 (G1674)": [
+      "ITRF90",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "ITRF90|WGS84 (G1150)": [
+      "ITRF90",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "ITRF90|WGS84 (G873)": [
+      "ITRF90",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "ITRF90|WGS84 (G730)": [
+      "ITRF90",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "ITRF90|WGS84 Ensemble": [
+      "ITRF90",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "ITRF91|WGS84 (G2296)": [
+      "ITRF91",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "ITRF91|WGS84 (G2139)": [
+      "ITRF91",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "ITRF91|WGS84 (G1762)": [
+      "ITRF91",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "ITRF91|WGS84 (G1674)": [
+      "ITRF91",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "ITRF91|WGS84 (G1150)": [
+      "ITRF91",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "ITRF91|WGS84 (G873)": [
+      "ITRF91",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "ITRF91|WGS84 (Transit)": [
+      "ITRF91",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "ITRF91|WGS84 Ensemble": [
+      "ITRF91",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "ITRF92|WGS84 (G2296)": [
+      "ITRF92",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "ITRF92|WGS84 (G2139)": [
+      "ITRF92",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "ITRF92|WGS84 (G1762)": [
+      "ITRF92",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "ITRF92|WGS84 (G1674)": [
+      "ITRF92",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "ITRF92|WGS84 (G1150)": [
+      "ITRF92",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "ITRF92|WGS84 (G873)": [
+      "ITRF92",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "ITRF92|WGS84 (G730)": [
+      "ITRF92",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "ITRF92|WGS84 (Transit)": [
+      "ITRF92",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "ITRF92|WGS84 Ensemble": [
+      "ITRF92",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "ITRF93|WGS84 (G2296)": [
+      "ITRF93",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "ITRF93|WGS84 (G2139)": [
+      "ITRF93",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "ITRF93|WGS84 (G1762)": [
+      "ITRF93",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "ITRF93|WGS84 (G1674)": [
+      "ITRF93",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "ITRF93|WGS84 (G1150)": [
+      "ITRF93",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "ITRF93|WGS84 (G873)": [
+      "ITRF93",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "ITRF93|WGS84 (G730)": [
+      "ITRF93",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "ITRF93|WGS84 (Transit)": [
+      "ITRF93",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "ITRF93|WGS84 Ensemble": [
+      "ITRF93",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "ITRF94|WGS84 (G2296)": [
+      "ITRF94",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "ITRF94|WGS84 (G2139)": [
+      "ITRF94",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "ITRF94|WGS84 (G1762)": [
+      "ITRF94",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "ITRF94|WGS84 (G1674)": [
+      "ITRF94",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "ITRF94|WGS84 (G1150)": [
+      "ITRF94",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "ITRF94|WGS84 (G730)": [
+      "ITRF94",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "ITRF94|WGS84 (Transit)": [
+      "ITRF94",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "ITRF94|WGS84 Ensemble": [
+      "ITRF94",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "ITRF96|WGS84 (G2296)": [
+      "ITRF96",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "ITRF96|WGS84 (G2139)": [
+      "ITRF96",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "ITRF96|WGS84 (G1762)": [
+      "ITRF96",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "ITRF96|WGS84 (G1674)": [
+      "ITRF96",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "ITRF96|WGS84 (G1150)": [
+      "ITRF96",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "ITRF96|WGS84 (G730)": [
+      "ITRF96",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "ITRF96|WGS84 (Transit)": [
+      "ITRF96",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "ITRF96|WGS84 Ensemble": [
+      "ITRF96",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "ITRF97|WGS84 (G2296)": [
+      "ITRF97",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "ITRF97|WGS84 (G2139)": [
+      "ITRF97",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "ITRF97|WGS84 (G1762)": [
+      "ITRF97",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "ITRF97|WGS84 (G1674)": [
+      "ITRF97",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "ITRF97|WGS84 (G1150)": [
+      "ITRF97",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "ITRF97|WGS84 (G730)": [
+      "ITRF97",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "ITRF97|WGS84 (Transit)": [
+      "ITRF97",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "ITRF97|WGS84 Ensemble": [
+      "ITRF97",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "ITRF2000|WGS84 (G2296)": [
+      "ITRF2000",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "ITRF2000|WGS84 (G2139)": [
+      "ITRF2000",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "ITRF2000|WGS84 (G1762)": [
+      "ITRF2000",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "ITRF2000|WGS84 (G1674)": [
+      "ITRF2000",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "ITRF2000|WGS84 (G873)": [
+      "ITRF2000",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "ITRF2000|WGS84 (G730)": [
+      "ITRF2000",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "ITRF2000|WGS84 (Transit)": [
+      "ITRF2000",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "ITRF2000|WGS84 Ensemble": [
+      "ITRF2000",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "ITRF2005|WGS84 (G2296)": [
+      "ITRF2005",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "ITRF2005|WGS84 (G2139)": [
+      "ITRF2005",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "ITRF2005|WGS84 (G1762)": [
+      "ITRF2005",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "ITRF2005|WGS84 (G1150)": [
+      "ITRF2005",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "ITRF2005|WGS84 (G873)": [
+      "ITRF2005",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "ITRF2005|WGS84 (G730)": [
+      "ITRF2005",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "ITRF2005|WGS84 (Transit)": [
+      "ITRF2005",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "ITRF2005|WGS84 Ensemble": [
+      "ITRF2005",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "ITRF2008|WGS84 (G2296)": [
+      "ITRF2008",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "ITRF2008|WGS84 (G2139)": [
+      "ITRF2008",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "ITRF2008|WGS84 (G1674)": [
+      "ITRF2008",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "ITRF2008|WGS84 (G1150)": [
+      "ITRF2008",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "ITRF2008|WGS84 (G873)": [
+      "ITRF2008",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "ITRF2008|WGS84 (G730)": [
+      "ITRF2008",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "ITRF2008|WGS84 (Transit)": [
+      "ITRF2008",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "ITRF2008|WGS84 Ensemble": [
+      "ITRF2008",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "ITRF2014|WGS84 (G2296)": [
+      "ITRF2014",
+      "ITRF2020",
+      "WGS84 (G2296)"
+    ],
+    "ITRF2014|WGS84 (G1762)": [
+      "ITRF2014",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "ITRF2014|WGS84 (G1674)": [
+      "ITRF2014",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "ITRF2014|WGS84 (G1150)": [
+      "ITRF2014",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "ITRF2014|WGS84 (G873)": [
+      "ITRF2014",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "ITRF2014|WGS84 (G730)": [
+      "ITRF2014",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "ITRF2014|WGS84 (Transit)": [
+      "ITRF2014",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "ITRF2020|WGS84 (G2139)": [
+      "ITRF2020",
+      "ITRF2014",
+      "WGS84 (G2139)"
+    ],
+    "ITRF2020|WGS84 (G1762)": [
+      "ITRF2020",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "ITRF2020|WGS84 (G1674)": [
+      "ITRF2020",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "ITRF2020|WGS84 (G1150)": [
+      "ITRF2020",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "ITRF2020|WGS84 (G873)": [
+      "ITRF2020",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "ITRF2020|WGS84 (G730)": [
+      "ITRF2020",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "ITRF2020|WGS84 (Transit)": [
+      "ITRF2020",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "ITRF2020|WGS84 Ensemble": [
+      "ITRF2020",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "WGS84 (G2296)|WGS84 (G1674)": [
+      "WGS84 (G2296)",
+      "ITRF2020",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "WGS84 (G2296)|WGS84 (G1150)": [
+      "WGS84 (G2296)",
+      "ITRF2020",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "WGS84 (G2296)|WGS84 (G873)": [
+      "WGS84 (G2296)",
+      "ITRF2020",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "WGS84 (G2296)|WGS84 (G730)": [
+      "WGS84 (G2296)",
+      "ITRF2020",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "WGS84 (G2296)|WGS84 (Transit)": [
+      "WGS84 (G2296)",
+      "ITRF2020",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "WGS84 (G2296)|WGS84 Ensemble": [
+      "WGS84 (G2296)",
+      "ITRF2020",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "WGS84 (G2139)|WGS84 (G1762)": [
+      "WGS84 (G2139)",
+      "ITRF2014",
+      "ITRF2008",
+      "WGS84 (G1762)"
+    ],
+    "WGS84 (G2139)|WGS84 (G1674)": [
+      "WGS84 (G2139)",
+      "ITRF2014",
+      "ITRF2005",
+      "WGS84 (G1674)"
+    ],
+    "WGS84 (G2139)|WGS84 (G1150)": [
+      "WGS84 (G2139)",
+      "ITRF2014",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "WGS84 (G2139)|WGS84 (G873)": [
+      "WGS84 (G2139)",
+      "ITRF2014",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "WGS84 (G2139)|WGS84 (G730)": [
+      "WGS84 (G2139)",
+      "ITRF2014",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "WGS84 (G2139)|WGS84 (Transit)": [
+      "WGS84 (G2139)",
+      "ITRF2014",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "WGS84 (G2139)|WGS84 Ensemble": [
+      "WGS84 (G2139)",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "WGS84 (G1762)|WGS84 (G1150)": [
+      "WGS84 (G1762)",
+      "ITRF2008",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "WGS84 (G1762)|WGS84 (G873)": [
+      "WGS84 (G1762)",
+      "ITRF2008",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "WGS84 (G1762)|WGS84 (G730)": [
+      "WGS84 (G1762)",
+      "ITRF2008",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "WGS84 (G1762)|WGS84 (Transit)": [
+      "WGS84 (G1762)",
+      "ITRF2008",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "WGS84 (G1762)|WGS84 Ensemble": [
+      "WGS84 (G1762)",
+      "ITRF2008",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "WGS84 (G1674)|WGS84 (G1150)": [
+      "WGS84 (G1674)",
+      "ITRF2005",
+      "ITRF2000",
+      "WGS84 (G1150)"
+    ],
+    "WGS84 (G1674)|WGS84 (G873)": [
+      "WGS84 (G1674)",
+      "ITRF2005",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "WGS84 (G1674)|WGS84 (G730)": [
+      "WGS84 (G1674)",
+      "ITRF2005",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "WGS84 (G1674)|WGS84 (Transit)": [
+      "WGS84 (G1674)",
+      "ITRF2005",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "WGS84 (G1674)|WGS84 Ensemble": [
+      "WGS84 (G1674)",
+      "ITRF2005",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "WGS84 (G1150)|WGS84 (G873)": [
+      "WGS84 (G1150)",
+      "ITRF2000",
+      "ITRF94",
+      "WGS84 (G873)"
+    ],
+    "WGS84 (G1150)|WGS84 (G730)": [
+      "WGS84 (G1150)",
+      "ITRF2000",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "WGS84 (G1150)|WGS84 (Transit)": [
+      "WGS84 (G1150)",
+      "ITRF2000",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "WGS84 (G1150)|WGS84 Ensemble": [
+      "WGS84 (G1150)",
+      "ITRF2000",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "WGS84 (G873)|WGS84 (G730)": [
+      "WGS84 (G873)",
+      "ITRF97",
+      "ITRF91",
+      "WGS84 (G730)"
+    ],
+    "WGS84 (G873)|WGS84 (Transit)": [
+      "WGS84 (G873)",
+      "ITRF97",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "WGS84 (G873)|WGS84 Ensemble": [
+      "WGS84 (G873)",
+      "ITRF97",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "WGS84 (G730)|WGS84 (Transit)": [
+      "WGS84 (G730)",
+      "ITRF91",
+      "ITRF90",
+      "WGS84 (Transit)"
+    ],
+    "WGS84 (G730)|WGS84 Ensemble": [
+      "WGS84 (G730)",
+      "ITRF91",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ],
+    "WGS84 (Transit)|WGS84 Ensemble": [
+      "WGS84 (Transit)",
+      "ITRF90",
+      "ITRF2014",
+      "WGS84 Ensemble"
+    ]
+  },
+  "direct_pairs": {
+    "ITRF88|ITRF96": true,
+    "ITRF96|ITRF88": true,
+    "ITRF94|ITRF96": true,
+    "ITRF96|ITRF94": true,
+    "ITRF91|ITRF97": true,
+    "ITRF97|ITRF91": true,
+    "ITRF2008|ITRF2014": true,
+    "ITRF2014|ITRF2008": true,
+    "ITRF97|ITRF2014": true,
+    "ITRF2014|ITRF97": true,
+    "WGS84 (G2296)|WGS84 (G1762)": true,
+    "WGS84 (G1762)|WGS84 (G2296)": true,
+    "ITRF90|ITRF92": true,
+    "ITRF92|ITRF90": true,
+    "ITRF92|ITRF93": true,
+    "ITRF93|ITRF92": true,
+    "ITRF93|ITRF94": true,
+    "ITRF94|ITRF93": true,
+    "ITRF92|ITRF94": true,
+    "ITRF94|ITRF92": true,
+    "ITRF91|ITRF2020": true,
+    "ITRF2020|ITRF91": true,
+    "ITRF2005|ITRF2008": true,
+    "ITRF2008|ITRF2005": true,
+    "ITRF90|ITRF93": true,
+    "ITRF93|ITRF90": true,
+    "ITRF88|ITRF90": true,
+    "ITRF90|ITRF88": true,
+    "GDA2020|GDA94": true,
+    "GDA94|GDA2020": true,
+    "ITRF2000|ITRF2020": true,
+    "ITRF2020|ITRF2000": true,
+    "ITRF88|ITRF2000": true,
+    "ITRF2000|ITRF88": true,
+    "ITRF96|ITRF97": true,
+    "ITRF97|ITRF96": true,
+    "ITRF94|ITRF2000": true,
+    "ITRF2000|ITRF94": true,
+    "ITRF93|ITRF2005": true,
+    "ITRF2005|ITRF93": true,
+    "ITRF93|ITRF2008": true,
+    "ITRF2008|ITRF93": true,
+    "ITRF94|WGS84 (G873)": true,
+    "WGS84 (G873)|ITRF94": true,
+    "ITRF92|ITRF2005": true,
+    "ITRF2005|ITRF92": true,
+    "ITRF92|ITRF2008": true,
+    "ITRF2008|ITRF92": true,
+    "ITRF96|ITRF2020": true,
+    "ITRF2020|ITRF96": true,
+    "ITRF2008|ITRF2020": true,
+    "ITRF2020|ITRF2008": true,
+    "ITRF92|ITRF96": true,
+    "ITRF96|ITRF92": true,
+    "ITRF88|ITRF2014": true,
+    "ITRF2014|ITRF88": true,
+    "ITRF97|ITRF2000": true,
+    "ITRF2000|ITRF97": true,
+    "ITRF2008|WGS84 (G1762)": true,
+    "WGS84 (G1762)|ITRF2008": true,
+    "ITRF94|ITRF2014": true,
+    "ITRF2014|ITRF94": true,
+    "GDA2020|ITRF2014": true,
+    "ITRF2014|GDA2020": true,
+    "ITRF90|ITRF91": true,
+    "ITRF91|ITRF90": true,
+    "ITRF90|ITRF2005": true,
+    "ITRF2005|ITRF90": true,
+    "ITRF90|ITRF2008": true,
+    "ITRF2008|ITRF90": true,
+    "ITRF89|ITRF92": true,
+    "ITRF92|ITRF89": true,
+    "ITRF97|WGS84 (G873)": true,
+    "WGS84 (G873)|ITRF97": true,
+    "ITRF90|ITRF96": true,
+    "ITRF96|ITRF90": true,
+    "ITRF88|ITRF89": true,
+    "ITRF89|ITRF88": true,
+    "ITRF89|ITRF93": true,
+    "ITRF93|ITRF89": true,
+    "ITRF93|ITRF2000": true,
+    "ITRF2000|ITRF93": true,
+    "ITRF88|ITRF97": true,
+    "ITRF97|ITRF88": true,
+    "ITRF94|ITRF97": true,
+    "ITRF97|ITRF94": true,
+    "ITRF92|ITRF2000": true,
+    "ITRF2000|ITRF92": true,
+    "ITRF2005|ITRF2014": true,
+    "ITRF2014|ITRF2005": true,
+    "ITRF90|ITRF94": true,
+    "ITRF94|ITRF90": true,
+    "ITRF90|ITRF2000": true,
+    "ITRF2000|ITRF90": true,
+    "ITRF88|ITRF2020": true,
+    "ITRF2020|ITRF88": true,
+    "ITRF94|ITRF2020": true,
+    "ITRF2020|ITRF94": true,
+    "ITRF2000|ITRF2008": true,
+    "ITRF2008|ITRF2000": true,
+    "ITRF89|ITRF91": true,
+    "ITRF91|ITRF89": true,
+    "ITRF93|ITRF2014": true,
+    "ITRF2014|ITRF93": true,
+    "ITRF89|ITRF2005": true,
+    "ITRF2005|ITRF89": true,
+    "ITRF89|ITRF2008": true,
+    "ITRF2008|ITRF89": true,
+    "ITRF92|ITRF2014": true,
+    "ITRF2014|ITRF92": true,
+    "GDA94|AGD66": true,
+    "AGD66|GDA94": true,
+    "ITRF89|ITRF96": true,
+    "ITRF96|ITRF89": true,
+    "ITRF2020|WGS84 (G2296)": true,
+    "WGS84 (G2296)|ITRF2020": true,
+    "ITRF91|ITRF92": true,
+    "ITRF92|ITRF91": true,
+    "GDA94|AGD84": true,
+    "AGD84|GDA94": true,
+    "ITRF90|ITRF2014": true,
+    "ITRF2014|ITRF90": true,
+    "ITRF97|ITRF2020": true,
+    "ITRF2020|ITRF97": true,
+    "ITRF96|ITRF2008": true,
+    "ITRF2008|ITRF96": true,
+    "ITRF91|ITRF93": true,
+    "ITRF93|ITRF91": true,
+    "ITRF2000|WGS84 (G1150)": true,
+    "WGS84 (G1150)|ITRF2000": true,
+    "WGS84 (G1762)|WGS84 (G1674)": true,
+    "WGS84 (G1674)|WGS84 (G1762)": true,
+    "ITRF93|ITRF97": true,
+    "ITRF97|ITRF93": true,
+    "ITRF91|ITRF94": true,
+    "ITRF94|ITRF91": true,
+    "ITRF92|ITRF97": true,
+    "ITRF97|ITRF92": true,
+    "ITRF2005|WGS84 (G1674)": true,
+    "WGS84 (G1674)|ITRF2005": true,
+    "ITRF89|ITRF90": true,
+    "ITRF90|ITRF89": true,
+    "GDA94|ITRF2005": true,
+    "ITRF2005|GDA94": true,
+    "GDA94|ITRF2008": true,
+    "ITRF2008|GDA94": true,
+    "ITRF89|ITRF94": true,
+    "ITRF94|ITRF89": true,
+    "ITRF89|ITRF2000": true,
+    "ITRF2000|ITRF89": true,
+    "ITRF90|WGS84 (Transit)": true,
+    "WGS84 (Transit)|ITRF90": true,
+    "ITRF90|ITRF97": true,
+    "ITRF97|ITRF90": true,
+    "GDA94|ITRF96": true,
+    "ITRF96|GDA94": true,
+    "ITRF93|ITRF2020": true,
+    "ITRF2020|ITRF93": true,
+    "ITRF92|ITRF2020": true,
+    "ITRF2020|ITRF92": true,
+    "ITRF91|ITRF2005": true,
+    "ITRF2005|ITRF91": true,
+    "ITRF91|ITRF2008": true,
+    "ITRF2008|ITRF91": true,
+    "ITRF2014|WGS84 (G2139)": true,
+    "WGS84 (G2139)|ITRF2014": true,
+    "ITRF2000|ITRF2014": true,
+    "ITRF2014|ITRF2000": true,
+    "ITRF89|ITRF2014": true,
+    "ITRF2014|ITRF89": true,
+    "ITRF2000|ITRF2005": true,
+    "ITRF2005|ITRF2000": true,
+    "ITRF91|ITRF96": true,
+    "ITRF96|ITRF91": true,
+    "ITRF2014|ITRF2020": true,
+    "ITRF2020|ITRF2014": true,
+    "GDA94|ITRF2000": true,
+    "ITRF2000|GDA94": true,
+    "ITRF96|ITRF2014": true,
+    "ITRF2014|ITRF96": true,
+    "ITRF96|ITRF2005": true,
+    "ITRF2005|ITRF96": true,
+    "ITRF88|ITRF92": true,
+    "ITRF92|ITRF88": true,
+    "ITRF89|ITRF97": true,
+    "ITRF97|ITRF89": true,
+    "ITRF97|ITRF2005": true,
+    "ITRF2005|ITRF97": true,
+    "ITRF97|ITRF2008": true,
+    "ITRF2008|ITRF97": true,
+    "ITRF2005|ITRF2020": true,
+    "ITRF2020|ITRF2005": true,
+    "ITRF91|ITRF2000": true,
+    "ITRF2000|ITRF91": true,
+    "ITRF88|ITRF93": true,
+    "ITRF93|ITRF88": true,
+    "ITRF88|ITRF94": true,
+    "ITRF94|ITRF88": true,
+    "ATRF2014|ITRF2014": true,
+    "ITRF2014|ATRF2014": true,
+    "ITRF89|ITRF2020": true,
+    "ITRF2020|ITRF89": true,
+    "ITRF91|WGS84 (G730)": true,
+    "WGS84 (G730)|ITRF91": true,
+    "ITRF91|ITRF2014": true,
+    "ITRF2014|ITRF91": true,
+    "ITRF96|ITRF2000": true,
+    "ITRF2000|ITRF96": true,
+    "ITRF90|ITRF2020": true,
+    "ITRF2020|ITRF90": true,
+    "GDA2020|ATRF2014": true,
+    "ATRF2014|GDA2020": true,
+    "ITRF93|ITRF96": true,
+    "ITRF96|ITRF93": true,
+    "GDA94|ITRF97": true,
+    "ITRF97|GDA94": true,
+    "ITRF96|WGS84 (G873)": true,
+    "WGS84 (G873)|ITRF96": true,
+    "ITRF88|ITRF91": true,
+    "ITRF91|ITRF88": true,
+    "ITRF88|ITRF2005": true,
+    "ITRF2005|ITRF88": true,
+    "ITRF88|ITRF2008": true,
+    "ITRF2008|ITRF88": true,
+    "ITRF94|ITRF2005": true,
+    "ITRF2005|ITRF94": true,
+    "ITRF94|ITRF2008": true,
+    "ITRF2008|ITRF94": true,
+    "WGS84 (G2296)|WGS84 (G2139)": true,
+    "WGS84 (G2139)|WGS84 (G2296)": true,
+    "ITRF2014|WGS84 Ensemble": true,
+    "WGS84 Ensemble|ITRF2014": true
+  },
+  "rewrite_rules": {
+    "expanded_nodes": {
+      "GDA2020/ITRF2014": [
+        "GDA2020",
+        "ITRF2014"
+      ]
+    }
+  },
+  "notes": {
+    "assumption": "Blank cells in upper triangle (row index < column index) represent direct transformations.",
+    "reverse_rule": "If a route is missing for SRC|DST, the reverse of DST|SRC may be used.",
+    "composite_expansion": "Any occurrence of 'GDA2020/ITRF2014' in a route is replaced with steps ['GDA2020', 'ITRF2014']."
+  },
+  "stats": {
+    "frames_original": 28,
+    "frames_total": 35,
+    "routes_filled": 262,
+    "routes_with_composite_expanded": 34,
+    "direct_upper_blanks": 116,
+    "direct_pairs_directional": 232
+  }
+}
