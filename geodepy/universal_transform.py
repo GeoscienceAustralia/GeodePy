@@ -1,12 +1,19 @@
+#!/usr/bin/env python3
+
+"""
+Geoscience Australia - Python Geodesy Package
+Universal Transformation Module
+"""
+
 import json
 from datetime import date
-import geodepy.transform as tr
-import geodepy.constants as gc
-import geodepy.geodesy as gg
-import geodepy.convert as con
 import numpy as np
 import datetime
-import geodepy.point_in_polygon as pp
+
+import transform as tr
+import constants as gc
+import convert as con
+import point_in_polygon as pp
 
 # Setup for transformation paths
 with open("other_files/transformation_routes_v3.json", "r", encoding="utf-8") as f:

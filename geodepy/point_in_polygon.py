@@ -1,4 +1,9 @@
-from __future__ import annotations
+#!/usr/bin/env python3
+
+"""
+Geoscience Australia - Python Geodesy Package
+Point in Polygon Module
+"""
 
 import re
 import math
@@ -12,9 +17,9 @@ from shapely.prepared import prep
 
 from pyproj import CRS, Transformer
 
-import geodepy.convert
-from geodepy.constants import Transformation, TransformationSD
-import geodepy.transform
+import convert
+from constants import Transformation, TransformationSD
+import transform
 
 PLATE_ID_RE = re.compile(r"^[A-Z]{2}$")
 
@@ -260,7 +265,7 @@ def plate_from_xyz(x, y, z, plate_index):
     :return: plate ID
     :rtype: Array of strings or None
     """
-    lat, lon, h = geodepy.convert.xyz2llh(x, y, z)
+    lat, lon, h = convert.xyz2llh(x, y, z)
     return plate_from_ll(lat, lon, plate_index)
 
 @dataclass(frozen=True)
@@ -496,6 +501,6 @@ def universal_plate_motion_transformation(x ,y, z,
     transformation = plate_transformation(plate_id, poles_file, ref_epoch=ref_epoch)
 
     # Complete transformation between given dates
-    xtrans, ytrans, ztrans, vcv = geodepy.transform.plate_motion_transformation(x, y, z, from_epoch, to_epoch, transformation, vcv)
+    xtrans, ytrans, ztrans, vcv = transform.plate_motion_transformation(x, y, z, from_epoch, to_epoch, transformation, vcv)
 
     return xtrans, ytrans, ztrans, vcv
