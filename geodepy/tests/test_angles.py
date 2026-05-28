@@ -1,35 +1,35 @@
-import unittest
 import os
-from math import radians, pi
+import unittest
+from math import pi, radians
 
 from geodepy.angles import (
-    DECAngle,
-    HPAngle,
-    GONAngle,
-    DMSAngle,
     DDMAngle,
-    dec2hp,
-    dec2hpa,
+    DECAngle,
+    DMSAngle,
+    GONAngle,
+    HPAngle,
+    angular_typecheck,
+    dd2sec,
+    dec2ddm,
+    dec2dms,
     dec2gon,
     dec2gona,
-    dec2dms,
-    dec2ddm,
-    hp2dec,
-    hp2deca,
-    hp2gon,
-    hp2gona,
-    hp2dms,
-    hp2ddm,
-    hp2rad,
+    dec2hp,
+    dec2hpa,
+    gon2ddm,
     gon2dec,
     gon2deca,
+    gon2dms,
     gon2hp,
     gon2hpa,
-    gon2dms,
-    gon2ddm,
     gon2rad,
-    dd2sec,
-    angular_typecheck,
+    hp2ddm,
+    hp2dec,
+    hp2deca,
+    hp2dms,
+    hp2gon,
+    hp2gona,
+    hp2rad,
 )
 
 rad_exs = [
@@ -134,7 +134,7 @@ class TestConvert(unittest.TestCase):
                 for sec in range(60):
                     if sec:
                         hp_minus = float(
-                            f"{deg:4d}.{min:02d}{sec-1:02d}" + "9" * (dec_places - 4)
+                            f"{deg:4d}.{min:02d}{sec - 1:02d}" + "9" * (dec_places - 4)
                         )
                         dec_minus = deg + (min / 60.0 + (sec - error) / 3600.0)
                         gon_minus = 400.0 / 360.0 * dec_minus

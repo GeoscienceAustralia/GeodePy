@@ -5,10 +5,12 @@ Geoscience Australia - Python Geodesy Package
 Geodesy Module
 """
 
-from math import degrees, radians, sqrt, sin, cos, tan, asin, acos, atan, atan2
+from math import acos, asin, atan, atan2, cos, degrees, radians, sin, sqrt, tan
+
 import numpy as np
+
 from geodepy.constants import grs80, utm
-from geodepy.convert import geo2grid, grid2geo, angular_typecheck
+from geodepy.convert import angular_typecheck, geo2grid, grid2geo
 from geodepy.statistics import rotation_matrix
 from geodepy.survey import radiations
 
@@ -65,7 +67,7 @@ def vincdir(lat1, lon1, azimuth1to2, ell_dist, ellipsoid=grs80):
     :type azimuth1to2: float (decimal degrees), DMSAngle or DDMAngle
     :param ell_dist: Ellipsoidal Distance between Points 1 and 2 (metres)
     :param ellipsoid: Ellipsoid Object
-    :return: 
+    :return:
         - lat2 - Latitude of Point 2 (Decimal Degrees),
         - lon2 - Longitude of Point 2 (Decimal Degrees),
         - azimuth2to1 - Azimuth from Point 2 to 1 (Decimal Degrees)
@@ -112,7 +114,6 @@ def vincdir(lat1, lon1, azimuth1to2, ell_dist, ellipsoid=grs80):
     # or after 1000 iterations have been completed
     two_sigma_m = 0
     for i in range(1000):
-
         # Eq. 95
         two_sigma_m = 2 * sigma1 + sigma
 
@@ -207,7 +208,7 @@ def vincinv(lat1, lon1, lat2, lon2, ellipsoid=grs80):
         - ell_dist - Ellipsoidal Distance between Points 1 and 2 (m),
         - azimuth1to2 - Azimuth from Point 1 to 2 (Decimal Degrees),
         - azimuth2to1 - Azimuth from Point 2 to 1 (Decimal Degrees)
-    
+
     """
 
     # Convert Angles to Decimal Degrees (if required)
@@ -239,7 +240,6 @@ def vincinv(lat1, lon1, lat2, lon2, ellipsoid=grs80):
     sigma = 0
     cos_two_sigma_m = 0
     for i in range(1000):
-
         # Eq. 74
         sin_sigma = sqrt(
             (cos(u2) * sin(lon)) ** 2
@@ -364,7 +364,7 @@ def vincdir_utm(
     :param grid_dist: UTM Grid Distance between Points 1 and 2 (m)
     :param hemisphere: String - 'North' or 'South'(default)
     :param ellipsoid: Ellipsoid Object (default: GRS80)
-    :return: 
+    :return:
         - zone2 -  Point 2 Zone Number - 1 to 60
         - east2 -  Point 2 Easting (m, within 3330km of Central Meridian)
         - north2 -  Point 2 Northing (m, 0 to 10,000,000m)
@@ -421,7 +421,7 @@ def vincinv_utm(
     :param north2: Point 2 Northing (m, 0 to 10,000,000m)
     :param hemisphere: String - 'North' or 'South'(default)
     :param ellipsoid: Ellipsoid Object (default: GRS80)
-    :return: 
+    :return:
         - grid_dist - UTM Grid Distance between Points 1 and 2 (m),
         - grid1to2 - Grid Bearing from Point 1 to 2 (decimal degrees),
         - grid2to1 - Grid Bearing from Point 2 to 1 (decimal degrees)
@@ -516,7 +516,7 @@ def nu(lat, ellipsoid=grs80):
     """
     Return the radius of curvature of the ellipsoid in the prime vertical plane
     (nu) at a given latitude
-    
+
     :param lat: latitude in decimal degrees
     :param ellipsoid: Ellipsoid Object
     :return: nu at specified latitude

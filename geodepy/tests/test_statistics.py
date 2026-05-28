@@ -1,6 +1,8 @@
 import unittest
-from geodepy import statistics
+
 import numpy as np
+
+from geodepy import statistics
 
 lat = 19.4792453
 lon = 70.69315634

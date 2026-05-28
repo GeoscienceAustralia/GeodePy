@@ -5,9 +5,10 @@ Geoscience Australia - Python Geodesy Package
 Survey Module
 """
 
-from math import sqrt, sin, cos, atan, radians, degrees, exp
+from math import atan, cos, degrees, exp, radians, sin, sqrt
 from statistics import mean, stdev
-from geodepy.convert import rect2polar, polar2rect
+
+from geodepy.convert import polar2rect, rect2polar
 
 
 def first_vel_params(wavelength, frequency, n_REF=None, unit_length=None):
@@ -158,7 +159,7 @@ def precise_inst_ht(vert_list, spacing, offset):
     Uses a set of Vertical Angle Observations taken to a
     levelling staff at regular intervals to determine the
     height of the instrument above a reference mark
-    
+
     :param vert_list: List of Vertical (Zenith) Angle Observations (minimum of 3) in Decimal Degrees format
     :param spacing: Distance in metres between each vertical angle observation
     :param offset: Lowest observed height above reference mark
@@ -221,7 +222,7 @@ def va_conv(zenith_angle, slope_dist, height_inst=0, height_tgt=0):
     :param height_inst:     Height of Instrument. Optional - Default Value of 0m
     :param height_tgt:      Height of Target. Optional - Default Value of 0m
 
-    :return: 
+    :return:
         - vert_angle_pt - Vertical Angle between Ground Points, expressed in decimal degrees
         - slope_dist_pt - Slope Distance between Ground Points in metres
         - hz_dist - Horizontal Distance
@@ -385,7 +386,7 @@ def phase_refractivity(LAMDA, TC, P, PV, XC=420):
     :param P: pressure (hPa)
     :param PV: partial water vapour pressure (Pa)
     :param XC: carbon dioxide content (ppm)
-    
+
     :return: NPROPP_1 - phase refractivity = (NPROPphase-1)10E8
     """
 
@@ -519,7 +520,7 @@ def group_refractivity(LAMDA, TC, P, PV, XC=420):
     :param P: pressure (hPa)
     :param PV: partial water vapour pressure (Pa)
     :param XC: carbon dioxide content (ppm)
-    
+
     :return: NPROPG_1 - group refractivity = (NPROPgroup-1)10E8
     """
 
@@ -653,7 +654,7 @@ def humidity2part_water_vapour_press(H, TC):
 
     :param H: humidity (%)
     :param TC: temperature (degrees Celcius)
-    
+
     :return: PV - partial water vapour pressure (Pa)
     """
 

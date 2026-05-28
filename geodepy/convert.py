@@ -5,40 +5,41 @@ Geoscience Australia - Python Geodesy Package
 Convert Module
 """
 
-from math import sin, cos, atan2, radians, degrees, sqrt, cosh, sinh, tan, atan, log
 import datetime
 import warnings
-from geodepy.constants import utm, isg, grs80, ans
+from math import atan, atan2, cos, cosh, degrees, log, radians, sin, sinh, sqrt, tan
+
 from geodepy.angles import (
-    DECAngle,
-    HPAngle,
-    GONAngle,
-    DMSAngle,
     DDMAngle,
-    dec2hp,
-    dec2hpa,
+    DECAngle,
+    DMSAngle,
+    GONAngle,
+    HPAngle,
+    angular_typecheck,
+    dd2sec,
+    dec2ddm,
+    dec2dms,
     dec2gon,
     dec2gona,
-    dec2dms,
-    dec2ddm,
-    hp2dec,
-    hp2deca,
-    hp2gon,
-    hp2gona,
-    hp2dms,
-    hp2ddm,
-    hp2rad,
-    hp2dec_v,
+    dec2hp,
+    dec2hpa,
+    gon2ddm,
     gon2dec,
     gon2deca,
+    gon2dms,
     gon2hp,
     gon2hpa,
-    gon2dms,
-    gon2ddm,
     gon2rad,
-    dd2sec,
-    angular_typecheck,
+    hp2ddm,
+    hp2dec,
+    hp2dec_v,
+    hp2deca,
+    hp2dms,
+    hp2gon,
+    hp2gona,
+    hp2rad,
 )
+from geodepy.constants import ans, grs80, isg, utm
 
 
 def polar2rect(r, theta):
@@ -65,7 +66,7 @@ def rect2polar(x, y):
 
     :param x: Rectangular Coordinate X
     :param y: Rectangular Coordinate Y
-    :return: 
+    :return:
         - Radius
         - Angle (decimal degrees)
     """
@@ -489,9 +490,7 @@ def grid2geo(zone, east, north, hemisphere="south", ellipsoid=grs80, prj=utm):
             raise ValueError("Invalid Zone - Zones from 1 to 60")
 
     if east < -2830000 or east > 3830000:
-        raise ValueError(
-            "Invalid Easting - Must be within" "3330km of Central Meridian"
-        )
+        raise ValueError("Invalid Easting - Must be within3330km of Central Meridian")
 
     if north < 0 or north > 10000000:
         raise ValueError("Invalid Northing - Must be between 0 and 10,000,000m")
@@ -554,9 +553,7 @@ def grid2geo(zone, east, north, hemisphere="south", ellipsoid=grs80, prj=utm):
     def f1tn(tn, ecc1, ecc1sq):
         return (
             sqrt(1 + (sigma(tn, ecc1)) ** 2) * sqrt(1 + tn**2) - sigma(tn, ecc1) * tn
-        ) * (
-            ((1 - float(ecc1sq)) * sqrt(1 + t**2)) / (1 + (1 - float(ecc1sq)) * t**2)
-        )
+        ) * (((1 - float(ecc1sq)) * sqrt(1 + t**2)) / (1 + (1 - float(ecc1sq)) * t**2))
 
     diff = 1
     t = t1

@@ -14,23 +14,28 @@ sys.path.insert(0, os.path.abspath(".."))  # Adjust to your directory
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'GeodePy'
-copyright = '2025, Geoscience Australia'
-author = 'Geoscience Australia'
-release = '0.6.0'
+project = "GeodePy"
+copyright = "2025, Geoscience Australia"
+author = "Geoscience Australia"
+release = "0.6.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.napoleon", "sphinx.ext.viewcode",'sphinx_copybutton']
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
+    "sphinx_copybutton",
+]
 
-templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 html_sidebars = {
     "**": [
-        "sidebar/brand.html",      # Logo
-        "sidebar/extra.html",      # Custom tagline + badge
+        "sidebar/brand.html",  # Logo
+        "sidebar/extra.html",  # Custom tagline + badge
         "sidebar/scroll-start.html",
         "sidebar/search.html",
         "sidebar/navigation.html",
@@ -38,13 +43,13 @@ html_sidebars = {
     ]
 }
 
-autoclass_content = 'both'
+autoclass_content = "both"
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'furo'
-html_static_path = ['_static']
+html_theme = "furo"
+html_static_path = ["_static"]
 html_theme_options = {
     "light_logo": "geodepy-logo-light.png",
     "dark_logo": "geodepy-logo-dark.png",
@@ -52,15 +57,17 @@ html_theme_options = {
 }
 
 html_css_files = [
-    'custom.css',
+    "custom.css",
 ]
 html_js_files = [
-    'custom.js',
+    "custom.js",
 ]
-html_favicon = '_static/favicon.ico'
+html_favicon = "_static/favicon.ico"
 em_dash_char = chr(8212)
-html_title = "GeodePy: Geodesy in Python " + em_dash_char+  " v" + release + " Documentation"
+html_title = (
+    "GeodePy: Geodesy in Python " + em_dash_char + " v" + release + " Documentation"
+)
 ogp_site_name = "GeodePy: Geodesy in Python"
 html_extra_path = ["_static/robots.txt", "_static/sitemap.xml"]
 
-autodoc_mock_imports = ["osgeo","gdal","GDAL"]
+autodoc_mock_imports = ["osgeo", "gdal", "GDAL"]

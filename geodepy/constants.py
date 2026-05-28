@@ -5,8 +5,8 @@ Geoscience Australia - Python Geodesy Package
 Constants Module
 """
 
-from math import sqrt
 from datetime import date
+from math import sqrt
 
 c_vac = 299792.458
 k_0 = 0.9996
@@ -15,13 +15,13 @@ k_0 = 0.9996
 # Ellipsoid constants
 class Ellipsoid(object):
     def __init__(self, semimaj, inversef):
-        '''
+        """
         Ellipsoid Parameters
 
         :param semimaj: Semi-major axis (m)
         :param inversef: Inverse flattening
 
-        '''
+        """
         self.semimaj = semimaj
         self.inversef = inversef
         self.f = 1 / self.inversef
@@ -84,7 +84,6 @@ isg = Projection(300000, 5000000, 0.99994, 2, -177)
 # Helmert 14 parameter transformation
 class Transformation(object):
     def __init__(
-        
         self,
         from_datum,
         to_datum,
@@ -309,7 +308,7 @@ class TransformationSD(object):
         sd_d_ry=None,
         sd_d_rz=None,
     ):
-        '''
+        """
         Transformation Standard Deviation Parameters
 
         :param sd_tx: one-sigma uncertainty of tx (m)
@@ -327,7 +326,7 @@ class TransformationSD(object):
         :param sd_d_ry: one-sigma uncertainty of d_ry (arcsec/yr)
         :param sd_d_rz: one-sigma uncertainty of d_rz (arcsec/yr)
 
-        '''
+        """
         self.sd_tx = sd_tx  # one-sigma uncertainty of tx (m)
         self.sd_ty = sd_ty  # one-sigma uncertainty of ty (m)
         self.sd_tz = sd_tz  # one-sigma uncertainty of tz (m)
@@ -362,13 +361,13 @@ def iers2trans(
     d_rx,
     d_ry,
     d_rz,
-    tf_sd=None
+    tf_sd=None,
 ):
     """
     Used to convert IERS transformation parameters into GeodePy Transformation
     class parameters.
     Note: All rotation and delta rotation terms have the sign change applied.
-    
+
     :param itrf_from: ITRF realization transforming from
     :param itrf_to: ITRF realization transforming to
     :param ref_epoch: Reference epoch (YYYY.DOY)
@@ -407,8 +406,9 @@ def iers2trans(
         round(-d_rx / 1000, 8),
         round(-d_ry / 1000, 8),
         round(-d_rz / 1000, 8),
-        tf_sd=tf_sd
+        tf_sd=tf_sd,
     )
+
 
 def iers2transSD(
     sd_tx=None,
@@ -430,7 +430,7 @@ def iers2transSD(
     Used to convert IERS transformation standard deviation parameters into GeodePy TransformationSD
     class parameters.
     Note: All rotation and delta rotation terms have the sign change applied.
-    
+
     :param sd_tx: one-sigma uncertainty of tx (mm)
     :param sd_ty: one-sigma uncertainty of ty (mm)
     :param sd_tz: one-sigma uncertainty of tz (mm)
@@ -964,7 +964,7 @@ itrf2020_to_itrf2014_sd = iers2transSD(
     sd_d_sc=0.03,
     sd_d_rx=0.007,
     sd_d_ry=0.006,
-    sd_d_rz=0.007
+    sd_d_rz=0.007,
 )
 
 itrf2020_to_itrf2014 = iers2trans(
@@ -985,7 +985,7 @@ itrf2020_to_itrf2014 = iers2trans(
     d_rx=0.0,
     d_ry=0.0,
     d_rz=0.0,
-    tf_sd=itrf2020_to_itrf2014_sd
+    tf_sd=itrf2020_to_itrf2014_sd,
 )
 
 itrf2020_to_itrf2008 = iers2trans(
@@ -1266,7 +1266,7 @@ itrf2014_to_itrf2008_sd = iers2transSD(
     sd_d_sc=0.02,
     sd_d_rx=0.006,
     sd_d_ry=0.006,
-    sd_d_rz=0.006
+    sd_d_rz=0.006,
 )
 
 itrf2014_to_itrf2008 = iers2trans(
@@ -1287,7 +1287,7 @@ itrf2014_to_itrf2008 = iers2trans(
     d_rx=0,
     d_ry=0,
     d_rz=0,
-    tf_sd=itrf2014_to_itrf2008_sd
+    tf_sd=itrf2014_to_itrf2008_sd,
 )
 
 itrf2014_to_itrf2005 = iers2trans(
@@ -1547,7 +1547,7 @@ itrf2008_to_itrf2005_sd = iers2transSD(
     sd_d_sc=0.03,
     sd_d_rx=0.008,
     sd_d_ry=0.008,
-    sd_d_rz=0.008
+    sd_d_rz=0.008,
 )
 
 itrf2008_to_itrf2005 = iers2trans(
@@ -1568,7 +1568,7 @@ itrf2008_to_itrf2005 = iers2trans(
     d_rx=0,
     d_ry=0,
     d_rz=0,
-    tf_sd=itrf2008_to_itrf2005_sd
+    tf_sd=itrf2008_to_itrf2005_sd,
 )
 
 itrf2008_to_itrf2000 = iers2trans(
@@ -1808,7 +1808,7 @@ itrf2005_to_itrf2000_sd = iers2transSD(
     sd_d_sc=0.05,
     sd_d_rx=0.012,
     sd_d_ry=0.012,
-    sd_d_rz=0.012
+    sd_d_rz=0.012,
 )
 
 itrf2005_to_itrf2000 = iers2trans(
@@ -1829,7 +1829,7 @@ itrf2005_to_itrf2000 = iers2trans(
     d_rx=0,
     d_ry=0,
     d_rz=0,
-    tf_sd=itrf2005_to_itrf2000_sd
+    tf_sd=itrf2005_to_itrf2000_sd,
 )
 
 itrf2005_to_itrf97 = iers2trans(
@@ -2045,7 +2045,7 @@ itrf2000_to_itrf97_sd = iers2transSD(
     sd_d_sc=0.05,
     sd_d_rx=0.012,
     sd_d_ry=0.012,
-    sd_d_rz=0.014
+    sd_d_rz=0.014,
 )
 
 itrf2000_to_itrf97 = iers2trans(
@@ -2066,7 +2066,7 @@ itrf2000_to_itrf97 = iers2trans(
     d_rx=0,
     d_ry=0,
     d_rz=0.02,
-    tf_sd=itrf2000_to_itrf97_sd
+    tf_sd=itrf2000_to_itrf97_sd,
 )
 
 itrf2000_to_itrf96 = iers2trans(
@@ -2409,7 +2409,7 @@ itrf92_to_itrf97 = -itrf97_to_itrf92
 itrf91_to_itrf97 = -itrf97_to_itrf91
 itrf90_to_itrf97 = -itrf97_to_itrf90
 itrf89_to_itrf97 = -itrf97_to_itrf89
-itrf88_to_itrf97 = -itrf97_to_itrf88    
+itrf88_to_itrf97 = -itrf97_to_itrf88
 
 # itrf96
 # Ref: https://itrf.ign.fr/en/solutions/transformations
@@ -2560,7 +2560,7 @@ itrf92_to_itrf96 = -itrf96_to_itrf92
 itrf91_to_itrf96 = -itrf96_to_itrf91
 itrf90_to_itrf96 = -itrf96_to_itrf90
 itrf89_to_itrf96 = -itrf96_to_itrf89
-itrf88_to_itrf96 = -itrf96_to_itrf88 
+itrf88_to_itrf96 = -itrf96_to_itrf88
 
 # ITRF94 parameters
 # Ref: https://itrf.ign.fr/en/solutions/transformations
@@ -2690,7 +2690,7 @@ itrf92_to_itrf94 = -itrf94_to_itrf92
 itrf91_to_itrf94 = -itrf94_to_itrf91
 itrf90_to_itrf94 = -itrf94_to_itrf90
 itrf89_to_itrf94 = -itrf94_to_itrf89
-itrf88_to_itrf94 = -itrf94_to_itrf88 
+itrf88_to_itrf94 = -itrf94_to_itrf88
 
 # ITRF93 paramters
 # Ref: https://itrf.ign.fr/en/solutions/transformations
@@ -2799,7 +2799,7 @@ itrf92_to_itrf93 = -itrf93_to_itrf92
 itrf91_to_itrf93 = -itrf93_to_itrf91
 itrf90_to_itrf93 = -itrf93_to_itrf90
 itrf89_to_itrf93 = -itrf93_to_itrf89
-itrf88_to_itrf93 = -itrf93_to_itrf88 
+itrf88_to_itrf93 = -itrf93_to_itrf88
 
 # ITRF92 paramters
 # Ref: https://itrf.ign.fr/en/solutions/transformations
@@ -3002,7 +3002,7 @@ itrf90_to_itrf88 = iers2trans(
 itrf89_to_itrf90 = -itrf90_to_itrf89
 itrf88_to_itrf90 = -itrf90_to_itrf88
 
-#ITRF89 Paramters
+# ITRF89 Paramters
 # Ref: https://itrf.ign.fr/en/solutions/transformations
 
 itrf89_to_itrf88 = iers2trans(
@@ -3044,7 +3044,7 @@ wgs84g2139_to_wgs84g2296_sd = iers2transSD(
     sd_d_sc=0.04,
     sd_d_rx=0.01,
     sd_d_ry=0.01,
-    sd_d_rz=0.01
+    sd_d_rz=0.01,
 )
 
 wgs84g1762_to_wgs84g2296_sd = iers2transSD(
@@ -3061,7 +3061,7 @@ wgs84g1762_to_wgs84g2296_sd = iers2transSD(
     sd_d_sc=0.09,
     sd_d_rx=0.02,
     sd_d_ry=0.03,
-    sd_d_rz=0.02
+    sd_d_rz=0.02,
 )
 
 wgs84g2296_to_itrf2020_sd = TransformationSD(
@@ -3078,7 +3078,7 @@ wgs84g2296_to_itrf2020_sd = TransformationSD(
     sd_d_sc=0.0,
     sd_d_rx=0.0,
     sd_d_ry=0.0,
-    sd_d_rz=0.0
+    sd_d_rz=0.0,
 )
 
 wgs84g2296_to_itrf2020 = Transformation(
@@ -3099,7 +3099,7 @@ wgs84g2296_to_itrf2020 = Transformation(
     d_rx=0.0,
     d_ry=0.0,
     d_rz=0.0,
-    tf_sd=wgs84g2296_to_itrf2020_sd
+    tf_sd=wgs84g2296_to_itrf2020_sd,
 )
 
 wgs84g2139_to_wgs84g2296 = iers2trans(
@@ -3120,7 +3120,7 @@ wgs84g2139_to_wgs84g2296 = iers2trans(
     d_rx=0.0,
     d_ry=-0.02,
     d_rz=-0.02,
-    tf_sd=wgs84g2139_to_wgs84g2296_sd
+    tf_sd=wgs84g2139_to_wgs84g2296_sd,
 )
 
 wgs84g1762_to_wgs84g2296 = iers2trans(
@@ -3141,14 +3141,14 @@ wgs84g1762_to_wgs84g2296 = iers2trans(
     d_rx=0.0,
     d_ry=-0.02,
     d_rz=0.01,
-    tf_sd=wgs84g1762_to_wgs84g2296_sd
+    tf_sd=wgs84g1762_to_wgs84g2296_sd,
 )
 
 itrf2020_to_wgs84g2296 = -wgs84g2296_to_itrf2020
 wgs84g2296_to_wgs84g2139 = -wgs84g2139_to_wgs84g2296
 wgs84g2296_to_wgs84g1762 = -wgs84g1762_to_wgs84g2296
 
-#WGS84 (G2139) paramters
+# WGS84 (G2139) paramters
 # https://www.unoosa.org/documents/pdf/icg/2023/ICG-17/icg17_wgd_02_02.pdf
 
 wgs84g2139_to_itrf2014_sd = TransformationSD(
@@ -3165,7 +3165,7 @@ wgs84g2139_to_itrf2014_sd = TransformationSD(
     sd_d_sc=0.0,
     sd_d_rx=0.0,
     sd_d_ry=0.0,
-    sd_d_rz=0.0
+    sd_d_rz=0.0,
 )
 
 wgs84g2139_to_itrf2014 = Transformation(
@@ -3186,12 +3186,12 @@ wgs84g2139_to_itrf2014 = Transformation(
     d_rx=0.0,
     d_ry=0.0,
     d_rz=0.0,
-    tf_sd=wgs84g2139_to_itrf2014_sd
+    tf_sd=wgs84g2139_to_itrf2014_sd,
 )
 
 itrf2014_to_wgs84g2139 = -wgs84g2139_to_itrf2014
 
-#WGS84 (G1762) parameters
+# WGS84 (G1762) parameters
 # https://www.unoosa.org/documents/pdf/icg/2023/ICG-17/icg17_wgd_02_02.pdf
 
 wgs84g1762_to_itrf2008_sd = TransformationSD(
@@ -3208,7 +3208,7 @@ wgs84g1762_to_itrf2008_sd = TransformationSD(
     sd_d_sc=0.0,
     sd_d_rx=0.0,
     sd_d_ry=0.0,
-    sd_d_rz=0.0
+    sd_d_rz=0.0,
 )
 
 wgs84g1762_to_itrf2008 = Transformation(
@@ -3229,12 +3229,12 @@ wgs84g1762_to_itrf2008 = Transformation(
     d_rx=0.0,
     d_ry=0.0,
     d_rz=0.0,
-    tf_sd=wgs84g1762_to_itrf2008_sd
+    tf_sd=wgs84g1762_to_itrf2008_sd,
 )
 
 itrf2008_to_wgs84g1762 = -wgs84g1762_to_itrf2008
 
-#WGS84 (G1674) parameters
+# WGS84 (G1674) parameters
 # https://www.unoosa.org/documents/pdf/icg/2023/ICG-17/icg17_wgd_02_02.pdf and
 # Kelly and Dennis, 2022
 
@@ -3252,7 +3252,7 @@ wgs84g1674_to_itrf2005_sd = TransformationSD(
     sd_d_sc=0.0,
     sd_d_rx=0.0,
     sd_d_ry=0.0,
-    sd_d_rz=0.0
+    sd_d_rz=0.0,
 )
 
 wgs84g1674_to_wgs84g1762_sd = TransformationSD(
@@ -3269,7 +3269,7 @@ wgs84g1674_to_wgs84g1762_sd = TransformationSD(
     sd_d_sc=0.0,
     sd_d_rx=0.0,
     sd_d_ry=0.0,
-    sd_d_rz=0.0
+    sd_d_rz=0.0,
 )
 
 itrf2005_to_wgs84g1674 = iers2trans(
@@ -3290,7 +3290,7 @@ itrf2005_to_wgs84g1674 = iers2trans(
     d_rx=0.0,
     d_ry=0.0,
     d_rz=0.0,
-    tf_sd=wgs84g1674_to_itrf2005_sd
+    tf_sd=wgs84g1674_to_itrf2005_sd,
 )
 
 wgs84g1674_to_wgs84g1762 = iers2trans(
@@ -3311,13 +3311,13 @@ wgs84g1674_to_wgs84g1762 = iers2trans(
     d_rx=0.0,
     d_ry=0.0,
     d_rz=0.0,
-    tf_sd=wgs84g1674_to_itrf2005_sd
+    tf_sd=wgs84g1674_to_itrf2005_sd,
 )
 
 wgs84g1674_to_itrf2005 = -itrf2005_to_wgs84g1674
 wgs84g1762_to_wgs84g1674 = -wgs84g1674_to_wgs84g1762
 
-#WGS84 (G1150) parameters
+# WGS84 (G1150) parameters
 # https://www.unoosa.org/documents/pdf/icg/2023/ICG-17/icg17_wgd_02_02.pdf
 
 wgs84g1150_to_itrf2000_sd = TransformationSD(
@@ -3334,10 +3334,10 @@ wgs84g1150_to_itrf2000_sd = TransformationSD(
     sd_d_sc=0.0,
     sd_d_rx=0.0,
     sd_d_ry=0.0,
-    sd_d_rz=0.0
+    sd_d_rz=0.0,
 )
 
-#From Kelly and Dennis (2022)
+# From Kelly and Dennis (2022)
 
 wgs84g1150_to_itrf2000 = iers2trans(
     itrf_from="WGS84 (G1150)",
@@ -3357,12 +3357,12 @@ wgs84g1150_to_itrf2000 = iers2trans(
     d_rx=0.0,
     d_ry=0.0,
     d_rz=0.0,
-    tf_sd=wgs84g1150_to_itrf2000_sd
+    tf_sd=wgs84g1150_to_itrf2000_sd,
 )
 
 itrf2000_to_wgs84g1150 = -wgs84g1150_to_itrf2000
 
-#WGS84 (G873) parameters
+# WGS84 (G873) parameters
 # https://www.unoosa.org/documents/pdf/icg/2023/ICG-17/icg17_wgd_02_02.pdf
 
 wgs84g873_to_itrf94_sd = TransformationSD(
@@ -3379,7 +3379,7 @@ wgs84g873_to_itrf94_sd = TransformationSD(
     sd_d_sc=0.0,
     sd_d_rx=0.0,
     sd_d_ry=0.0,
-    sd_d_rz=0.0
+    sd_d_rz=0.0,
 )
 
 wgs84g873_to_itrf96_sd = TransformationSD(
@@ -3396,7 +3396,7 @@ wgs84g873_to_itrf96_sd = TransformationSD(
     sd_d_sc=0.0,
     sd_d_rx=0.0,
     sd_d_ry=0.0,
-    sd_d_rz=0.0
+    sd_d_rz=0.0,
 )
 
 wgs84g873_to_itrf97_sd = TransformationSD(
@@ -3413,7 +3413,7 @@ wgs84g873_to_itrf97_sd = TransformationSD(
     sd_d_sc=0.0,
     sd_d_rx=0.0,
     sd_d_ry=0.0,
-    sd_d_rz=0.0
+    sd_d_rz=0.0,
 )
 
 wgs84g873_to_itrf94 = Transformation(
@@ -3434,7 +3434,7 @@ wgs84g873_to_itrf94 = Transformation(
     d_rx=0.0,
     d_ry=0.0,
     d_rz=0.0,
-    tf_sd=wgs84g873_to_itrf94_sd
+    tf_sd=wgs84g873_to_itrf94_sd,
 )
 
 wgs84g873_to_itrf96 = Transformation(
@@ -3455,7 +3455,7 @@ wgs84g873_to_itrf96 = Transformation(
     d_rx=0.0,
     d_ry=0.0,
     d_rz=0.0,
-    tf_sd=wgs84g873_to_itrf94_sd
+    tf_sd=wgs84g873_to_itrf94_sd,
 )
 
 wgs84g873_to_itrf97 = Transformation(
@@ -3476,14 +3476,14 @@ wgs84g873_to_itrf97 = Transformation(
     d_rx=0.0,
     d_ry=0.0,
     d_rz=0.0,
-    tf_sd=wgs84g873_to_itrf94_sd
+    tf_sd=wgs84g873_to_itrf94_sd,
 )
 
 itrf94_to_wgs84g873 = -wgs84g873_to_itrf94
 itrf96_to_wgs84g873 = -wgs84g873_to_itrf96
 itrf97_to_wgs84g873 = -wgs84g873_to_itrf97
 
-#WGS84 (G730) parameters
+# WGS84 (G730) parameters
 # https://www.unoosa.org/documents/pdf/icg/2023/ICG-17/icg17_wgd_02_02.pdf
 
 wgs84g730_to_itrf91_sd = TransformationSD(
@@ -3500,7 +3500,7 @@ wgs84g730_to_itrf91_sd = TransformationSD(
     sd_d_sc=0.0,
     sd_d_rx=0.0,
     sd_d_ry=0.0,
-    sd_d_rz=0.0
+    sd_d_rz=0.0,
 )
 
 wgs84g730_to_itrf91 = Transformation(
@@ -3521,12 +3521,12 @@ wgs84g730_to_itrf91 = Transformation(
     d_rx=0.0,
     d_ry=0.0,
     d_rz=0.0,
-    tf_sd=wgs84g730_to_itrf91_sd
+    tf_sd=wgs84g730_to_itrf91_sd,
 )
 
 itrf91_to_wgs84g730 = -wgs84g730_to_itrf91
 
-#WGS84 (Transit) parameters
+# WGS84 (Transit) parameters
 # Kelly and Dennis (2022)
 
 wgs84trans_to_itrf90_sd = TransformationSD(
@@ -3543,7 +3543,7 @@ wgs84trans_to_itrf90_sd = TransformationSD(
     sd_d_sc=0.0,
     sd_d_rx=0.0,
     sd_d_ry=0.0,
-    sd_d_rz=0.0
+    sd_d_rz=0.0,
 )
 
 wgs84trans_to_itrf90 = iers2trans(
@@ -3584,7 +3584,7 @@ wgs84ensemble_to_itrf2014_sd = TransformationSD(
     sd_d_sc=0.0,
     sd_d_rx=0.0,
     sd_d_ry=0.0,
-    sd_d_rz=0.0
+    sd_d_rz=0.0,
 )
 
 wgs84ensemble_to_itrf2014 = Transformation(
@@ -3605,7 +3605,7 @@ wgs84ensemble_to_itrf2014 = Transformation(
     d_rx=0.0,
     d_ry=0.0,
     d_rz=0.0,
-    tf_sd=wgs84ensemble_to_itrf2014_sd
+    tf_sd=wgs84ensemble_to_itrf2014_sd,
 )
 
 itrf2014_to_wgs84ensemble = -wgs84ensemble_to_itrf2014

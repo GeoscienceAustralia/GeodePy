@@ -13,16 +13,18 @@ http://www.mygeodesy.id.au/documents/Karney-Krueger%20equations.pdf
 
 import datetime
 from math import radians
+
 import numpy as np
+
 from geodepy.constants import (
     Transformation,
     TransformationSD,
     atrf2014_to_gda2020,
     gda94_to_gda2020,
 )
-from geodepy.statistics import vcv_local2cart, vcv_cart2local
-from geodepy.convert import hp2dec, geo2grid, grid2geo, xyz2llh, llh2xyz
+from geodepy.convert import geo2grid, grid2geo, hp2dec, llh2xyz, xyz2llh
 from geodepy.ntv2reader import NTv2Grid, interpolate_ntv2
+from geodepy.statistics import vcv_cart2local, vcv_local2cart
 
 
 def conform7(x, y, z, trans, vcv=None):
@@ -146,6 +148,7 @@ def conform14(x, y, z, to_epoch, trans, vcv=None):
     xtrans, ytrans, ztrans, trans_vcv = conform7(x, y, z, timetrans, vcv=vcv)
     return xtrans, ytrans, ztrans, trans_vcv
 
+
 def plate_motion_transformation(x, y, z, from_epoch, to_epoch, plate_motion, vcv=None):
     """
     Preforms plate motion transformations using a helmert 14 conformal transformation.
@@ -166,10 +169,10 @@ def plate_motion_transformation(x, y, z, from_epoch, to_epoch, plate_motion, vcv
     if type(plate_motion) != Transformation:
         raise ValueError("plate_motion must be a Transformation Object")
 
-    #calculate number of years to be moved
-    timediff= to_epoch - from_epoch
+    # calculate number of years to be moved
+    timediff = to_epoch - from_epoch
 
-    #calculate epoch needed for plate motion
+    # calculate epoch needed for plate motion
     change_epoch = plate_motion.ref_epoch - timediff
 
     # Calculate 7 Parameters from 14 Parameter Transformation Object
@@ -178,6 +181,7 @@ def plate_motion_transformation(x, y, z, from_epoch, to_epoch, plate_motion, vcv
     # Perform Transformation
     xtrans, ytrans, ztrans, trans_vcv = conform7(x, y, z, timetrans, vcv=vcv)
     return xtrans, ytrans, ztrans, trans_vcv
+
 
 def transform_mga94_to_mga2020(zone, east, north, ell_ht=False, vcv=None):
     """
@@ -273,7 +277,7 @@ def transform_gda2020_to_atrf2014(x, y, z, epoch_to, vcv=None):
 def ntv2_2d(ntv2_grid, lat, lon, forward_tf=True, method="bicubic"):
     """
     Performs a 2D transformation based on ntv2 grid shifts.
-    
+
     :param ntv2_grid: Ntv2Grid object (create with read_ntv2_file() function in geodepy.ntv2reader module)
     :param lat: latitude in decimal degrees
     :param lon: longitude in decimal degrees

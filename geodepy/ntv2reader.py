@@ -8,6 +8,7 @@ Expanded (2021-03-21) for the more general case to include horizontal transforma
 
 import struct
 from datetime import datetime as dt
+
 import numpy as np
 
 
@@ -27,7 +28,7 @@ class NTv2Grid(object):
         minor_t,
         file_path,
     ):
-        '''
+        """
         NTv2 Grid Parameters
 
         :param num_orec: Number of header identifiers
@@ -43,7 +44,7 @@ class NTv2Grid(object):
         :param minor_t: semi minor of to system
         :param file_path: full path to ntv2 gsb file
 
-        '''
+        """
         self.num_orec = num_orec  # Number of header identifiers
         self.num_srec = num_srec  # Number of sub-header idents
         self.num_file = num_file  # Number of subgrids in file
@@ -74,7 +75,7 @@ class SubGrid(object):
         long_inc,
         gs_count,
     ):
-        '''
+        """
         Sub Grid Parameters
 
         :param sub_name: subgrid name
@@ -89,7 +90,7 @@ class SubGrid(object):
         :param long_inc: longitude increment
         :param gs_count: total nodes in subgrid
 
-        '''
+        """
         self.sub_name = sub_name  # subgrid name
         self.parent = parent  # parent name
         self.created = created  # date created
@@ -666,7 +667,7 @@ def read_ntv2_file(ntv2_gsb_file):
 def interpolate_ntv2(grid_object, lat, lon, method="bicubic"):
     """
     Function to interpolate Ntv2Grid objects
-    
+
     :param grid_object: Ntv2Grid object
     :param lat: latitude (decimal degrees)
     :param lon: longitude (decimal degrees)
@@ -719,7 +720,6 @@ def interpolate_ntv2(grid_object, lat, lon, method="bicubic"):
 
     with open(grid_object.file_path, "rb") as f:
         for sg in grid_object.subgrids.values():
-
             skip_bytes += 176  # subgrid header length
             if sg.sub_name == in_grid.sub_name:
                 if method == "bilinear":

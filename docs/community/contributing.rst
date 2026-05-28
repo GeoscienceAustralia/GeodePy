@@ -17,9 +17,15 @@ Please read it to understand the expectations for behavior when contributing to 
 Coding Style Guide
 ------------------
 
-GeodePy uses `Black <https://github.com/psf/black>`_ to keep coding style consistent while still being accessable to all. 
-Black uses `PEP 8 <https://peps.python.org/pep-0008/>`_ coding style, an industry standard for python code. Before 
-any commits to GeodePy ensure Black has been used.
+GeodePy uses `Ruff <https://docs.astral.sh/ruff/>`_ to keep Python formatting and import ordering consistent. Ruff is
+configured in ``pyproject.toml`` and is checked in continuous integration.
+
+Before committing Python changes, run:
+
+.. code:: bash
+
+    ruff format .
+    ruff check .
 
 .. _code:
 
@@ -31,7 +37,7 @@ When contributing code please follow these steps:
 1. Fork the repository on `GitHub <https://github.com/GeoscienceAustralia/GeodePy>`_.
 2. Run tests on current code to ensure it works on your system (See :ref:`Testing <testing>`)
 3. Create tests that demonstrate your bug or feature.
-4. Make changes, ensuring coding sytle guide is abided by.
+4. Make changes, ensuring the coding style guide is followed.
 5. Run all tests again including one added and ensure all tests pass.
 6. Send a Github Pull Request to the repository's **master** branch
 
