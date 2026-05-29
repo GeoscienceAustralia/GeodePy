@@ -2239,7 +2239,7 @@ itrf90_to_itrf2000 = -itrf2000_to_itrf90
 itrf89_to_itrf2000 = -itrf2000_to_itrf89
 itrf88_to_itrf2000 = -itrf2000_to_itrf88
 
-# ITRF97 paramters
+# ITRF97 parameters
 # Ref: https://itrf.ign.fr/en/solutions/transformations
 
 itrf97_to_itrf96 = iers2trans(
@@ -2692,7 +2692,7 @@ itrf90_to_itrf94 = -itrf94_to_itrf90
 itrf89_to_itrf94 = -itrf94_to_itrf89
 itrf88_to_itrf94 = -itrf94_to_itrf88
 
-# ITRF93 paramters
+# ITRF93 parameters
 # Ref: https://itrf.ign.fr/en/solutions/transformations
 
 itrf93_to_itrf92 = iers2trans(
@@ -2801,7 +2801,7 @@ itrf90_to_itrf93 = -itrf93_to_itrf90
 itrf89_to_itrf93 = -itrf93_to_itrf89
 itrf88_to_itrf93 = -itrf93_to_itrf88
 
-# ITRF92 paramters
+# ITRF92 parameters
 # Ref: https://itrf.ign.fr/en/solutions/transformations
 
 itrf92_to_itrf91 = iers2trans(
@@ -3002,7 +3002,7 @@ itrf90_to_itrf88 = iers2trans(
 itrf89_to_itrf90 = -itrf90_to_itrf89
 itrf88_to_itrf90 = -itrf90_to_itrf88
 
-# ITRF89 Paramters
+# ITRF89 Parameters
 # Ref: https://itrf.ign.fr/en/solutions/transformations
 
 itrf89_to_itrf88 = iers2trans(
@@ -3148,7 +3148,7 @@ itrf2020_to_wgs84g2296 = -wgs84g2296_to_itrf2020
 wgs84g2296_to_wgs84g2139 = -wgs84g2139_to_wgs84g2296
 wgs84g2296_to_wgs84g1762 = -wgs84g1762_to_wgs84g2296
 
-# WGS84 (G2139) paramters
+# WGS84 (G2139) parameters
 # https://www.unoosa.org/documents/pdf/icg/2023/ICG-17/icg17_wgd_02_02.pdf
 
 wgs84g2139_to_itrf2014_sd = TransformationSD(

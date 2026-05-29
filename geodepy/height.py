@@ -1,7 +1,7 @@
 # ___________________________________________________________________________#
 # Some notes:
 # Written by Jack McCubbine of Geoscience Australia, date: 08/11/2019
-# This code contains functions to handle tranformations between GPS and
+# This code contains functions to handle transformations between GPS and
 # AWVS/AHD and Vice Versa
 # Gridded data used for the varisous reference surfaces are geotiff files
 # These allow direct access remotely using "gdal"

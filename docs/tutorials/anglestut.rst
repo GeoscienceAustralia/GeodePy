@@ -1,6 +1,6 @@
 .. _tutorials/angles:
 
-Angle Classes and Converstions
+Angle Classes and Conversions
 =================================
 
 GeodePy has 5 main angle classes to represent angles in different formats. These will be explored here along with how to convert between these types.
@@ -26,7 +26,7 @@ Angles expressed in degrees, minutes, and seconds.
 - **Conversion:** 1° = 60′, 1′ = 60″
 - **Example:** ``123° 34' 56.2"``
 
-To initalise a dms class:
+To initialise a dms class:
 
 .. code:: python
 
@@ -41,7 +41,7 @@ Angles expressed in degrees and minutes, with minutes shown as a decimal fractio
 - **Format:** ``ddd° mm.mm'``
 - **Example:** ``123° 34.933'``
 
-To initalise a ddm class:
+To initialise a ddm class:
 
 .. code:: python
 
@@ -56,7 +56,7 @@ Angles expressed entirely in decimal degrees.
 - **Format:** ``ddd.ddd°``
 - **Example:** ``123.5823°``
 
-To initalise a dec class:
+To initialise a dec class:
 
 .. code:: python
 
@@ -71,7 +71,7 @@ HP notation expresses latitude and longitude as positive values with hemisphere 
 - **Format:** ``ddd.mmssss``
 - **Example:** ``123.231524°``
 
-To initalise a hpa class:
+To initialise a hpa class:
 
 .. code:: python
 
@@ -87,7 +87,7 @@ A metric-based angle unit where a full circle equals 400 gradians.
 - **Conversion:** 1 grad = 0.9°
 - **Example:** ``137.5``
 
-To initalise a gona class:
+To initialise a gona class:
 
 .. code:: python
 
@@ -106,7 +106,7 @@ First import GeodePy.
 
     import geodepy.angles as angles  
 
-In this example a DMS angle will be created. This object can be initalised by including the degrees, minutes and seconds as arguments.
+In this example a DMS angle will be created. This object can be initialised by including the degrees, minutes and seconds as arguments.
 
 .. code:: python
 
@@ -115,7 +115,7 @@ In this example a DMS angle will be created. This object can be initalised by in
 
     >>30 5 42
 
-Using this class we can get individual variables for degree minute and seconds componets seperately.
+Using this class we can get individual variables for degree minute and seconds components separately.
 
 .. code:: python
 
@@ -152,7 +152,7 @@ This will be done using the DDM Angle class
 
     angle2 = angles.DDMAngle(40, 10.52)
 
-Now this new anlge class can be added or subtracted from the first class
+Now this new angle class can be added or subtracted from the first class
 
 .. code:: python
 
@@ -201,4 +201,3 @@ The following operators can be preformed on angle objects:
 +----------------------+------------------+
 
 .. caution:: Basic arthimitc should not be completed on HPA class. These should be converted to decimal degree first.
-

@@ -118,7 +118,7 @@ def read_sinex_comments(file):
 
         comments.insert(
             -1,
-            f"* File created by Geodepy.gnss.py at {datetime.now().strftime('%d-%m-%Y, %H:%M')}",
+            f"* File created by GeodePy.gnss.py at {datetime.now().strftime('%d-%m-%Y, %H:%M')}",
         )
 
     return comments
@@ -449,7 +449,7 @@ def read_sinex_sites(file):
         * point is the site's point code
         * domes is the site's dome number
         * obs is the observation technique
-        * station_description is a free format desciption of the site
+        * station_description is a free format description of the site
         * lon is the approximate longitude of the site as a DMSAngle object
         * lat is the approximate latitude of the site as a DMSAngle object
         * h is the approximate height of the site
@@ -1230,7 +1230,7 @@ def dataframe2matrix_solution_matrix_estimate(df, tri="L"):
     forms the full VCV matrix from that dataframe.
 
     :param DataFrame df: dataframe from sinex2dataframe_solution_matrix_estimate().
-    :param String tri: String to indicate "upper" or "lower" triagle matrix.
+    :param String tri: String to indicate "upper" or "lower" triangle matrix.
     :return: Numpy matrix of full VCV.
     """
 
@@ -1312,7 +1312,7 @@ def matrix2dataframe_solution_matrix_estimate(m, tri="L"):
     is the format produced from sinex2dataframe_solution_matrix_estimate().
 
     :param numpy.array() m: A numpy array of the VCV matrix.
-    :param str tri: String to indicate "upper" or "lower" triagle matrix.
+    :param str tri: String to indicate "upper" or "lower" triangle matrix.
     :return: A dataframe of SOLUTION/MATRIX_ESTIMATE.
     :rtype: DataFrame
     """
@@ -1464,7 +1464,7 @@ def writeSINEX(
     :param list of str SiteID:  +SITE/ID block. Can get from read_sinex_site_id_block().
     :param list of str SolutionEpochs:  +SOLUTION/EPOCHS block. Can get from read_sinex_solution_epochs_block().
     :param list of str SolutionEstimate:  +SOLUTION/ESTIMATE block. Can get from read_sinex_solution_estimate_block().
-    :param list of str SolutionMatricEstimate:  +SOLUTION/MATRIX_ESTIMATE block. Can get from read_sinex_solution_matrix_estimate_block().
+    :param list of str SolutionMatrixEstimate:  +SOLUTION/MATRIX_ESTIMATE block. Can get from read_sinex_solution_matrix_estimate_block().
     :param list of str fileReference:  +FILE/REFERENCE block. Can get from read_sinex_file_reference_block().
     :param list of str inputAcknowledgments:  +INPUT/ACKNOWLEDGEMENTS block. Can get from read_sinex_input_acknowledgments_block().
     :param list of str siteReceiver:  +SITE/RECEIVER block. Can get from read_sinex_site_receiver_block().
@@ -1472,7 +1472,7 @@ def writeSINEX(
     :param list of str siteGpsPhaseCenter: +SITE/GPS_PHASE_CENTER block. Can get from read_site_gps_phase_center_block().
     :param list of str siteEccentricity: +SITE/ECCENTRICITY block. Can get from read_sinex_site_eccentricity_block().
     :param list of str solutionApriori: +SOLUTION/APRIORI block. Can get from read_sinex_solution_apriori_block().
-    :param list of str solutionMatrixApriori: +SOLUTION/MATRIX_APRIORI block. Can get from read_sinex_solution_matric_apriori_block().
+    :param list of str solutionMatrixApriori: +SOLUTION/MATRIX_APRIORI block. Can get from read_sinex_solution_matrix_apriori_block().
 
     :return: No return. But a new SINEX file will be written out to the file path (fp).
 

@@ -321,7 +321,7 @@ The following has been translated from UNSW FORTRAN code
     SIGMA = wavenumber (1/micrometre)
     SVP = saturation vapour pressure of water vapour (Pa)
           in air at temperature (TK)
-    TC = temperature (degrees Celcius)
+    TC = temperature (degrees Celsius)
     TK = temperature (Kelvin)
     W0,W1,W2,W3 = constants used to calculate NWS
     XC = carbon dioxide content (ppm)
@@ -336,7 +336,7 @@ def refractivity_constants():
     """
     :return: Refractivity constants used in the refractivity calculations.
     """
-    # PECK & REEDER (1972) AS AMMENDED BY CIDDOR
+    # PECK & REEDER (1972) AS AMENDED BY CIDDOR
     # (DRY AIR REFRACTIVITY)
     (K0, K1, K2, K3) = (238.0185, 5792105.0, 57.362, 167917.0)
 
@@ -382,7 +382,7 @@ def phase_refractivity(LAMDA, TC, P, PV, XC=420):
     Calculates the phase refractivity of moist air using Ciddor's equations
 
     :param LAMDA: wavelength (micrometre)
-    :param TC: temperature (degrees Celcius)
+    :param TC: temperature (degrees Celsius)
     :param P: pressure (hPa)
     :param PV: partial water vapour pressure (Pa)
     :param XC: carbon dioxide content (ppm)
@@ -516,7 +516,7 @@ def group_refractivity(LAMDA, TC, P, PV, XC=420):
     Calculates the group refractivity of moist air using Ciddor's equations
 
     :param LAMDA: wavelength (micrometre)
-    :param TC: temperature (degrees Celcius)
+    :param TC: temperature (degrees Celsius)
     :param P: pressure (hPa)
     :param PV: partial water vapour pressure (Pa)
     :param XC: carbon dioxide content (ppm)
@@ -653,7 +653,7 @@ def humidity2part_water_vapour_press(H, TC):
     Calculates the partial water vapour pressure from relative humidity and temperature
 
     :param H: humidity (%)
-    :param TC: temperature (degrees Celcius)
+    :param TC: temperature (degrees Celsius)
 
     :return: PV - partial water vapour pressure (Pa)
     """
@@ -661,7 +661,7 @@ def humidity2part_water_vapour_press(H, TC):
     (A, B, C, D) = (1.2378847e-5, -1.9121316e-2, 33.93711047, -6.3431645e3)
     TK = TC + 273.15
 
-    # NOW CONVERT THE RELATIVE HUMIDITY TO PATIAL WATER VAPOUR PRESSURE (hPa)
+    # NOW CONVERT THE RELATIVE HUMIDITY TO PARTIAL WATER VAPOUR PRESSURE (hPa)
     # SEE EQ.(22) GIACOMO 1982
     SVP = exp(A * TK * TK + B * TK + C + D / TK)
     PV = (H / 100.0) * SVP

@@ -8,7 +8,7 @@ This module contains constants commonly used in geodetic calculations, including
 Classes
 --------
 
-GeodePy provides four classes for handling commonly used geodetic constants. These include a class for ellipsoids, projections, tranformations and tranformations sigmas.
+GeodePy provides four classes for handling commonly used geodetic constants. These include a class for ellipsoids, projections, transformations and transformations sigmas.
 These classes can be used to create objects that store the relevant parameters for each type of constant, and provide methods for accessing and manipulating these parameters.
 
 
@@ -164,11 +164,11 @@ All other combinations of ITRF transformations are available.
 IERS to GeodePy Transformation
 ------------------------------
 
-GeeodePy also includes a function for converting from IERS transfomration parameters to a GeodePy Transformation object.
+GeeodePy also includes a function for converting from IERS transformation parameters to a GeodePy Transformation object.
 
 .. autofunction:: geodepy.constants.iers2trans
 
 Height
 ---------
 
-The module also contains locations for files commonly used in height converstions that will be used in the :ref:`height <features/height>` module.
+The module also contains locations for files commonly used in height conversions that will be used in the :ref:`height <features/height>` module.

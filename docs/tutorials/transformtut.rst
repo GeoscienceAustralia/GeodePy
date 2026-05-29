@@ -3,25 +3,25 @@
 Datum Transformation
 =====================
 
-GeodePy has the ability to tranform between datums. Here we will discuss how to 
-change between datums without changing the reference epoch while in the 
-:ref:`time dependant <tutorials/timetrans>` tutorial we will discuss changing epochs.
+GeodePy has the ability to transform between datums. Here we will discuss how to
+change between datums without changing the reference epoch while in the
+:ref:`time dependent <tutorials/timetrans>` tutorial we will discuss changing epochs.
 To learn more about transformation refer to the `GDA2020 technical manual <https://www.anzlic.gov.au/sites/default/files/files/GDA2020%20Technical%20Manual%20V1.8_published.pdf>`_.
 
 Common Example
 --------------
 
-The most common example for datum transformation is converting from MGA94 to MGA2020. 
-This is handled by a function in the transformation module that converts the grid 
-input to a caresian coordinate (xyz), and then runs a 7 paramter helmert transformation 
-using the gda94_to_gda2020 transformation constant. This process will be explored more in 
+The most common example for datum transformation is converting from MGA94 to MGA2020.
+This is handled by a function in the transformation module that converts the grid
+input to a cartesian coordinate (xyz), and then runs a 7 parameter helmert transformation
+using the gda94_to_gda2020 transformation constant. This process will be explored more in
 the :ref:`latter <tutorials/transformfunc>` part of this tutorial but first lets use this function.
 
 Begin by importing GeodePy.
 
 .. code:: python
 
-    import geodepy.transform   
+    import geodepy.transform
 
 Next, define some coordinate values in MGA94.
 
@@ -47,8 +47,8 @@ Now, transform this coordinate to MGA2020.
 
 This it the MGA2020 coordinates.
 
-To complete this transformation a function from the transformation module was used. This 
-will not always be the case. In the next section transformations where a function is not already 
+To complete this transformation a function from the transformation module was used. This
+will not always be the case. In the next section transformations where a function is not already
 present will be explored.
 
 .. _tutorials/transformfunc:
@@ -63,7 +63,7 @@ First import GeodePy.
 
 .. code:: python
 
-    import geodepy.transform 
+    import geodepy.transform
     import geodepy.constants
     import geodepy.angles
 
@@ -73,13 +73,13 @@ Now we need some starting coordinates.
 
     lat = geodepy.angles.DMSAngle(-23,33,25.21)
     long = geodepy.angles.DMSAngle(133,49,13.87)
-    height = 427.863 
+    height = 427.863
 
     print(f"The AGD84 position is {lat}, {long}, {height}"
 
     >>The AGD84 position is -23 33 25.21, 133 49 13.87, 427.863
 
-All transformations in GeodePy need to be completed with corrdinates in cartesian (xyz) form. Lets transform to xyz.
+All transformations in GeodePy need to be completed with coordinates in cartesian (xyz) form. Let's transform to xyz.
 
 .. code:: python
 
@@ -88,9 +88,9 @@ All transformations in GeodePy need to be completed with corrdinates in cartesia
 
     >>-4050634.051819 4220935.13646 -2533555.369303
 
-Now we need some transformation parameters. Within Geodepy there are many transformaton parameters already 
-present within the constants module. A table of these can be seen :ref:`here <features/constants/transform>`. If the 
-transformation needed isn't currently in Geodepy, new transformations can be added using the :ref:`transformation class <transclass>`. 
+Now we need some transformation parameters. Within GeodePy there are many transformation parameters already
+present within the constants module. A table of these can be seen :ref:`here <features/constants/transform>`. If the
+transformation needed isn't currently in GeodePy, new transformations can be added using the :ref:`transformation class <transclass>`.
 Here the agd66_to_gda94 transformation will be used.
 
 .. code:: python
@@ -107,35 +107,35 @@ Here the agd66_to_gda94 transformation will be used.
     >>ry: -0.443" + 0.0"/yr
     >>rz: -0.277" + 0.0"/yr
 
-These transformation parameters will be used to complete a 7 paramter helmert transformation.
+These transformation parameters will be used to complete a 7 parameter helmert transformation.
 
 .. code:: python
 
     x_94, y_94, z_94, _ = geodepy.transform.conform7(
-        x, 
-        y, 
-        z, 
+        x,
+        y,
+        z,
         geodepy.constants.agd84_to_gda94 #transformation parameters
     )
     print(x_94, y_94, z_94)
 
     >>-4050762.150962 4220880.96717 -2533401.14935
 
-.. tip:: 
-    The "_" in the conform7 variables is for a vcv matrix. If you dont input a vcv matrix 
-    then the resulting variable will be None. However as the variable needs to be assigned 
-    for the function to work using "_" meets to requirement but doesn't store the variable 
+.. tip::
+    The "_" in the conform7 variables is for a vcv matrix. If you don't input a vcv matrix
+    then the resulting variable will be None. However as the variable needs to be assigned
+    for the function to work using "_" meets to requirement but doesn't store the variable
     in a meaningful way.
 
-Now we need to transform from GDA94 to GDA2020 using the same method but with the gda94_to_gda2020 
+Now we need to transform from GDA94 to GDA2020 using the same method but with the gda94_to_gda2020
 transformation class.
 
 .. code:: python
 
     x_20, y_20, z_20, _ = geodepy.transform.conform7(
-        x_94, 
-        y_94, 
-        z_94, 
+        x_94,
+        y_94,
+        z_94,
         geodepy.constants.gda94_to_gda2020 #transformation parameters
     )
 
@@ -149,9 +149,9 @@ Now the cartesian coordinates can be converted back to geographic coordinates (l
 
     lat_20, long_20, height_20 = geodepy.transform.xyz2llh(x_20, y_20, z_20)
 
-    print(f"The GDA2020 position is 
-    {geodepy.angles.dec2dms(lat_20)}, 
-    {geodepy.angles.dec2dms(long_20)}, 
+    print(f"The GDA2020 position is
+    {geodepy.angles.dec2dms(lat_20)},
+    {geodepy.angles.dec2dms(long_20)},
     {height_20}")
 
     >>The GDA2020 position is -23 33 19.921108332, 133 49 18.481110119, 411.61055134
@@ -164,11 +164,11 @@ All of this can now be combined into one function.
 
         x, y, z = geodepy.transform.llh2xyz(lat, long, height)
         x_94, y_94, z_94, _ = geodepy.transform.conform7(
-            x, y, z, 
+            x, y, z,
             geodepy.constants.agd84_to_gda94
         )
         x_20, y_20, z_20, _ = geodepy.transform.conform7(
-            x_94, y_94, z_94, 
+            x_94, y_94, z_94,
             geodepy.constants.gda94_to_gda2020
         )
 
@@ -176,10 +176,9 @@ All of this can now be combined into one function.
 
     lat_new, long_new, height_new = transform_agd84_to_gda2020(lat, long, height)
 
-    print(f"The GDA2020 position is 
-        {geodepy.angles.dec2dms(lat_new)}, 
-        {geodepy.angles.dec2dms(long_new)}, 
+    print(f"The GDA2020 position is
+        {geodepy.angles.dec2dms(lat_new)},
+        {geodepy.angles.dec2dms(long_new)},
         {height_new}")
 
     >>The GDA2020 position is -23 33 19.921108332, 133 49 18.481110119, 411.61055134
-
