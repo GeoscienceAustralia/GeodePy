@@ -59,20 +59,20 @@ class DECAngle(float):
         try:
             return DECAngle(self.dec() + other.dec())
         except AttributeError:
-            raise TypeError("Can only add Angle objects with .dec() method " "together")
+            raise TypeError("Can only add Angle objects with .dec() method together")
 
     def __radd__(self, other):
         try:
             return DECAngle(other.dec() + self.dec())
         except AttributeError:
-            raise TypeError("Can only add Angle objects with .dec() method " "together")
+            raise TypeError("Can only add Angle objects with .dec() method together")
 
     def __sub__(self, other):
         try:
             return DECAngle(self.dec() - other.dec())
         except AttributeError:
             raise TypeError(
-                "Can only subtract Angle objects with .dec() method" " together"
+                "Can only subtract Angle objects with .dec() method together"
             )
 
     def __rsub__(self, other):
@@ -80,7 +80,7 @@ class DECAngle(float):
             return DECAngle(other.dec() - self.dec())
         except AttributeError:
             raise TypeError(
-                "Can only subtract Angle objects with .dec() method" " together"
+                "Can only subtract Angle objects with .dec() method together"
             )
 
     def __mul__(self, other):
@@ -88,7 +88,7 @@ class DECAngle(float):
             return DECAngle(self.dec() * other)
         except TypeError:
             raise TypeError(
-                "Multiply only defined between DECAngle Object " "and Int or Float"
+                "Multiply only defined between DECAngle Object and Int or Float"
             )
 
     def __rmul__(self, other):
@@ -96,7 +96,7 @@ class DECAngle(float):
             return DECAngle(other * self.dec())
         except TypeError:
             raise TypeError(
-                "Multiply only defined between DECAngle Object " "and Int or Float"
+                "Multiply only defined between DECAngle Object and Int or Float"
             )
 
     def __truediv__(self, other):
@@ -104,7 +104,7 @@ class DECAngle(float):
             return DECAngle(self.dec() / other)
         except TypeError:
             raise TypeError(
-                "Division only defined between DECAngle Object " "and Int or Float"
+                "Division only defined between DECAngle Object and Int or Float"
             )
 
     def __abs__(self):
@@ -245,20 +245,20 @@ class HPAngle(object):
         try:
             return HPAngle(dec2hp(self.dec() + other.dec()))
         except AttributeError:
-            raise TypeError("Can only add Angle objects with .dec() method " "together")
+            raise TypeError("Can only add Angle objects with .dec() method together")
 
     def __radd__(self, other):
         try:
             return HPAngle(dec2hp(other.dec() + self.dec()))
         except AttributeError:
-            raise TypeError("Can only add Angle objects with .dec() method " "together")
+            raise TypeError("Can only add Angle objects with .dec() method together")
 
     def __sub__(self, other):
         try:
             return HPAngle(dec2hp(self.dec() - other.dec()))
         except AttributeError:
             raise TypeError(
-                "Can only subtract Angle objects with .dec() method" " together"
+                "Can only subtract Angle objects with .dec() method together"
             )
 
     def __rsub__(self, other):
@@ -266,7 +266,7 @@ class HPAngle(object):
             return HPAngle(dec2hp(other.dec() - self.dec()))
         except AttributeError:
             raise TypeError(
-                "Can only subtract Angle objects with .dec() method" " together"
+                "Can only subtract Angle objects with .dec() method together"
             )
 
     def __mul__(self, other):
@@ -274,7 +274,7 @@ class HPAngle(object):
             return HPAngle(dec2hp(self.dec() * other))
         except TypeError:
             raise TypeError(
-                "Multiply only defined between Angle objects and " "Int or Float"
+                "Multiply only defined between Angle objects and Int or Float"
             )
 
     def __rmul__(self, other):
@@ -282,7 +282,7 @@ class HPAngle(object):
             return HPAngle(dec2hp(other * self.dec()))
         except TypeError:
             raise TypeError(
-                "Multiply only defined between Angle objects and " "Int or Float"
+                "Multiply only defined between Angle objects and Int or Float"
             )
 
     def __truediv__(self, other):
@@ -290,7 +290,7 @@ class HPAngle(object):
             return HPAngle(dec2hp(self.dec() / other))
         except TypeError:
             raise TypeError(
-                "Division only defined between HPAngle objects " "and Int or Float"
+                "Division only defined between HPAngle objects and Int or Float"
             )
 
     def __abs__(self):
@@ -420,20 +420,20 @@ class GONAngle(object):
         try:
             return GONAngle(dec2gon(self.dec() + other.dec()))
         except AttributeError:
-            raise TypeError("Can only add Angle objects with .dec() method " "together")
+            raise TypeError("Can only add Angle objects with .dec() method together")
 
     def __radd__(self, other):
         try:
             return GONAngle(dec2gon(other.dec() + self.dec()))
         except AttributeError:
-            raise TypeError("Can only add Angle objects with .dec() method " "together")
+            raise TypeError("Can only add Angle objects with .dec() method together")
 
     def __sub__(self, other):
         try:
             return GONAngle(dec2gon(self.dec() - other.dec()))
         except AttributeError:
             raise TypeError(
-                "Can only subtract Angle objects with .dec() method" " together"
+                "Can only subtract Angle objects with .dec() method together"
             )
 
     def __rsub__(self, other):
@@ -441,7 +441,7 @@ class GONAngle(object):
             return GONAngle(dec2gon(other.dec() - self.dec()))
         except AttributeError:
             raise TypeError(
-                "Can only subtract Angle objects with .dec() method" " together"
+                "Can only subtract Angle objects with .dec() method together"
             )
 
     def __mul__(self, other):
@@ -449,7 +449,7 @@ class GONAngle(object):
             return GONAngle(dec2gon(self.dec() * other))
         except TypeError:
             raise TypeError(
-                "Multiply only defined between Angle objects and " "Int or Float"
+                "Multiply only defined between Angle objects and Int or Float"
             )
 
     def __rmul__(self, other):
@@ -457,7 +457,7 @@ class GONAngle(object):
             return GONAngle(dec2gon(other * self.dec()))
         except TypeError:
             raise TypeError(
-                "Multiply only defined between Angle objects and " "Int or Float"
+                "Multiply only defined between Angle objects and Int or Float"
             )
 
     def __truediv__(self, other):
@@ -465,7 +465,7 @@ class GONAngle(object):
             return GONAngle(dec2gon(self.dec() / other))
         except TypeError:
             raise TypeError(
-                "Division only defined between HPAngle objects " "and Int or Float"
+                "Division only defined between HPAngle objects and Int or Float"
             )
 
     def __abs__(self):
@@ -634,20 +634,20 @@ class DMSAngle(object):
         try:
             return dec2dms(self.dec() + other.dec())
         except AttributeError:
-            raise TypeError("Can only add Angle objects with .dec() method " "together")
+            raise TypeError("Can only add Angle objects with .dec() method together")
 
     def __radd__(self, other):
         try:
             return dec2dms(other.dec() + self.dec())
         except AttributeError:
-            raise TypeError("Can only add Angle objects with .dec() method " "together")
+            raise TypeError("Can only add Angle objects with .dec() method together")
 
     def __sub__(self, other):
         try:
             return dec2dms(self.dec() - other.dec())
         except AttributeError:
             raise TypeError(
-                "Can only subtract Angle objects with .dec() method" " together"
+                "Can only subtract Angle objects with .dec() method together"
             )
 
     def __rsub__(self, other):
@@ -655,7 +655,7 @@ class DMSAngle(object):
             return dec2dms(other.dec() - self.dec())
         except AttributeError:
             raise TypeError(
-                "Can only subtract Angle objects with .dec() method" " together"
+                "Can only subtract Angle objects with .dec() method together"
             )
 
     def __mul__(self, other):
@@ -663,7 +663,7 @@ class DMSAngle(object):
             return dec2dms(self.dec() * other)
         except TypeError:
             raise TypeError(
-                "Multiply only defined between DMSAngle Object " "and Int or Float"
+                "Multiply only defined between DMSAngle Object and Int or Float"
             )
 
     def __rmul__(self, other):
@@ -671,7 +671,7 @@ class DMSAngle(object):
             return dec2dms(other * self.dec())
         except TypeError:
             raise TypeError(
-                "Multiply only defined between DMSAngle Object " "and Int or Float"
+                "Multiply only defined between DMSAngle Object and Int or Float"
             )
 
     def __truediv__(self, other):
@@ -679,7 +679,7 @@ class DMSAngle(object):
             return dec2dms(self.dec() / other)
         except TypeError:
             raise TypeError(
-                "Division only defined between DMSAngle Object " "and Int or Float"
+                "Division only defined between DMSAngle Object and Int or Float"
             )
 
     def __abs__(self):
@@ -855,20 +855,20 @@ class DDMAngle(object):
         try:
             return dec2ddm(self.dec() + other.dec())
         except AttributeError:
-            raise TypeError("Can only add Angle objects with .dec() method " "together")
+            raise TypeError("Can only add Angle objects with .dec() method together")
 
     def __radd__(self, other):
         try:
             return dec2ddm(other.dec() + self.dec())
         except AttributeError:
-            raise TypeError("Can only add Angle objects with .dec() method " "together")
+            raise TypeError("Can only add Angle objects with .dec() method together")
 
     def __sub__(self, other):
         try:
             return dec2ddm(self.dec() - other.dec())
         except AttributeError:
             raise TypeError(
-                "Can only subtract Angle objects with .dec() method" " together"
+                "Can only subtract Angle objects with .dec() method together"
             )
 
     def __rsub__(self, other):
@@ -876,7 +876,7 @@ class DDMAngle(object):
             return dec2ddm(other.dec() - self.dec())
         except AttributeError:
             raise TypeError(
-                "Can only subtract Angle objects with .dec() method" " together"
+                "Can only subtract Angle objects with .dec() method together"
             )
 
     def __mul__(self, other):
@@ -884,7 +884,7 @@ class DDMAngle(object):
             return dec2ddm(self.dec() * other)
         except TypeError:
             raise TypeError(
-                "Multiply only defined between DMSAngle Object " "and Int or Float"
+                "Multiply only defined between DMSAngle Object and Int or Float"
             )
 
     def __rmul__(self, other):
@@ -892,7 +892,7 @@ class DDMAngle(object):
             return dec2ddm(other * self.dec())
         except TypeError:
             raise TypeError(
-                "Multiply only defined between DMSAngle Object " "and Int or Float"
+                "Multiply only defined between DMSAngle Object and Int or Float"
             )
 
     def __truediv__(self, other):
@@ -900,7 +900,7 @@ class DDMAngle(object):
             return dec2ddm(self.dec() / other)
         except TypeError:
             raise TypeError(
-                "Division only defined between DMSAngle Object " "and Int or Float"
+                "Division only defined between DMSAngle Object and Int or Float"
             )
 
     def __abs__(self):
@@ -1146,13 +1146,11 @@ def hp2dec(hp):
     hp = float(hp)
     hp_deg_str, hp_mmss_str = f"{hp:.13f}".split(".")
     if int(hp_mmss_str[0]) > 5:
-        raise ValueError(
-            f"Invalid HP Notation: 1st decimal place greater " f"than 5: {hp}"
-        )
+        raise ValueError(f"Invalid HP Notation: 1st decimal place greater than 5: {hp}")
     if len(hp_mmss_str) > 2:
         if int(hp_mmss_str[2]) > 5:
             raise ValueError(
-                f"Invalid HP Notation: 3rd decimal place greater " f"than 5: {hp}"
+                f"Invalid HP Notation: 3rd decimal place greater than 5: {hp}"
             )
     # parse string to avoid precision problems with floating point ops and base 10 numbers
     deg = abs(int(hp_deg_str))

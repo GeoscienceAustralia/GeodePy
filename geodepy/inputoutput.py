@@ -1,11 +1,13 @@
 __all__ = ["grid2geoio", "geo2gridio", "gdatrans7"]
 
-import geodepy.convert
-import pandas as pd
 import tkinter as ttk
-import geodepy.transform as tf
-import geodepy.convert as cv
+
+import pandas as pd
+
 import geodepy.constants as cs
+import geodepy.convert
+import geodepy.convert as cv
+import geodepy.transform as tf
 
 """
 The inputoutput module acts as the backend for the GUI and manages the calls
@@ -18,16 +20,16 @@ overcrowd the transform module.
 def grid2geoio(fn, fn_out, easting, northing, utmzone, geotypeout):
     """
 
-     The CSV data must have headers.
+    The CSV data must have headers.
 
-     :param fn: input file path
-     :param fn_out: file output path
-     :param easting: is the column name in the csv where the eastings are stored
-     :param northing: is the column name in the csv where the northings are stored
-     :param utmzone: is the column name in the csv where the UTM Zone is stored
-     :param geotypeout: format of latitude and longitude output e.g. DD or DMS
+    :param fn: input file path
+    :param fn_out: file output path
+    :param easting: is the column name in the csv where the eastings are stored
+    :param northing: is the column name in the csv where the northings are stored
+    :param utmzone: is the column name in the csv where the UTM Zone is stored
+    :param geotypeout: format of latitude and longitude output e.g. DD or DMS
 
-     :return: Data is output to the fn_out location as a CSV.
+    :return: Data is output to the fn_out location as a CSV.
     """
 
     # Check whether geotypeout value is from GUI or if function called within other code, then check that a valid
@@ -115,17 +117,17 @@ def geo2gridio(fn, fn_out, latitude, longitude, geotypein):
 def gdatrans7(fn, fn_out, latitude, longitude, ellht, gdageotypein, direction):
     """
 
-     The CSV data must have headers.
+    The CSV data must have headers.
 
-     :param fn: input file path
-     :param fn_out: file output path
-     :param latitude: is the column name in the csv where the latitudes are stored
-     :param longitude: is the column name in the csv where the longitudes are stored
-     :param ellht: is the column name in the csv where the ellipsoidal heights are stored
-     :param gdageotypein: format of latitude and longitude e.g. DD or DMS
-     :param direction: either "94to2020" or "2020to94". Specifies the datum to transform from and to.
+    :param fn: input file path
+    :param fn_out: file output path
+    :param latitude: is the column name in the csv where the latitudes are stored
+    :param longitude: is the column name in the csv where the longitudes are stored
+    :param ellht: is the column name in the csv where the ellipsoidal heights are stored
+    :param gdageotypein: format of latitude and longitude e.g. DD or DMS
+    :param direction: either "94to2020" or "2020to94". Specifies the datum to transform from and to.
 
-     :return: Data is output to the fn_out location as a CSV.
+    :return: Data is output to the fn_out location as a CSV.
     """
 
     # Check whether direction value is from GUI or if function called within other code, then check that a valid

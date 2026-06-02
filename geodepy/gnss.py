@@ -55,12 +55,14 @@ General functions for writing to SINEX:
 
 """
 
+import re
 from datetime import datetime
+
 import numpy as np
 import pandas as pd
-from numpy import zeros, delete
+from numpy import delete, zeros
+
 from geodepy.angles import DMSAngle
-import re
 
 
 def list_sinex_blocks(file):
@@ -320,12 +322,12 @@ def read_sinex_matrix(file):
     :param file: the input SINEX file
     :return: Sinex matrix as list of lists
     """
-    '''
+    """
     ToDo:
     1. The above order is only valid if the matrix is upper triangle. If it is
        lower triangle, then the covar_xy is actually the var_y. Will need to fix
        this when time permits.
-    '''
+    """
     # Read in the codes (station names) and solutions, and check for velocities
     data = read_sinex_estimate(file)
     code = []
@@ -1198,7 +1200,6 @@ def dataframe2matrix_snx_vcv(df, numPar=3):
     j = 0
     r = 0
     while r < len(df.code):
-
         # variances
         Q[i + 0, j + 0] = df.xx[r]
         Q[i + 1, j + 1] = df.yy[r]
@@ -1241,9 +1242,7 @@ def dataframe2matrix_solution_matrix_estimate(df, tri="L"):
     Q = np.zeros((n, n))
 
     if triangle == "L":
-
         for i in range(len(df.row)):
-
             # Get matrix indices
             row = int(df.row[i]) - 1
             col = int(df.col[i]) - 1
@@ -1264,15 +1263,12 @@ def dataframe2matrix_solution_matrix_estimate(df, tri="L"):
             Q[col + 2, row] = q3
 
     if triangle == "U":
-
         for i in range(len(df.row)):
-
             # Get matrix indices
             row = int(df.row[i]) - 1
             col = int(df.col[i]) - 1
 
             if df.col[i] < n - 1:
-
                 # Fill PARA2+0
                 q1 = df.q1[i]
                 Q[row, col] = q1
@@ -1289,7 +1285,6 @@ def dataframe2matrix_solution_matrix_estimate(df, tri="L"):
                 Q[col + 2, row] = q3
 
             if df.col[i] == n - 1:
-
                 # Fill PARA2+0
                 q1 = df.q1[i]
                 Q[row, col] = q1
@@ -1301,7 +1296,6 @@ def dataframe2matrix_solution_matrix_estimate(df, tri="L"):
                 Q[col + 1, row] = q2
 
             if df.col[i] == n:
-
                 # Fill PARA2+0
                 q1 = df.q1[i]
                 Q[row, col] = q1
@@ -1329,7 +1323,6 @@ def matrix2dataframe_solution_matrix_estimate(m, tri="L"):
     n = np.shape(Q)[0]
 
     if triangle == "L":
-
         # Make upper triangle NaNs
         Q[np.triu_indices(n, 1)] = np.nan
 
@@ -1352,7 +1345,6 @@ def matrix2dataframe_solution_matrix_estimate(m, tri="L"):
             i += 1
 
     if triangle == "U":
-
         # Make lower triangle NaNs
         Q[np.tril_indices(n, -1)] = np.nan
 
@@ -1488,7 +1480,6 @@ def writeSINEX(
 
     # Open File
     with open(fp, "w") as f:
-
         # Header
         if header == None:
             pass
@@ -1670,7 +1661,6 @@ def remove_stns_sinex(sinex, sites):
 
     # Open the output file
     with open("output.snx", "w") as out:
-
         # Get header line and update the creation time and the number of
         # parameter estimates. Write the updated header line to the new file
         header = read_sinex_header_line(sinex)
@@ -1851,7 +1841,6 @@ def remove_velocity_sinex(sinex):
 
     # Open the output file
     with open("output.snx", "w") as out:
-
         # With header line:
         # - update the creation time
         # - update number of parameter estimates
@@ -1982,13 +1971,13 @@ def remove_velocity_sinex(sinex):
             j = 0
             while i < len(Q):
                 while j <= i:
-                    out.write(f" {i+1:5d} {j+1:5d} {Q[i,j]:21.14E} ")
+                    out.write(f" {i + 1:5d} {j + 1:5d} {Q[i, j]:21.14E} ")
                     j += 1
                     if j <= i:
-                        out.write(f"{Q[i,j]:21.14E} ")
+                        out.write(f"{Q[i, j]:21.14E} ")
                         j += 1
                     if j <= i:
-                        out.write(f"{Q[i,j]:21.14E}")
+                        out.write(f"{Q[i, j]:21.14E}")
                         j += 1
                     out.write(" \n")
                 j = 0
@@ -1999,13 +1988,13 @@ def remove_velocity_sinex(sinex):
             for i in range(len(Q)):
                 j = i
                 while j < len(Q):
-                    out.write(f" {i+1:5d} {j+1:5d} {Q[i,j]:21.14E} ")
+                    out.write(f" {i + 1:5d} {j + 1:5d} {Q[i, j]:21.14E} ")
                     j += 1
                     if j < len(Q):
-                        out.write(f"{Q[i,j]:21.14E} ")
+                        out.write(f"{Q[i, j]:21.14E} ")
                         j += 1
                     if j < len(Q):
-                        out.write(f"{Q[i,j]:21.14E}")
+                        out.write(f"{Q[i, j]:21.14E}")
                         j += 1
                     out.write(" \n")
         # Write out end of block line, and delete large variables
@@ -2030,7 +2019,6 @@ def remove_matrixzeros_sinex(sinex):
 
     # Open the output file
     with open("output.snx", "w") as out:
-
         # With header line:
         # - update the creation time
         # - then write to file

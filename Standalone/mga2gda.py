@@ -7,104 +7,81 @@ mga2gda Program
 
 # Author: Josh Batchelor <josh.batchelor@ga.gov.au>
 
-
-from decimal import *
-from math import sqrt, log, degrees, sin, cos, sinh, cosh, atan
-import os
 import argparse
 import csv
+import os
+from decimal import *
+from math import atan, cos, cosh, degrees, log, sin, sinh, sqrt
 
 # Universal Transverse Mercator Projection Parameters
-proj = [6378137, Decimal('298.25722210088'), 500000,
-        10000000, Decimal('0.9996'), 6, -177]
+proj = [
+    6378137,
+    Decimal("298.25722210088"),
+    500000,
+    10000000,
+    Decimal("0.9996"),
+    6,
+    -177,
+]
 
 # Ellipsoidal Constants
 f = 1 / proj[1]
 semi_maj = proj[0]
 semi_min = float(semi_maj * (1 - f))
 ecc1sq = float(f * (2 - f))
-ecc2sq = float(ecc1sq/(1 - ecc1sq))
+ecc2sq = float(ecc1sq / (1 - ecc1sq))
 ecc1 = sqrt(ecc1sq)
 n = f / (2 - f)
 n = float(n)
-n2 = n ** 2
+n2 = n**2
 
 # Rectifying Radius (Horner Form)
-A = proj[0] / (1 + n) * ((n2 *
-                          (n2 *
-                           (n2 *
-                            (25 * n2 + 64)
-                            + 256)
-                           + 4096)
-                          + 16384)
-                         / 16384.)
+A1 = n2 * (25 * n2 + 64) + 256
+A2 = n2 * A1 + 4096
+A3 = n2 * A2 + 16384
+A = proj[0] / (1 + n) * (A3 / 16384.0)
 
 # Beta Coefficients (Horner Form)
-b2 = ((n *
-       (n *
-        (n *
-         (n *
-          (n *
-           (n *
-            ((37845269 - 31777436 * n) - 43097152)
-            + 42865200)
-           + 752640)
-          - 104428800)
-         + 180633600)
-        - 135475200))
-      / 270950400.)
+b2a = (37845269 - 31777436 * n) - 43097152
+b2b = n * b2a + 42865200
+b2c = n * b2b + 752640
+b2d = n * b2c - 104428800
+b2e = n * b2d + 180633600
+b2f = n * b2e - 135475200
+b2 = n * b2f / 270950400.0
 
-b4 = ((n ** 2 *
-       (n *
-        (n *
-         (n *
-          (n *
-           ((-24749483 * n - 14930208) * n + 100683990)
-           - 152616960)
-          + 105719040)
-         - 23224320)
-        - 7257600))
-      / 348364800.)
+b4a = (-24749483 * n - 14930208) * n + 100683990
+b4b = n * b4a - 152616960
+b4c = n * b4b + 105719040
+b4d = n * b4c - 23224320
+b4e = n * b4d - 7257600
+b4 = n**2 * b4e / 348364800.0
 
-b6 = ((n ** 3 *
-       (n *
-        (n *
-         (n *
-          (n *
-           (232468668 * n - 101880889)
-           - 39205760)
-          + 29795040)
-         + 28131840)
-        - 22619520))
-      / 638668800.)
+b6a = 232468668 * n - 101880889
+b6b = n * b6a - 39205760
+b6c = n * b6b + 29795040
+b6d = n * b6c + 28131840
+b6e = n * b6d - 22619520
+b6 = n**3 * b6e / 638668800.0
 
-b8 = ((n ** 4 *
-       (n *
-        (n *
-         ((-324154477 * n - 1433121792) * n + 876745056)
-         + 167270400)
-        - 208945440))
-      / 7664025600.)
+b8a = (-324154477 * n - 1433121792) * n + 876745056
+b8b = n * b8a + 167270400
+b8c = n * b8b - 208945440
+b8 = n**4 * b8c / 7664025600.0
 
-b10 = ((n ** 5 *
-        (n *
-         (n *
-          (312227409 - 457888660 * n)
-          + 67920528)
-         - 70779852))
-       / 2490808320.)
+b10a = 312227409 - 457888660 * n
+b10b = n * b10a + 67920528
+b10c = n * b10b - 70779852
+b10 = n**5 * b10c / 2490808320.0
 
-b12 = ((n ** 6 *
-        (n *
-         (19841813847 * n + 3665348512)
-         - 3758062126))
-       / 116237721600.)
+b12a = 19841813847 * n + 3665348512
+b12b = n * b12a - 3758062126
+b12 = n**6 * b12b / 116237721600.0
 
-b14 = ((n ** 7 *
-        (1989295244 * n - 1979471673))
-       / 49816166400.)
+b14a = 1989295244 * n - 1979471673
+b14 = n**7 * b14a / 49816166400.0
 
-b16 = ((-191773887257 * n ** 8) / 3719607091200.)
+b16 = (-191773887257 * n**8) / 3719607091200.0
 
 
 def dd2dms(dd):
@@ -154,16 +131,23 @@ def grid2geo(zone, easting, northing):
     # Finding t using Newtons Method
     def sigma(t):
         sigma = sinh(
-            ecc1 * 0.5 * log((1 + ((ecc1 * t) / (sqrt(1 + t ** 2)))) / (1 - ((ecc1 * t) / (sqrt(1 + t ** 2))))))
+            ecc1
+            * 0.5
+            * log(
+                (1 + ((ecc1 * t) / (sqrt(1 + t**2))))
+                / (1 - ((ecc1 * t) / (sqrt(1 + t**2))))
+            )
+        )
         return sigma
 
     def ftn(t):
-        ftn = t * sqrt(1 + (sigma(t)) ** 2) - sigma(t) * sqrt(1 + t ** 2) - t1
+        ftn = t * sqrt(1 + (sigma(t)) ** 2) - sigma(t) * sqrt(1 + t**2) - t1
         return ftn
 
     def f1tn(t):
-        f1tn = (sqrt(1 + (sigma(t)) ** 2) * sqrt(1 + t ** 2) - sigma(t) * t) * (
-                ((1 - float(ecc1sq)) * sqrt(1 + t ** 2)) / (1 + (1 - float(ecc1sq)) * t ** 2))
+        f1tn = (sqrt(1 + (sigma(t)) ** 2) * sqrt(1 + t**2) - sigma(t) * t) * (
+            ((1 - float(ecc1sq)) * sqrt(1 + t**2)) / (1 + (1 - float(ecc1sq)) * t**2)
+        )
         return f1tn
 
     t2 = t1 - (ftn(t1)) / (f1tn(t1))
@@ -196,9 +180,9 @@ def grid2geoio(fn):
     csvfile = open(fn)
     csvreader = csv.reader(csvfile)
     # Create Output File
-    fn_part = (os.path.splitext(fn))
-    fn_out = fn_part[0] + '_out' + fn_part[1]
-    outfile = open(fn_out, 'w', newline='')
+    fn_part = os.path.splitext(fn)
+    fn_out = fn_part[0] + "_out" + fn_part[1]
+    outfile = open(fn_out, "w", newline="")
     # Write Output
     outfilewriter = csv.writer(outfile)
     # outfilewriter.writerow(['Pt', 'Latitude', 'Longitude'])
@@ -216,15 +200,17 @@ def grid2geoio(fn):
     # Close Files
     outfile.close()
     csvfile.close()
-    return 'Output saved as ' + str(fn_out)
+    return "Output saved as " + str(fn_out)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Batch Converter of Map Grid of Australia grid co-ordinates to '
-                                                 'Geodetic Datum of Australia geographic co-ordinates. Files must '
-                                                 'be .csv and of the format Pt ID, Zone, Easting, Northing with no '
-                                                 'header line.')
-    parser.add_argument('f', metavar='--file', type=str, help='Input Filename')
+    parser = argparse.ArgumentParser(
+        description="Batch Converter of Map Grid of Australia grid co-ordinates to "
+        "Geodetic Datum of Australia geographic co-ordinates. Files must "
+        "be .csv and of the format Pt ID, Zone, Easting, Northing with no "
+        "header line."
+    )
+    parser.add_argument("f", metavar="--file", type=str, help="Input Filename")
     args = parser.parse_args()
     fn = args.f
 

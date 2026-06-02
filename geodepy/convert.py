@@ -5,40 +5,41 @@ Geoscience Australia - Python Geodesy Package
 Convert Module
 """
 
-from math import sin, cos, atan2, radians, degrees, sqrt, cosh, sinh, tan, atan, log
 import datetime
 import warnings
-from geodepy.constants import utm, isg, grs80, ans
+from math import atan, atan2, cos, cosh, degrees, log, radians, sin, sinh, sqrt, tan
+
 from geodepy.angles import (
-    DECAngle,
-    HPAngle,
-    GONAngle,
-    DMSAngle,
     DDMAngle,
-    dec2hp,
-    dec2hpa,
+    DECAngle,
+    DMSAngle,
+    GONAngle,
+    HPAngle,
+    angular_typecheck,
+    dd2sec,
+    dec2ddm,
+    dec2dms,
     dec2gon,
     dec2gona,
-    dec2dms,
-    dec2ddm,
-    hp2dec,
-    hp2deca,
-    hp2gon,
-    hp2gona,
-    hp2dms,
-    hp2ddm,
-    hp2rad,
-    hp2dec_v,
+    dec2hp,
+    dec2hpa,
+    gon2ddm,
     gon2dec,
     gon2deca,
+    gon2dms,
     gon2hp,
     gon2hpa,
-    gon2dms,
-    gon2ddm,
     gon2rad,
-    dd2sec,
-    angular_typecheck,
+    hp2ddm,
+    hp2dec,
+    hp2dec_v,
+    hp2deca,
+    hp2dms,
+    hp2gon,
+    hp2gona,
+    hp2rad,
 )
+from geodepy.constants import ans, grs80, isg, utm
 
 
 def polar2rect(r, theta):
@@ -65,7 +66,7 @@ def rect2polar(x, y):
 
     :param x: Rectangular Coordinate X
     :param y: Rectangular Coordinate Y
-    :return: 
+    :return:
         - Radius
         - Angle (decimal degrees)
     """
@@ -208,78 +209,44 @@ def beta_coeff(ellipsoid):
     :rtype: tuple
     """
     nval = ellipsoid.n
-    b2 = (
-        nval
-        * (
-            nval
-            * (
-                nval
-                * (
-                    nval
-                    * (
-                        nval
-                        * (nval * ((37845269 - 31777436 * nval) - 43097152) + 42865200)
-                        + 752640
-                    )
-                    - 104428800
-                )
-                + 180633600
-            )
-            - 135475200
-        )
-    ) / 270950400.0
+    b2a = (37845269 - 31777436 * nval) - 43097152
+    b2b = nval * b2a + 42865200
+    b2c = nval * b2b + 752640
+    b2d = nval * b2c - 104428800
+    b2e = nval * b2d + 180633600
+    b2f = nval * b2e - 135475200
+    b2 = nval * b2f / 270950400.0
 
-    b4 = (
-        nval**2
-        * (
-            nval
-            * (
-                nval
-                * (
-                    nval
-                    * (
-                        nval * ((-24749483 * nval - 14930208) * nval + 100683990)
-                        - 152616960
-                    )
-                    + 105719040
-                )
-                - 23224320
-            )
-            - 7257600
-        )
-    ) / 348364800.0
+    b4a = (-24749483 * nval - 14930208) * nval + 100683990
+    b4b = nval * b4a - 152616960
+    b4c = nval * b4b + 105719040
+    b4d = nval * b4c - 23224320
+    b4e = nval * b4d - 7257600
+    b4 = nval**2 * b4e / 348364800.0
 
-    b6 = (
-        nval**3
-        * (
-            nval
-            * (
-                nval
-                * (nval * (nval * (232468668 * nval - 101880889) - 39205760) + 29795040)
-                + 28131840
-            )
-            - 22619520
-        )
-    ) / 638668800.0
+    b6a = 232468668 * nval - 101880889
+    b6b = nval * b6a - 39205760
+    b6c = nval * b6b + 29795040
+    b6d = nval * b6c + 28131840
+    b6e = nval * b6d - 22619520
+    b6 = nval**3 * b6e / 638668800.0
 
-    b8 = (
-        nval**4
-        * (
-            nval
-            * (nval * ((-324154477 * nval - 1433121792) * nval + 876745056) + 167270400)
-            - 208945440
-        )
-    ) / 7664025600.0
+    b8a = (-324154477 * nval - 1433121792) * nval + 876745056
+    b8b = nval * b8a + 167270400
+    b8c = nval * b8b - 208945440
+    b8 = nval**4 * b8c / 7664025600.0
 
-    b10 = (
-        nval**5 * (nval * (nval * (312227409 - 457888660 * nval) + 67920528) - 70779852)
-    ) / 2490808320.0
+    b10a = 312227409 - 457888660 * nval
+    b10b = nval * b10a + 67920528
+    b10c = nval * b10b - 70779852
+    b10 = nval**5 * b10c / 2490808320.0
 
-    b12 = (
-        nval**6 * (nval * (19841813847 * nval + 3665348512) - 3758062126)
-    ) / 116237721600.0
+    b12a = 19841813847 * nval + 3665348512
+    b12b = nval * b12a - 3758062126
+    b12 = nval**6 * b12b / 116237721600.0
 
-    b14 = (nval**7 * (1989295244 * nval - 1979471673)) / 49816166400.0
+    b14a = 1989295244 * nval - 1979471673
+    b14 = nval**7 * b14a / 49816166400.0
 
     b16 = (-191773887257 * nval**8) / 3719607091200.0
     return b2, b4, b6, b8, b10, b12, b14, b16
@@ -489,9 +456,7 @@ def grid2geo(zone, east, north, hemisphere="south", ellipsoid=grs80, prj=utm):
             raise ValueError("Invalid Zone - Zones from 1 to 60")
 
     if east < -2830000 or east > 3830000:
-        raise ValueError(
-            "Invalid Easting - Must be within" "3330km of Central Meridian"
-        )
+        raise ValueError("Invalid Easting - Must be within3330km of Central Meridian")
 
     if north < 0 or north > 10000000:
         raise ValueError("Invalid Northing - Must be between 0 and 10,000,000m")
@@ -554,9 +519,7 @@ def grid2geo(zone, east, north, hemisphere="south", ellipsoid=grs80, prj=utm):
     def f1tn(tn, ecc1, ecc1sq):
         return (
             sqrt(1 + (sigma(tn, ecc1)) ** 2) * sqrt(1 + tn**2) - sigma(tn, ecc1) * tn
-        ) * (
-            ((1 - float(ecc1sq)) * sqrt(1 + t**2)) / (1 + (1 - float(ecc1sq)) * t**2)
-        )
+        ) * (((1 - float(ecc1sq)) * sqrt(1 + t**2)) / (1 + (1 - float(ecc1sq)) * t**2))
 
     diff = 1
     t = t1

@@ -5,20 +5,20 @@ Geoscience Australia - Python Geodesy Package
 Coordinate Module
 """
 
-from geodepy.constants import Projection, utm, grs80
 from geodepy.angles import (
-    DECAngle,
-    HPAngle,
-    GONAngle,
-    DMSAngle,
     DDMAngle,
-    dec2hpa,
-    dec2gona,
-    dec2dms,
-    dec2ddm,
+    DECAngle,
+    DMSAngle,
+    GONAngle,
+    HPAngle,
     angular_typecheck,
+    dec2ddm,
+    dec2dms,
+    dec2gona,
+    dec2hpa,
 )
-from geodepy.convert import xyz2llh, llh2xyz, grid2geo, geo2grid
+from geodepy.constants import Projection, grs80, utm
+from geodepy.convert import geo2grid, grid2geo, llh2xyz, xyz2llh
 
 
 class CoordCart(object):
@@ -500,7 +500,7 @@ class CoordTM(object):
         Convert coordinates to Cartesian
 
         Note: If no ellipsoid height set, uses 0m. No N Value output
-        
+
         :param ellipsoid: geodepy.constants.Ellipsoid Object (default: grs80)
         :return: Cartesian Coordinate
         :rtype: CoordCart

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from math import radians, sin, cos, sqrt, atan2, degrees
+from math import atan2, cos, degrees, radians, sin, sqrt
+
 import numpy as np
 
 
@@ -119,7 +120,7 @@ def error_ellipse(vcv):
 def relative_error(lat, lon, var1, var2, cov12):
     """
     Function to compute relative error between two 3D stations:
-    
+
     * 2D relative error ellipse [semi-major axis, semi-minor axis, bearing]
     * 1D relative 'up' error
 
@@ -196,7 +197,7 @@ def k_val95(dof):
     120, returns k value of 1.96 and for DOF below 1, returns k value
     for DOF = 1. Coverage Factor produced using following scipy stats:
 
-    .. code:: python 
+    .. code:: python
 
         stats.t.ppf(1-0.025,dof)
 

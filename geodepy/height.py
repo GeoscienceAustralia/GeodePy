@@ -7,19 +7,21 @@
 # These allow direct access remotely using "gdal"
 # ___________________________________________________________________________#
 # Import dependencies
+import math as m
+
+import numpy as np
+from osgeo import gdal
+from scipy.interpolate import griddata
+
 import geodepy.constants as cons
 import geodepy.geodesy as gg
-from osgeo import gdal
-import numpy as np
-from scipy.interpolate import griddata
-import math as m
 
 
 # ___________________________________________________________________________#
 # Interpolation functions
 def interp_file(Lat, Long, file):
     """
-    Interpolates files at specific Latitude and Longitude. Uses files found in 
+    Interpolates files at specific Latitude and Longitude. Uses files found in
     geodepy.constants and vsicurl to access only part of file.
 
     :param Lat: Latitude in decimal degrees
@@ -98,7 +100,7 @@ def AHD_to_AVWS(Lat, Long, AHD_H):
     :param Long: Longitude in decimal degrees
     :param AHD_H: AHD height (m)
     :return: AVWS height (m)
-    """    
+    """
     # Convert to GPS
     GPS_H = AHD_H + interp_file(Lat, Long, cons.file_AG2020)  # AUSGEOID2020 file
     # Convert to AVWS
@@ -146,7 +148,7 @@ def AVWS_to_AHD(Lat, Long, AVWS_H):
     :param Long: Longitude in decimal degrees
     :param AVWS_H: AVWS height (m)
     :return: AHD height (m)
-    """   
+    """
     # Convert to GPS
     GPS_H = AVWS_H + interp_file(Lat, Long, cons.file_AVWS)  # AVWS file
     # Convert to AHD
@@ -178,7 +180,7 @@ def GPS_to_AUSGeoid98(Lat, Long, GPS_H):
     :param Long: Longitude in decimal degrees
     :param GPS_H: Ellipsoidal height (m)
     :return: AHD using AUSGeoid98 (m)
-    """  
+    """
     N = interp_file(Lat, Long, cons.file_AG98)  # AUSGEOID98 file
     AHD_H = GPS_H - N
     return [AHD_H]
@@ -192,7 +194,7 @@ def AUSGeoid98_to_GPS(Lat, Long, AHD_H):
     :param Long: Longitude in decimal degrees
     :param AHD_H: height using AUSGEOID98 (m)
     :return: Ellipsoidal height (m)
-    """ 
+    """
     N = interp_file(Lat, Long, cons.file_AG98)  # AUSGEOID98 file
     GPS_H = AHD_H + N
     return [GPS_H]
@@ -206,7 +208,7 @@ def GPS_to_AUSGeoid09(Lat, Long, GPS_H):
     :param Long: Longitude in decimal degrees
     :param AHD_H: ellipsoidal height (m)
     :return: AHD using AUSGeoid09 (m)
-    """ 
+    """
     N = interp_file(Lat, Long, cons.file_AG09)  # AUSGEOID09 file
     AHD_H = GPS_H - N
     return [AHD_H]
@@ -220,7 +222,7 @@ def AUSGeoid09_to_GPS(Lat, Long, AHD_H):
     :param Long: Longitude in decimal degrees
     :param AHD_H: AHD using AUSGEOID98 (m)
     :return: Ellipsoidal height (m)
-    """ 
+    """
     N = interp_file(Lat, Long, cons.file_AG09)  # AUSGEOID09 file
     GPS_H = AHD_H + N
     return [GPS_H]
@@ -334,7 +336,7 @@ def normal_grav(Lat, h):
 
 def mean_surface_grav(Lat_A, Long_A, H_A, Lat_B, Long_B, H_B):
     """
-    Mean surface gravity between two points. Uses anomalies, normal theoretical 
+    Mean surface gravity between two points. Uses anomalies, normal theoretical
     gravity and the Bouguer slab correction.
 
     :param Lat_A: Latitude of point A in decimal degrees
