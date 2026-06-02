@@ -3,7 +3,7 @@
 NTV2 Reader
 ===============
 
-Tihs module provides functionality to read and utilize NTV2 grid files for coordinate transformations.
+This module provides functionality to read and utilize NTV2 grid files for coordinate transformations.
 It has been adapted from Jaimie Dodd's ntv2reader.py
 
 Classes

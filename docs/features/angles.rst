@@ -70,7 +70,7 @@ All **angle classes** can be seen below:
 .. autoclass:: geodepy.angles.DDMAngle
     :members:
 
-.. _converstions:
+.. _conversions:
 
 -------------------
 
@@ -132,7 +132,7 @@ For converting **Gradians** to other formats:
 
 -------------------
 
-Other Converstion Functions:
+Other Conversion Functions:
 
 .. autofunction:: geodepy.angles.dd2sec
 

@@ -47,7 +47,7 @@ def polar2rect(r, theta):
     Converts point in polar coordinates to corresponding rectangular coordinates
 
     :param r: Radius
-    :param theta: Angle (decimal degrees) from postive y axis (north)
+    :param theta: Angle (decimal degrees) from positive y axis (north)
     :type theta: Float (decimal degrees), DMSAngle or DDMAngle
     :return: Rectangular Coordinates X, Y
 

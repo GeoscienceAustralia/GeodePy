@@ -482,7 +482,7 @@ def line_sf(
         east2 = stn2_zone1[2]
         north2 = stn2_zone1[3]
 
-    # Comute easting distances from Central Meridian
+    # Compute easting distances from Central Meridian
     eastofcm1 = east1 - projection.falseeast
     eastofcm2 = east2 - projection.falseeast
 

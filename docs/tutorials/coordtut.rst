@@ -11,7 +11,7 @@ The three different classes are:
 - :ref:`CoordGeo - Geographic Coordinates (lat, long, H) <tut/geo>`
 - :ref:`CoordTM - Transverse Mercator Coordinates (e, n, H) <tut/tm>`
 
-To learn more about these corrdinate types refer to the `GDA2020 technical manual <https://www.anzlic.gov.au/sites/default/files/files/GDA2020%20Technical%20Manual%20V1.8_published.pdf>`_.
+To learn more about these coordinate types refer to the `GDA2020 technical manual <https://www.anzlic.gov.au/sites/default/files/files/GDA2020%20Technical%20Manual%20V1.8_published.pdf>`_.
 
 Classes
 --------
@@ -21,13 +21,13 @@ Classes
 Cartesian Coordinates
 ^^^^^^^^^^^^^^^^^^^^^^
 Cartesian coordinates represent points in three dimensions (X, Y, Z), typically in an Earth-Centered, Earth-Fixed (ECEF) system. 
-In this class an "n" value can also be added representing seperation between ellipsoid and geiod.
+In this class an "n" value can also be added representing separation between ellipsoid and geiod.
 
 - **Description:** Defines a point by its distance along three perpendicular axes.
 - **Format:** ``(X, Y, Z)`` in meters.
 - **Example:** ``( -4052051.0, 4212831.0, -2545100.0 )``
 
-To initalise a cartesian coordinate class:
+To initialise a cartesian coordinate class:
 
 .. code:: python
 
@@ -43,7 +43,7 @@ Geographic coordinates express positions on the Earth's surface using latitude, 
 - **Format:** ``(latitude, longitude, height)``
 - **Example:** ``(-33.8650°, 151.2094°, 58)``
 
-To initalise a geographic coordinate class:
+To initialise a geographic coordinate class:
 
 .. code:: python
 
@@ -59,7 +59,7 @@ A projected coordinate system that maps the curved Earth onto a flat plane using
 - **Format:** ``(Zone, Easting, Northing, Height)``
 - **Example:** ``(55, 334567.89, 6254321.12, 58.2)``
 
-To initalise a transverse mercator coordinate class:
+To initialise a transverse mercator coordinate class:
 
 .. code:: python
 
@@ -78,7 +78,7 @@ First import GeodePy.
     import geodepy.coord
     import geodepy.geodesy
 
-We can now create a coordinate obect. For this example we will use a transverse mercator coordinate.
+We can now create a coordinate object. For this example we will use a transverse mercator coordinate.
 
 .. code:: python
 

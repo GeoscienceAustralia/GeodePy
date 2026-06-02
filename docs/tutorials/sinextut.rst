@@ -3,7 +3,7 @@
 Sinex Files
 ============
 
-Geodepy has the ability to read and write sinex files. Below we will explore how to 
+GeodePy has the ability to read and write SINEX files. Below we will explore how to
 read certain parts of a sinex file and ultimately how to write a new sinex file. In 
 this tutorial the sinex file "STR1AUSPOS.SNX" found in the docs folder will be used. This was 
 generated using AUSPOS.

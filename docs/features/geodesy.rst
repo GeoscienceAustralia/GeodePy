@@ -5,7 +5,7 @@ Geodesy
 
 This module includes functions for geodetic calculations.
 
-Convertions
+Conversions
 ------------
 
 .. autofunction:: geodepy.geodesy.enu2xyz

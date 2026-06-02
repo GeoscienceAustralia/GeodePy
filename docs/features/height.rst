@@ -38,7 +38,7 @@ The functions below can be used to calculate different components of gravity.
 .. autofunction:: geodepy.height.normal_correction
 .. autofunction:: geodepy.height.normal_orthometric_correction
 
-Auxilary Function
+Auxiliary Function
 -----------------
 
 Functions used to enable other functions in the module.
