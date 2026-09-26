@@ -273,7 +273,7 @@ def transform_gda2020_to_atrf2014(x, y, z, epoch_to, vcv=None):
 def ntv2_2d(ntv2_grid, lat, lon, forward_tf=True, method="bicubic"):
     """
     Performs a 2D transformation based on ntv2 grid shifts.
-    
+
     :param ntv2_grid: Ntv2Grid object (create with read_ntv2_file() function in geodepy.ntv2reader module)
     :param lat: latitude in decimal degrees
     :param lon: longitude in decimal degrees
@@ -282,6 +282,8 @@ def ntv2_2d(ntv2_grid, lat, lon, forward_tf=True, method="bicubic"):
                        - False applies the shifts in the opposite direction of the grid
     :param method: Interpolation strategy - either 'bicubic' or 'bilinear'
     :return: Transformed latitude and longitude
+    :raises ValueError: If bicubic interpolation lacks a complete 4x4 stencil
+                        in the selected subgrid. Use method='bilinear' instead.
     """
 
     # validate input data

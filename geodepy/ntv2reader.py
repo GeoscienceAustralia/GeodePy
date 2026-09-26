@@ -184,8 +184,19 @@ class SubGrid(object):
         :param start_byte: start index of subgrid
 
         :return: Four field tuple of interpolation results at point of interest.
+        :raises ValueError: If the 4x4 interpolation stencil extends outside
+                            this subgrid. Use bilinear interpolation instead.
 
         """
+
+        # Check rows and columns separately: a valid file offset can still
+        # wrap into another row or read a neighbouring subgrid's header/data.
+        num_rows = self.gs_count // num_cols
+        if not (1 <= row < num_rows - 2 and 1 <= col < num_cols - 2):
+            raise ValueError(
+                "Bicubic interpolation requires a complete 4x4 stencil within "
+                "the subgrid; use method='bilinear' near subgrid boundaries"
+            )
 
         #   |     |     |     |
         # --o-----o-----o-----o--
@@ -666,13 +677,15 @@ def read_ntv2_file(ntv2_gsb_file):
 def interpolate_ntv2(grid_object, lat, lon, method="bicubic"):
     """
     Function to interpolate Ntv2Grid objects
-    
+
     :param grid_object: Ntv2Grid object
     :param lat: latitude (decimal degrees)
     :param lon: longitude (decimal degrees)
     :param method: interpolation strategy, bicubic or bilinear
 
     :return: Tuple of four ntv2 fields
+    :raises ValueError: If bicubic interpolation lacks a complete 4x4 stencil
+                        in the selected subgrid. Use method='bilinear' instead.
     """
 
     interpolation_methods = {"bicubic", "bilinear"}
