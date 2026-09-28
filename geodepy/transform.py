@@ -273,7 +273,10 @@ def transform_gda2020_to_atrf2014(x, y, z, epoch_to, vcv=None):
 def ntv2_2d(ntv2_grid, lat, lon, forward_tf=True, method="bicubic"):
     """
     Performs a 2D transformation based on ntv2 grid shifts.
-    
+
+    Reverse transformations refine the shifts once at the estimated source
+    coordinate to reduce the error from evaluating a source grid in the target CRS.
+
     :param ntv2_grid: Ntv2Grid object (create with read_ntv2_file() function in geodepy.ntv2reader module)
     :param lat: latitude in decimal degrees
     :param lon: longitude in decimal degrees
@@ -301,6 +304,13 @@ def ntv2_2d(ntv2_grid, lat, lon, forward_tf=True, method="bicubic"):
         tf_lat = lat + shifts[0] / 3600
         tf_lon = lon - shifts[1] / 3600
     else:
+        tf_lat = lat - shifts[0] / 3600
+        tf_lon = lon + shifts[1] / 3600
+
+        # Grid shifts are defined in the source CRS, so refine the source estimate.
+        shifts = interpolate_ntv2(ntv2_grid, tf_lat, tf_lon, method=method)
+        if shifts[0] is None:
+            raise ValueError("Coordinate outside of grid extents")
         tf_lat = lat - shifts[0] / 3600
         tf_lon = lon + shifts[1] / 3600
 
