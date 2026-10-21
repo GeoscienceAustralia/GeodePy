@@ -174,7 +174,12 @@ def vincdir(lat1, lon1, azimuth1to2, ell_dist, ellipsoid=grs80):
     )
 
     # Eq. 102
-    lon2 = float(lon1) + degrees(omega)
+    # Apply the public return precision before checking the longitude range.
+    # This preserves existing endpoint labels when sub-resolution motion rounds
+    # to +/-180, rather than wrapping a value that will not be returned.
+    lon2 = round(float(lon1) + degrees(omega), 11)
+    if lon2 < -180.0 or lon2 > 180.0:
+        lon2 = (lon2 + 180.0) % 360.0 - 180.0
 
     # Calculate the Reverse Azimuth
     azimuth2to1 = (
