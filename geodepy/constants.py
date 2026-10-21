@@ -5,11 +5,33 @@ Geoscience Australia - Python Geodesy Package
 Constants Module
 """
 
-from math import sqrt
-from datetime import date
+from datetime import date, datetime, time
+from math import floor, isfinite, sqrt
 
 c_vac = 299792.458
 k_0 = 0.9996
+
+
+# Epoch conversion
+def _epoch_datetime(value):
+    """Convert a calendar date or decimal epoch to a datetime.
+
+    Decimal fractions count through the actual Gregorian calendar year:
+    2024.5 is 2024-07-02 00:00; 2025.5 is 2025-07-02 12:00.
+    The transformation's existing 365.25-day rate denominator is unchanged.
+    """
+    if type(value) == datetime:
+        return value
+    if type(value) == date:
+        return datetime.combine(value, time.min)
+    if type(value) not in (int, float) or not isfinite(value):
+        raise ValueError("epoch must be a date or finite decimal year")
+    year = floor(value)
+    if not 1 <= year <= 9998:
+        raise ValueError("decimal year outside supported calendar range")
+    start = datetime(year, 1, 1)
+    duration = datetime(year + 1, 1, 1) - start
+    return start + duration * (value - year)
 
 
 # Ellipsoid constants
@@ -237,59 +259,61 @@ class Transformation(object):
         Change the transformation epoch to a specified date. Advances all
         transformation parameters by their respective rates of change.
 
-        :param other: datetime.date object
+        :param other: datetime.date object or decimal epoch (YYYY.fraction)
         :return: transformation object with parameters and ref epoch moved to
                  the specified date
         """
-        if type(other) == date:
+        if type(other) is date and type(self.ref_epoch) is date:
+            # Preserve existing calendar-date behaviour exactly.
             timediff = (other - self.ref_epoch).days / 365.25
-
-            if type(self.tf_sd) == TransformationSD:
-                self.tf_sd.sd_tx = (
-                    self.tf_sd.sd_tx**2 + (self.tf_sd.sd_d_tx * timediff) ** 2
-                ) ** 0.5
-                self.tf_sd.sd_ty = (
-                    self.tf_sd.sd_ty**2 + (self.tf_sd.sd_d_ty * timediff) ** 2
-                ) ** 0.5
-                self.tf_sd.sd_tz = (
-                    self.tf_sd.sd_tz**2 + (self.tf_sd.sd_d_tz * timediff) ** 2
-                ) ** 0.5
-                self.tf_sd.sd_sc = (
-                    self.tf_sd.sd_sc**2 + (self.tf_sd.sd_d_sc * timediff) ** 2
-                ) ** 0.5
-                self.tf_sd.sd_rx = (
-                    self.tf_sd.sd_rx**2 + (self.tf_sd.sd_d_rx * timediff) ** 2
-                ) ** 0.5
-                self.tf_sd.sd_ry = (
-                    self.tf_sd.sd_ry**2 + (self.tf_sd.sd_d_ry * timediff) ** 2
-                ) ** 0.5
-                self.tf_sd.sd_rz = (
-                    self.tf_sd.sd_rz**2 + (self.tf_sd.sd_d_rz * timediff) ** 2
-                ) ** 0.5
-
-            return Transformation(
-                self.to_datum,
-                self.from_datum,
-                other,
-                round(self.tx + (self.d_tx * timediff), 8),
-                round(self.ty + (self.d_ty * timediff), 8),
-                round(self.tz + (self.d_tz * timediff), 8),
-                round(self.sc + (self.d_sc * timediff), 8),
-                round(self.rx + (self.d_rx * timediff), 8),
-                round(self.ry + (self.d_ry * timediff), 8),
-                round(self.rz + (self.d_rz * timediff), 8),
-                self.d_tx,
-                self.d_ty,
-                self.d_tz,
-                self.d_sc,
-                self.d_rx,
-                self.d_ry,
-                self.d_rz,
-                self.tf_sd,
-            )
         else:
-            ValueError("supports adding datetime.date objects only")
+            timediff = (
+                _epoch_datetime(other) - _epoch_datetime(self.ref_epoch)
+            ).total_seconds() / (86400 * 365.25)
 
+        if type(self.tf_sd) == TransformationSD:
+            self.tf_sd.sd_tx = (
+                self.tf_sd.sd_tx**2 + (self.tf_sd.sd_d_tx * timediff) ** 2
+            ) ** 0.5
+            self.tf_sd.sd_ty = (
+                self.tf_sd.sd_ty**2 + (self.tf_sd.sd_d_ty * timediff) ** 2
+            ) ** 0.5
+            self.tf_sd.sd_tz = (
+                self.tf_sd.sd_tz**2 + (self.tf_sd.sd_d_tz * timediff) ** 2
+            ) ** 0.5
+            self.tf_sd.sd_sc = (
+                self.tf_sd.sd_sc**2 + (self.tf_sd.sd_d_sc * timediff) ** 2
+            ) ** 0.5
+            self.tf_sd.sd_rx = (
+                self.tf_sd.sd_rx**2 + (self.tf_sd.sd_d_rx * timediff) ** 2
+            ) ** 0.5
+            self.tf_sd.sd_ry = (
+                self.tf_sd.sd_ry**2 + (self.tf_sd.sd_d_ry * timediff) ** 2
+            ) ** 0.5
+            self.tf_sd.sd_rz = (
+                self.tf_sd.sd_rz**2 + (self.tf_sd.sd_d_rz * timediff) ** 2
+            ) ** 0.5
+
+        return Transformation(
+            self.to_datum,
+            self.from_datum,
+            other,
+            round(self.tx + (self.d_tx * timediff), 8),
+            round(self.ty + (self.d_ty * timediff), 8),
+            round(self.tz + (self.d_tz * timediff), 8),
+            round(self.sc + (self.d_sc * timediff), 8),
+            round(self.rx + (self.d_rx * timediff), 8),
+            round(self.ry + (self.d_ry * timediff), 8),
+            round(self.rz + (self.d_rz * timediff), 8),
+            self.d_tx,
+            self.d_ty,
+            self.d_tz,
+            self.d_sc,
+            self.d_rx,
+            self.d_ry,
+            self.d_rz,
+            self.tf_sd,
+        )
 
 class TransformationSD(object):
     def __init__(

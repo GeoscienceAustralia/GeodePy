@@ -17,6 +17,7 @@ import numpy as np
 from geodepy.constants import (
     Transformation,
     TransformationSD,
+    _epoch_datetime,
     atrf2014_to_gda2020,
     gda94_to_gda2020,
 )
@@ -130,15 +131,15 @@ def conform14(x, y, z, to_epoch, trans, vcv=None):
     :param x: Cartesian X (m)
     :param y: Cartesian Y (m)
     :param z: Cartesian Z (m)
-    :param to_epoch: Epoch co-ordinate transformation is performed at (datetime.date Object)
+    :param to_epoch: Target epoch (datetime.date or decimal year, e.g. 2025.5)
     :param trans: Transformation Object
     :param vcv: Optional 3*3 numpy array in Cartesian units to propagate tf uncertainty
     :return: Cartesian X, Y, Z co-ordinates and vcv matrix transformed using Transformation parameters at desired epoch
     """
     if type(trans) != Transformation:
         raise ValueError("trans must be a Transformation Object")
-    if type(to_epoch) != datetime.date:
-        raise ValueError("to_epoch must be a datetime.date Object")
+    if type(to_epoch) not in (datetime.date, int, float):
+        raise ValueError("to_epoch must be a datetime.date or decimal year")
     # Calculate 7 Parameters from 14 Parameter Transformation Object
     timetrans = trans + to_epoch
 
@@ -153,24 +154,26 @@ def plate_motion_transformation(x, y, z, from_epoch, to_epoch, plate_motion, vcv
     :param x: Cartesian X (m)
     :param y: Cartesian Y (m)
     :param z: Cartesian Z (m)
-    :param from_epoch: Epoch the co-ordinate transformation is from (datetime.date Object)
-    :param to_epoch: Epoch the co-ordinate transformation is to (datetime.date Object)
+    :param from_epoch: Source epoch (datetime.date or decimal year)
+    :param to_epoch: Target epoch (datetime.date or decimal year)
     :param plate_motion: Plate motion model for transformation
     :param vcv: Optional 3*3 numpy array in Cartesian units to propagate tf uncertainty
     :return: Cartesian X, Y, Z co-ordinates and vcv matrix transformed using plate motion to desired epoch
     """
-    if type(to_epoch) != datetime.date:
-        raise ValueError("to_epoch must be a datetime.date Object")
-    if type(from_epoch) != datetime.date:
-        raise ValueError("from_epoch must be a datetime.date Object")
+    if type(to_epoch) not in (datetime.date, int, float):
+        raise ValueError("to_epoch must be a datetime.date or decimal year")
+    if type(from_epoch) not in (datetime.date, int, float):
+        raise ValueError("from_epoch must be a datetime.date or decimal year")
     if type(plate_motion) != Transformation:
         raise ValueError("plate_motion must be a Transformation Object")
 
-    #calculate number of years to be moved
-    timediff= to_epoch - from_epoch
-
-    #calculate epoch needed for plate motion
-    change_epoch = plate_motion.ref_epoch - timediff
+    # Retain exact existing day arithmetic for calendar-date inputs.
+    if type(from_epoch) is datetime.date and type(to_epoch) is datetime.date:
+        timediff = to_epoch - from_epoch
+        change_epoch = plate_motion.ref_epoch - timediff
+    else:
+        timediff = _epoch_datetime(to_epoch) - _epoch_datetime(from_epoch)
+        change_epoch = _epoch_datetime(plate_motion.ref_epoch) - timediff
 
     # Calculate 7 Parameters from 14 Parameter Transformation Object
     timetrans = plate_motion + change_epoch
