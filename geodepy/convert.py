@@ -399,8 +399,14 @@ def geo2grid(lat, lon, zone=0, ellipsoid=grs80, prj=utm):
             amgzone = int(amgzone)
             zone = int(f"{amgzone}{subzone}")
         else:
-            zone = int(
-                (float(lon) - (prj.initialcm - (1.5 * prj.zonewidth))) / prj.zonewidth
+            # Floating-point rounding at +180 (or immediately below it)
+            # can otherwise select zone 61, outside the UTM 1-60 range.
+            zone = min(
+                60,
+                int(
+                    (float(lon) - (prj.initialcm - (1.5 * prj.zonewidth)))
+                    / prj.zonewidth
+                ),
             )
     if prj == isg:
         amgzone = int(str(zone)[:2])
