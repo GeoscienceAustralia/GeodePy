@@ -498,6 +498,117 @@ def line_sf(
     return projection.cmscale * (1 + k1 * (1 + k2))
 
 
+def height_sf(
+    zone1,
+    east1,
+    north1,
+    height1,
+    zone2=None,
+    east2=None,
+    north2=None,
+    height2=None,
+    hemisphere="south",
+    ellipsoid=grs80,
+    projection=utm,
+):
+    """
+    Computes the Height Scale Factor. If two points are provided, the Height Scale
+    Factor is computed using the radius of curvature at point 1 of the normal section
+    in the direction of the azimuth between points 1 and 2
+
+    Ref: Deakin 2006, Traverse Computations on the UTM Projection for Surveys
+    of Limited Extent, pp 13
+    Ref: GDA2020 Technical Manual v1.8, Section 5.1.1 pp 51-53
+
+    Note: This function ignores the deflection of the vertical and assumes that the ellipsoid
+    normal is parallel to the geoid normal. For larger-extent or geoid-sensitive surveys, the
+    deflection of the vertical should be considered when computing the height scale factor/combined 
+    scale factor.
+
+    :param zone1: Station 1 Zone Number - 1 to 60
+    :param east1: Station 1 Easting (m, within 3330km of Central Meridian)
+    :param north1: Station 1 Northing (m, 0 to 10,000,000m)
+    :param height1: Station 1 Ellipsoid Height (m)
+    :param zone2: Station 2 Zone Number - 1 to 60
+    :param east2: Station 2 Easting (m, within 3330km of Central Meridian)
+    :param north2: Station 2 Northing (m, 0 to 10,000,000m)
+    :param height2: Station 2 Ellipsoid Height (m)
+    :param hemisphere: String - 'North' or 'South'(default)
+    :param ellipsoid: Ellipsoid Object (default GRS80)
+    :param projection: Projection Object (default Universal Transverse Mercator)
+    :return: Height Scale Factor
+    """
+    point2_args = (zone2, east2, north2, height2)
+    if any(a is not None for a in point2_args) and not all(a is not None for a in point2_args):
+        raise ValueError("zone2, east2, north2 and height2 must all be provided for a two-point solution")
+
+    lat1, lon1 = grid2geo(zone1, east1, north1, hemisphere, ellipsoid, projection)[:2]
+    rho1 = rho(lat1, ellipsoid)
+    nu1 = nu(lat1, ellipsoid)
+
+    if zone2 is not None: # Using Radius of Curvature in the Azimuth of the Line between Points 1 & 2 - Tech Manual Formula 64
+        lat2, lon2 = grid2geo(zone2, east2, north2, hemisphere, ellipsoid, projection)[:2]
+        az1to2 = vincinv(lat1, lon1, lat2, lon2, ellipsoid)[1]
+        arc_rad = (rho1 * nu1) / ((rho1 * sin(radians(az1to2))**2) + (nu1 * cos(radians(az1to2))**2))
+        return arc_rad / (arc_rad + ((height1 + height2) / 2))
+    else: # Using Geometric Mean Radius of Curvature - Tech Manual Formula 63
+        arc_rad = sqrt(rho1 * nu1)
+        return arc_rad / (arc_rad + height1)
+
+
+def combined_sf(
+    zone1,
+    east1,
+    north1,
+    height1,
+    zone2=None,
+    east2=None,
+    north2=None,
+    height2=None,
+    hemisphere="south",
+    ellipsoid=grs80,
+    projection=utm,
+):
+    """
+    Computes the Combined Scale Factor. If two points are provided, the result is the product
+    of the Line Scale Factor and Height Factor. If one point is provided, the result is the
+    product of the Point Scale Factor and Height Factor.
+
+    Ref: Deakin 2006, Traverse Computations on the UTM Projection for Surveys
+    of Limited Extent, pp 13
+
+    Note: This function ignores the deflection of the vertical and assumes that the ellipsoid
+    normal is parallel to the geoid normal. For larger-extent or geoid-sensitive surveys, the
+    deflection of the vertical should be considered when computing the height scale factor/combined 
+    scale factor.
+
+    :param zone1: Station 1 Zone Number - 1 to 60
+    :param east1: Station 1 Easting (m, within 3330km of Central Meridian)
+    :param north1: Station 1 Northing (m, 0 to 10,000,000m)
+    :param height1: Station 1 Ellipsoid Height (m)
+    :param zone2: Station 2 Zone Number - 1 to 60
+    :param east2: Station 2 Easting (m, within 3330km of Central Meridian)
+    :param north2: Station 2 Northing (m, 0 to 10,000,000m)
+    :param height2: Station 2 Ellipsoid Height (m)
+    :param hemisphere: String - 'North' or 'South'(default)
+    :param ellipsoid: Ellipsoid Object (default GRS80)
+    :param projection: Projection Object (default Universal Transverse Mercator)
+    :return: Combined Scale Factor
+    """
+    point2_args = (zone2, east2, north2, height2)
+    if any(a is not None for a in point2_args) and not all(a is not None for a in point2_args):
+        raise ValueError("zone2, east2, north2 and height2 must all be provided for a two-point solution")
+
+    hsf = height_sf(zone1, east1, north1, height1, zone2, east2, north2, height2, hemisphere, ellipsoid, projection)
+
+    if zone2 is not None:
+        lsf = line_sf(zone1, east1, north1, zone2, east2, north2, hemisphere, ellipsoid, projection)
+        return lsf * hsf
+    else:
+        psf = grid2geo(zone1, east1, north1, hemisphere, ellipsoid, projection)[2]
+        return psf * hsf
+
+
 def rho(lat, ellipsoid=grs80):
     """
     Return the radius of curvature of the ellipsoid in the meridian plane

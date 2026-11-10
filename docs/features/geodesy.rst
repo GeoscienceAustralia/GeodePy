@@ -28,6 +28,10 @@ Other Geodetic Functions
 
 .. autofunction:: geodepy.geodesy.line_sf
 
+.. autofunction:: geodepy.geodesy.height_sf
+
+.. autofunction:: geodepy.geodesy.combined_sf
+
 .. autofunction:: geodepy.geodesy.rho
 
 .. autofunction:: geodepy.geodesy.nu
