@@ -11,7 +11,18 @@ from geodepy.convert import (
     llh2xyz,
     DMSAngle,
 )
-from geodepy.geodesy import vincinv, vincdir, vincinv_utm, vincdir_utm, enu2xyz, xyz2enu
+from geodepy.geodesy import (
+    vincinv,
+    vincdir,
+    vincinv_utm,
+    vincdir_utm,
+    enu2xyz,
+    xyz2enu,
+    height_sf,
+    combined_sf,
+    rho,
+    nu,
+)
 
 
 class TestGeodesy(unittest.TestCase):
@@ -262,6 +273,98 @@ class TestGeodesy(unittest.TestCase):
             test_pairs["long2"], vincdir_result[:, 1], decimal=8
         )
         np.testing.assert_almost_equal(vincinv_result[:, 2], vincdir_result[:, 2])
+
+    # Worked example from Deakin 2006, Traverse Computation on the UTM
+    # Projection for Surveys of Limited Extent, Steeles Road traverse
+    # (pp 16-18). Coordinates are MGA Zone 55; Reduced Levels (RL's, AHD
+    # heights) are from the diagram on page 16, and converted to ellipsoidal
+    # heights using h = AHD height + N with an average geoid-ellipsoid
+    # separation N = 6 m (Step 6, "say 6 m (nearest metre)").
+    N_VALUE = 6
+    STATIONS = {
+        "PM32": (55, 233624.855, 5848077.325, 525),
+        "PT_A": (55, 234085, 5847363, 520),
+        "PT_B": (55, 233971, 5846869, 500),
+        "PT_C": (55, 234622, 5846238, 480),
+        "PT_D": (55, 235474, 5846317, 460),
+        "PM47": (55, 235549.870, 5845514.270, 480),
+    }
+
+    def _station_args(self, name):
+        zone, east, north, rl = self.STATIONS[name]
+        return zone, east, north, rl + self.N_VALUE
+
+    def test_height_sf(self):
+        # (station1, station2, expected Height Scale Factor) from the
+        # paper's Step 6 table
+        lines = (
+            ("PM32", "PT_A", 0.9999171),
+            ("PT_A", "PT_B", 0.9999190),
+            ("PT_B", "PT_C", 0.9999221),
+            ("PT_C", "PT_D", 0.9999253),
+            ("PT_D", "PM47", 0.9999253),
+        )
+        for station1, station2, expected_hsf in lines:
+            with self.subTest(station1=station1, station2=station2):
+                zone1, east1, north1, height1 = self._station_args(station1)
+                zone2, east2, north2, height2 = self._station_args(station2)
+                hsf = height_sf(
+                    zone1, east1, north1, height1, zone2, east2, north2, height2
+                )
+                self.assertAlmostEqual(hsf, expected_hsf, 6)
+
+        # Single point solution: not covered by a worked example in Deakin
+        # 2006 (all of its examples are line-based), so this is instead
+        # checked for self-consistency against the Height Scale Factor
+        # formula (R = sqrt(rho * nu), HSF = R / (R + h)) documented in both
+        # Deakin 2006 Eq. 11 and GDA2020 Technical Manual v1.8 Eq. 63,
+        # computed independently here using the module's rho() and nu()
+        zone1, east1, north1, height1 = self._station_args("PM32")
+        lat1 = grid2geo(zone1, east1, north1)[0]
+        r = (rho(lat1) * nu(lat1)) ** 0.5
+        expected_hsf = r / (r + height1)
+        self.assertAlmostEqual(
+            height_sf(zone1, east1, north1, height1), expected_hsf, 9
+        )
+
+    def test_height_sf_requires_all_point2_args(self):
+        pm32 = self._station_args("PM32")
+        with self.assertRaises(ValueError):
+            height_sf(*pm32, zone2=55, east2=234085)
+
+    def test_combined_sf(self):
+        # (station1, station2, expected Combined Scale Factor) from the
+        # paper's Step 6 table
+        lines = (
+            ("PM32", "PT_A", 1.0003897),
+            ("PT_A", "PT_B", 1.0003904),
+            ("PT_B", "PT_C", 1.0003918),
+            ("PT_C", "PT_D", 1.0003901),
+            ("PT_D", "PM47", 1.0003871),
+        )
+        for station1, station2, expected_csf in lines:
+            with self.subTest(station1=station1, station2=station2):
+                zone1, east1, north1, height1 = self._station_args(station1)
+                zone2, east2, north2, height2 = self._station_args(station2)
+                csf = combined_sf(
+                    zone1, east1, north1, height1, zone2, east2, north2, height2
+                )
+                self.assertAlmostEqual(csf, expected_csf, 6)
+
+        # Single point solution: no published worked example exists in
+        # Deakin 2006, so this checks self-consistency against Point Scale
+        # Factor x Height Scale Factor using grid2geo() and height_sf()
+        zone1, east1, north1, height1 = self._station_args("PM32")
+        psf1 = grid2geo(zone1, east1, north1)[2]
+        expected_csf = psf1 * height_sf(zone1, east1, north1, height1)
+        self.assertAlmostEqual(
+            combined_sf(zone1, east1, north1, height1), expected_csf, 9
+        )
+
+    def test_combined_sf_requires_all_point2_args(self):
+        pm32 = self._station_args("PM32")
+        with self.assertRaises(ValueError):
+            combined_sf(*pm32, zone2=55, east2=234085)
 
     def test_vincinv_edgecases(self):
         lat1 = -32.153892
