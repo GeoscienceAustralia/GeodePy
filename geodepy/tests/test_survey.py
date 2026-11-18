@@ -90,13 +90,18 @@ class TestSurveyConvert(unittest.TestCase):
         self.assertAlmostEqual(test3[2], 0.266796, 5)
         self.assertAlmostEqual(test3[3], 14.277089, 5)
         test4 = va_conv(264.70444444444445, 3.25, 1.4)
-        self.assertAlmostEqual(test4[0], 27.71315483945665, 14)
-        self.assertAlmostEqual(test4[1], 3.65546, 5)
+        self.assertAlmostEqual(test4[0], 18.77427044113138, 14)
+        self.assertAlmostEqual(test4[1], 3.41799, 5)
         self.assertAlmostEqual(test4[2], 3.23613, 5)
-        self.assertAlmostEqual(test4[3], 1.69995, 5)
+        self.assertAlmostEqual(test4[3], 1.10005, 5)
         with self.assertRaises(ValueError):
             va_conv(-3.62, 1.5)
             va_conv("brian", 16)
+
+    def test_va_conv_opposite_faces(self):
+        for left, right in ((60, 300), (90, 270), (120, 240)):
+            with self.subTest(left=left, right=right):
+                self.assertEqual(va_conv(left, 10), va_conv(right, 10))
 
     def test_precise_inst_ht(self):
         va1 = 99.50920833333333
