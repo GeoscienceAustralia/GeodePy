@@ -448,7 +448,9 @@ def geo2grid(lat, lon, zone=0, ellipsoid=grs80, prj=utm):
         north = prj.cmscale * y + falsenorth
 
     # Point Scale Factor and Grid Convergence
-    psf, grid_conv = psfandgridconv(xi1, eta1, degrees(lat), lon, cm, conf_lat)
+    psf, grid_conv = psfandgridconv(
+        xi1, eta1, degrees(lat), lon, cm, conf_lat, ellipsoid, prj
+    )
 
     return (
         hemisphere,
@@ -583,7 +585,9 @@ def grid2geo(zone, east, north, hemisphere="south", ellipsoid=grs80, prj=utm):
     long = cm + long_diff
 
     # Point Scale Factor and Grid Convergence
-    psf, grid_conv = psfandgridconv(xi1, eta1, lat, long, cm, conf_lat)
+    psf, grid_conv = psfandgridconv(
+        xi1, eta1, lat, long, cm, conf_lat, ellipsoid, prj
+    )
 
     return (
         hemisign * round(lat, 11),

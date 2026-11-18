@@ -136,6 +136,16 @@ class TestConvert(unittest.TestCase):
             decimal=3,
         )
 
+    def test_isg_scale_and_convergence(self):
+        # ANNA from the ISG fixtures. Reference factors from PROJ (ESRI:102078),
+        # with the opposite sign convention for grid convergence.
+        forward = geo2grid(-32.786387375840, 152.085197007870, ellipsoid=ans, prj=isg)
+        inverse = grid2geo(562, 214306.617, 1370776.835, ellipsoid=ans, prj=isg)
+        for result in (forward, inverse):
+            with self.subTest(result=result):
+                self.assertAlmostEqual(result[-2], 1.00003051, 8)
+                self.assertAlmostEqual(result[-1], -0.495403765, 8)
+
     def test_llh2xyz(self):
 
         # Test of single point
