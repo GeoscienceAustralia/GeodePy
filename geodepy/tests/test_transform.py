@@ -1,5 +1,7 @@
 import unittest
 
+import numpy as np
+
 from geodepy.transform import (
     conform7,
     conform14,
@@ -29,6 +31,19 @@ class TestTransforms(unittest.TestCase):
         assert abs(alic_gda1994_comp[0] - alic_gda1994[0]) < 5e-5
         assert abs(alic_gda1994_comp[1] - alic_gda1994[1]) < 5e-5
         assert abs(alic_gda1994_comp[2] - alic_gda1994[2]) < 5e-5
+
+    def test_conform7_covariance(self):
+        # ALIC coordinates from the GDA2020 Technical Manual, section 3.1.1.
+        alic_gda1994 = (-4052051.7643, 4212836.2017, -2545106.0245)
+        _, _, _, covariance = conform7(
+            *alic_gda1994, gda94_to_gda2020, vcv=np.eye(3) * 1e-4
+        )
+        expected = [
+            [1.007199e-4, -1.221569e-7, 7.888910e-8],
+            [-1.221569e-7, 1.006026e-4, -7.672700e-8],
+            [7.888910e-8, -7.672700e-8, 1.006438e-4],
+        ]
+        np.testing.assert_allclose(covariance, expected, rtol=1e-6, atol=0)
 
     def test_conform14(self):
         # Replication of tests in GDA2020 Tech Manual v1.2 - Sect 3.3.1
