@@ -234,7 +234,7 @@ def va_conv(zenith_angle, slope_dist, height_inst=0, height_tgt=0):
         elif 0 < zenith_angle < 180:
             zenith_angle = radians(90 - zenith_angle)
         elif 180 < zenith_angle < 360:
-            zenith_angle = radians(270 - zenith_angle)
+            zenith_angle = radians(zenith_angle - 270)
         else:
             raise ValueError
     except ValueError:
