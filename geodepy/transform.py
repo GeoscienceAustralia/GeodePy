@@ -95,17 +95,15 @@ def conform7(x, y, z, trans, vcv=None):
         j_mat[2, 2] = scale
 
         # XYZ rotated
-        j_mat[0, 3] = rot_xyz[0]
-        j_mat[1, 3] = rot_xyz[1]
-        j_mat[2, 3] = rot_xyz[2]
+        j_mat[:, 3] = rot_xyz[:, 0]
 
         # scaled XYZ
-        j_mat[0, 5] = -scale * xyz_before[2]
-        j_mat[0, 6] = scale * xyz_before[1]
-        j_mat[1, 4] = scale * xyz_before[2]
-        j_mat[1, 6] = -scale * xyz_before[0]
-        j_mat[2, 4] = -scale * xyz_before[1]
-        j_mat[2, 5] = scale * xyz_before[0]
+        j_mat[0, 5] = -scale * xyz_before[2, 0]
+        j_mat[0, 6] = scale * xyz_before[1, 0]
+        j_mat[1, 4] = scale * xyz_before[2, 0]
+        j_mat[1, 6] = -scale * xyz_before[0, 0]
+        j_mat[2, 4] = -scale * xyz_before[1, 0]
+        j_mat[2, 5] = scale * xyz_before[0, 0]
 
         # Identity
         j_mat[0, 7] = 1
