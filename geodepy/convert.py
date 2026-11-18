@@ -485,7 +485,7 @@ def grid2geo(zone, east, north, hemisphere="south", ellipsoid=grs80, prj=utm):
                 "Invalid Zone - Choose from 541, 542, 543, 551, 552, 553, 561, 562, 563, 572"
             )
     else:
-        if zone < 0 or zone > 60:
+        if zone < 1 or zone > 60:
             raise ValueError("Invalid Zone - Zones from 1 to 60")
 
     if east < -2830000 or east > 3830000:

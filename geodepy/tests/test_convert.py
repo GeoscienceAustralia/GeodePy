@@ -298,17 +298,19 @@ class TestConvert(unittest.TestCase):
         with self.assertRaises(ValueError):
             grid2geo(-1, 0, 500000)
         with self.assertRaises(ValueError):
+            grid2geo(0, 500000, 0, "North")
+        with self.assertRaises(ValueError):
             grid2geo(61, 0, 500000)
         with self.assertRaises(ValueError):
-            grid2geo(0, -2830001, 500000)
+            grid2geo(1, -2830001, 500000)
         with self.assertRaises(ValueError):
-            grid2geo(0, 3830001, 500000)
+            grid2geo(1, 3830001, 500000)
         with self.assertRaises(ValueError):
-            grid2geo(0, 0, -1)
+            grid2geo(1, 0, -1)
         with self.assertRaises(ValueError):
-            grid2geo(0, 0, 10000001)
+            grid2geo(1, 0, 10000001)
         with self.assertRaises(ValueError):
-            grid2geo(0, 0, 500000, "fail")
+            grid2geo(1, 0, 500000, "fail")
         # test ValueError raised if not a valid ISG zone
         with self.assertRaises(ValueError):
             grid2geo(zone=530, east=300000, north=1500000, ellipsoid=ans, prj=isg)
