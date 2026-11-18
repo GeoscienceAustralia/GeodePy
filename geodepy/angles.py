@@ -31,7 +31,7 @@ e.g. HPAngle(value).dec()
 
 """
 
-from math import radians
+from math import inf, radians
 
 
 class DECAngle(float):
@@ -571,6 +571,14 @@ class GONAngle(object):
         return gon2ddm(self.gon_angle)
 
 
+def _round_with_carry(value, n):
+    rounded = round(value, n)
+    if 60 <= rounded < inf:
+        carry, remainder = divmod(rounded, 60)
+        return int(carry), remainder
+    return 0, rounded
+
+
 class DMSAngle(object):
     """
     Class for working with angles in Degrees, Minutes and Seconds format
@@ -712,10 +720,9 @@ class DMSAngle(object):
             )
 
     def __round__(self, n=None):
-        if self.positive:
-            return DMSAngle(self.degree, self.minute, round(self.second, n))
-        else:
-            return -DMSAngle(self.degree, self.minute, round(self.second, n))
+        carry, second = _round_with_carry(self.second, n)
+        degree, minute = divmod(self.minute + carry, 60)
+        return DMSAngle(self.degree + degree, minute, second, positive=self.positive)
 
     def __mod__(self, other):
         return dec2dms(self.dec() % other)
@@ -931,10 +938,8 @@ class DDMAngle(object):
             return "-" + str(self.degree) + " " + str(self.minute)
 
     def __round__(self, n=None):
-        if self.positive:
-            return DDMAngle(self.degree, round(self.minute, n))
-        else:
-            return DDMAngle(-self.degree, -round(self.minute, n))
+        degree, minute = _round_with_carry(self.minute, n)
+        return DDMAngle(self.degree + degree, minute, positive=self.positive)
 
     def __mod__(self, other):
         return dec2ddm(self.dec() % other)
@@ -1035,7 +1040,6 @@ def dec2hp(dec):
     :rtype: float
     """
     minute, second = divmod(abs(dec) * 3600, 60)
-    degree, minute = divmod(minute, 60)
 
     # floating point precision is 13 places for the variable 'dec' where values
     # are between 256 and 512 degrees. Precision improves for smaller angles.
@@ -1044,6 +1048,7 @@ def dec2hp(dec):
     if round(second, 9) == 60:
         second = 0
         minute += 1
+    degree, minute = divmod(minute, 60)
 
     # to avoid precision issues with floating point operations
     # a string will be built to represent a sexagesimal number and then converted to float

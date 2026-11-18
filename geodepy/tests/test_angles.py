@@ -443,6 +443,24 @@ class TestConvert(unittest.TestCase):
             self.assertEqual(DMSAngle(ex), dms_exs[num])
             self.assertEqual(ex, str(dms_exs[num]))
 
+    def test_dms_round_carries(self):
+        for positive in (True, False):
+            for minute, expected in ((12, (0, 13, 0)), (59, (1, 0, 0))):
+                with self.subTest(positive=positive, minute=minute):
+                    angle = DMSAngle(0, minute, 59.9999, positive=positive)
+                    result = round(angle, 2)
+                    self.assertEqual(
+                        (result.degree, result.minute, result.second), expected
+                    )
+                    self.assertEqual(result.positive, positive)
+
+    def test_ddm_round_carries(self):
+        for positive in (True, False):
+            with self.subTest(positive=positive):
+                result = round(DDMAngle(0, 59.9999, positive=positive), 2)
+                self.assertEqual((result.degree, result.minute), (1, 0))
+                self.assertEqual(result.positive, positive)
+
     def test_DDMAngle(self):
         # Test DDMAngle Methods
         for num, ex in enumerate(ddm_exs):
@@ -540,6 +558,11 @@ class TestConvert(unittest.TestCase):
             hp, dec, gon, rad = check
             self.assertAlmostEqual(hp, dec2hp(dec), 13)
             self.assertAlmostEqual(-hp, dec2hp(-dec), 13)
+
+    def test_dec2hp_carries(self):
+        for sign in (1, -1):
+            with self.subTest(sign=sign):
+                self.assertEqual(dec2hp(sign * (1 - 1e-13)), sign * 1.0)
 
     def test_dec2hpa(self):
         for num, ex in enumerate(dec_exs):
